@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://meredith2328.github.io</id>
     <title>Meredith2328的玩具箱</title>
-    <updated>2022-08-15T12:51:15.689Z</updated>
+    <updated>2022-08-15T13:24:14.678Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://meredith2328.github.io"/>
     <link rel="self" href="https://meredith2328.github.io/atom.xml"/>
@@ -10,6 +10,65 @@
     <logo>https://meredith2328.github.io/images/avatar.png</logo>
     <icon>https://meredith2328.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, Meredith2328的玩具箱</rights>
+    <entry>
+        <title type="html"><![CDATA[培养方案]]></title>
+        <id>https://meredith2328.github.io/post/pei-yang-fang-an-zi-yuan-zheng-he/</id>
+        <link href="https://meredith2328.github.io/post/pei-yang-fang-an-zi-yuan-zheng-he/">
+        </link>
+        <updated>2022-08-15T12:54:27.000Z</updated>
+        <summary type="html"><![CDATA[<p>课程名称 学分 周学时 课程代码 周学时学期安排（见培养方案）</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>课程名称 学分 周学时 课程代码 周学时学期安排（见培养方案）</p>
+<!-- more -->
+<h1 id="通识教育">通识教育</h1>
+<h1 id="大类基础">大类基础</h1>
+<p>ps. 数学分析 A、数学分析 B，高等数学 A 三组只能选一组<br>
+数学分析 AI 5 6 MATH120014 6<br>
+数学分析 AII 5 6 MATH120015 6<br>
+数学分析 BI 5 6 MATH120016 6<br>
+数学分析 BII 5 6 MATH120017 6<br>
+高等数学 A（上） 5 6 MATH120021 6<br>
+高等数学 A（下） 5 6 MATH120022 6<br>
+线性代数（理工类） 3 3 MATH120020<br>
+程序设计 4 4 COMP120006 5</p>
+<p>ps. 自然科学试验班学生必须修读第二组或第三组课程，其余课程可以跨组修读<br>
+第一组<br>
+大学物理 B（上） 4 5 PHYS120013 5<br>
+大学物理 B（下） 4 5 PHYS120014 5<br>
+电子系统导论 3 3 INFO120011 3<br>
+普通化学 A（上） 2 2<br>
+第二组<br>
+CHEM120005 2<br>
+普通化学 A（下） 2 2 CHEM120006 2<br>
+现代生物科学导论 A 3 3 BIOL120002 3<br>
+大学物理 A：力学 4 5<br>
+第三组<br>
+PHYS120016 5<br>
+大学物理 A：热学 2 3 PHYS120017 3<br>
+大学物理 A：电磁学 4 5 PHYS120018 5</p>
+<h2 id="数学分析b">数学分析B</h2>
+<h2 id="线性代数">线性代数</h2>
+<h2 id="c语言程序设计">C语言程序设计</h2>
+<h2 id="大学物理">大学物理</h2>
+<h1 id="专业核心教育">专业核心教育</h1>
+<p>高等线性代数 3 3 必修 DATA130042 3<br>
+数据结构 4 4 必修 DATA130023 4<br>
+概率论基础 3 3 必修 DATA130024 3<br>
+计算机原理 3 4 必修 DATA130025 4<br>
+数值算法与案例分析 I 3 3 必修 DATA130002 3<br>
+统计学基础：方法、原理及 R 应用 (I) 3 3 必修 DATA130005 3<br>
+数据库及实现 3 3 必修 DATA130039 4<br>
+最优化方法 3 3 必修 DATA130026 3<br>
+统计 ( 机器 ) 学习概论 3 3 必修 DATA130003 4<br>
+统计计算 3 3 必修 DATA130004 3<br>
+人工智能 3 3 必修 DATA130008 4<br>
+图像处理与可视化 3 3 必修 DATA130049 4<br>
+社会科学数据挖掘 3 3 必修 DATA130040 4<br>
+神经网络与深度学习 3 3 必修 DATA130011 3<br>
+生产实习 1 1 必修 DATA130016 1<br>
+毕业论文 6 6 必修 DATA130017 6</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[年度计划单]]></title>
         <id>https://meredith2328.github.io/post/nian-du-ji-hua-dan/</id>
