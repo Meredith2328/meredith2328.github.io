@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://meredith2328.github.io</id>
     <title>Meredith2328的玩具箱</title>
-    <updated>2022-08-15T13:24:14.678Z</updated>
+    <updated>2022-08-17T01:33:12.798Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://meredith2328.github.io"/>
     <link rel="self" href="https://meredith2328.github.io/atom.xml"/>
@@ -47,6 +47,8 @@ PHYS120016 5<br>
 大学物理 A：热学 2 3 PHYS120017 3<br>
 大学物理 A：电磁学 4 5 PHYS120018 5</p>
 <h2 id="数学分析b">数学分析B</h2>
+<h3 id="微积分">微积分</h3>
+<p>课本：Princeton Calculus</p>
 <h2 id="线性代数">线性代数</h2>
 <h2 id="c语言程序设计">C语言程序设计</h2>
 <h2 id="大学物理">大学物理</h2>
@@ -79,7 +81,10 @@ PHYS120016 5<br>
 ]]></summary>
         <content type="html"><![CDATA[<p>看看这个⑨今年在干什么？干了什么？</p>
 <!-- more -->
-<p>好！</p>
+<p><s>1. 复习高考</s> 已完成<br>
+2. 做一个一键爬迎新公告的小软件并移植到移动端<br>
+3. 学完Princeton Calculus<br>
+4. 搞定C Primer Plus在面向对象之前的内容</p>
 ]]></content>
     </entry>
     <entry>
