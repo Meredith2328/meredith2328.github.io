@@ -1,0 +1,1972 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://meredith2328.github.io</id>
+    <title>十派的玩具箱</title>
+    <updated>2024-08-30T04:44:46.432Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://meredith2328.github.io"/>
+    <link rel="self" href="https://meredith2328.github.io/atom.xml"/>
+    <subtitle>存着各种各样的不明物体</subtitle>
+    <logo>https://meredith2328.github.io/images/avatar.png</logo>
+    <icon>https://meredith2328.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2024, 十派的玩具箱</rights>
+    <entry>
+        <title type="html"><![CDATA[CS相关目录页]]></title>
+        <id>https://meredith2328.github.io/post/cs/</id>
+        <link href="https://meredith2328.github.io/post/cs/">
+        </link>
+        <updated>2024-08-30T02:00:11.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>发现CS61A的每个disc单独拆出来发，在信息量不大的情况下，还是占到了一整页。<br>
+因此尝试给已有的CS相关页面加一点相对链接~</p>
+</blockquote>
+<h1 id="csapp">CSAPP</h1>
+<p>复旦大学软件工程专业的ICS课程lab，基本与CMU原版保持一致。</p>
+<p><a href="https://meredith2328.github.io/post/csapp-shelllab/">Shelllab</a><br>
+<a href="https://meredith2328.github.io/post/csapp-cachelab/">Cachelab</a><br>
+<a href="https://meredith2328.github.io/post/csapp-attacklab/">Attacklab</a><br>
+<a href="https://meredith2328.github.io/post/csapp-bomblab/">Bomblab</a><br>
+<a href="https://meredith2328.github.io/post/csapp-datalab/">Datalab</a></p>
+<h1 id="cs61a-2024-summer">CS61A 2024 summer</h1>
+<p>只记录了Discussion(disc)部分的笔记：<br>
+因为这一部分难度适中、有东西说，相关的笔记也能推广到lab和hw部分w<br>
+更新进度：余scheme及其interpreter编写的部分，更新遥遥无期（雾）</p>
+<p><a href="https://meredith2328.github.io/post/cs61a-disc07/">disc07 树、链表</a><br>
+<a href="https://meredith2328.github.io/post/cs61a-disc05/">disc05 迭代、时空复杂度</a><br>
+<a href="https://meredith2328.github.io/post/cs61a-disc04/">disc04 树的递归</a><br>
+<a href="https://meredith2328.github.io/post/cs61a-disc03/">disc03 递归</a><br>
+<a href="https://meredith2328.github.io/post/cs61a-disc02/">disc02 高阶函数</a><br>
+<a href="https://meredith2328.github.io/post/cs61a-disc01/">disc01 “迭代与抽象”</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A disc07 树、链表]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-disc07/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-disc07/">
+        </link>
+        <updated>2024-08-30T01:57:47.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="q1-is-bst">Q1: Is BST</h2>
+<p>左子树的所有节点的值都小于等于父节点的值，<br>
+右子树的所有节点的值都大于父节点的值。</p>
+<pre><code class="language-python">def is_bst(t):
+    &quot;&quot;&quot;Returns True if the Tree t has the structure of a valid BST.
+
+    &gt;&gt;&gt; t1 = Tree(6, [Tree(2, [Tree(1), Tree(4)]), Tree(7, [Tree(7), Tree(8)])])
+    &gt;&gt;&gt; is_bst(t1)
+    True
+    &gt;&gt;&gt; t2 = Tree(8, [Tree(2, [Tree(9), Tree(1)]), Tree(3, [Tree(6)]), Tree(5)])
+    &gt;&gt;&gt; is_bst(t2)
+    False
+    &gt;&gt;&gt; t3 = Tree(6, [Tree(2, [Tree(4), Tree(1)]), Tree(7, [Tree(7), Tree(8)])])
+    &gt;&gt;&gt; is_bst(t3)
+    False
+    &gt;&gt;&gt; t4 = Tree(1, [Tree(2, [Tree(3, [Tree(4)])])])
+    &gt;&gt;&gt; is_bst(t4)
+    True
+    &gt;&gt;&gt; t5 = Tree(1, [Tree(0, [Tree(-1, [Tree(-2)])])])
+    &gt;&gt;&gt; is_bst(t5)
+    True
+    &gt;&gt;&gt; t6 = Tree(1, [Tree(4, [Tree(2, [Tree(3)])])])
+    &gt;&gt;&gt; is_bst(t6)
+    True
+    &gt;&gt;&gt; t7 = Tree(2, [Tree(1, [Tree(5)]), Tree(4)])
+    &gt;&gt;&gt; is_bst(t7)
+    False
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    def bst_max(t):
+        if t.is_leaf():
+            return t.label
+        return max(t.label, max([bst_max(b) for b in t.branches]))
+
+    def bst_min(t):
+        if t.is_leaf():
+            return t.label
+        return min(t.label, min([bst_min(b) for b in t.branches]))
+
+    if t.is_leaf():
+        return True
+    if len(t.branches) &gt; 2:
+        return False
+    elif len(t.branches) == 1:
+        branch = t.branches[0]
+        if is_bst(branch):
+            return True
+        else:
+            return False
+    else: # len(t.branches) == 2
+        l, r = t.branches
+        if bst_max(l) &lt;= t.label and t.label &lt; bst_min(r) and is_bst(l) and is_bst(r):
+            return True
+        else:
+            return False
+</code></pre>
+<h2 id="q2-prune-small">Q2: Prune Small</h2>
+<p>Solution 1</p>
+<pre><code class="language-python">def prune_small(t, n):
+    &quot;&quot;&quot;Prune the tree mutatively, keeping only the n branches
+    of each node with the smallest labels.
+
+    &gt;&gt;&gt; t1 = Tree(6)
+    &gt;&gt;&gt; prune_small(t1, 2)
+    &gt;&gt;&gt; t1
+    Tree(6)
+    &gt;&gt;&gt; t2 = Tree(6, [Tree(3), Tree(4)])
+    &gt;&gt;&gt; prune_small(t2, 1)
+    &gt;&gt;&gt; t2
+    Tree(6, [Tree(3)])
+    &gt;&gt;&gt; t3 = Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2), Tree(3)]), Tree(5, [Tree(3), Tree(4)])])
+    &gt;&gt;&gt; prune_small(t3, 2)
+    &gt;&gt;&gt; t3
+    Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])
+    &quot;&quot;&quot;
+    if t.is_leaf():
+        return
+    if len(t.branches) &gt; n:
+        t.branches = [t.branches[i] for i in range(n)] # Only n left
+    for b in t.branches:
+        prune_small(b, n)
+</code></pre>
+<p>Solution 2</p>
+<pre><code class="language-python">    while len(t.branches) &gt; n:
+        largest = max(t.branches, key=lambda x: x.label)
+        t.branches.remove(largest)
+    for b in t.branches:
+        prune_small(b, n)
+</code></pre>
+<h2 id="q3-sum-two-ways">Q3: Sum Two Ways</h2>
+<pre><code class="language-python">def sum_rec(s):
+    &quot;&quot;&quot;
+    Returns the sum of the elements in s.
+
+    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))
+    &gt;&gt;&gt; sum_rec(a)
+    14
+    &gt;&gt;&gt; sum_rec(Link.empty)
+    0
+    &quot;&quot;&quot;
+    # Use a recursive call to sum_rec
+    &quot;*** YOUR CODE HERE ***&quot;
+    if s is Link.empty:
+        return 0
+    return s.first + sum_rec(s.rest)
+
+def sum_iter(s):
+    &quot;&quot;&quot;
+    Returns the sum of the elements in s.
+
+    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))
+    &gt;&gt;&gt; sum_iter(a)
+    14
+    &gt;&gt;&gt; sum_iter(Link.empty)
+    0
+    &quot;&quot;&quot;
+    # Don't call sum_rec or sum_iter
+    &quot;*** YOUR CODE HERE ***&quot;
+    sum = 0
+    p = s
+    while p is not Link.empty:
+        sum += p.first
+        p = p.rest
+    return sum
+</code></pre>
+<h2 id="q4-overlap">Q4: Overlap</h2>
+<pre><code class="language-python">def overlap(s, t):
+    &quot;&quot;&quot;For increasing s and t, count the numbers that appear in both.
+
+    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))
+    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))
+    &gt;&gt;&gt; overlap(a, b)  # 3 and 7
+    2
+    &gt;&gt;&gt; overlap(a.rest, b)  # just 7
+    1
+    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))
+    3
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if s is Link.empty or t is Link.empty:
+        return 0
+    if s.first == t.first:
+        return 1 + overlap(s.rest, t.rest)
+    elif s.first &lt; t.first:
+        return overlap(s.rest, t)
+    else:
+        return overlap(s, t.rest)
+
+def overlap_iterative(s, t):
+    &quot;&quot;&quot;For increasing s and t, count the numbers that appear in both.
+
+    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))
+    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))
+    &gt;&gt;&gt; overlap(a, b)  # 3 and 7
+    2
+    &gt;&gt;&gt; overlap(a.rest, b)  # just 7
+    1
+    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))
+    3
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    count = 0
+    while (s is not Link.empty and t is not Link.empty):
+        if s.first == t.first:
+            count += 1
+            s, t = s.rest, t.rest
+        elif s.first &lt; t.first:
+            s = s.rest
+        else:
+            t = t.rest
+    return count
+</code></pre>
+<h2 id="q5-duplicate-link">Q5: Duplicate Link</h2>
+<pre><code class="language-python">def duplicate_link(s, val):
+    &quot;&quot;&quot;Mutates s so that each element equal to val is followed by another val.
+
+    &gt;&gt;&gt; x = Link(5, Link(4, Link(5)))
+    &gt;&gt;&gt; duplicate_link(x, 5)
+    &gt;&gt;&gt; x
+    Link(5, Link(5, Link(4, Link(5, Link(5)))))
+    &gt;&gt;&gt; y = Link(2, Link(4, Link(6, Link(8))))
+    &gt;&gt;&gt; duplicate_link(y, 10)
+    &gt;&gt;&gt; y
+    Link(2, Link(4, Link(6, Link(8))))
+    &gt;&gt;&gt; z = Link(1, Link(2, (Link(2, Link(3)))))
+    &gt;&gt;&gt; duplicate_link(z, 2) # ensures that back to back links with val are both duplicated
+    &gt;&gt;&gt; z
+    Link(1, Link(2, Link(2, Link(2, Link(2, Link(3))))))
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    p = s
+    while (p is not Link.empty):
+        if p.first == val:
+            p.rest = Link(val, p.rest)
+            p = p.rest.rest
+        else:
+            p = p.rest
+</code></pre>
+<h2 id="q6-decimal-expansion">Q6: Decimal Expansion</h2>
+<p>Hint写得很清楚，摘抄一下。</p>
+<p><strong>Hint: Approach</strong><br>
+Place the division pattern from the example above in a <code>while</code> statement:</p>
+<pre><code>&gt;&gt;&gt; q, r = 10 * n // d, 10 * n % d
+&gt;&gt;&gt; tail.rest = Link(q)
+&gt;&gt;&gt; tail = tail.rest
+&gt;&gt;&gt; n = r
+</code></pre>
+<p>While constructing the decimal expansion, store the <code>tail</code> for each <code>n</code> in a dictionary keyed by <code>n</code>. When some <code>n</code> appears a second time, instead of constructing a new <code>Link</code>, set its original link as the rest of the previous link. That will form a cycle of the appropriate length.</p>
+<pre><code class="language-python">def divide(n, d):
+    &quot;&quot;&quot;Return a linked list with a cycle containing the digits of n/d.
+
+    &gt;&gt;&gt; display(divide(5, 6))
+    0.8333333333...
+    &gt;&gt;&gt; display(divide(2, 7))
+    0.2857142857...
+    &gt;&gt;&gt; display(divide(1, 2500))
+    0.0004000000...
+    &gt;&gt;&gt; display(divide(3, 11))
+    0.2727272727...
+    &gt;&gt;&gt; display(divide(3, 99))
+    0.0303030303...
+    &gt;&gt;&gt; display(divide(2, 31), 50)
+    0.06451612903225806451612903225806451612903225806451...
+    &quot;&quot;&quot;
+    assert n &gt; 0 and n &lt; d
+    result = Link(0)  # The zero before the decimal point
+    &quot;*** YOUR CODE HERE ***&quot;
+    tail_dict = {}
+    tail = result
+    while (n not in tail_dict):
+        q, r = 10 * n // d, 10 * n % d # eg. 8, 2
+        tail.rest = Link(q)
+        tail = tail.rest
+        tail_dict[n] = tail
+        n = r
+    tail.rest = tail_dict[n]
+    return result
+
+</code></pre>
+<h2 id="hw05q6-store-digits">HW05Q6: Store Digits</h2>
+<p>（懒得再开一个HW05页了，这一道题比较经典，顺手标记一下）<br>
+经典老题，把整数的每一位作为链表的节点值构造链表。<br>
+关键是要想到：我们容易得到的是 <code>n // 10</code> 和 <code>n % 10</code>。<br>
+以<code>2345</code>举例，构造<code>2345</code>时是在已知<code>234</code>而非<code>345</code>的构造的情况下。<br>
+因此我们要做的就是在<code>234</code>构造的末尾加上一个<code>5</code>（先遍历到末尾节点、再添加），<br>
+而非在<code>345</code>的开头加上一个<code>2</code>（直接构造 <code>Link(2, 345的Link)</code>。</p>
+<pre><code class="language-python">def store_digits(n):
+    &quot;&quot;&quot;Stores the digits of a positive number n in a linked list.
+
+    &gt;&gt;&gt; s = store_digits(1)
+    &gt;&gt;&gt; s
+    Link(1)
+    &gt;&gt;&gt; store_digits(2345)
+    Link(2, Link(3, Link(4, Link(5))))
+    &gt;&gt;&gt; store_digits(876)
+    Link(8, Link(7, Link(6)))
+    &gt;&gt;&gt; store_digits(2450)
+    Link(2, Link(4, Link(5, Link(0))))
+    &gt;&gt;&gt; # a check for restricted functions
+    &gt;&gt;&gt; import inspect, re
+    &gt;&gt;&gt; cleaned = re.sub(r&quot;#.*\\n&quot;, '', re.sub(r'&quot;{3}[\s\S]*?&quot;{3}', '', inspect.getsource(store_digits)))
+    &gt;&gt;&gt; print(&quot;Do not use str or reversed!&quot;) if any([r in cleaned for r in [&quot;str&quot;, &quot;reversed&quot;]]) else None
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if n &lt; 10:
+        return Link(n)
+    before = store_digits(n // 10)
+    p = before
+    while p.rest != Link.empty:
+        p = p.rest
+    p.rest = Link(n % 10)
+    return before
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A disc05 迭代、时空复杂度]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-disc05/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-disc05/">
+        </link>
+        <updated>2024-08-30T01:57:27.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>edit time: 2024-07-24 12:19:44</p>
+</blockquote>
+<h2 id="q1-wwpd-iterators">Q1: WWPD: Iterators</h2>
+<pre><code class="language-python">&gt;&gt;&gt; s = &quot;cs61a&quot;
+&gt;&gt;&gt; s_iter = iter(s)
+&gt;&gt;&gt; next(s_iter)
+'c'
+&gt;&gt;&gt; next(s_iter)
+'s'
+&gt;&gt;&gt; list(s_iter)
+['6', '1', 'a']
+&gt;&gt;&gt; s = [[1, 2, 3, 4]]
+&gt;&gt;&gt; i = iter(s)
+&gt;&gt;&gt; j = iter(next(i))
+&gt;&gt;&gt; next(j)
+1
+&gt;&gt;&gt; s.append(5)
+&gt;&gt;&gt; next(i)
+5
+&gt;&gt;&gt; next(j)
+2
+&gt;&gt;&gt; list(j)
+[3, 4]
+&gt;&gt;&gt; next(i)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+StopIteration
+</code></pre>
+<h2 id="q2-repeated">Q2: Repeated</h2>
+<pre><code class="language-python">def repeated(t, k):
+    &quot;&quot;&quot;Return the first value in iterator t that appears k times in a row,
+    calling next on t as few times as possible.
+
+    &gt;&gt;&gt; s = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    &gt;&gt;&gt; repeated(s, 2)
+    9
+    &gt;&gt;&gt; t = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    &gt;&gt;&gt; repeated(t, 3)
+    8
+    &gt;&gt;&gt; u = iter([3, 2, 2, 2, 1, 2, 1, 4, 4, 5, 5, 5])
+    &gt;&gt;&gt; repeated(u, 3)
+    2
+    &gt;&gt;&gt; repeated(u, 3)
+    5
+    &gt;&gt;&gt; v = iter([4, 1, 6, 6, 7, 7, 8, 8, 2, 2, 2, 5])
+    &gt;&gt;&gt; repeated(v, 3)
+    2
+    &quot;&quot;&quot;
+    assert k &gt; 1
+    &quot;*** YOUR CODE HERE ***&quot;
+    count = 0
+    num = 0
+    for e in t:
+        if e != num:
+            count = 1
+            num = e
+        else:
+            count += 1
+        if count == k:
+            return num
+</code></pre>
+<h2 id="q3-something-different">Q3: Something Different</h2>
+<p>使用<code>try-except</code>块是为了在循环内调用<code>next(t)</code>足够多次、通过<code>StopIteration</code>退出循环时将其处理掉。</p>
+<pre><code class="language-python">def differences(t):
+    &quot;&quot;&quot;Yield the differences between adjacent values from iterator t.
+
+    &gt;&gt;&gt; list(differences(iter([5, 2, -100, 103])))
+    [-3, -102, 203]
+    &gt;&gt;&gt; next(differences(iter([39, 100])))
+    61
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    val = next(t)
+    try:
+        while True:
+            next_val = next(t)
+            yield next_val - val
+            val = next_val
+    except StopIteration:
+        pass
+</code></pre>
+<h2 id="q4-primes-generator">Q4: Primes Generator</h2>
+<p>用<code>for</code>还是很直接的，重点提一下用<code>yield from</code>构造生成函数的递归。</p>
+<pre><code class="language-python">def primes_gen(n):
+    &quot;&quot;&quot;Generates primes in decreasing order.
+    &gt;&gt;&gt; pg = primes_gen(7)
+    &gt;&gt;&gt; list(pg)
+    [7, 5, 3, 2]
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    for i in range(n, 1, -1):
+        if is_prime(i):
+            yield i
+</code></pre>
+<p>首先理解<code>yield from</code>，它是使用另外一个迭代器，效果类似于 <code>for item in iterable: yield item</code>。</p>
+<pre><code class="language-python">def generatorUsed():
+	yield 'Q'
+	yield 'A'
+	yield 'Q'
+
+def generatorUser():
+	yield '233'
+	yield from generatorUsed()
+</code></pre>
+<p>仅此还不够直观，不妨了解一个词语：“<strong>委派</strong>”：上述的<code>generatorUser</code>在第一次<code>__next__()</code>时产生<code>233</code>（“自己负责的”），而在后续<code>__next__()</code>时，就“交给<code>generatorUsed</code>来负责了”，<code>generatorUsed</code>负责处理后续的三次<code>__next__()</code>。<br>
+<s>おまかせ</s></p>
+<p>这件事和我们所学的<strong>过程-抽象</strong>其实是很类似的，以一道递归题目（disc03中Q3: Skip Factorial）为例：</p>
+<pre><code class="language-python">def skip_factorial(n):
+    &quot;&quot;&quot;Return the product of positive integers n * (n - 2) * (n - 4) * ...
+
+    &gt;&gt;&gt; skip_factorial(5) # 5 * 3 * 1
+    15
+    &gt;&gt;&gt; skip_factorial(8) # 8 * 6 * 4 * 2
+    384
+    &quot;&quot;&quot;
+    if n == 1 or n == 2:
+        return n
+    else:
+        return n * skip_factorial(n - 2)
+</code></pre>
+<p>它就像是本函数来负责某某情况，其他的情况处理一下之后就<strong>交给</strong> <code>skip_factorial(n - 2)</code>了。<br>
+这个“交给”正是与这一道涉及生成器的题目相同的抽象。下述是实现：</p>
+<pre><code class="language-python">def primes_gen(n):
+    &quot;&quot;&quot;Generates primes in decreasing order.
+    &gt;&gt;&gt; pg = primes_gen(7)
+    &gt;&gt;&gt; list(pg)
+    [7, 5, 3, 2]
+    &quot;&quot;&quot;
+    if n == 1:
+        return
+    if is_prime(n):
+        yield n
+    yield from primes_gen(n - 1)
+</code></pre>
+<p>上述对“交给”（委派）的阐述即是利用<code>yield from</code>构造了生成函数的递归。</p>
+<h2 id="q5-partitions">Q5: Partitions</h2>
+<p>注意这里的<code>for</code>遇到了 <code>yield</code> 时就与我们熟悉的执行顺序（一股脑全部执行完）不相同了：每次都会在<code>yield</code>那里“停一下”，直到进行下次迭代。</p>
+<pre><code class="language-python">def partition_gen(n, m):
+    &quot;&quot;&quot;Yield the partitions of n using parts up to size m.
+
+    &gt;&gt;&gt; for partition in sorted(partition_gen(6, 4)):
+    ...     print(partition)
+    1 + 1 + 1 + 1 + 1 + 1
+    1 + 1 + 1 + 1 + 2
+    1 + 1 + 1 + 3
+    1 + 1 + 2 + 2
+    1 + 1 + 4
+    1 + 2 + 3
+    2 + 2 + 2
+    2 + 4
+    3 + 3
+    &quot;&quot;&quot;
+    assert n &gt; 0 and m &gt; 0
+    if n == m:
+        yield str(m)
+    if n - m &gt; 0:
+        &quot;*** YOUR CODE HERE ***&quot;
+        # 使用m的情况: n &gt; m
+        for p in partition_gen(n - m, m):
+            yield p + ' + ' + str(m)
+    if m &gt; 1:
+        &quot;*** YOUR CODE HERE ***&quot;
+        # 不使用m的情况: 此时 n &lt; m且m &gt; 1
+        yield from partition_gen(n, m - 1)
+
+
+</code></pre>
+<h2 id="q6-bonk">Q6: Bonk</h2>
+<p><a href="https://cs61a.org/study-guide/orders-of-growth/">Study Guide: Orders of Growth | CS 61A Summer 2024</a></p>
+<blockquote>
+<p>Q6-Q8仅凭自己理解大概写的，没有系统了解 <em>Big O</em> (<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span>) 和 <em>Big Theta</em> (<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">Θ</span></span></span></span>)，可能有明显的符号使用不规范或过程中的错误，还望不吝赐教。</p>
+</blockquote>
+<ul>
+<li>Logarithmic</li>
+</ul>
+<p>记 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>n</mi><mi>k</mi><mo>(</mo><mi>i</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">bonk(i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mclose">)</span></span></span></span> 为该函数在参数为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>的执行次数，<br>
+设 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>n</mi><mi>k</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>C</mi></mrow><annotation encoding="application/x-tex">bonk(1)=C</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> ，<br>
+注意到</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>n</mi><mi>k</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mo>⌊</mo><mi>b</mi><mi>o</mi><mi>n</mi><mi>k</mi><mo>(</mo><mi>n</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo>)</mo><mo>⌋</mo></mrow><annotation encoding="application/x-tex">bonk(n)=1+ \lfloor bonk(n / 2) \rfloor
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mord">/</span><span class="mord">2</span><span class="mclose">)</span><span class="mclose">⌋</span></span></span></span></span></p>
+<p>故</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>n</mi><mi>k</mi><mo>(</mo><msup><mn>2</mn><mi>n</mi></msup><mo>)</mo><mo>=</mo><mi>n</mi><mo>×</mo><mi>C</mi></mrow><annotation encoding="application/x-tex">bonk(2^n)=n \times C
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span></span></p>
+<p>即为Logarithmic.</p>
+<h2 id="q7-boom">Q7: Boom</h2>
+<p><a href="https://cs61a.org/study-guide/orders-of-growth/">Study Guide: Orders of Growth | CS 61A Summer 2024</a></p>
+<blockquote>
+<p>Q6-Q8仅凭自己理解大概写的，没有系统了解 <em>Big O</em> (<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span>) 和 <em>Big Theta</em> (<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">Θ</span></span></span></span>)，可能有明显的符号使用不规范或过程中的错误，还望不吝赐教。</p>
+</blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">Θ</mi><mo>(</mo><msup><mi>n</mi><mn>4</mn></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">\Theta(n^4)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord">Θ</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></p>
+<p>因为是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">Θ</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo><mo>×</mo><mi mathvariant="normal">Θ</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">\Theta(n^2) \times \Theta(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord">Θ</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord">Θ</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>。</p>
+<h2 id="q8-boink">Q8: Boink</h2>
+<p><a href="https://cs61a.org/study-guide/orders-of-growth/">Study Guide: Orders of Growth | CS 61A Summer 2024</a></p>
+<blockquote>
+<p>Q6-Q8仅凭自己理解大概写的，没有系统了解 <em>Big O</em> (<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi></mrow><annotation encoding="application/x-tex">O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span></span></span></span>) 和 <em>Big Theta</em> (<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">Θ</span></span></span></span>)，可能有明显的符号使用不规范或过程中的错误，还望不吝赐教。</p>
+</blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><msup><mn>2</mn><mi>n</mi></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">O(2^n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></p>
+<p>记 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>i</mi><mi>n</mi><mi>k</mi><mo>(</mo><mi>i</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">boink(i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathdefault">i</span><span class="mclose">)</span></span></span></span> 为该函数在参数为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span>的执行次数，设 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>i</mi><mi>n</mi><mi>k</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>C</mi></mrow><annotation encoding="application/x-tex">boink(1)=C</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> ，注意到 n = k 时，执行次数为</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi><mi>o</mi><mi>i</mi><mi>n</mi><mi>k</mi><mo>(</mo><mi>k</mi><mo>)</mo><mo>=</mo><mi>b</mi><mi>o</mi><mi>i</mi><mi>n</mi><mi>k</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo>+</mo><mi>b</mi><mi>o</mi><mi>i</mi><mi>n</mi><mi>k</mi><mo>(</mo><mn>2</mn><mo>)</mo><mo>+</mo><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mi mathvariant="normal">.</mi><mo>+</mo><mi>b</mi><mi>o</mi><mi>i</mi><mi>n</mi><mi>k</mi><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo></mrow><annotation encoding="application/x-tex">boink(k) = boink(1) + boink(2) + ... + boink(k - 1)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">.</span><span class="mord">.</span><span class="mord">.</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">o</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></span></p>
+<p>上述类似于数列中的</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>S</mi><mo>(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>)</mo></mrow><annotation encoding="application/x-tex">a(n)=S(n - 1)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">a</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></span></p>
+<p>又根据前n项和的定义有</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>−</mo><mi>S</mi><mo>(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>)</mo></mrow><annotation encoding="application/x-tex">a(n)=S(n)-S(n - 1)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">a</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></span></p>
+<p>故</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mn>2</mn><mi>S</mi><mo>(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>=</mo><msup><mn>2</mn><mi>n</mi></msup><mi>S</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>C</mi><mo>×</mo><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">S(n)=2S(n-1)=2^nS(1)=C \times 2^n
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.7143919999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>则</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>S</mi><mo>(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>=</mo><mi>C</mi><mo>×</mo><msup><mn>2</mn><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">a(n)=S(n-1)=C\times2^{n-1}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">a</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.864108em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.864108em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">n</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>即为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><msup><mn>2</mn><mi>n</mi></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">O(2^n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A disc04 树的递归]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-disc04/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-disc04/">
+        </link>
+        <updated>2024-08-30T01:57:10.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>edit time: 2024-07-19 19:11:45</p>
+</blockquote>
+<h2 id="describing-the-recursive-case-in-words">describing the recursive case in words</h2>
+<p>For the following questions, don't start trying to write code right away. Instead, start by <strong>describing the recursive case in words</strong>. Some examples:</p>
+<ul>
+<li>In <code>fib</code> from lecture, the recursive case is to add together the previous two Fibonacci numbers.</li>
+<li>In <code>double_eights</code> from lab, the recursive case is to check for double eights in the rest of the number.</li>
+<li>In <code>count_partitions</code> from lecture, the recursive case is to partition <code>n-m</code> using parts up to size <code>m</code> <strong>and</strong> to partition <code>n</code> using parts up to size <code>m-1</code>.</li>
+</ul>
+<h2 id="q1-insect-combinatorics">Q1: Insect Combinatorics</h2>
+<p>基础情况略。<br>
+递归情况：从左下出发的路径的可能数，是第一步往上走、之后的路径的可能数 加 第一步往右走，之后的路径的可能数。</p>
+<pre><code class="language-python">def paths(m, n):
+    &quot;&quot;&quot;Return the number of paths from one corner of an
+    M by N grid to the opposite corner.
+
+    &gt;&gt;&gt; paths(2, 2)
+    2
+    &gt;&gt;&gt; paths(5, 7)
+    210
+    &gt;&gt;&gt; paths(117, 1)
+    1
+    &gt;&gt;&gt; paths(1, 157)
+    1
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if m == 1 or n == 1:
+        return 1
+    return paths(m - 1, n) + paths(m, n - 1)
+</code></pre>
+<h2 id="q2-even-weighted">Q2: Even weighted</h2>
+<p>先理解题目含义：<br>
+<code>x = [1, 2, 3, 4, 5, 6]</code>，下标从0开始，只留下标为<code>0, 2, 4</code>的三个元素即 <code>[1, 3, 5]</code> ，之后将每个元素与之前提到的偶数下标相乘，即 <code>[1 * 0, 3 * 2, 5 * 4] = [0, 6, 20]</code>。</p>
+<pre><code class="language-python">def even_weighted_loop(s):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]
+    &gt;&gt;&gt; even_weighted_loop(x)
+    [0, 6, 20]
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+
+    result = []
+    for i in range(len(s)):
+        if (i % 2 == 0):
+            result += [s[i] * i]
+    return result
+</code></pre>
+<pre><code class="language-python">def even_weighted_comprehension(s):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]
+    &gt;&gt;&gt; even_weighted_comprehension(x)
+    [0, 6, 20]
+    &quot;&quot;&quot;
+    return [s[i] * i for i in range(len(s)) if i % 2 == 0]
+</code></pre>
+<h2 id="q3-has-path">Q3: Has Path</h2>
+<p>递归情况：如果本节点值等于路径第一位，子分支中存在一个分支满足路径的剩余部分，则返回真。<br>
+硬控我好几分钟的地方是python的列表切片后如果长度为1，仍然是一个列表。令人忍俊不禁。</p>
+<pre><code class="language-python">def has_path(t, p):
+    &quot;&quot;&quot;Return whether tree t has a path from the root with labels p.
+
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; has_path(t1, [5, 6])        # This path is not from the root of t1
+    False
+    &gt;&gt;&gt; has_path(t2, [5, 6])        # This path is from the root of t2
+    True
+    &gt;&gt;&gt; has_path(t1, [3, 5])        # This path does not go to a leaf, but that's ok
+    True
+    &gt;&gt;&gt; has_path(t1, [3, 5, 6])     # This path goes to a leaf
+    True
+    &gt;&gt;&gt; has_path(t1, [3, 4, 5, 6])  # There is no path with these labels
+    False
+    &quot;&quot;&quot;
+    if p == [label(t)]:  # when len(p) is 1
+        return True
+    elif label(t) != p[0]:
+        return False
+    else:
+        &quot;*** YOUR CODE HERE ***&quot;
+        for child in branches(t):
+            if has_path(child, p[1:]):
+                return True
+        return False
+        # one line version:
+        # return True in [has_path(child, p[1:]) for child in branches(t)]
+</code></pre>
+<h2 id="q4-find-path">Q4: Find Path</h2>
+<p>不妨先抛弃题目模板，自行思考。<br>
+仍然满足上一题“子情况中存在一个满足则返回该子情况，子情况全部不满足才返回不满足”。</p>
+<pre><code class="language-python">def find_path(t, x):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; find_path(t1, 5)
+    [3, 5]
+    &gt;&gt;&gt; find_path(t1, 4)
+    [3, 4]
+    &gt;&gt;&gt; find_path(t1, 6)
+    [3, 5, 6]
+    &gt;&gt;&gt; find_path(t2, 6)
+    [5, 6]
+    &gt;&gt;&gt; print(find_path(t1, 2))
+    None
+    &quot;&quot;&quot;
+    if label(t) == x:
+        return [label(t)]
+    else:
+        for child in branches(t):
+            if find_path(child, x):
+                return [label(t)] + find_path(child, x)
+        return None
+</code></pre>
+<p>之后尝试与题目模板格式匹配：</p>
+<pre><code class="language-python">def find_path(t, x):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; find_path(t1, 5)
+    [3, 5]
+    &gt;&gt;&gt; find_path(t1, 4)
+    [3, 4]
+    &gt;&gt;&gt; find_path(t1, 6)
+    [3, 5, 6]
+    &gt;&gt;&gt; find_path(t2, 6)
+    [5, 6]
+    &gt;&gt;&gt; print(find_path(t1, 2))
+    None
+    &quot;&quot;&quot;
+    if label(t) == x:
+        return [label(t)]
+    for child in branches(t):
+        path = find_path(child, x)
+        if path:
+            return [label(t)] + path
+    return None
+</code></pre>
+<p>（当时在<code>for</code>那里的空填了<code>else</code>，想到一个 <code>path = any([find_path(child, x) for child in branches(t)])</code>，之后会麻烦亿点、而且跟<code>path</code>这个变量名不匹配，xsl）</p>
+<h2 id="q5-sprout-leaves">Q5: Sprout Leaves</h2>
+<p>注意题目要求构造<code>tree</code>，而且在<code>branches</code>里的也是<code>tree</code>。<br>
+思路很简单：<br>
+如果是叶，则构造一个标签相同、带了新叶的树返回；<br>
+如果不是叶，则构造一个标签相同、每个分支完成了<code>sprout leaves</code>（即题设要求的函数）的树返回。</p>
+<pre><code class="language-python">def sprout_leaves(t, leaves):
+    &quot;&quot;&quot;Sprout new leaves containing the labels in leaves at each leaf of
+    the original tree t and return the resulting tree.
+
+    &gt;&gt;&gt; t1 = tree(1, [tree(2), tree(3)])
+    &gt;&gt;&gt; print_tree(t1)
+    1
+      2
+      3
+    &gt;&gt;&gt; new1 = sprout_leaves(t1, [4, 5])
+    &gt;&gt;&gt; print_tree(new1)
+    1
+      2
+        4
+        5
+      3
+        4
+        5
+
+    &gt;&gt;&gt; t2 = tree(1, [tree(2, [tree(3)])])
+    &gt;&gt;&gt; print_tree(t2)
+    1
+      2
+        3
+    &gt;&gt;&gt; new2 = sprout_leaves(t2, [6, 1, 2])
+    &gt;&gt;&gt; print_tree(new2)
+    1
+      2
+        3
+          6
+          1
+          2
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if is_leaf(t):
+        return tree(label(t), [tree(val) for val in leaves])
+    return tree(label(t), [sprout_leaves(branch, leaves) for branch in branches(t)])
+</code></pre>
+<h2 id="q6-tree-deciphering">Q6: Tree Deciphering</h2>
+<p><code>result</code>的值是<code>t1</code>和<code>t2</code>中较大的那棵树的所有子分支中最小的分支的标签。<br>
+“大”与“小”通过比较<code>label(t)</code>判断。<br>
+（<code>max(s, key=f)</code> returns the item <code>x</code> in <code>s</code> for which <code>f(x)</code> is largest.<br>
+<code>max([t1, t2], key=label)</code> returns the tree with the largest label, in this case <code>t2</code>.）</p>
+<pre><code class="language-python">def tree(label, branches=[]):
+    for branch in branches:
+        assert is_tree(branch), 'branches must be trees'
+    return [label] + list(branches)
+
+def label(tree):
+    return tree[0]
+
+def branches(tree):
+    return tree[1:]
+
+def is_leaf(tree):
+    return not branches(tree)
+
+def is_tree(tree):
+    if type(tree) != list or len(tree) &lt; 1:
+        return False
+    for branch in branches(tree):
+        if not is_tree(branch):
+            return False
+    return True
+
+t2 = tree(5, [tree(6), tree(7)])
+t1 = tree(3, [tree(4), t2])
+result = label(min(branches(max([t1, t2], key=label)), key=label))
+print(result)
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A disc03 递归]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-disc03/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-disc03/">
+        </link>
+        <updated>2024-08-30T01:56:28.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>edit time: 2024-07-18 20:57:12</p>
+</blockquote>
+<p>依旧遵从disc01的<strong>案例-过程-抽象-实现</strong>的思路。</p>
+<p>为了简化本blog及之后的blog，对于部分题目，首先会省略写出实现后、代入案例检验的过程；也可能会只取一个案例做分析，其他案例请自行思考；还可能会省略从案例抽象出某些符号的观察思考过程，直接给出实现。<br>
+在分析案例时可能会尽量将案例拆分开、遵照由简单到复杂的思考过程。如果某些步骤整合后一次性给出不易理解，可以尝试自行拆分。<br>
+还请读者自行对比思考，尽量完整理解，注意掌握分析思想。如果对理解上述思路有疑惑，可以看看本blog中讲解比较详细的题目，或者之前讲解的<code>disc01</code>等。</p>
+<h2 id="q1-warm-up-recursive-multiplication">Q1: Warm Up: Recursive Multiplication</h2>
+<p>思考过程省略。</p>
+<pre><code class="language-python">def multiply(m, n):
+    &quot;&quot;&quot;Takes two positive integers and returns their product using recursion.
+    &gt;&gt;&gt; multiply(5, 3)
+    15
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    # Guarantee that m &gt;= n, to simplify recursion.
+    if m &lt; n:
+        m, n = n, m
+    if n == 1:
+        return m
+    else:
+        return m + multiply(m, n - 1)
+</code></pre>
+<h2 id="q2-swipe">Q2: Swipe</h2>
+<p>base: n &lt; 10<br>
+取案例。考虑两位数的情况：eg. <code>swipe(28)</code><br>
+将其转化为：一些操作，以及对降一阶（在这里就是位数少一位）的值执行<code>swipe</code>，一种可行操作如下：</p>
+<pre><code class="language-python">print(8)
+swipe(2)
+print(8)
+</code></pre>
+<p>注意中间一定要化用位数少一位的<code>swipe(2)</code>函数，而不是直接<code>print(2)</code>，这是为了构造递归，即从描述过程中取出某种抽象的、一般的物体；<br>
+在递归时，我们只考虑本情况和“<strong>相对低阶一点</strong>”的情况，而不考虑无关的情况。如题目给出的调用<strong>四</strong>位数，我们只考虑怎样将其转化为一些操作和调用<strong>三</strong>位数；或者从调用<strong>三</strong>位数考虑转化为一些操作和调用<strong>两</strong>位数。<br>
+将上述的<code>2</code>和<code>8</code>抽象为<code>n // 10</code>和<code>n % 10</code>，考虑一种实现如下：</p>
+<pre><code class="language-python">def swipe(n):
+    &quot;&quot;&quot;Print the digits of n, one per line, first backward then forward.
+
+    &gt;&gt;&gt; swipe(2837)
+    7
+    3
+    8
+    2
+    8
+    3
+    7
+    &quot;&quot;&quot;
+    if n &lt; 10:
+        print(n)
+    else:
+        &quot;*** YOUR CODE HERE ***&quot;
+        print(n % 10)
+        swipe(n // 10)
+        print(n % 10)
+</code></pre>
+<h2 id="q3-skip-factorial">Q3: Skip Factorial</h2>
+<p>思考省略。</p>
+<pre><code class="language-python">def skip_factorial(n):
+    &quot;&quot;&quot;Return the product of positive integers n * (n - 2) * (n - 4) * ...
+
+    &gt;&gt;&gt; skip_factorial(5) # 5 * 3 * 1
+    15
+    &gt;&gt;&gt; skip_factorial(8) # 8 * 6 * 4 * 2
+    384
+    &quot;&quot;&quot;
+    if n == 1 or n == 2:
+        return n
+    else:
+        return n * skip_factorial(n - 2)
+</code></pre>
+<h2 id="q4-recursive-hailstone">Q4: Recursive Hailstone</h2>
+<p>这是第一次在递归中使用返回值计数。因为比较重要，这里多写一点。<br>
+仍然从取案例开始，从案例中整理过程，从过程中抽象，从抽象到实现。</p>
+<p><code>b = hailstone(1)</code>相对更简，取该案例分析。执行时首先打印，之后它的返回值是通过<code>return odd(1)</code>得到的，值为<code>1</code>。总结出一个命题：<code>odd(1) = 1</code> (1)。</p>
+<p>再考虑稍微复杂一点：<code>c = hailstone(2)</code>，思考经历的过程。<br>
+为了更加简化，我们可以先不考虑计数，只考虑<code>2</code>是怎么变成<code>1</code>的，以及其中经历的打印过程：<br>
+首先打印2，之后返回<code>even(2)</code>，<br>
+而<code>even(2)</code>的计算过程应当为 <code>2 // 2</code> 得到<code>1</code> ，相当于完成了与<code>2</code>相关的一步，<br>
+在<code>2</code>完成之后，要对<code>1</code>执行完全相同的操作，所以应当调用<code>hailstone(1)</code> (2)。<br>
+再考虑计数，我们利用递归的返回值而非全局变量进行计数，每执行一步返回值加一，意味着<code>even(2)</code>的返回值要在<code>hailstone(1)</code>的值基础上加一。(3)</p>
+<p>基于以上命题(1)(2)(3)，我们考虑在递归的返回值处调用相对低阶的函数。下述还把计算写到了参数中，读者当然可以在思考时拆分开，先用临时变量做计算，再将临时变量作为参数。</p>
+<pre><code class="language-python">def hailstone(n):
+    &quot;&quot;&quot;Print out the hailstone sequence starting at n, 
+    and return the number of elements in the sequence.
+    &gt;&gt;&gt; a = hailstone(10)
+    10
+    5
+    16
+    8
+    4
+    2
+    1
+    &gt;&gt;&gt; a
+    7
+    &gt;&gt;&gt; b = hailstone(1)
+    1
+    &gt;&gt;&gt; b
+    1
+    &quot;&quot;&quot;
+    print(n)
+    if n % 2 == 0:
+        return even(n)
+    else:
+        return odd(n)
+
+def even(n):
+    return 1 + hailstone(n // 2)
+
+def odd(n):
+    &quot;*** YOUR CODE HERE ***&quot;
+    if n == 1:
+        return 1
+    return 1 + hailstone(3 * n + 1)
+</code></pre>
+<h2 id="q5-count-stair-ways">Q5: Count Stair Ways</h2>
+<p>题目引导超级详细，没有其他补充。</p>
+<pre><code class="language-python">def count_stair_ways(n):
+    &quot;&quot;&quot;Returns the number of ways to climb up a flight of
+    n stairs, moving either one step or two steps at a time.
+    &gt;&gt;&gt; count_stair_ways(1)
+    1
+    &gt;&gt;&gt; count_stair_ways(2)
+    2
+    &gt;&gt;&gt; count_stair_ways(4)
+    5
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if (n == 1):
+        return 1
+    elif (n == 2):
+        return 2
+    else:
+        return count_stair_ways(n - 1) + count_stair_ways(n - 2)
+</code></pre>
+<h2 id="q6-sevens">Q6: Sevens</h2>
+<p>有一个坑点：题目给的<code>has_seven</code>函数只实现了函数中是否含<code>7</code>的判断，而题目要求还要判断是否为<code>7</code>的倍数。</p>
+<p>相比于从头到尾模拟，更适合这道题的可能是“取一个切面来模拟”。<br>
+首先假定读者已经搞清楚了<code>helper function</code>封装起来的想法：如果<code>f(i, who, direction)</code>的<code>i</code>恰好等于<code>n</code>，则此时的<code>who</code>就是我们要找的<code>who</code>。用下面的案例说明，我们不妨找找内层函数<code>f</code>返回时，各参数值为多少？</p>
+<pre><code class="language-python">    &gt;&gt;&gt; sevens(6, 5)
+    1
+    &gt;&gt;&gt; sevens(7, 5)
+    2
+    &gt;&gt;&gt; sevens(8, 5)
+    1
+</code></pre>
+<p>很明显，<code>sevens(6, 5)</code>是<code>f(6, 1, 1)</code>，<code>sevens(7, 5)</code>是<code>f(7, 2, 1)</code>，<code>sevens(8, 5)</code>是<code>f(8, 1, -1)</code>。</p>
+<p>以<code>sevens(7, 5)</code>从<code>f(6, 1, 1)</code>开始的思考过程为例：</p>
+<p>此时<code>f(6, 1, 1)</code>这几个参数不满足<code>i == n</code>，所以经过“一些过程”，下次测试（即返回）<code>f(7, 2, -1)</code>。<code>f(7, 2, -1)</code>这几个参数满足<code>i == n</code>，返回<code>who</code>。<br>
+考虑上述的“一些过程”。<code>i</code>从<code>6</code>到<code>7</code>，<code>who</code>从<code>1</code>到<code>2</code>，<code>direction</code>从<code>1</code>到<code>-1</code>。那么我们在执行<code>f(6, 1, 1)</code>的过程中，<code>who</code>是根据当前的<code>direction == 1</code>来修改的，而<code>direction</code>却是根据新的<code>(i + 1) == 7</code>来修改的，务必注意。</p>
+<pre><code class="language-python">def sevens(n, k):
+    &quot;&quot;&quot;Return the (clockwise) position of who says n among k players.
+
+    &gt;&gt;&gt; sevens(2, 5)
+    2
+    &gt;&gt;&gt; sevens(6, 5)
+    1
+    &gt;&gt;&gt; sevens(7, 5)
+    2
+    &gt;&gt;&gt; sevens(8, 5)
+    1
+    &gt;&gt;&gt; sevens(9, 5)
+    5
+    &gt;&gt;&gt; sevens(18, 5)
+    2
+    &quot;&quot;&quot;
+
+    def f(i, who, direction):
+        if i == n:
+            return who
+        &quot;*** YOUR CODE HERE ***&quot;
+        # change person
+        who = who + direction
+
+        # boundary and round
+        if who == (k + 1):
+            who = 1
+        elif who == 0:
+            who = k
+            
+        # switch direction
+        i += 1
+        if has_seven(i) or ((i % 7) == 0):
+            direction = -direction
+        return f(i, who, direction)
+
+    return f(1, 1, 1)
+
+
+def has_seven(n):
+    if n == 0:
+        return False
+    elif n % 10 == 7:
+        return True
+    else:
+        return has_seven(n // 10)
+
+</code></pre>
+<h2 id="hw02-q6-count-coins">HW02 Q6: Count Coins</h2>
+<p>hw02懒得再开新一篇，于是写到这里了。</p>
+<p>题目给出了一个案例：</p>
+<p>For example, the following sets make change for <code>15</code>:</p>
+<ul>
+<li>15 1-cent coins</li>
+<li>10 1-cent, 1 5-cent coins</li>
+<li>5 1-cent, 2 5-cent coins</li>
+<li>5 1-cent, 1 10-cent coins</li>
+<li>3 5-cent coins</li>
+<li>1 5-cent, 1 10-cent coin</li>
+</ul>
+<p>一种树状图思路如下：</p>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1724983148922.jpg" alt="" loading="lazy"></figure>
+<p>我们从上往下考虑。对于每一个金额（节点），分支上的数字是小于该金额的所有金币，并且要求下面的分支的金币面额不能大于上面的分支。则题目所示的所有情况就是从根节点（值为总金额）到叶节点（值为0）路径的总数。</p>
+<p>观察发现以下命题 <s>规则类怪谈</s> ：</p>
+<ol>
+<li>如果减到剩余的值恰为0，则计数为一。</li>
+<li>（可以合并到 1. 中，用于提升计算效率）如果用到的金币面额为1，仅有后面一直用面额为1的一种情况，计数为一。</li>
+<li>可以把单个节点连接三个、四个及以上的分支拆解成两个分支的情况，即图中的最小单元，且这两个分支用到的金额关系是较大和较小相邻的。两个分支总共的可能性是两个分支各自的可能性之和。</li>
+</ol>
+<p>从而可能的方法如下：<br>
+（以下Solution1 和 Solution 1 another implement都能跑，至于Solution 2, 3, 4, ..., 114514就交给你啦（））</p>
+<pre><code class="language-python">    # Solution 1
+
+    # def helper(remain, coin):
+    #     if coin == None:
+    #         return 0
+    #     if remain == 0:
+    #         return 1 # Sum up to total.
+    #     elif (coin &gt; remain):
+    #         return helper(remain, next_smaller_coin(coin))
+    #     else:
+    #         return helper(remain - coin, coin) + helper(remain, next_smaller_coin(coin))
+
+    # Solution 1 another implement
+    def helper(remain, coin):
+        if coin == 1:
+            return 1
+        if remain == 0:
+            return 1
+        elif remain &lt; 0:
+            return 0
+        else:
+            return helper(remain - coin, coin) + helper(remain, next_smaller_coin(coin))
+    return helper(remain = total, coin = 25)
+</code></pre>
+<p>当然，如果认真听了课，学会了 <code>count_partition</code> 那道更一般的情况，这一道题也是相似的。最终要总结出类似于以下这样的命题：</p>
+<ul>
+<li>In <code>count_partitions</code> from lecture, the recursive case is to partition <code>n-m</code> using parts up to size <code>m</code> <strong>and</strong> to partition <code>n</code> using parts up to size <code>m-1</code>. （引自 <a href="https://cs61a.org/disc/disc04/">Discussion 4 | CS 61A Summer 2024</a> ）</li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[freshdan 新生wiki项目]]></title>
+        <id>https://meredith2328.github.io/post/freshdan-xin-sheng-wiki-xiang-mu/</id>
+        <link href="https://meredith2328.github.io/post/freshdan-xin-sheng-wiki-xiang-mu/">
+        </link>
+        <updated>2024-08-26T09:26:23.000Z</updated>
+        <summary type="html"><![CDATA[<p>已发布至 <a href="https://meredith2328.github.io/fduWiki/#/">freshdan</a></p>
+]]></summary>
+        <content type="html"><![CDATA[<p>已发布至 <a href="https://meredith2328.github.io/fduWiki/#/">freshdan</a></p>
+<!-- more -->
+<p>假期内跟 <a href="https://github.com/JingYiJun">@Jingyijun</a> 老师聊天时画了这个饼，和 <a href="https://github.com/CodingMizore">某人</a> 激烈交流、以及参考了 <a href="https://github.com/Cameudis">@Cameudis</a> 老师的意见之后，终于成为一个比较完整的项目。</p>
+<p>当前涉及“怎样选课、各类课程简介、GPA介绍、搜集信息、常用资源介绍、大学与自学”共计六部分内容，基本把我能想到的比较重要的东西都涵盖到了。作为读了两遍大一的双倍小登，读大一这个事情我还是比较有经验的（雾）之后有什么其他应当写的，大概需要朋友们提提建议。</p>
+<p>对于后续完善发展，考虑过添加社团社群圈子wiki，由各社团及学生组织负责人编写自己组织的相关资料和联系信息，这样的话会比现在靠公众号、百团、口口相传的宣传效果要更好，同时也应当有助于增加人手、积极完善更新。但这个饼不是靠我自己能做的。想要多结交一些志同道合的朋友。</p>
+<p>freshdan/鲜蛋，先这样吧。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A disc02 高阶函数]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-disc02/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-disc02/">
+        </link>
+        <updated>2024-07-17T14:45:22.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://cs61a.org/disc/disc02/">Discussion 2 | CS 61A Summer 2024</a></p>
+<h2 id="q1-warm-up">Q1: Warm Up</h2>
+<p>这里的等号是数学等号，不是赋值↓</p>
+<p><code>(lambda x:3)(4)</code> = 3<br>
+<code>(lambda x:  2 * 3 * x)(5)</code> = 30</p>
+<h2 id="q2q3"><s>Q2/Q3</s></h2>
+<p>对Environment Diagram不太有兴趣，Q2和Q3就跳过了qwq</p>
+<h2 id="q4-make-keeper">Q4: Make Keeper</h2>
+<p>思路：还是符合上一次disc提到的解决问题的迭代与抽象方式。<br>
+首先取<code>make_keeper(5)(is_even)</code>，描述它的执行过程：<br>
+<code>make_keeper(5)</code>返回一个这样的函数，它的循环变量<code>i</code>从1到5递增，如果<code>cond(i)</code>，则打印<code>i</code>。<br>
+根据这个抽象，我们发现我们并不需要知道<code>cond</code>函数的具体细节，只是“用”就好了。因此，我们先描述出符合上述要求的函数，再把该函数的函数名（函数指针）作为外层函数的返回值即可。<br>
+完成函数编写之后，将已有例子代入考虑执行过程，发现是合理的。</p>
+<pre><code class="language-python">def make_keeper(n):
+    &quot;&quot;&quot;Returns a function that takes one parameter cond and prints
+    out all integers 1..i..n where calling cond(i) returns True.
+
+    &gt;&gt;&gt; def is_even(x): # Even numbers have remainder 0 when divided by 2.
+    ...     return x % 2 == 0
+    &gt;&gt;&gt; make_keeper(5)(is_even)
+    2
+    4
+    &gt;&gt;&gt; make_keeper(5)(lambda x: True)
+    1
+    2
+    3
+    4
+    5
+    &gt;&gt;&gt; make_keeper(5)(lambda x: False)  # Nothing is printed
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    def printer(cond):
+        for i in range(1, n + 1):
+            if cond(i):
+                print(i)
+    return printer
+</code></pre>
+<p>额外一点话：<br>
+这道题体现出了Python中的函数名可以作为返回值、函数参数。<br>
+Higher Order Function/高阶函数看起来很有趣。我们返回的函数作用域以内实际上可以用到内外作用域的两个变量，但我们把这两个变量拆分给两个函数分别构造。</p>
+<h2 id="q5-digit-finder">Q5: Digit Finder</h2>
+<p>先简化问题：我们不考虑<code>lambda</code>表达式，怎样构造符合题目条件的函数，将其函数名返回？</p>
+<pre><code class="language-python">def find_digit(k):
+    &quot;&quot;&quot;Returns a function that returns the kth digit of x.
+
+    &gt;&gt;&gt; find_digit(2)(3456)
+    5
+    &gt;&gt;&gt; find_digit(2)(5678)
+    7
+    &gt;&gt;&gt; find_digit(1)(10)
+    0
+    &gt;&gt;&gt; find_digit(4)(789)
+    0
+    &quot;&quot;&quot;
+    assert k &gt; 0
+    &quot;*** YOUR CODE HERE ***&quot;
+
+    def get_kth_digit(x):
+        return (x // (pow(10, k - 1))) % 10
+    return get_kth_digit
+</code></pre>
+<p>之后再根据题目将其写为<code>lambda</code>表达式，是很自然的。</p>
+<pre><code class="language-python">return lambda x : (x // (pow(10, k - 1))) % 10
+</code></pre>
+<h2 id="q6-match-maker">Q6: Match Maker</h2>
+<p>依旧将循环拆分，通过迭代抽象来完成题目目标。<br>
+我个人的习惯是先不看题目给出的函数结构、试着自己做一下。<br>
+取案例<code>match_k(2)(1010)</code>，它可能经过这样的过程：<br>
+首先取最低位<code>0</code>（<code>x % 10</code>），<br>
+取与其相差距离为 <code>2</code> 的较高位（<code>x // (pow(10, 2)) % 10</code>，<br>
+判断这两位是否相同，如不相同，返回<code>False</code>，否则令<code>x //= 10</code>，重新执行上一步，除非较高位即<code>x // (pow(10, 2)) % 10</code>为0，跳出循环，返回<code>True</code>。<br>
+再把距离换为<code>k</code>即可。<br>
+对照题目模板，恰好匹配，塔诺西。</p>
+<pre><code class="language-python">def match_k(k):
+    &quot;&quot;&quot;Returns a function that checks if digits k apart match.
+
+    &gt;&gt;&gt; match_k(2)(1010)
+    True
+    &gt;&gt;&gt; match_k(2)(2010)
+    False
+    &gt;&gt;&gt; match_k(1)(1010)
+    False
+    &gt;&gt;&gt; match_k(1)(1)
+    True
+    &gt;&gt;&gt; match_k(1)(2111111111111111)
+    False
+    &gt;&gt;&gt; match_k(3)(123123)
+    True
+    &gt;&gt;&gt; match_k(2)(123123)
+    False
+    &quot;&quot;&quot;
+    def check(x):
+        while x // (10 ** k) &gt; 0:
+            if (x % 10) != (x // (10 ** k) % 10):
+                return False
+            x //= 10
+        return True
+    return check
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>上一次disc用到的那些思想的含金量还在增加！</p>
+<p>Remember the problem-solving approach from last discussion; it works just as well for implementing higher-order functions.</p>
+<ol>
+<li>Pick an example input and corresponding output. <em>(This time it might be a function.)</em></li>
+<li>Describe a process (in English) that computes the output from the input using simple steps.</li>
+<li>Figure out what additional names you'll need to carry out this process.</li>
+<li>Implement the process in code using those additional names.</li>
+<li>Determine whether the implementation really works on your original example.</li>
+<li>Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CS61A disc01 “迭代与抽象”]]></title>
+        <id>https://meredith2328.github.io/post/cs61a-disc01/</id>
+        <link href="https://meredith2328.github.io/post/cs61a-disc01/">
+        </link>
+        <updated>2024-07-17T14:44:34.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://cs61a.org/disc/disc01/">Discussion 1 | CS 61A Summer 2024</a></p>
+<blockquote>
+<p>edit time: 2024-07-17 17:57:15</p>
+</blockquote>
+<h2 id="q1-race">Q1: Race</h2>
+<p>eg. <code>race(3, 4)</code></p>
+<p>以下先考虑前10min中构造无限循环。<br>
+第一个条件显然不符合我们的需要。<br>
+因为第二个条件是 <code>tortoise - hare</code> ，若其为负值、则仍可以继续循环。<br>
+0-4min 由于<code>y&gt;x</code>，<code>hare=my &gt; tortoise=mx</code>，不可能追上。<br>
+5-9min 此时 <code>hare=5y</code> ，<code>tortoise=mx, m = 6, ..., 10</code>，恰好追上即<code>mx=5y</code>，即<code>6x=5y, 7x=5y, 8x=5y, 9x=5y, 10x=5y</code>这五种情况。<br>
+任意选择不满足这五种情况的值即可。</p>
+<p>关于值有误的情况：举例为 <code>race(3,5)</code> ，按照上面的推理继续往后，实际是满足了 <code>25x=15y</code> 的情况，恰好不是无限循环。</p>
+<p>懒得做一般推理了qwq读者有兴趣自便咯</p>
+<h2 id="q2-fizzbuzz">Q2: Fizzbuzz</h2>
+<pre><code class="language-python">def fizzbuzz(n):
+    for i in range(1, n + 1):
+        if (i % 3 == 0):
+            if (i % 5 == 0):
+                print('fizzbuzz')
+            else:
+                print('fizz')
+        else:
+            if (i % 5 == 0):
+                print('buzz')
+            else:
+                print(i)
+</code></pre>
+<h2 id="q3-is-prime">Q3: Is Prime?</h2>
+<p>虽然这道题实现很容易，而且很可能已经在读者的长期记忆中存下来了，但不妨去跟着hint想一下这个过程。</p>
+<p>（1. Pick an example input and corresponding output.）<br>
+用 <code>n=10, return False</code> 举例，考虑详细过程 ：</p>
+<p>（2. Describe a process (in English) that computes the output from the input using simple steps.）<br>
+检测是否为素数即该正整数（下简写为数）不被 <code>1</code> 和 <code>10</code> 整除。<br>
+<code>10</code> 显然不会被大于<code>10</code>的数整除。<br>
+因此我们要考虑的是：怎样描述一个过程，以检测<code>10</code> 是否被 <code>1</code> 到 <code>10</code> 中间的这些正整数整除。<br>
+可以从小到大按顺序依次递增检测：<br>
+检测<code>10</code>是否被<code>2</code>整除，即<code>10 % 2 == 0</code> ，若满足则返回<code>False</code> ，不满足则继续检测<code>3</code>；<br>
+检测<code>10</code>是否被<code>3</code>整除，即<code>10 % 3 == 0</code> ，若满足则返回<code>False</code> ，不满足则继续检测<code>4</code>；<br>
+...<br>
+直到全部检测完毕（即检测完<code>n-1</code>）为止，返回<code>True</code>。</p>
+<p>（3. Figure out what additional names you'll need to carry out this process.）</p>
+<blockquote>
+<p>这一步最为关键。<br>
+但没有上一步的准确描述，往往不能正确地完成这一步。</p>
+</blockquote>
+<p>那么我们再做<strong>抽象</strong>：前面的步骤都有共同的结构，即检测 <code>10 % i == 0, 1 &lt; i &lt; 10</code>，若满足则返回<code>False</code> ，不满足则继续检测下一个数。<br>
+在这个抽象中，“additional name”是<code>i</code>，表示某一个特定的数。<br>
+我们可以取<code>i</code>初始为<code>2</code>，<code>i</code>的下一个数是<code>i+1</code>，这样可以覆盖到范围内所需的所有的数，达成了我们的需求。</p>
+<p>（4. Implement the process in code using those additional names.）<br>
+那么对于上面这个非常符合直觉的检测过程，<code>python</code>提供了这个循环结构对应的函数：<code>for i in range(2, n)</code>，表示<code>i</code>的范围从<code>2</code>到<code>n-1</code>依次递增。代码如下：</p>
+<pre><code class="language-python">def is_prime(n):
+	&quot;&quot;&quot;Haven't Finished.&quot;&quot;&quot;
+    for i in range(2, n):
+        if (n % i == 0):
+            return False
+    return True
+</code></pre>
+<p>（5. Determine whether the implementation really works on your original example.）<br>
+我们将<code>n=10</code>代入其中考虑，发现<code>i=2</code>时满足<code>10%2==0</code>，得到<code>False</code>符合我们判断的结果。</p>
+<p>（6. Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)）<br>
+可以尝试执行<code>is_prime(n), n = 1, 2, ..., 10</code>这样的方式，人工测试；或者通过确认无误的函数来对照检测该函数的正确性。<br>
+我们意识到（或通过测试发现）存在一个反例：<code>n=1</code>是无法满足的，但对于其他情况，我们上述的过程尚不存在反例。因此，我们考虑将<code>n=1</code>单独处理，见下。<br>
+（我认为，只有对算法过程从数学上严格证明不存在反例，才能保证算法的正确性；否则上述过程可能只能保证对测试用例有效）</p>
+<pre><code class="language-python">def is_prime(n):
+    if n == 1:
+        return False
+    for i in range(2, n):
+        if (n % i == 0):
+            return False
+    return True
+</code></pre>
+<h2 id="q4-unique-digits">Q4: Unique Digits</h2>
+<pre><code class="language-python">def unique_digits(n):
+    &quot;&quot;&quot;Return the number of unique digits in positive integer n.
+    &gt;&gt;&gt; unique_digits(8675309) # All are unique
+    7
+    &gt;&gt;&gt; unique_digits(13173131) # 1, 3, and 7
+    3
+    &gt;&gt;&gt; unique_digits(101) # 0 and 1
+    2
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    count = 0
+    for i in range(0, 10):
+        if has_digit(n, i):
+            count += 1
+    return count
+  
+def has_digit(n, k):
+    &quot;&quot;&quot;Returns whether k is a digit in n.
+    &gt;&gt;&gt; has_digit(10, 1)
+    True
+    &gt;&gt;&gt; has_digit(12, 7)
+    False
+    &quot;&quot;&quot;
+    assert k &gt;= 0 and k &lt; 10
+
+    &quot;*** YOUR CODE HERE ***&quot;
+
+    while (n &gt; 0):
+        if n % 10 == k:
+            return True
+        n //= 10
+    return False
+</code></pre>
+<p>我们当然可以用其他的算法，也可以利用已经完成的函数。</p>
+<p>这里依旧使用上一题的<code>Problem-Solving</code>思想：<br>
+考虑出一种包含基本（这里的simple含义我不是很确定：基本、简单，似乎都能说通）步骤的过程，<br>
+在这个过程中抽象出<code>additional names</code>即更一般的某个“东西”，把过程表示成对这些“东西”的操作。转化为代码，尝试引出这个过程的那个案例，再尝试其他案例，反复迭代修改过程。</p>
+<p>用在本题中，“有数字”可以考虑的判断条件是“某一位数字是否等于已知数”，那么就要考虑怎样将所查数按顺序拆分成各数字，进而引出转化为字符串、或者整除运算等方法。<br>
+整除运算是很常见的用法，可以记忆并熟练运用。</p>
+<h2 id="q5-ordered-digits">Q5: Ordered Digits</h2>
+<pre><code class="language-python">def ordered_digits(x):
+    &quot;&quot;&quot;Return True if the (base 10) digits of X&gt;0 are in non-decreasing
+    order, and False otherwise.
+    &gt;&gt;&gt; ordered_digits(5)
+    True
+    &gt;&gt;&gt; ordered_digits(11)
+    True
+    &gt;&gt;&gt; ordered_digits(127)
+    True
+    &gt;&gt;&gt; ordered_digits(1357)
+    True
+    &gt;&gt;&gt; ordered_digits(21)
+    False
+    &gt;&gt;&gt; result = ordered_digits(1375) # Return, don't print
+    &gt;&gt;&gt; result
+    False
+    &quot;&quot;&quot;
+
+    &quot;*** YOUR CODE HERE ***&quot;
+    while (x &gt; 0):
+        if (x % 10) &lt; (x // 10 % 10):
+            return False
+        x //= 10
+    return True
+</code></pre>
+<p>类似上一题的思考：<br>
+逐个判断“是否有某一位数小于它的高位数”？</p>
+<h2 id="总结">总结</h2>
+<p>很明显，Q3-Q5反映了相同的从一个具体案例，引出解决过程的描述、对该过程描述中的实体的抽象、再反过来利用抽象测试是否满足该案例，以及是否满足其他案例这样的“迭代过程”。<br>
+这个思想贯穿整个课程及教材，务必仔细体会。</p>
+<p>如下摘录相关思想的原文。</p>
+<blockquote>
+<p><strong>Problem-Solving</strong> from <a href="https://cs61a.org/disc/disc01/">Discussion 1 | CS 61A Summer 2024</a></p>
+</blockquote>
+<p>A useful approach to implementing a function is to:</p>
+<ol>
+<li>Pick an example input and corresponding output.</li>
+<li>Describe a process (in English) that computes the output from the input using simple steps.</li>
+<li>Figure out what additional names you'll need to carry out this process.</li>
+<li>Implement the process in code using those additional names.</li>
+<li>Determine whether the implementation really works on your original example.</li>
+<li>Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)</li>
+</ol>
+<p>Importantly, this approach doesn't go straight from reading a question to writing code.</p>
+<p>For example, in the <code>is_prime</code> problem below, you could:</p>
+<ol>
+<li>Pick <code>n</code> is 9 as the input and <code>False</code> as the output.</li>
+<li>Here's a process: Check that <code>9</code> (<code>n</code>) is not a multiple of any integers between 1 and <code>9</code> (<code>n</code>).</li>
+<li>Introduce <code>i</code> to represent each number between 1 and 9 (<code>n</code>).</li>
+<li>Implement <code>is_prime</code> (you get to do this part with your group).</li>
+<li>Check that <code>is_prime(9)</code> will return <code>False</code> by thinking through the execution of the code.</li>
+<li>Check that <code>is_prime(3)</code> will return <code>True</code> and <code>is_prime(1)</code> will return <code>False</code>.</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: shelllab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-shelllab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-shelllab/">
+        </link>
+        <updated>2024-06-27T05:15:58.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>待修改：当前仅仅包含了作业报告的提交内容。</p>
+</blockquote>
+<h2 id="效果">效果</h2>
+<p>以<code>test16</code>为例，其余效果相似。<br>
+<img src="https://meredith2328.github.io/post-images/1719465528078.png" alt="" loading="lazy"></p>
+<h2 id="知识整理">知识整理</h2>
+<p>根据课本，我们在编写信号处理程序时应当遵守以下规则<s>类怪谈</s>：</p>
+<blockquote>
+<ol start="0">
+<li>处理程序要尽可能简单。</li>
+<li>在处理程序中只调用异步信号安全的函数。</li>
+<li>保存和恢复 <code>errno</code>。</li>
+<li><strong>阻塞所有的信号</strong>，保护对共享<strong>全局</strong>数据结构的访问。</li>
+<li>用volatile声明全局变量。</li>
+<li>用sig_atomic_t声明标志。</li>
+</ol>
+</blockquote>
+<p>我们为了阻塞信号，提供的主要函数有：</p>
+<pre><code>/* 初始化 */
+sigset_t mask_all, mask_chld, prev_mask;
+
+Sigfillset(&amp;mask_all); // 将mask_all设置为包含所有信号的mask
+
+Sigemptyset(&amp;mask_chld); 
+Sigaddset(&amp;mask_chld, SIGCHLD); // 将mask_all设置为只包含SIGCHLD的mask
+</code></pre>
+<pre><code>/* 阻塞与取消阻塞 */
+
+// 阻塞所有信号，并将原mask存入prev_mask中
+Sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+
+// 只阻塞SIGCHLD信号
+Sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask);
+
+// 取消阻塞所有信号，恢复mask为prev_mask
+Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+</code></pre>
+<h2 id="eval">eval</h2>
+<h3 id="思路">思路</h3>
+<p>课本（中文）8.4.6节（P525）提供了不回收后台子进程的eval缺陷版本，在此之上加入信号处理：</p>
+<ol>
+<li>改变全局变量前后需要阻塞和取消阻塞全部信号，保证原子性；</li>
+<li>在使用Fork之前阻塞<code>SIGCHLD</code>，防止子进程在<code>fork</code>之后、<code>addjob</code>之前终止并被<code>handler</code>回收。同时要在子进程中取消阻塞<code>SIGCHLD</code>。</li>
+</ol>
+<p>上述两条信号处理是基于下列文档提示的。</p>
+<h3 id="关于信号处理的文档提示">关于信号处理的文档提示</h3>
+<p><strong>eval block:</strong></p>
+<blockquote>
+<p>In eval, the parent must use sigprocmask to block SIGCHLD signals before it forks the child,<br>
+and then unblock these signals, again using sigprocmask after it adds the child to the job list by calling addjob. Since children inherit the blocked vectors of their parents, the child must be sure to then unblock SIGCHLD signals before it execs the new program. The parent needs to block the SIGCHLD signals in this way in order to avoid the race condition where the child is reaped by sigchld handler (and thus removed from the job list) before the parent calls addjob.</p>
+</blockquote>
+<p><strong>process group:</strong></p>
+<blockquote>
+<p>When you run your shell from the standard Unix shell, your shell is running in the foreground process group. If your shell then creates a child process, by default that child will also be a member of the foreground process group. Since typing ctrl-c sends a SIGINT to every process in the foreground group, typing ctrl-c will send a SIGINT to your shell, as well as to every process that your shell created, which obviously isn’t correct. Here is the workaround: After the fork, but before the execve, the child process should call setpgid(0, 0), which puts the child in a new process group whose group ID is identical to the child’s PID. This ensures that there will be only one process, your shell, in the foreground process group. When you type ctrl-c, the shell should catch the resulting SIGINT and then forward it to the appropriate foreground job (or more precisely, the process group that contains the foreground job).</p>
+</blockquote>
+<h3 id="具体实现">具体实现</h3>
+<pre><code class="language-c">void eval(char *cmdline) 
+{
+    char *argv[MAXARGS];
+    char buf[MAXLINE];
+    int bg;
+    pid_t pid;
+
+    strcpy(buf, cmdline); // dest, src
+    bg = parseline(buf, argv);
+    if (argv[0] == NULL)
+        return; // Ignore empty lines
+
+    if (!builtin_cmd(argv)) { // create a new job
+        // init mask_chld = {SIGCHLD};
+        sigset_t mask_all, mask_chld, prev_mask;
+        sigfillset(&amp;mask_all);
+        sigemptyset(&amp;mask_chld);
+        sigaddset(&amp;mask_chld, SIGCHLD);
+
+        /* Fork, addjob */
+        sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask); // Block SIGCHLD, store prev_mask
+        if ((pid = fork()) == 0) { // Child runs user job
+            sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // Unblock SIGCHLD in the child
+            setpgid(0, 0); // Note: each child process must have a unique process group ID
+            if (execve(argv[0], argv, environ) &lt; 0) {
+                printf(&quot;%s: Command not found.\n&quot;, argv[0]);
+                exit(0);
+            }
+        }
+        // addjob changes the global variable &quot;pid&quot;, so block all
+        sigprocmask(SIG_BLOCK, &amp;mask_all, NULL);
+        addjob(jobs, pid, bg?BG:FG, cmdline);
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // restore prev_mask
+
+        /* printf */
+        // Before operating, block the SIGCHLD
+        sigprocmask(SIG_BLOCK, &amp;mask_chld, NULL);
+        // Parent waits for foreground job to terminate
+        if (!bg) {
+            waitfg(pid);
+        }
+        else {
+            // When doing printf, block all signals
+            sigprocmask(SIG_BLOCK, &amp;mask_all, NULL);
+            printf(&quot;[%d] (%d) %s&quot;, pid2jid(pid), pid, cmdline); // Background
+        }
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // After all operations, restore prev_mask
+    }
+    return;
+}
+</code></pre>
+<h2 id="builtin_cmd">builtin_cmd</h2>
+<h3 id="思路-2">思路</h3>
+<p>照猫画虎：课本（中文）8.4.6节。相应结构作用相当于Java语言（C语言的<code>switch</code>不能直接比较字符串）中的<code>switch</code>：</p>
+<pre><code class="language-java">switch (argv[0]){
+	case &quot;quit&quot;:
+	...
+}
+</code></pre>
+<p>注意遵守“规则”，即在使用全局变量 <code>jobs</code> 时阻塞所有信号。</p>
+<h3 id="具体实现-2">具体实现</h3>
+<pre><code class="language-c">int builtin_cmd(char **argv) 
+{
+    /* If first arg is a builtin command (quit, jobs, bg or fg), 
+     * run it and return true.
+     */ 
+    // switch(argv[0]) case &quot;quit&quot;:
+    if (!strcmp(argv[0], &quot;quit&quot;)) /* quit command */
+        exit(0);
+    if (!strcmp(argv[0], &quot;bg&quot;) || !strcmp(argv[0], &quot;fg&quot;)) {
+        /* bg or fg */
+        do_bgfg(argv);
+        return 1;
+    }
+    if (!strcmp(argv[0], &quot;jobs&quot;)) {
+        // Since we access the global variable &quot;jobs&quot;, block all signals.
+        sigset_t mask_all, prev_mask;
+        sigfillset(&amp;mask_all);
+        sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+        listjobs(jobs);
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+        return 1;
+    }
+    if (!strcmp(argv[0], &quot;&amp;&quot;)) /* Ignore singleton &amp; */
+        return 1;
+    return 0;     /* not a builtin command */
+}
+</code></pre>
+<h2 id="waitfg">waitfg</h2>
+<h3 id="思路-3">思路</h3>
+<p>参考课本8.5.7节“显式地等待信号”(P543)的相关部分，利用<code>while</code>循环和<code>sigsuspend</code>维护，直到相应前台进程终止（循环是为了保证只能因为该条件停止、而非收到<code>Ctrl-C</code>等对应的信号）时再停止等待。</p>
+<p>由于我们此处等待的<code>job</code>运行在前台，在该进程终止时，首先发出<code>SIGCHLD</code>信号给父进程，父进程此时在<code>sigsuspend</code>（相当于原子的<code>pause</code>），收到信号后，控制从<code>waitfg</code>先转移到<code>handler</code>，<code>handler</code>确认收到该信号对应终止的所有子进程（收到信号意味着至少有一个进程终止）中包含前台进程（见下<code>sigchld_handler</code>中的<code>if (job-&gt;state == FG)</code>），则在“<code>handler</code>运行结束、控制返回<code>waitfg</code>、<code>waitfg</code>的<code>pause</code>因为信号处理程序执行完毕而返回”的之后需要让<code>waitfg</code>跳出循环。因此设置了一个<code>fg_child_flag</code>变量作为循环条件，用于达成上述效果。</p>
+<h3 id="具体实现-3">具体实现</h3>
+<pre><code class="language-c">void waitfg(pid_t pid)
+{
+	sigset_t mask_empty;
+	sigemptyset(&amp;mask_empty);
+	fg_child_flag = 0;
+	while(!fg_child_flag){
+        // hang the process, until we get a signal
+		sigsuspend(&amp;mask_empty);
+	}
+}
+</code></pre>
+<h2 id="sigchld_handler">sigchld_handler</h2>
+<h3 id="课本提示">课本提示</h3>
+<blockquote>
+<p>• The waitpid, kill, fork, execve, setpgid, and sigprocmask functions will come in very handy. The WUNTRACED and WNOHANG options to waitpid will also be useful.<br>
+• When you implement your signal handlers, be sure to send SIGINT and SIGTSTP signals to the entire foreground process group, using ”-pid” instead of ”pid” in the argument to the kill function. The sdriver.pl program tests for this error.<br>
+• One of the tricky parts of the assignment is deciding on the allocation of work between the waitfg and sigchld handler functions. We recommend the following approach:<br>
+– In waitfg, use a busy loop around the sleep function.<br>
+– In sigchld handler, use exactly one call to waitpid.<br>
+While other solutions are possible, such as calling waitpid in both waitfg and sigchld handler, these can be very confusing. It is simpler to do all reaping in the handler.</p>
+</blockquote>
+<h3 id="思路-4">思路</h3>
+<p>照猫画虎：课本（中文）8.5.6节。<br>
+之后按照<code>job</code>结束状态打印相关信息。这些信息是根据<code>sdriver.pl</code>和各<code>trace</code>比对<code>tsh</code>和<code>tshref</code>的结果（记得先<code>make</code>）比较得到的。</p>
+<h3 id="具体实现-4">具体实现</h3>
+<pre><code class="language-c">void sigchld_handler(int sig) 
+{
+    int olderrno = errno, status;
+    sigset_t mask_all, prev_all;
+    pid_t pid;
+
+    sigfillset(&amp;mask_all);
+    while ((pid = waitpid(-1, &amp;status, WNOHANG | WUNTRACED)) &gt; 0) { /* Reap all zombie children */
+        sigprocmask(SIG_BLOCK, &amp;mask_all, &amp;prev_all);
+        struct job_t *job = getjobpid(jobs, pid);
+
+		if (job-&gt;state == FG){ // for waitfg
+			fg_child_flag = 1;
+		}
+
+        if (WIFEXITED(status)) { // normal exit
+            deletejob(jobs, pid);
+        }
+        else if (WIFSIGNALED(status)) { // unhandled signal exit
+            printf(&quot;Job [%d] (%d) terminated by signal %d\n&quot;, job-&gt;jid, pid, WTERMSIG(status));
+            deletejob(jobs, pid);
+        }
+        else if (WIFSTOPPED(status)) { // stopped
+            job-&gt;state = ST;
+            printf(&quot;Job [%d] (%d) stopped by signal %d\n&quot;, job-&gt;jid, pid, WSTOPSIG(status));
+        }
+        sigprocmask(SIG_SETMASK, &amp;prev_all, NULL);
+    }
+
+    errno = olderrno;
+}
+</code></pre>
+<h2 id="sigint_handler">sigint_handler</h2>
+<p>参考 <code>trace06</code> 微调输出。</p>
+<p>由于所有的终止情况都包含子进程的终止，子进程终止时会发送<code>SIGCHLD</code>给父进程，所以我们不需要额外写信息输出。</p>
+<pre><code class="language-c">void sigint_handler(int sig) 
+{
+    // to &quot;the foreground job&quot;
+    sigset_t mask_all, prev_all;
+    sigfillset(&amp;mask_all);
+    
+    sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_all);
+    int pid = fgpid(jobs); // global variable: jobs
+    sigprocmask(SIG_SETMASK, &amp;prev_all, NULL);
+
+    if (pid &gt; 0) {
+        kill(-pid, SIGINT);
+        // output is in the sigchld_handler,
+        // since when a child terminates,
+        // the kernel will send a SIGCHLD to the parent.
+    }
+}
+</code></pre>
+<h2 id="sigtstp_handler">sigtstp_handler</h2>
+<p>与<code>sigint_handler</code>基本完全相同。</p>
+<pre><code class="language-c">void sigtstp_handler(int sig) 
+{
+    // almost the same as sigint_handler
+	sigset_t mask_all, prev_mask;
+	sigfillset(&amp;mask_all);
+    
+	sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+	int pid = fgpid(jobs);
+	sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+
+	if(pid &gt; 0){
+		kill(-pid, SIGTSTP);
+	}
+}
+</code></pre>
+<h2 id="do_bgfg">do_bgfg</h2>
+<h3 id="思路-5">思路</h3>
+<p>首先获取<code>pid</code>或<code>jid</code>。从<code>builtin_cmd</code>传入的参数是<code>argv*[]</code>，<code>pid</code>或<code>jid</code>保存在<code>argv[1]</code>处，其中<code>jid</code>以<code>'%'</code>打头，可以用<code>atoi(argv[1] + 1)</code>消去该字符。</p>
+<p>在获取到<code>pid</code>或<code>jid</code>后，我们要获取需要被修改状态的进程，即根据<code>pid</code>或<code>jid</code>以及提供的相应封装函数来获取到我们需要切换<code>BG</code>或<code>FG</code>状态的<code>job</code>。</p>
+<p>在获取到<code>job</code>后，<code>bg</code>指令对应切换到<code>BG</code>状态，<code>fg</code>指令对应切换到<code>FG</code>状态并开始<code>waitfg</code>。</p>
+<h3 id="具体实现-5">具体实现</h3>
+<pre><code class="language-c">void do_bgfg(char **argv) 
+{
+    /* Block the signals */
+    sigset_t mask_all, prev_mask;
+	sigfillset(&amp;mask_all);
+	sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+    struct job_t *job;
+    int pid;
+
+    /* Match pid/jid, get a pid. */
+    char *id = argv[1];
+	if(id == NULL){ // no PID(num) or JID(%num)
+		printf(&quot;%s command requires PID or %%jobid argument\n&quot;, argv[0]);
+		return;
+	}
+    else if (id[0] == '%') {
+        int jid = atoi(id + 1); // JID, eliminate '%'
+        job = getjobjid(jobs, jid);
+        if (job == NULL) {
+            printf(&quot;%%%d: No such job\n&quot;, jid);
+			return;
+        }
+        pid = job-&gt;pid;
+    }
+    else {
+        pid = atoi(id); // PID
+        if(pid &lt;= 0){
+			printf(&quot;%s: argument must be a PID or %%jobid\n&quot;, argv[0]);
+			return;
+		}
+        job = getjobpid(jobs, pid);
+        if (job == NULL) {
+            printf(&quot;(%d): No such process\n&quot;, pid);
+			return;
+        }
+    }
+
+    /* Switch the command. */
+    if (!strcmp(argv[0], &quot;bg&quot;)) {
+        /* Change a stopped background job to a running background job. */
+        job-&gt;state = BG;
+        printf(&quot;[%d] (%d) %s&quot;, job-&gt;jid, pid, job-&gt;cmdline);
+		sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // First stop blocking
+		kill(-pid, SIGCONT); // Signal the child and its descendents
+    }
+	else if (!strcmp(argv[0], &quot;fg&quot;)){
+        /* Change a stopped or running background job to a running in the foreground. */
+		job-&gt;state = FG;
+		sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+		kill(-pid, SIGCONT);
+		waitfg(pid); // Switch to the foreground, wait.
+	}
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CSAPP: cachelab]]></title>
+        <id>https://meredith2328.github.io/post/csapp-cachelab/</id>
+        <link href="https://meredith2328.github.io/post/csapp-cachelab/">
+        </link>
+        <updated>2024-06-05T06:54:18.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>man, what can I say.jpg<br>
+<img src="https://meredith2328.github.io/post-images/1717570490815.png" alt="" loading="lazy"></p>
+</blockquote>
+<h1 id="cachelab">Cachelab</h1>
+<pre><code>python2 driver.py
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1717570680646.png" alt="" loading="lazy"></figure>
+<h2 id="phase1">phase1</h2>
+<p>一开始错理解为只有<code>S</code>指令时才保存cache，忽略了cache本来就是为了访问，所以只要有访问就应该保存cache。将这一点修改之后问题就迎刃而解了。</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1717570672450.png" alt="" loading="lazy"></figure>
+<h2 id="phase2">phase2</h2>
+<p><code>./test-trans -M 32 -N 32</code></p>
+<p>上述指令遇到了</p>
+<pre><code>Function 0 (2 total)
+Step 1: Validating and generating memory traces
+sh: 1: valgrind: not found
+Validation error at function 126! Run ./tracegen -M 32 -N 32 -F 0 for details.
+Skipping performance evaluation for this function.
+</code></pre>
+<p>这样的问题，排查确认是未安装<code>valgrind</code>，利用<code>sudo apt install valgrind</code> 就解决了。</p>
+<h3 id="32-32-关于分块利用局部性的分析">32 * 32: 关于分块利用局部性的分析</h3>
+<h4 id="缓存大小"><strong>缓存大小</strong></h4>
+<p>由于程序中<code>static A, B</code> 部分的相关定义~~（静态链接）~~，<strong>可以认为</strong><code>A</code>、<code>B</code>地址连续（中间无填充），它们对应的<code>Cache</code>的组和行的分布恰好是完全相同的（见下图）（这会造成对角线一定的Conflict Miss，见下）。</p>
+<p>缓存的利用机制如下：</p>
+<p>给出的<code>s = 5, E = 1, b = 5</code> 计算可知对应的Cache大小为<code>2^5 * 1 * 2^5 = 1024</code> Bytes。考虑到<code>int</code>类型为4 Bytes，</p>
+<p>我们对<code>A</code>和<code>B</code>使用的<code>Cache</code>有<code>S = 2^s = 2^5 = 32</code>组，每组有<code>E = 1</code>行，每行存储了<code>8 int</code>的块。</p>
+<p>不妨把这些组的唯一行编号为<code>Line 00</code> 到<code>Line 31</code>，见下图。</p>
+<h4 id="缓存过程分析为什么要分块"><strong>缓存过程分析：为什么要分块？</strong></h4>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1717570661757.png" alt="" loading="lazy"></figure>
+<p>这个图是我自己画的。形式参考自：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，非常感谢原作者的优秀思考。</p>
+<p>从开头举例，<strong>原始转置操作<code>B[j][i] = A[i][j]</code>指令经历了如下的过程：</strong></p>
+<blockquote>
+<p>读<code>A[0][0]</code>，<code>Line 00</code>中无该值，发生Cold Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[0][0]</code>，<code>Line 00</code>中无该值，且该行恰好存了<code>A[0][0]</code>到<code>A[0][7]</code> ，发生Conflict Miss和Eviction，<code>Line 00</code>换为<code>B[0][0]</code>到<code>B[0][7]</code>。（注意取出B时是<strong>行优先</strong>，虽然B是<strong>按列写</strong>的，但我们存入缓存是按内存连续、即按行存的，这是课本中提到的最重要的局部性问题的来源）</p>
+<p>读<code>A[0][1]</code>，<code>Line 00</code>中无该值（上述已<code>Eviction</code>），发生Conflict Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[1][0]</code>，<code>Line 04</code>中无该值，发生Cold Miss，将<code>B[1][0]</code>到<code>B[1][7]</code>存入<code>Line 04</code>中。</p>
+<p>读<code>A[0][2]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[2][0]</code>，<code>Line 08</code>中无该值，将<code>B[2][0]</code>到<code>B[2][7]</code>存入<code>Line 08</code>中。</p>
+<p>读<code>A[0][3]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[3][0]</code>，<code>Line 12</code>中无该值，将<code>B[3][0]</code>到<code>B[3][7]</code>存入<code>Line 12</code>中。</p>
+<p>读<code>A[0][4]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[4][0]</code>，<code>Line 16</code>中无该值，将<code>B[4][0]</code>到<code>B[4][7]</code>存入<code>Line 16</code>中。</p>
+<p>...</p>
+<p>读<code>A[0][8]</code>，<code>Line 01</code>中无该值，发生Cold Miss，将<code>A[0][8]</code>到<code>A[0][15]</code> 存入<code>Line 01</code>中。</p>
+<p>写<code>B[8][0]</code>，<code>Line 00</code>中无该值，发生Conflict Miss，将<code>B[8][0]</code>到<code>B[8][7]</code>存入<code>Line 00</code>中。</p>
+<p>...</p>
+</blockquote>
+<p>为了便于理解，我详细阐述了整个过程。利用我们小学<s>或者幼儿园</s>学到的找规律可以知道：</p>
+<ol>
+<li><code>A[i][i]</code>和<code>B[i][i]</code>会引起Conflict Miss。具体而言，写<code>B[i][i]</code>时会驱逐相同的Cache Line，导致<code>A[i][i + 1]</code>冲突不命中。（由于i = 0, 1, ..., 31，共计32次miss）（其实此处分析不完全，见下述第二次改进）</li>
+<li>A具有良好的局部性，只在每读入8个int的第一个才会发生Cold Miss，其余都是Hit。（共计128次miss）</li>
+<li>B的缓存未良好使用，每次写入都会发生Miss。（共计1024次miss）。</li>
+</ol>
+<p>求和即miss总次数为32 + 128 + 1024 - 4（上述1. 与 2.在图中标红处共计4次重复计数） = 1180。</p>
+<p>查询源码可以发现valgrind本身使用了3次miss，即得下述Function 1的misses:1183。</p>
+<h4 id="第一次改进使用8-8分块"><strong>第一次改进：使用8 * 8分块</strong></h4>
+<p>我们在理解了为什么会发生冲突之后，分块的作用就显而易见了。</p>
+<p>首先利用分块解决影响最大的问题：B按列读取，每读入8块时即驱逐之前的缓存。为了解决这个问题，我们可以考虑 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>8</mn><mo>×</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">8 \times 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span></span></span></span>​的分块，在下一次驱逐缓存行之前先完成所有缓存行的传入。</p>
+<pre><code class="language-c">void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, a, b, c, d, e, f, g, h;
+    for (i = 0; i &lt; N; i+=8) {
+        for (j = 0; j &lt; M; j+=8) {
+            // 8 * 8
+            for (int ii = i; ii &lt; i + 8; ii++) {
+                for (int jj = j; jj &lt; j + 8; jj++) {
+                    B[jj][ii] = A[ii][jj];
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>得到的结果如下Function 0：</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/1717570650830.png" alt="" loading="lazy"></figure>
+<p>相比于原始代码Function 1，已经有了极大改善。</p>
+<h4 id="第二次改进使用局部变量"><strong>第二次改进：使用局部变量</strong></h4>
+<p>之后继续修改，处理对角的conflict miss。</p>
+<p>我们在之前“可以认为”那里发现，如果我们要从<code>A[i][j]</code>转置到<code>B[i][j]</code>即转置相同坐标的元素，会必定驱逐相同的Cache Line，造成冲突不命中。那么什么时候会转置到相同坐标位置呢？显而易见，方阵对角线处，即<code>i == j</code>。</p>
+<p>但是我们按照前述计算的理论值应当为 32 + 128 + 128 = 288次，与340次（显示值misses = 343）仍然相差一定数值，说明我们的分析仍然有问题。这是为什么？</p>
+<p>我们不妨重新仔细分析 8 * 8 分块后A和B分别使用的Cache Line。对于A使用的<code>(x, y)</code> (<code>x</code>, <code>y</code> = 0, 1, 2, 3)块，它对应与B使用的<code>(y, x)</code>块，我们会发现除了<code>x == y</code>的其他情况的对应块所包含的Cache Line都不重合。因此我们大胆猜测，造成这一部分问题的是<strong>对角块冲突</strong>，而非对角线元素冲突。</p>
+<p><strong>当前转置操作经历了如下的过程：</strong></p>
+<blockquote>
+<p>读<code>A[0][0]</code>，<code>Line 00</code>中无该值，发生Cold Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[0][0]</code>，<code>Line 00</code>中无该值，且该行恰好存了<code>A[0][0]</code>到<code>A[0][7]</code> ，发生Conflict Miss和Eviction，<code>Line 00</code>换为<code>B[0][0]</code>到<code>B[0][7]</code>。</p>
+<p><strong>读<code>A[0][1]</code>，<code>Line 00</code>中无该值（上述已<code>Eviction</code>），发生Conflict Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。(1)</strong></p>
+<p>写<code>B[1][0]</code>，<code>Line 04</code>中无该值，发生Cold Miss，将<code>B[1][0]</code>到<code>B[1][7]</code>存入<code>Line 04</code>中。</p>
+<p>读<code>A[0][2]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>...</p>
+<p>读<code>A[1][0]</code>，<code>Line 04</code>中无该值，miss，<code>Line 04 := A[1][0..7]</code></p>
+<p><strong>写<code>B[0][1]</code>，<code>Line 00</code>中无该值，miss，<code>Line 00 := B[0][0..7]</code> (2)</strong></p>
+<p>读<code>A[1][1]</code>，<code>Line 04</code>中有该值，hit</p>
+<p><strong>写<code>B[1][1]</code>，<code>Line 04</code>中无该值，miss，<code>Line 04 := B[1][0..7]</code> (3)</strong></p>
+</blockquote>
+<p>我们发现之前分析到的对角线元素、即A和B同一坐标处使用相同行存取的影响分为三部分：</p>
+<ol>
+<li><code>A[i][i + 1]</code>处出现Conflict Miss （上述标号**<code>(1)</code>**），这是因为写<code>B[i][i]</code>时驱逐了<code>A[i][i + 1]</code>本应被缓存到的行。</li>
+<li><code>B[i][i + 1]</code>处出现Conflict Miss（上述标号**<code>(2)</code>**），这是因为写<code>B[i][i + 1]</code>时本应使用上一部分提到的写<code>B[i][i]</code>缓存的行，但它被上一部分读<code>A[i][i + 1]</code>时驱逐了。</li>
+<li><code>B[i][i]</code>处出现Conflict Miss（上述标号**<code>(3)</code>**），这是因为我们在写<code>B[i][i]</code>之前一定会先读<code>A[i][i]</code>导致驱逐。</li>
+</ol>
+<p>上述1、2可以归类为<strong>对角块冲突</strong>造成的影响 <s>相爱相杀</s> ，而3可以归类为<strong>对角线元素冲突</strong>造成的影响。</p>
+<p>由这三部分影响、连同无法避免的Cold Miss造成的所有miss对应A、B矩阵见下两图：</p>
+<p><img src="https://meredith2328.github.io/post-images/1717570641850.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1717570634679.png" alt="" loading="lazy"></p>
+<p>图片来源：<a href="https://d-sketon.top/20211015/csapp-cachelab/">CSAPP - CacheLab (d-sketon.top)</a></p>
+<p>为了规避上述由对角块造成的1、2问题，我们考虑利用题目所给的共计12个局部变量。对于每一个 8 * 8 分块，可以将<code>A[i][i..(i + 7)]</code>存入8个临时变量中，利用临时变量而非Cache进行转置。</p>
+<p>这样虽然似乎与Cache本身的意义有少许矛盾（甚至有种开挂感），但就优化而言是可行的。优化理论结果 misses = 128 + 128 + 32 = 288。同上-4即得284，与下图（显示值<code>misses = 287</code>）符合。</p>
+<pre><code class="language-c">void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, a, b, c, d, e, f, g, h, k;
+    for (i = 0; i &lt; N; i+=8) {
+        for (j = 0; j &lt; M; j+=8) {
+            // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+            for (int k = 0; k &lt; 8; k++) {
+                a = A[i + k][j];
+                b = A[i + k][j + 1];
+                c = A[i + k][j + 2];
+                d = A[i + k][j + 3];
+                e = A[i + k][j + 4];
+                f = A[i + k][j + 5];
+                g = A[i + k][j + 6];
+                h = A[i + k][j + 7];
+                B[j][i + k] = a;
+                B[j + 1][i + k] = b;
+                B[j + 2][i + k] = c;
+                B[j + 3][i + k] = d;
+                B[j + 4][i + k] = e;
+                B[j + 5][i + k] = f;
+                B[j + 6][i + k] = g;
+                B[j + 7][i + k] = h;
+            }
+        }
+    }
+}
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://meredith2328.github.io/post-images/1717570623218.png" alt="" loading="lazy"></figure>
+<h3 id="64-64">64 * 64</h3>
+<p>有了上述分析，本次只需多尝试不同的分块方法、再思考做优化即迎刃而解了。</p>
+<figure data-type="image" tabindex="6"><img src="./assets/%E5%8C%BA%E5%9D%97%E7%94%A8%E5%88%B0%E7%9A%84%E7%BB%84.jpg" alt="区块用到的组" loading="lazy"></figure>
+<p>图片来源：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，虽然之前感谢过一次了，但再次感谢原作者的优秀思考。</p>
+<p>看图发现 8 * 8 的分块内部上下两部分存在冲突，所以考虑继续缩小分块，先用 4 * 4分块尝试：</p>
+<pre><code class="language-c">    if (M == 64) {
+        for (int i = 0; i &lt; N; i += 4) {
+            for (int j = 0; j &lt; M; j += 4) {
+                // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                for (int k = 0; k &lt; 4; k++) {
+                    a = A[i + k][j];
+                    b = A[i + k][j + 1];
+                    c = A[i + k][j + 2];
+                    d = A[i + k][j + 3];
+                    B[j][i + k] = a;
+                    B[j + 1][i + k] = b;
+                    B[j + 2][i + k] = c;
+                    B[j + 3][i + k] = d;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="7"><img src="https://meredith2328.github.io/post-images/1717570614606.png" alt="" loading="lazy"></figure>
+<p>结果未达到1300以下，考虑继续优化。</p>
+<p>是否可以利用 4 * 8 的分块呢？4 * 8的分块内部的确不存在冲突，可以充分利用A的局部性，但置于B之后就不可以了。由此我们思考：是否可以先将A的 4 * 8 块置于B的相同位置、再将其中不在对角线上、需要转置的4 * 4块转置过来，如是操作，以相比于上述 4 * 4 分块的方式更好利用A的局部性？</p>
+<p>代码如下：</p>
+<pre><code class="language-c">if (M == 64) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                
+                for (int k = i; k &lt; i + 4; k++) {
+                    // copy the A(i, j) 4 * 8 block(4 * 4 block 1, 2), row by row.
+                    // Then paste it to B(i, j).
+                    // So block1 is at the right place,
+                    // block2 should be transposed.
+                    a = A[k][j];
+                    b = A[k][j + 1];
+                    c = A[k][j + 2];
+                    d = A[k][j + 3];
+                    e = A[k][j + 4];
+                    f = A[k][j + 5];
+                    g = A[k][j + 6];
+                    h = A[k][j + 7];
+                    B[j][k] = a;
+                    B[j + 1][k] = b;
+                    B[j + 2][k] = c;
+                    B[j + 3][k] = d;
+                    B[j + 0][k + 4] = e;
+                    B[j + 1][k + 4] = f;
+                    B[j + 2][k + 4] = g;
+                    B[j + 3][k + 4] = h;
+                }
+
+                for (int k = j; k &lt; j + 4; k++) {
+                    // Store block2, row by row.
+                    a = B[k][i + 4];
+                    b = B[k][i + 5];
+                    c = B[k][i + 6];
+                    d = B[k][i + 7];
+                    // Store block3 in A.
+                    e = A[i + 4][k];
+                    f = A[i + 5][k];
+                    g = A[i + 6][k];
+                    h = A[i + 7][k];
+                    // Copy block3 to the place of block2(transpose block3).
+                    B[k][i + 4] = e;
+                    B[k][i + 5] = f;
+                    B[k][i + 6] = g;
+                    B[k][i + 7] = h;
+                    // Copy block2 to the place of block3(transpose block2).
+                    B[k + 4][i] = a;
+                    B[k + 4][i + 1] = b;
+                    B[k + 4][i + 2] = c;
+                    B[k + 4][i + 3] = d;
+                }
+
+                for (int k = i + 4; k &lt; i + 8; k++) {
+                    // Copy block4.
+                    a = A[k][j + 4];
+                    b = A[k][j + 5];
+                    c = A[k][j + 6];
+                    d = A[k][j + 7];
+                    B[j + 4][k] = a;
+                    B[j + 5][k] = b;
+                    B[j + 6][k] = c;
+                    B[j + 7][k] = d;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="8"><img src="https://meredith2328.github.io/post-images/1717570604287.png" alt="" loading="lazy"></figure>
+<h3 id="61-67">61 * 67</h3>
+<p>尝试对大部分块使用 8 * 8 分块，对边界处的直接转置，</p>
+<pre><code class="language-c">    if (M == 61) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                // Solve the boundary. Use 8 * 8 block for most places.
+                if (i + 8 &lt;= N &amp;&amp; j + 8 &lt;= M) {
+                    // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                    for (int k = i; k &lt; i + 8; k++) {
+                        a = A[k][j];
+                        b = A[k][j + 1];
+                        c = A[k][j + 2];
+                        d = A[k][j + 3];
+                        e = A[k][j + 4];
+                        f = A[k][j + 5];
+                        g = A[k][j + 6];
+                        h = A[k][j + 7];
+                        B[j][k] = a;
+                        B[j + 1][k] = b;
+                        B[j + 2][k] = c;
+                        B[j + 3][k] = d;
+                        B[j + 4][k] = e;
+                        B[j + 5][k] = f;
+                        B[j + 6][k] = g;
+                        B[j + 7][k] = h;
+                    }
+                }
+                else {
+                    // For the boundary, transpose directly.
+                    // k &lt; min(i + 8, N), s &lt; min(j + 8, M)
+                    for (int k = i; k &lt; (((i + 8) &lt; N) ? (i + 8) : N); k++) {
+                        for (int l = j; l &lt; (((j + 8) &lt; M) ? (j + 8) : M); l++) {
+                            B[l][k] = A[k][l];
+                        }
+                    }
+                    
+                }
+
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="9"><img src="https://meredith2328.github.io/post-images/1717570592488.png" alt="" loading="lazy"></figure>
+<p>正好不在2000以下。</p>
+<p>思考我们的分块之后，决定把长边设置为循环变量，重新测试：</p>
+<pre><code class="language-c">    if (M == 61) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                // Solve the boundary. Use 8 * 8 block for most places.
+                if (i + 8 &lt;= N &amp;&amp; j + 8 &lt;= M) {
+                    // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                    for (int k = j; k &lt; j + 8; k++) {
+                        a = A[i][k];
+                        b = A[i + 1][k];
+                        c = A[i + 2][k];
+                        d = A[i + 3][k];
+                        e = A[i + 4][k];
+                        f = A[i + 5][k];
+                        g = A[i + 6][k];
+                        h = A[i + 7][k];
+                        B[k][i] = a;
+                        B[k][i + 1] = b;
+                        B[k][i + 2] = c;
+                        B[k][i + 3] = d;
+                        B[k][i + 4] = e;
+                        B[k][i + 5] = f;
+                        B[k][i + 6] = g;
+                        B[k][i + 7] = h;
+                    }
+                }
+                else {
+                    // For the boundary, transpose directly.
+                    // k &lt; min(i + 8, N), s &lt; min(j + 8, M)
+                    for (int k = i; k &lt; (((i + 8) &lt; N) ? (i + 8) : N); k++) {
+                        for (int l = j; l &lt; (((j + 8) &lt; M) ? (j + 8) : M); l++) {
+                            B[l][k] = A[k][l];
+                        }
+                    }
+                    
+                }
+
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="10"><img src="https://meredith2328.github.io/post-images/1717570567470.png" alt="" loading="lazy"></figure>
+<p>成功通过。</p>
+]]></content>
+    </entry>
+</feed>
