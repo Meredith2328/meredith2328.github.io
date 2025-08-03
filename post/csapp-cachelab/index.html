@@ -1,0 +1,582 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSAPP: cachelab | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CSAPP: cachelab | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+man, what can I say.jpg
+
+
+Cachelab
+python2.7 driver.py
+
+
+安装python2和valgrind
+由于测试程序driver.py是python2程序，首先需要安装python2。流程如..." />
+    <meta name="keywords" content="CSAPP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CSAPP: cachelab
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-06-05
+              </span>
+              <span>
+                17 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/oq58-HRV4/" class="post-tag">
+                  # CSAPP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://meredith2328.github.io/post-images/csapp-cachelab.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>man, what can I say.jpg<br>
+<img src="https://meredith2328.github.io/post-images/1717570490815.png" alt="" loading="lazy"></p>
+</blockquote>
+<h1 id="cachelab">Cachelab</h1>
+<pre><code>python2.7 driver.py
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1717570680646.png" alt="" loading="lazy"></figure>
+<h2 id="安装python2和valgrind">安装python2和valgrind</h2>
+<p>由于测试程序driver.py是python2程序，首先需要安装python2。流程如下：</p>
+<ol>
+<li>
+<p>从Python官网（https://www.python.org/downloads/release/python-2718/）下载Python2的源码包(.tar.xz)并解压，进入解压后的目录。</p>
+</li>
+<li>
+<p>安装python2依赖。</p>
+</li>
+</ol>
+<pre><code>sudo apt-get install build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils
+</code></pre>
+<ol start="3">
+<li>进入源码目录，逐一执行以下指令进行构建和安装。</li>
+</ol>
+<pre><code>./configure --enable-optimizations
+make -j 8
+sudo make altinstall
+</code></pre>
+<ol start="4">
+<li>通过查看版本号，验证Python2安装是否成功。</li>
+</ol>
+<pre><code>python2.7 --version
+</code></pre>
+<p>另外为了执行driver.py，需要用apt安装valgrind。</p>
+<pre><code>sudo apt install valgrind
+</code></pre>
+<h2 id="phase1">phase1</h2>
+<p>一开始错理解为只有<code>S</code>指令时才保存cache，忽略了cache本来就是为了访问，所以只要有访问就应该保存cache。将这一点修改之后问题就迎刃而解了。</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1717570672450.png" alt="" loading="lazy"></figure>
+<h2 id="phase2">phase2</h2>
+<p><code>./test-trans -M 32 -N 32</code></p>
+<p>上述指令在未安装 <code>valgrind</code> 时遇到了</p>
+<pre><code>Function 0 (2 total)
+Step 1: Validating and generating memory traces
+sh: 1: valgrind: not found
+Validation error at function 126! Run ./tracegen -M 32 -N 32 -F 0 for details.
+Skipping performance evaluation for this function.
+</code></pre>
+<p>这样的问题，排查确认是未安装<code>valgrind</code>，利用<code>sudo apt install valgrind</code> 就解决了。</p>
+<h3 id="32-32-关于分块利用局部性的分析">32 * 32: 关于分块利用局部性的分析</h3>
+<h4 id="缓存大小"><strong>缓存大小</strong></h4>
+<p>由于程序中<code>static A, B</code> 部分的相关定义~~（静态链接）~~，<strong>可以认为</strong><code>A</code>、<code>B</code>地址连续（中间无填充），它们对应的<code>Cache</code>的组和行的分布恰好是完全相同的（见下图）（这会造成对角线一定的Conflict Miss，见下）。</p>
+<p>缓存的利用机制如下：</p>
+<p>给出的<code>s = 5, E = 1, b = 5</code> 计算可知对应的Cache大小为<code>2^5 * 1 * 2^5 = 1024</code> Bytes。考虑到<code>int</code>类型为4 Bytes，</p>
+<p>我们对<code>A</code>和<code>B</code>使用的<code>Cache</code>有<code>S = 2^s = 2^5 = 32</code>组，每组有<code>E = 1</code>行，每行存储了<code>8 int</code>的块。</p>
+<p>不妨把这些组的唯一行编号为<code>Line 00</code> 到<code>Line 31</code>，见下图。</p>
+<h4 id="缓存过程分析为什么要分块"><strong>缓存过程分析：为什么要分块？</strong></h4>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1717570661757.png" alt="" loading="lazy"></figure>
+<p>这个图是我自己画的。形式参考自：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，非常感谢原作者的优秀思考。</p>
+<p>从开头举例，<strong>原始转置操作<code>B[j][i] = A[i][j]</code>指令经历了如下的过程：</strong></p>
+<blockquote>
+<p>读<code>A[0][0]</code>，<code>Line 00</code>中无该值，发生Cold Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[0][0]</code>，<code>Line 00</code>中无该值，且该行恰好存了<code>A[0][0]</code>到<code>A[0][7]</code> ，发生Conflict Miss和Eviction，<code>Line 00</code>换为<code>B[0][0]</code>到<code>B[0][7]</code>。（注意取出B时是<strong>行优先</strong>，虽然B是<strong>按列写</strong>的，但我们存入缓存是按内存连续、即按行存的，这是课本中提到的最重要的局部性问题的来源）</p>
+<p>读<code>A[0][1]</code>，<code>Line 00</code>中无该值（上述已<code>Eviction</code>），发生Conflict Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[1][0]</code>，<code>Line 04</code>中无该值，发生Cold Miss，将<code>B[1][0]</code>到<code>B[1][7]</code>存入<code>Line 04</code>中。</p>
+<p>读<code>A[0][2]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[2][0]</code>，<code>Line 08</code>中无该值，将<code>B[2][0]</code>到<code>B[2][7]</code>存入<code>Line 08</code>中。</p>
+<p>读<code>A[0][3]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[3][0]</code>，<code>Line 12</code>中无该值，将<code>B[3][0]</code>到<code>B[3][7]</code>存入<code>Line 12</code>中。</p>
+<p>读<code>A[0][4]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>写<code>B[4][0]</code>，<code>Line 16</code>中无该值，将<code>B[4][0]</code>到<code>B[4][7]</code>存入<code>Line 16</code>中。</p>
+<p>...</p>
+<p>读<code>A[0][8]</code>，<code>Line 01</code>中无该值，发生Cold Miss，将<code>A[0][8]</code>到<code>A[0][15]</code> 存入<code>Line 01</code>中。</p>
+<p>写<code>B[8][0]</code>，<code>Line 00</code>中无该值，发生Conflict Miss，将<code>B[8][0]</code>到<code>B[8][7]</code>存入<code>Line 00</code>中。</p>
+<p>...</p>
+</blockquote>
+<p>为了便于理解，我详细阐述了整个过程。利用我们小学<s>或者幼儿园</s>学到的找规律可以知道：</p>
+<ol>
+<li><code>A[i][i]</code>和<code>B[i][i]</code>会引起Conflict Miss。具体而言，写<code>B[i][i]</code>时会驱逐相同的Cache Line，导致<code>A[i][i + 1]</code>冲突不命中。（由于i = 0, 1, ..., 31，共计32次miss）（其实此处分析不完全，见下述第二次改进）</li>
+<li>A具有良好的局部性，只在每读入8个int的第一个才会发生Cold Miss，其余都是Hit。（共计128次miss）</li>
+<li>B的缓存未良好使用，每次写入都会发生Miss。（共计1024次miss）。</li>
+</ol>
+<p>求和即miss总次数为32 + 128 + 1024 - 4（上述1. 与 2.在图中标红处共计4次重复计数） = 1180。</p>
+<p>查询源码可以发现valgrind本身使用了3次miss，即得下述Function 1的misses:1183。</p>
+<h4 id="第一次改进使用8-8分块"><strong>第一次改进：使用8 * 8分块</strong></h4>
+<p>我们在理解了为什么会发生冲突之后，分块的作用就显而易见了。</p>
+<p>首先利用分块解决影响最大的问题：B按列读取，每读入8块时即驱逐之前的缓存。为了解决这个问题，我们可以考虑 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>8</mn><mo>×</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">8 \times 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span></span></span></span>​的分块，在下一次驱逐缓存行之前先完成所有缓存行的传入。</p>
+<pre><code class="language-c">void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, a, b, c, d, e, f, g, h;
+    for (i = 0; i &lt; N; i+=8) {
+        for (j = 0; j &lt; M; j+=8) {
+            // 8 * 8
+            for (int ii = i; ii &lt; i + 8; ii++) {
+                for (int jj = j; jj &lt; j + 8; jj++) {
+                    B[jj][ii] = A[ii][jj];
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>得到的结果如下Function 0：</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/1717570650830.png" alt="" loading="lazy"></figure>
+<p>相比于原始代码Function 1，已经有了极大改善。</p>
+<h4 id="第二次改进使用局部变量"><strong>第二次改进：使用局部变量</strong></h4>
+<p>之后继续修改，处理对角的conflict miss。</p>
+<p>我们在之前“可以认为”那里发现，如果我们要从<code>A[i][j]</code>转置到<code>B[i][j]</code>即转置相同坐标的元素，会必定驱逐相同的Cache Line，造成冲突不命中。那么什么时候会转置到相同坐标位置呢？显而易见，方阵对角线处，即<code>i == j</code>。</p>
+<p>但是我们按照前述计算的理论值应当为 32 + 128 + 128 = 288次，与340次（显示值misses = 343）仍然相差一定数值，说明我们的分析仍然有问题。这是为什么？</p>
+<p>我们不妨重新仔细分析 8 * 8 分块后A和B分别使用的Cache Line。对于A使用的<code>(x, y)</code> (<code>x</code>, <code>y</code> = 0, 1, 2, 3)块，它对应与B使用的<code>(y, x)</code>块，我们会发现除了<code>x == y</code>的其他情况的对应块所包含的Cache Line都不重合。因此我们大胆猜测，造成这一部分问题的是<strong>对角块冲突</strong>，而非对角线元素冲突。</p>
+<p><strong>当前转置操作经历了如下的过程：</strong></p>
+<blockquote>
+<p>读<code>A[0][0]</code>，<code>Line 00</code>中无该值，发生Cold Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。</p>
+<p>写<code>B[0][0]</code>，<code>Line 00</code>中无该值，且该行恰好存了<code>A[0][0]</code>到<code>A[0][7]</code> ，发生Conflict Miss和Eviction，<code>Line 00</code>换为<code>B[0][0]</code>到<code>B[0][7]</code>。</p>
+<p><strong>读<code>A[0][1]</code>，<code>Line 00</code>中无该值（上述已<code>Eviction</code>），发生Conflict Miss，将<code>A[0][0]</code>到<code>A[0][7]</code> 存入<code>Line 00</code>中。(1)</strong></p>
+<p>写<code>B[1][0]</code>，<code>Line 04</code>中无该值，发生Cold Miss，将<code>B[1][0]</code>到<code>B[1][7]</code>存入<code>Line 04</code>中。</p>
+<p>读<code>A[0][2]</code>，<code>Line 00</code>中有该值，发生hit。</p>
+<p>...</p>
+<p>读<code>A[1][0]</code>，<code>Line 04</code>中无该值，miss，<code>Line 04 := A[1][0..7]</code></p>
+<p><strong>写<code>B[0][1]</code>，<code>Line 00</code>中无该值，miss，<code>Line 00 := B[0][0..7]</code> (2)</strong></p>
+<p>读<code>A[1][1]</code>，<code>Line 04</code>中有该值，hit</p>
+<p><strong>写<code>B[1][1]</code>，<code>Line 04</code>中无该值，miss，<code>Line 04 := B[1][0..7]</code> (3)</strong></p>
+</blockquote>
+<p>我们发现之前分析到的对角线元素、即A和B同一坐标处使用相同行存取的影响分为三部分：</p>
+<ol>
+<li><code>A[i][i + 1]</code>处出现Conflict Miss （上述标号**<code>(1)</code>**），这是因为写<code>B[i][i]</code>时驱逐了<code>A[i][i + 1]</code>本应被缓存到的行。</li>
+<li><code>B[i][i + 1]</code>处出现Conflict Miss（上述标号**<code>(2)</code>**），这是因为写<code>B[i][i + 1]</code>时本应使用上一部分提到的写<code>B[i][i]</code>缓存的行，但它被上一部分读<code>A[i][i + 1]</code>时驱逐了。</li>
+<li><code>B[i][i]</code>处出现Conflict Miss（上述标号**<code>(3)</code>**），这是因为我们在写<code>B[i][i]</code>之前一定会先读<code>A[i][i]</code>导致驱逐。</li>
+</ol>
+<p>上述1、2可以归类为<strong>对角块冲突</strong>造成的影响 <s>相爱相杀</s> ，而3可以归类为<strong>对角线元素冲突</strong>造成的影响。</p>
+<p>由这三部分影响、连同无法避免的Cold Miss造成的所有miss对应A、B矩阵见下两图：</p>
+<p><img src="https://meredith2328.github.io/post-images/1717570641850.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1717570634679.png" alt="" loading="lazy"></p>
+<p>图片来源：<a href="https://d-sketon.top/20211015/csapp-cachelab/">CSAPP - CacheLab (d-sketon.top)</a></p>
+<p>为了规避上述由对角块造成的1、2问题，我们考虑利用题目所给的共计12个局部变量。对于每一个 8 * 8 分块，可以将<code>A[i][i..(i + 7)]</code>存入8个临时变量中，利用临时变量而非Cache进行转置。</p>
+<p>这样虽然似乎与Cache本身的意义有少许矛盾（甚至有种开挂感），但就优化而言是可行的。优化理论结果 misses = 128 + 128 + 32 = 288。同上-4即得284，与下图（显示值<code>misses = 287</code>）符合。</p>
+<pre><code class="language-c">void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, a, b, c, d, e, f, g, h, k;
+    for (i = 0; i &lt; N; i+=8) {
+        for (j = 0; j &lt; M; j+=8) {
+            // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+            for (int k = 0; k &lt; 8; k++) {
+                a = A[i + k][j];
+                b = A[i + k][j + 1];
+                c = A[i + k][j + 2];
+                d = A[i + k][j + 3];
+                e = A[i + k][j + 4];
+                f = A[i + k][j + 5];
+                g = A[i + k][j + 6];
+                h = A[i + k][j + 7];
+                B[j][i + k] = a;
+                B[j + 1][i + k] = b;
+                B[j + 2][i + k] = c;
+                B[j + 3][i + k] = d;
+                B[j + 4][i + k] = e;
+                B[j + 5][i + k] = f;
+                B[j + 6][i + k] = g;
+                B[j + 7][i + k] = h;
+            }
+        }
+    }
+}
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://meredith2328.github.io/post-images/1717570623218.png" alt="" loading="lazy"></figure>
+<h3 id="64-64">64 * 64</h3>
+<p>有了上述分析，本次只需多尝试不同的分块方法、再思考做优化即迎刃而解了。</p>
+<figure data-type="image" tabindex="6"><img src="./assets/%E5%8C%BA%E5%9D%97%E7%94%A8%E5%88%B0%E7%9A%84%E7%BB%84.jpg" alt="区块用到的组" loading="lazy"></figure>
+<p>图片来源：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，虽然之前感谢过一次了，但再次感谢原作者的优秀思考。</p>
+<p>看图发现 8 * 8 的分块内部上下两部分存在冲突，所以考虑继续缩小分块，先用 4 * 4分块尝试：</p>
+<pre><code class="language-c">    if (M == 64) {
+        for (int i = 0; i &lt; N; i += 4) {
+            for (int j = 0; j &lt; M; j += 4) {
+                // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                for (int k = 0; k &lt; 4; k++) {
+                    a = A[i + k][j];
+                    b = A[i + k][j + 1];
+                    c = A[i + k][j + 2];
+                    d = A[i + k][j + 3];
+                    B[j][i + k] = a;
+                    B[j + 1][i + k] = b;
+                    B[j + 2][i + k] = c;
+                    B[j + 3][i + k] = d;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="7"><img src="https://meredith2328.github.io/post-images/1717570614606.png" alt="" loading="lazy"></figure>
+<p>结果未达到1300以下，考虑继续优化。</p>
+<p>是否可以利用 4 * 8 的分块呢？4 * 8的分块内部的确不存在冲突，可以充分利用A的局部性，但置于B之后就不可以了。由此我们思考：是否可以先将A的 4 * 8 块置于B的相同位置、再将其中不在对角线上、需要转置的4 * 4块转置过来，如是操作，以相比于上述 4 * 4 分块的方式更好利用A的局部性？</p>
+<p>代码如下：</p>
+<pre><code class="language-c">if (M == 64) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                
+                for (int k = i; k &lt; i + 4; k++) {
+                    // copy the A(i, j) 4 * 8 block(4 * 4 block 1, 2), row by row.
+                    // Then paste it to B(i, j).
+                    // So block1 is at the right place,
+                    // block2 should be transposed.
+                    a = A[k][j];
+                    b = A[k][j + 1];
+                    c = A[k][j + 2];
+                    d = A[k][j + 3];
+                    e = A[k][j + 4];
+                    f = A[k][j + 5];
+                    g = A[k][j + 6];
+                    h = A[k][j + 7];
+                    B[j][k] = a;
+                    B[j + 1][k] = b;
+                    B[j + 2][k] = c;
+                    B[j + 3][k] = d;
+                    B[j + 0][k + 4] = e;
+                    B[j + 1][k + 4] = f;
+                    B[j + 2][k + 4] = g;
+                    B[j + 3][k + 4] = h;
+                }
+
+                for (int k = j; k &lt; j + 4; k++) {
+                    // Store block2, row by row.
+                    a = B[k][i + 4];
+                    b = B[k][i + 5];
+                    c = B[k][i + 6];
+                    d = B[k][i + 7];
+                    // Store block3 in A.
+                    e = A[i + 4][k];
+                    f = A[i + 5][k];
+                    g = A[i + 6][k];
+                    h = A[i + 7][k];
+                    // Copy block3 to the place of block2(transpose block3).
+                    B[k][i + 4] = e;
+                    B[k][i + 5] = f;
+                    B[k][i + 6] = g;
+                    B[k][i + 7] = h;
+                    // Copy block2 to the place of block3(transpose block2).
+                    B[k + 4][i] = a;
+                    B[k + 4][i + 1] = b;
+                    B[k + 4][i + 2] = c;
+                    B[k + 4][i + 3] = d;
+                }
+
+                for (int k = i + 4; k &lt; i + 8; k++) {
+                    // Copy block4.
+                    a = A[k][j + 4];
+                    b = A[k][j + 5];
+                    c = A[k][j + 6];
+                    d = A[k][j + 7];
+                    B[j + 4][k] = a;
+                    B[j + 5][k] = b;
+                    B[j + 6][k] = c;
+                    B[j + 7][k] = d;
+                }
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="8"><img src="https://meredith2328.github.io/post-images/1717570604287.png" alt="" loading="lazy"></figure>
+<h3 id="61-67">61 * 67</h3>
+<p>尝试对大部分块使用 8 * 8 分块，对边界处的直接转置，</p>
+<pre><code class="language-c">    if (M == 61) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                // Solve the boundary. Use 8 * 8 block for most places.
+                if (i + 8 &lt;= N &amp;&amp; j + 8 &lt;= M) {
+                    // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                    for (int k = i; k &lt; i + 8; k++) {
+                        a = A[k][j];
+                        b = A[k][j + 1];
+                        c = A[k][j + 2];
+                        d = A[k][j + 3];
+                        e = A[k][j + 4];
+                        f = A[k][j + 5];
+                        g = A[k][j + 6];
+                        h = A[k][j + 7];
+                        B[j][k] = a;
+                        B[j + 1][k] = b;
+                        B[j + 2][k] = c;
+                        B[j + 3][k] = d;
+                        B[j + 4][k] = e;
+                        B[j + 5][k] = f;
+                        B[j + 6][k] = g;
+                        B[j + 7][k] = h;
+                    }
+                }
+                else {
+                    // For the boundary, transpose directly.
+                    // k &lt; min(i + 8, N), s &lt; min(j + 8, M)
+                    for (int k = i; k &lt; (((i + 8) &lt; N) ? (i + 8) : N); k++) {
+                        for (int l = j; l &lt; (((j + 8) &lt; M) ? (j + 8) : M); l++) {
+                            B[l][k] = A[k][l];
+                        }
+                    }
+                    
+                }
+
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="9"><img src="https://meredith2328.github.io/post-images/1717570592488.png" alt="" loading="lazy"></figure>
+<p>正好不在2000以下。</p>
+<p>思考我们的分块之后，决定把长边设置为循环变量，重新测试：</p>
+<pre><code class="language-c">    if (M == 61) {
+        for (int i = 0; i &lt; N; i += 8) {
+            for (int j = 0; j &lt; M; j += 8) {
+                // Solve the boundary. Use 8 * 8 block for most places.
+                if (i + 8 &lt;= N &amp;&amp; j + 8 &lt;= M) {
+                    // copy the A(i, j) block, row by row. Then paste it to B(j, i).
+                    for (int k = j; k &lt; j + 8; k++) {
+                        a = A[i][k];
+                        b = A[i + 1][k];
+                        c = A[i + 2][k];
+                        d = A[i + 3][k];
+                        e = A[i + 4][k];
+                        f = A[i + 5][k];
+                        g = A[i + 6][k];
+                        h = A[i + 7][k];
+                        B[k][i] = a;
+                        B[k][i + 1] = b;
+                        B[k][i + 2] = c;
+                        B[k][i + 3] = d;
+                        B[k][i + 4] = e;
+                        B[k][i + 5] = f;
+                        B[k][i + 6] = g;
+                        B[k][i + 7] = h;
+                    }
+                }
+                else {
+                    // For the boundary, transpose directly.
+                    // k &lt; min(i + 8, N), s &lt; min(j + 8, M)
+                    for (int k = i; k &lt; (((i + 8) &lt; N) ? (i + 8) : N); k++) {
+                        for (int l = j; l &lt; (((j + 8) &lt; M) ? (j + 8) : M); l++) {
+                            B[l][k] = A[k][l];
+                        }
+                    }
+                    
+                }
+
+            }
+        }
+    }
+</code></pre>
+<p>结果如下：</p>
+<figure data-type="image" tabindex="10"><img src="https://meredith2328.github.io/post-images/1717570567470.png" alt="" loading="lazy"></figure>
+<p>成功通过。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#cachelab">Cachelab</a>
+<ul>
+<li><a href="#%E5%AE%89%E8%A3%85python2%E5%92%8Cvalgrind">安装python2和valgrind</a></li>
+<li><a href="#phase1">phase1</a></li>
+<li><a href="#phase2">phase2</a>
+<ul>
+<li><a href="#32-32-%E5%85%B3%E4%BA%8E%E5%88%86%E5%9D%97%E5%88%A9%E7%94%A8%E5%B1%80%E9%83%A8%E6%80%A7%E7%9A%84%E5%88%86%E6%9E%90">32 * 32: 关于分块利用局部性的分析</a>
+<ul>
+<li><a href="#%E7%BC%93%E5%AD%98%E5%A4%A7%E5%B0%8F"><strong>缓存大小</strong></a></li>
+<li><a href="#%E7%BC%93%E5%AD%98%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%86%E5%9D%97"><strong>缓存过程分析：为什么要分块？</strong></a></li>
+<li><a href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%94%B9%E8%BF%9B%E4%BD%BF%E7%94%A88-8%E5%88%86%E5%9D%97"><strong>第一次改进：使用8 * 8分块</strong></a></li>
+<li><a href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%94%B9%E8%BF%9B%E4%BD%BF%E7%94%A8%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><strong>第二次改进：使用局部变量</strong></a></li>
+</ul>
+</li>
+<li><a href="#64-64">64 * 64</a></li>
+<li><a href="#61-67">61 * 67</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/csapp-attacklab/">
+              <h3 class="post-title">
+                CSAPP: attacklab
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,432 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS61A disc04 树的递归 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS61A disc04 树的递归 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+edit time: 2024-07-19 19:11:45
+
+describing the recursive case in words
+For the following questions, don't start trying ..." />
+    <meta name="keywords" content="CS61A" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS61A disc04 树的递归
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-08-30
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/cX9znZti-/" class="post-tag">
+                  # CS61A
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>edit time: 2024-07-19 19:11:45</p>
+</blockquote>
+<h2 id="describing-the-recursive-case-in-words">describing the recursive case in words</h2>
+<p>For the following questions, don't start trying to write code right away. Instead, start by <strong>describing the recursive case in words</strong>. Some examples:</p>
+<ul>
+<li>In <code>fib</code> from lecture, the recursive case is to add together the previous two Fibonacci numbers.</li>
+<li>In <code>double_eights</code> from lab, the recursive case is to check for double eights in the rest of the number.</li>
+<li>In <code>count_partitions</code> from lecture, the recursive case is to partition <code>n-m</code> using parts up to size <code>m</code> <strong>and</strong> to partition <code>n</code> using parts up to size <code>m-1</code>.</li>
+</ul>
+<h2 id="q1-insect-combinatorics">Q1: Insect Combinatorics</h2>
+<p>基础情况略。<br>
+递归情况：从左下出发的路径的可能数，是第一步往上走、之后的路径的可能数 加 第一步往右走，之后的路径的可能数。</p>
+<pre><code class="language-python">def paths(m, n):
+    &quot;&quot;&quot;Return the number of paths from one corner of an
+    M by N grid to the opposite corner.
+
+    &gt;&gt;&gt; paths(2, 2)
+    2
+    &gt;&gt;&gt; paths(5, 7)
+    210
+    &gt;&gt;&gt; paths(117, 1)
+    1
+    &gt;&gt;&gt; paths(1, 157)
+    1
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if m == 1 or n == 1:
+        return 1
+    return paths(m - 1, n) + paths(m, n - 1)
+</code></pre>
+<h2 id="q2-even-weighted">Q2: Even weighted</h2>
+<p>先理解题目含义：<br>
+<code>x = [1, 2, 3, 4, 5, 6]</code>，下标从0开始，只留下标为<code>0, 2, 4</code>的三个元素即 <code>[1, 3, 5]</code> ，之后将每个元素与之前提到的偶数下标相乘，即 <code>[1 * 0, 3 * 2, 5 * 4] = [0, 6, 20]</code>。</p>
+<pre><code class="language-python">def even_weighted_loop(s):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]
+    &gt;&gt;&gt; even_weighted_loop(x)
+    [0, 6, 20]
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+
+    result = []
+    for i in range(len(s)):
+        if (i % 2 == 0):
+            result += [s[i] * i]
+    return result
+</code></pre>
+<pre><code class="language-python">def even_weighted_comprehension(s):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]
+    &gt;&gt;&gt; even_weighted_comprehension(x)
+    [0, 6, 20]
+    &quot;&quot;&quot;
+    return [s[i] * i for i in range(len(s)) if i % 2 == 0]
+</code></pre>
+<h2 id="q3-has-path">Q3: Has Path</h2>
+<p>递归情况：如果本节点值等于路径第一位，子分支中存在一个分支满足路径的剩余部分，则返回真。<br>
+硬控我好几分钟的地方是python的列表切片后如果长度为1，仍然是一个列表。令人忍俊不禁。</p>
+<pre><code class="language-python">def has_path(t, p):
+    &quot;&quot;&quot;Return whether tree t has a path from the root with labels p.
+
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; has_path(t1, [5, 6])        # This path is not from the root of t1
+    False
+    &gt;&gt;&gt; has_path(t2, [5, 6])        # This path is from the root of t2
+    True
+    &gt;&gt;&gt; has_path(t1, [3, 5])        # This path does not go to a leaf, but that's ok
+    True
+    &gt;&gt;&gt; has_path(t1, [3, 5, 6])     # This path goes to a leaf
+    True
+    &gt;&gt;&gt; has_path(t1, [3, 4, 5, 6])  # There is no path with these labels
+    False
+    &quot;&quot;&quot;
+    if p == [label(t)]:  # when len(p) is 1
+        return True
+    elif label(t) != p[0]:
+        return False
+    else:
+        &quot;*** YOUR CODE HERE ***&quot;
+        for child in branches(t):
+            if has_path(child, p[1:]):
+                return True
+        return False
+        # one line version:
+        # return True in [has_path(child, p[1:]) for child in branches(t)]
+</code></pre>
+<h2 id="q4-find-path">Q4: Find Path</h2>
+<p>不妨先抛弃题目模板，自行思考。<br>
+仍然满足上一题“子情况中存在一个满足则返回该子情况，子情况全部不满足才返回不满足”。</p>
+<pre><code class="language-python">def find_path(t, x):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; find_path(t1, 5)
+    [3, 5]
+    &gt;&gt;&gt; find_path(t1, 4)
+    [3, 4]
+    &gt;&gt;&gt; find_path(t1, 6)
+    [3, 5, 6]
+    &gt;&gt;&gt; find_path(t2, 6)
+    [5, 6]
+    &gt;&gt;&gt; print(find_path(t1, 2))
+    None
+    &quot;&quot;&quot;
+    if label(t) == x:
+        return [label(t)]
+    else:
+        for child in branches(t):
+            if find_path(child, x):
+                return [label(t)] + find_path(child, x)
+        return None
+</code></pre>
+<p>之后尝试与题目模板格式匹配：</p>
+<pre><code class="language-python">def find_path(t, x):
+    &quot;&quot;&quot;
+    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
+    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
+    &gt;&gt;&gt; find_path(t1, 5)
+    [3, 5]
+    &gt;&gt;&gt; find_path(t1, 4)
+    [3, 4]
+    &gt;&gt;&gt; find_path(t1, 6)
+    [3, 5, 6]
+    &gt;&gt;&gt; find_path(t2, 6)
+    [5, 6]
+    &gt;&gt;&gt; print(find_path(t1, 2))
+    None
+    &quot;&quot;&quot;
+    if label(t) == x:
+        return [label(t)]
+    for child in branches(t):
+        path = find_path(child, x)
+        if path:
+            return [label(t)] + path
+    return None
+</code></pre>
+<p>（当时在<code>for</code>那里的空填了<code>else</code>，想到一个 <code>path = any([find_path(child, x) for child in branches(t)])</code>，之后会麻烦亿点、而且跟<code>path</code>这个变量名不匹配，xsl）</p>
+<h2 id="q5-sprout-leaves">Q5: Sprout Leaves</h2>
+<p>注意题目要求构造<code>tree</code>，而且在<code>branches</code>里的也是<code>tree</code>。<br>
+思路很简单：<br>
+如果是叶，则构造一个标签相同、带了新叶的树返回；<br>
+如果不是叶，则构造一个标签相同、每个分支完成了<code>sprout leaves</code>（即题设要求的函数）的树返回。</p>
+<pre><code class="language-python">def sprout_leaves(t, leaves):
+    &quot;&quot;&quot;Sprout new leaves containing the labels in leaves at each leaf of
+    the original tree t and return the resulting tree.
+
+    &gt;&gt;&gt; t1 = tree(1, [tree(2), tree(3)])
+    &gt;&gt;&gt; print_tree(t1)
+    1
+      2
+      3
+    &gt;&gt;&gt; new1 = sprout_leaves(t1, [4, 5])
+    &gt;&gt;&gt; print_tree(new1)
+    1
+      2
+        4
+        5
+      3
+        4
+        5
+
+    &gt;&gt;&gt; t2 = tree(1, [tree(2, [tree(3)])])
+    &gt;&gt;&gt; print_tree(t2)
+    1
+      2
+        3
+    &gt;&gt;&gt; new2 = sprout_leaves(t2, [6, 1, 2])
+    &gt;&gt;&gt; print_tree(new2)
+    1
+      2
+        3
+          6
+          1
+          2
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if is_leaf(t):
+        return tree(label(t), [tree(val) for val in leaves])
+    return tree(label(t), [sprout_leaves(branch, leaves) for branch in branches(t)])
+</code></pre>
+<h2 id="q6-tree-deciphering">Q6: Tree Deciphering</h2>
+<p><code>result</code>的值是<code>t1</code>和<code>t2</code>中较大的那棵树的所有子分支中最小的分支的标签。<br>
+“大”与“小”通过比较<code>label(t)</code>判断。<br>
+（<code>max(s, key=f)</code> returns the item <code>x</code> in <code>s</code> for which <code>f(x)</code> is largest.<br>
+<code>max([t1, t2], key=label)</code> returns the tree with the largest label, in this case <code>t2</code>.）</p>
+<pre><code class="language-python">def tree(label, branches=[]):
+    for branch in branches:
+        assert is_tree(branch), 'branches must be trees'
+    return [label] + list(branches)
+
+def label(tree):
+    return tree[0]
+
+def branches(tree):
+    return tree[1:]
+
+def is_leaf(tree):
+    return not branches(tree)
+
+def is_tree(tree):
+    if type(tree) != list or len(tree) &lt; 1:
+        return False
+    for branch in branches(tree):
+        if not is_tree(branch):
+            return False
+    return True
+
+t2 = tree(5, [tree(6), tree(7)])
+t1 = tree(3, [tree(4), t2])
+result = label(min(branches(max([t1, t2], key=label)), key=label))
+print(result)
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#describing-the-recursive-case-in-words">describing the recursive case in words</a></li>
+<li><a href="#q1-insect-combinatorics">Q1: Insect Combinatorics</a></li>
+<li><a href="#q2-even-weighted">Q2: Even weighted</a></li>
+<li><a href="#q3-has-path">Q3: Has Path</a></li>
+<li><a href="#q4-find-path">Q4: Find Path</a></li>
+<li><a href="#q5-sprout-leaves">Q5: Sprout Leaves</a></li>
+<li><a href="#q6-tree-deciphering">Q6: Tree Deciphering</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/cs61a-disc03/">
+              <h3 class="post-title">
+                CS61A disc03 递归
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

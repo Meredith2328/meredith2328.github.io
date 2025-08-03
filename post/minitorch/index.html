@@ -1,0 +1,1060 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MiniTorch的一个实现 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="MiniTorch的一个实现 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="项目文档链接：MiniTorch
+项目仓库：minitorch/minitorch: The full minitorch student suite.
+我的实现：Meredith2328/minitorch: The full minit..." />
+    <meta name="keywords" content="ai,CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              MiniTorch的一个实现
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-07-23
+              </span>
+              <span>
+                40 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/M7LPgZDOj4/" class="post-tag">
+                  # ai
+                </a>
+              
+                <a href="https://meredith2328.github.io/tag/xjOokRWMh/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>项目文档链接：<a href="https://minitorch.github.io/">MiniTorch</a><br>
+项目仓库：<a href="https://github.com/minitorch/minitorch">minitorch/minitorch: The full minitorch student suite.</a></p>
+<p>我的实现：<a href="https://github.com/Meredith2328/minitorch">Meredith2328/minitorch: The full minitorch student suite.</a><br>
+（完成了Fundamentals, ML Primer, AutoDiff, Tensors, Efficiency部分，未涉及Networks部分。）</p>
+<p>另外推荐参考这个，写得比我好得多：<a href="https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf">MiniTorch-学习全攻略.pdf</a></p>
+<h2 id="安装环境">安装环境</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/20250702081943.png" alt="" loading="lazy"></figure>
+<p>将以下内容保存为requirements.txt并替换原始项目使用的requirements.txt和requirements.txt.extra：</p>
+<pre><code>backports.tarfile==1.2.0
+colorama==0.4.6
+datasets==2.21.0
+embeddings==0.0.8
+hypothesis==6.111.2
+importlib-metadata==6.11.0
+importlib-resources==6.4.0
+jaraco.text==3.12.1
+mypy==1.11.2
+numba==0.60.0
+plotly==5.24.0
+pre-commit==3.8.0
+pydot==3.0.1
+pytest-env==1.1.3
+pytest-runner==6.0.1
+python-mnist==0.7
+streamlit-ace==0.1.1
+tomli==2.0.1
+torch==2.4.0
+numpy==1.24.0
+streamlit==1.26.0
+</code></pre>
+<p>关于requirements的说明：</p>
+<pre><code>conda create -n myminitorch python==3.11
+官方setup给的requirements有conflict，参考了pr里的requirements进行了修改
+pip install -r requirements.txt
+pip install -Ue .
+之后发现torch版本很新、自动装的2.0的numpy不兼容，手动降级一下：
+pip install numpy==1.24
+以及跑Task0.5出了一些id重复的报错，判断是Streamlit版本新了一点加了检查，为了省去改代码的麻烦手动降级一下：
+pip install streamlit==1.26.0
+
+之后做到Efficiency(Task3那些)要用CUDA，我本地机CUDA==12.6，所以参考了pytorch官网的指令在环境里装gpu的pytorch：
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+</code></pre>
+<h2 id="fundamentals">Fundamentals</h2>
+<p>Fundamentals：torch的算子<code>Operator</code>，模块<code>Module</code>等。<br>
+（负责利用Python的math库，开发一些诸如sigmoid, add, mul之类的函数）</p>
+<h3 id="实现细节">实现细节</h3>
+<p>注意true置为1.0，false置为0.0。</p>
+<blockquote>
+<p>modern python语法: <code>Callable[[inputs], output]</code><br>
+所有输入参数传为第一个列表参数 <code>[type]</code> ，输出为 <code>type</code> ，表示一个以<code>[type]</code>为输入参数、<code>type</code>为返回值的函数</p>
+</blockquote>
+<pre><code class="language-python">def map(fn: Callable[[float], float]) 
+-&gt; Callable[[Iterable[float]], Iterable[float]]:
+</code></pre>
+<p>解读为：<br>
+传入一个函数参数<code>fn</code>，输出一个函数。<br>
+<code>fn</code>的性质是输入一个<code>float</code>，输出<code>float</code>。<br>
+输出函数的性质是输入一个<code>Iterable[float]</code>即<code>float</code>的列表，输出<code>Iterable[float]</code>。</p>
+<p>多用<code>assert_close</code>而非<code>==</code>。</p>
+<h3 id="结果">结果</h3>
+<p>最终成功跑通：<br>
+<img src="https://meredith2328.github.io/post-images/20250702170517.png" alt="" loading="lazy"><br>
+看起来streamlit是一个类似于tensorflow playground的可视化模块。</p>
+<p>跑通task0_1到task0_4：<br>
+<img src="https://meredith2328.github.io/post-images/20250702171057.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/20250702171143.png" alt="" loading="lazy"></p>
+<blockquote>
+<p>ps. 这里有一个实现细节：<br>
+operators.py里的函数不能相互依赖，比如sigmoid不能用同模块下的exp，但是可以用math.exp等，这是为了Efficiency一章numba能够识别相关函数。</p>
+</blockquote>
+<h2 id="ml-primer">ML Primer</h2>
+<p>ML Primer：讲了一点机器学习基础，以二分类为例，无代码作业。</p>
+<p>文中对ReLU的理解例子十分有趣，看一看：</p>
+<blockquote>
+<p>Neural networks are compound model classes that divide classification into two or more <strong>stages</strong>. Each stage uses a linear model to seperate the data. And then an <em>activation</em> function to reshape it.</p>
+<p>We would like <strong>only</strong> points in the green or yellow sections to be classified as X's.<br>
+To do this, we employ an activation function that <strong>filters</strong> out only these points. This function is known as a <strong>ReLU</strong> function, which is a fancy way of saying &quot;threshold&quot;.</p>
+</blockquote>
+<p><img src="https://meredith2328.github.io/post-images/20250702173828.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/20250702173835.png" alt="" loading="lazy"><br>
+只考虑其中一个分类边界，wx+b之后进行ReLU，只保留了黄色部分的z值、而负半轴的z值置为0（ReLU正半轴，对应前述黄色部分），<br>
+相当于对所有初始数据进行的一种变换h1得到了下述的h1值，可以把它们画到黄色轴上。<br>
+<img src="https://meredith2328.github.io/post-images/20250702175034.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/20250702174044.png" alt="" loading="lazy"></p>
+<p>同理我们也可以对所有初始数据进行另一个变换得到h2，我们可以把它们画到上述绿色轴上。<br>
+<img src="https://meredith2328.github.io/post-images/20250702175242.png" alt="" loading="lazy"></p>
+<p>有点像是把它们降维到轴上之后就很容易划分出两个轴上的边界点，从而得到边界线，即将两个不同的变换值整合在一块的一个线性变换：<br>
+<img src="https://meredith2328.github.io/post-images/20250702175305.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/20250702174044.png" alt="" loading="lazy"></p>
+<p>再升维回去，直接考虑整个图像的效果就得到了一个非线性的分类边界：<br>
+<img src="https://meredith2328.github.io/post-images/20250702174129.png" alt="" loading="lazy"></p>
+<blockquote>
+<p>Mathematically we can think of the transformed data as values h1,h2 which we get from applying separators with different parameters to the original data.<br>
+The final prediction then applies a separator to h1,h2.<br>
+<img src="https://meredith2328.github.io/post-images/20250702174343.png" alt="" loading="lazy"></p>
+</blockquote>
+<h2 id="autodiff">AutoDiff</h2>
+<p>Autodiff：标量<code>scalar</code>，自动求导，包括反向传播<br>
+（这时候已经能拿来跑模型训练了，但是因为没有并行所以效率很低）</p>
+<h3 id="autodiff-2">AutoDiff</h3>
+<blockquote>
+<p>modern python语法：<strong>打包与解包</strong></p>
+<p>打包：函数内使用参数<br>
+<code>def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) -&gt; Any:</code><br>
+（这里会把中间的参数全部打包成一整个元组vals）</p>
+<p>解包：函数外传入参数<br>
+<code>return (f(*valsAdd) - f(*valsSub)) / (2 * epsilon)</code><br>
+（这里需要在元组前加入解包的*符号才能传入n个参数）</p>
+</blockquote>
+<p>注意使用中心差分，所以是 <code>(f(x + h) - f(x - h)) / 2h</code> 而不是我们习惯的单<code>h</code>求导方式<br>
+查完wiki发现这一页有写知识点hhhhhh</p>
+<h3 id="scalar">Scalar</h3>
+<blockquote>
+<p>Autodifferentiation works by <strong>collecting information about the computation path</strong> used within the function, and then transforming this information into a procedure for computing derivatives. Unlike the black-box method, autodifferentiation will allow us to use this information to compute each step more precisely.</p>
+</blockquote>
+<p>需要实现<strong>跟踪计算</strong>。</p>
+<p>所以这里的思想同样是通过每一步多记录信息、为我们整体的更优思路提供方便。<br>
+包括将数值和计算函数进行包装。<br>
+要达成的效果：</p>
+<pre><code>x1 = minitorch.Scalar(10)
+x2 = minitorch.Scalar(30)
+y = x1 + x2
+y.history
+</code></pre>
+<pre><code>ScalarHistory(last_fn=&lt;class 'minitorch.scalar_functions.Add'&gt;, ctx=Context(no_grad=False, saved_values=()), inputs=[Scalar(10.000000), Scalar(30.000000)])
+</code></pre>
+<p>所以这就是所谓的forward函数的作用吗。<br>
+apply除了forward中的实际操作，还记录了各种操作，便于利用。</p>
+<blockquote>
+<p>modern python语法：<strong>类方法</strong></p>
+</blockquote>
+<p>在 Python 中，<em>cls</em> 是类方法的第一个参数，用于表示类本身。<br>
+它类似于实例方法中的 <em>self</em>，但 <em>self</em> 代表的是类的实例对象，而 <em>cls</em> 代表的是类对象。</p>
+<ul>
+<li>类方法：使用 <em>@classmethod</em> 装饰器定义，第一个参数必须是 <em>cls</em>，用于访问类变量和其他类方法。</li>
+<li>静态方法：使用 <em>@staticmethod</em> 装饰器定义，不需要 <em>self</em> 或 <em>cls</em> 参数，不能访问类变量。</li>
+</ul>
+<pre><code class="language-python">class MyClass:
+	class_variable = &quot;I am a class variable&quot;
+	
+	@staticmethod
+	def static_method():
+		print(&quot;I am a static method&quot;)
+	
+	@classmethod
+	def class_method(cls):
+		print(cls.class_variable)
+</code></pre>
+<p>之后理一下ScalarFunction的结构：<br>
+这里使用了静态类和cls上下文来组织代码。<br>
+cls是具体的类，所有类都需要在调用自身实现的forward的同时，进行统一输入类型、和创建context等操作，所以将这些统一的操作写到静态的ScalarFunction里。<br>
+这样的好处是，<strong>每个具体类都只需要关心具体的function实现</strong>，而无须考虑接口处理问题。</p>
+<blockquote>
+<p>软件工程知识：<strong>工厂方法</strong></p>
+</blockquote>
+<p>定义一个工厂类（<code>ScalarFunction</code>），它可以根据参数的不同返回不同类的实例（apply类方法），被创建的实例通常都具有共同的父类（Scalar），这正是<em>简单工厂模式</em>。<br>
+（重复一遍，简单工厂模式根据不同传入参数创建不同实例。）<br>
+而将实例创建的具体逻辑不统一在工厂类、而是交予专门的工厂子类完成（如Add等），这正是更进一步的<strong>工厂方法模式</strong>。工厂类只要简单地调用工厂子类变量<code>cls</code>即可。</p>
+<pre><code class="language-python">class ScalarFunction:
+
+    @classmethod
+    def _backward(cls, ctx: Context, d_out: float) -&gt; Tuple[float, ...]:
+        return wrap_tuple(cls.backward(ctx, d_out))  # type: ignore
+
+    @classmethod
+    def _forward(cls, ctx: Context, *inps: float) -&gt; float:
+	    # _forward和_backward一个解包一个装包, 规整一点, 具体逻辑留给具体类
+        return cls.forward(ctx, *inps)  # type: ignore
+
+    @classmethod
+    def apply(cls, *vals: &quot;ScalarLike&quot;) -&gt; Scalar:
+	    ...
+	    # 感觉这里也可以直接调用cls.forward呢，
+	    # 或许是为了代码规整，一个_forward一个_backward都写在静态类里
+	    # 这样的话forward只用写具体逻辑了
+        c = cls._forward(ctx, *raw_vals)
+</code></pre>
+<p>debug:</p>
+<pre><code class="language-python">        c = cls._forward(ctx, *raw_vals)
+&gt;       assert isinstance(c, float), &quot;Expected return type float got %s&quot; % (type(c))
+E       AssertionError: Expected return type float got &lt;class 'int'&gt;
+E       Falsifying example: test_one_args(
+E           fn=('exp', exp, exp),
+E           t1=Scalar(0.000000),  # or any other generated value
+E       )
+
+minitorch\scalar_functions.py:64: AssertionError
+</code></pre>
+<p>思考：为什么c是int，为什么_forward返回了一个int。追踪！<br>
+通过给Neg加print打印类型检错，发现传入int之后加neg还是int。<br>
+在operator里加了个强制转换，解决了问题。</p>
+<pre><code class="language-python">def forward(ctx: Context, a: float) -&gt; float:
+	# print('type of a here is ', type(a))
+	# print('type of neg(a) here is ', type(operators.neg(a)))
+	return operators.neg(a) # 这里需要强制加个转换, 好奇怪
+</code></pre>
+<pre><code>type of a here is  &lt;class 'int'&gt;
+type of neg(a) here is  &lt;class 'int'&gt;
+</code></pre>
+<pre><code class="language-python">def neg(x: float) -&gt; float:
+    &quot;$f(x) = -x$&quot;
+    return -float(x)
+</code></pre>
+<h3 id="chain-rule">Chain Rule</h3>
+<p>将每个函数理解成一个黑箱操作，输入了上一个黑箱的结果，函数调用层层<strong>嵌套</strong>，<br>
+每次求导就是逆黑箱的过程，输入了上一次逆黑箱的结果，求导结果依次<strong>相乘</strong>。</p>
+<p>每次backward就是每个逆黑箱求导的具体过程，即求导并乘d_output。<br>
+例如forward是log(a)，一个输入变量a，<br>
+那么backward输出也只有结果对a求导得到的一个值再乘d_output，即d_output / a。<br>
+再例如forward是a+b，两个输入变量a和b，<br>
+那么backward输出是结果对两个变量分别求偏导得到的两个值、每个值乘d_output，即d_output和d_output。</p>
+<pre><code class="language-python">class Log(ScalarFunction):
+    &quot;Log function $f(x) = log(x)$&quot;
+
+    @staticmethod
+    def forward(ctx: Context, a: float) -&gt; float:
+        '''保存a, 计算log(a)并返回'''
+        ctx.save_for_backward(a)
+        return operators.log(a)
+
+    @staticmethod
+    def backward(ctx: Context, d_output: float) -&gt; float:
+        '''取出保存的a, 根据传回的d_output, 计算d_output/a并返回, 即d_output f\'(x)'''
+        (a,) = ctx.saved_values
+        return operators.log_back(a, d_output)
+</code></pre>
+<p>那么chain rule就是将层层嵌套得到的最终函数一步步逆黑箱，得到计算结果。<br>
+为了编写chain rule，我们需要每个黑箱的信息。看看history是怎么记录的。<br>
+ps. last_fn其实是当前要计算处理的function的意思，至于为什么叫last后面就知道了</p>
+<pre><code class="language-python">    last_fn: Optional[Type[ScalarFunction]] = None
+    ctx: Optional[Context] = None
+    inputs: Sequence[Scalar] = ()
+</code></pre>
+<p>scalar实例是由一系列scalarFunction操作得到的。<br>
+在scalarFunction这个黑盒进行apply时将history以以下形式组织：</p>
+<pre><code class="language-python"># Create a new variable from the result with a new history.
+back = minitorch.scalar.ScalarHistory(cls, ctx, scalars)
+return minitorch.scalar.Scalar(c, back)
+</code></pre>
+<p>即back存储了当前黑盒的cls、ctx和输入值scalars。这足以逆黑盒计算导数。<br>
+cls: 当前黑盒是什么scalarFunction<br>
+scalars: 当前黑盒的全部输入变量<br>
+ctx: forward时记录的变量，现在直接传进去用就行，后面应该会提到</p>
+<p>回到scalar定义的chain_rule接口及相关要求。</p>
+<pre><code class="language-python">def chain_rule(self, d_output: Any) -&gt; Iterable[Tuple[Variable, Any]]:
+</code></pre>
+<blockquote>
+<p>Implement the chain_rule function in Scalar for functions of arbitrary arguments. This function should be able to backward process a function by passing it in a context and (d) and then <strong>collecting the local derivatives</strong>. It should then <strong>pair these with the right variables</strong> and return them. This function is also where we filter out constants that were used on the forward pass, but do not need derivatives.</p>
+</blockquote>
+<p>d_output我们知道是backward里面用到要乘的数值，我们要计算的是 d_output * f'(x)。<br>
+仍然以一个简单的例子为例：<br>
+假设输入值为<code>2.0</code>, 经过一个<code>log</code>，得到了<code>log(2.0)</code>。设<code>d_output = 1</code><br>
+那么我们当前一步的求导一定是：<code>1 * log'(2.0)</code><br>
+即执行了：</p>
+<ol>
+<li>collecting the local derivatives，即对last_fn进行backward得到全部偏导组成的tuple。</li>
+<li>pair these with the right variables，即再进行一个zip操作。</li>
+</ol>
+<p>根据测试里的顺序可以看到每个pair的variable在前面、derivative在后面。</p>
+<h3 id="backpropagate">Backpropagate</h3>
+<blockquote>
+<p>The key implementation challenge of backpropagation is to make sure that we process each node in the correct order, i.e. we have first processed every node that uses a Variable before that varible itself.</p>
+</blockquote>
+<p><a href="https://minitorch.github.io/module1/backpropagate/#running-example">Backpropagate - MiniTorch</a></p>
+<p>这一段看起来难理解一点，那就慢慢读，步步为营，小步快跑<br>
+<img src="https://meredith2328.github.io/post-images/20250707212822.png" alt="" loading="lazy"></p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/20250707213331.png" alt="" loading="lazy"></figure>
+<ul>
+<li>
+<p>第一层<br>
+首先是最后一个黑盒 <s>橘盒</s> 即 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>+</mo></mrow><annotation encoding="application/x-tex">+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">+</span></span></span></span> 输出的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>h</mi><mo>(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo>)</mo><mo>=</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo separator="true">,</mo><mi>a</mi><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo>(</mo><mi>z</mi><mo>)</mo><mo separator="true">,</mo><mi>b</mi><mo>=</mo><mi>e</mi><mi>x</mi><mi>p</mi><mo>(</mo><mi>z</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">h(a, b)=a + b, a = log(z), b = exp(z)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">h</span><span class="mopen">(</span><span class="mord mathdefault">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">b</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">b</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">e</span><span class="mord mathdefault">x</span><span class="mord mathdefault">p</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mclose">)</span></span></span></span><br>
+<strong>每次反黑盒都是黑盒的输出变量通过黑盒的函数形式对输入变量逐个求偏导的过程。</strong><br>
+进行第一个反黑盒backward计算，得到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">h</span></span></span></span>对两个输入变量<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a, b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">b</span></span></span></span>各自的偏导数。</p>
+</li>
+<li>
+<p>第二层<br>
+接下来假设先对上面那个节点进行处理，a自顾自地对z反黑盒（先拿到了偏导数用来乘，再让a对z求导，把用来乘的值和求导值乘起来）<br>
+<img src="https://meredith2328.github.io/post-images/20250707213447.png" alt="" loading="lazy"></p>
+</li>
+</ul>
+<p>再对下面黑盒处理，b对z反黑盒<br>
+<img src="https://meredith2328.github.io/post-images/20250707213747.png" alt="" loading="lazy"></p>
+<p>根据链式法则，为了将这一步两个反黑盒与前一步反黑盒结合起来、得到h对z的导数，除了前述“拿到偏导数用来<strong>乘</strong>”的步骤，还要把这一步两个反黑盒得到的值<strong>加</strong>起来。<br>
+（某一层有多个对相同变量的反黑盒，得到的导数要加起来）</p>
+<ul>
+<li>第三层<br>
+最后一层反黑盒。拿汇合的导数值作为乘数，乘以z分别对x和y的偏导，就得到了结果： <code>x.derivative</code>和<code>y.derivative</code>，即<strong>h对x和y的偏导</strong>。<br>
+<img src="https://meredith2328.github.io/post-images/20250707214230.png" alt="" loading="lazy"><br>
+有趣的是，在以上的过程中，每个变量及中间变量（如h、a、b、x、y）都有保存的导数。<br>
+第一层反黑盒传入的导数是h对h，输出了<strong>h对a</strong>和<strong>h对b</strong>；<br>
+第二层反黑盒传入的导数是h对a和h对b，先计算了a对z和b对z，再输出了<strong>h对z</strong>；<br>
+第三层反黑盒传入的导数是h对z，先计算了z对x和z对y，再输出了h对x和h对y。<br>
+上述加粗的存储入以被求导变量为键的字典用于后续计算使用，而最后的变量（leaf variable, x和y）被存储（如 <code>x.derivative, y.derivative</code>）。</li>
+</ul>
+<blockquote>
+<p>Backpropagate Algorithm：反向传播算法</p>
+</blockquote>
+<ol start="0">
+<li>Call topological sort to get an ordered queue</li>
+<li>Create a dictionary of Scalars and current derivatives</li>
+<li>For each node in backward order, pull a completed Scalar and derivative from the queue:</li>
+</ol>
+<ul>
+<li>a. if the Scalar is a leaf, add its final derivative (<code>accumulate_derivative</code>) and loop to (1)</li>
+<li>b. if the Scalar is not a leaf,
+<ul>
+<li>a. call <code>.chain_rule</code> on the last function with <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>d</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{out}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.84444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2805559999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">u</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></li>
+<li>b. loop through all the Scalars+derivative produced by the chain rule</li>
+<li>c. accumulate derivatives for the Scalar in a dictionary</li>
+</ul>
+</li>
+</ul>
+<p>之后实现了拓扑排序、实现了反向传播，再实现算子的backward，就搞定了这一段。<br>
+其中实现算子的backward时，需要什么变量，forward就存过来什么变量。（也可以为了节省计算而存入一些计算好的值，我这里直接传变量再算一遍了）<br>
+完结撒花。</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/20250707232057.png" alt="" loading="lazy"></figure>
+<h2 id="tensors">Tensors</h2>
+<p>Tensor：把标量<code>scalar</code>换成张量<code>Tensor</code>，与Pytorch使用的数据结构保持一致</p>
+<h3 id="tensor_data">tensor_data</h3>
+<p>实现了tensor的索引部分，参考Pytorch的API确定相关功能。为了保证输出正确，相关命令结果均通过Pytorch运行后复制得到。</p>
+<p>stride是在Tensor指定维度中从一个元素跳到下一个元素的步长，而shape是Tensor的形状。<br>
+也就是说stride是可以从shape推断得到的。<br>
+感觉stride是一个非常有用的思考方式，从多维到一维映射。一开始没看知识讲解，看了之后感觉醍醐灌顶。</p>
+<blockquote>
+<ul>
+<li><strong>Strides</strong> is a tuple that provides the mapping from user indexing to the position in the 1-D <code>storage</code>.</li>
+<li><code>contiguous</code> mapping, is in the natural counting order (<strong>bigger strides left</strong>).</li>
+</ul>
+</blockquote>
+<pre><code class="language-python">&gt;&gt;&gt; a = torch.arange(6)
+&gt;&gt;&gt; b = a.view(2, 3)
+&gt;&gt;&gt; b
+tensor([[0, 1, 2],
+        [3, 4, 5]])
+&gt;&gt;&gt; b.stride()
+(3, 1)
+&gt;&gt;&gt; b.shape
+torch.Size([2, 3])
+</code></pre>
+<p>index方法：把元组形式的index转换为下标。<br>
+indices方法：产生n多个元组形式index的iterable，其中n是内部存储的数量。</p>
+<pre><code class="language-python">    def indices(self) -&gt; Iterable[UserIndex]:
+        lshape: Shape = array(self.shape)
+        out_index: Index = array(self.shape)
+        for i in range(self.size):
+            to_index(i, lshape, out_index)
+            yield tuple(out_index)
+</code></pre>
+<p>把数字按照形状排列如果没有思路不妨找找规律。正如我们在CS61A中反复采用的方法，对应于某个初始值处理得到某一位，然后通过改变初始值再相同处理得到下一位，如是迭代。</p>
+<pre><code class="language-python"># 0-&gt;(0,0) 5-&gt;(1,0) 10-&gt;(2,0) 14-&gt;(2,4), 当 shape=(3,5)
+# 0-&gt;(0,0,0) 3-&gt;(0,0,3) 4-&gt;(0,1,0) 12-&gt;(1,0,0) 当shape=(2,3,4)
+# out_index[-1] = ordinal % shape[-1]  
+# out_index[-2] = ordinal // shape[-1] % shape[-2]
+# out_index[-3] = ordinal // shape[-1] // shape[-2] % shape[-3]
+for i in range(len(shape) - 1, -1, -1): # 倒序
+	out_index[i] = ordinal % shape[i]
+	ordinal = ordinal // shape[i]
+</code></pre>
+<p>不妨读读从shape到stride转换的代码以加深理解：</p>
+<pre><code class="language-python">def strides_from_shape(shape: UserShape) -&gt; UserStrides:
+    layout = [1]
+    offset = 1
+    for s in reversed(shape):
+        layout.append(s * offset)
+        offset = s * offset
+    return tuple(reversed(layout[:-1]))
+</code></pre>
+<p>eg. (5, 2) -&gt; (2, 1)<br>
+思考：<br>
+strides的最右侧维度，当前步长一定为1（offset的当前值为1），故layout初始化为<code>[1]</code><br>
+strides的右数第二维，当前步长乘了shape最右侧维度，<br>
+右数第三维再乘了shape右数第二维维度，以此类推，<br>
+strides的最左维一定是乘了shape的左数第二维得到的。</p>
+<p>permute方法用于重新排列维度：</p>
+<pre><code class="language-python">import torch
+x = torch.randn(2, 3, 5)
+x_permuted = x.permute(2, 0, 1) # 使用permute函数重新排列维度
+print(x_permuted.size()) # 输出: torch.Size([5, 2, 3])
+</code></pre>
+<p>这个很适合用列表推导式来写。因为列表推导式天然地可以根据某个顺序来重新排列列表。<br>
+例如将a按照order顺序排列，就是<code>[a[i] for i in order]</code>。</p>
+<pre><code class="language-python">return TensorData(self._storage, tuple([self.shape[i] for i in order]), tuple([self.strides[i] for i in order]))
+</code></pre>
+<h3 id="broadcasting">broadcasting</h3>
+<p><strong>Rule 1</strong>: Any dimension of size 1 can be zipped with dimensions of size n &gt; 1 by assuming the dimension is copied n times.<br>
+eg.<br>
+(3,) + (1,) = (3,)<br>
+(5, 1) + (5, 3) = (5, 3)</p>
+<p><strong>Rule 2</strong>: Extra dimensions of shape 1 can be added to a tensor to ensure the same number of dimensions with another tensor.<br>
+<strong>Rule 3</strong>: Any extra dimension of size 1 can only be implicitly added <strong>on the left side</strong> of the shape.<br>
+eg.<br>
+(3,) + (5, 3) = (1, 3) + (5, 3) = (5, 3)<br>
+(2, 3, 1) + (7, 2, 1, 5) = (1, 2, 3, 1) + (7, 2, 1, 5) = (7, 2, 3, 5)</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/20250713170442.png" alt="" loading="lazy"></figure>
+<h3 id="autograd">Autograd</h3>
+<p>先看autograd的API效果：</p>
+<pre><code class="language-python">&gt;&gt;&gt; import torch
+&gt;&gt;&gt; tensor1 = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+&gt;&gt;&gt; out = tensor1.sum()
+&gt;&gt;&gt; out.backward()
+&gt;&gt;&gt; print(tensor1.grad)
+tensor([1., 1., 1.])
+&gt;&gt;&gt;
+</code></pre>
+<p>原因：执行了一个sum函数（当然梯度是不因tensor初始值发生变化的，只取决于执行的函数）</p>
+<pre><code>out = sum([x1, x2, x3]) = x1 + x2 + x3
+所以out对x的梯度是[1., 1., 1.]
+</code></pre>
+<p>再比如说执行乘和求和两个函数，函数梯度再发生变化：</p>
+<pre><code class="language-python">&gt;&gt;&gt; tensor1 = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+&gt;&gt;&gt; out = (tensor1 * 2).sum()
+&gt;&gt;&gt; out.backward()
+&gt;&gt;&gt; print(tensor1.grad)
+tensor([2., 2., 2.])
+</code></pre>
+<blockquote>
+<p>It turns out that you can do most of machine learning without ever thinking in higher dimensions.</p>
+</blockquote>
+<p>这里别的都好说，硬算就行，<br>
+permute函数的backward需要通过实验额外说明一下：</p>
+<pre><code class="language-python">&gt;&gt;&gt; x = torch.randn(2, 3, 4, requires_grad = True)
+&gt;&gt;&gt; y = x.permute(2, 0, 1)
+&gt;&gt;&gt; y.shape
+torch.Size([4, 2, 3])
+&gt;&gt;&gt; loss = y.sum()
+&gt;&gt;&gt; loss.backward()
+&gt;&gt;&gt; x.grad.shape
+torch.Size([2, 3, 4])
+</code></pre>
+<pre><code class="language-python">&gt;&gt;&gt; x = torch.randn(2, 3, 4, requires_grad = True)
+&gt;&gt;&gt; loss = x.sum()
+&gt;&gt;&gt; loss.backward()
+&gt;&gt;&gt; x.grad.shape
+torch.Size([2, 3, 4])
+</code></pre>
+<p>x先执行了permute，再执行了sum，之后执行backward。<br>
+从两个实验可以看出，无论是否执行permute，对完整过程执行backward得到的是一样的。这说明permute的backward事实上是一个逆向permute的过程，将gradient与输入张量对齐。<br>
+由此可以得到以下的实现：</p>
+<pre><code class="language-python">    @staticmethod
+    def backward(ctx: Context, grad_output: Tensor) -&gt; Tuple[Tensor, float]:
+		# 第一个是把grad_output按照a的shape和strides重排, 第二个是order的梯度为0.0
+        (a,) = ctx.saved_values
+        return Tensor.make(grad_output._tensor._storage, a.shape, a.strides, grad_output.backend), 0.0
+</code></pre>
+<p>之后2.4和2.5逐渐遇到一些神奇的bug，不知道是框架代码写错了还是我写错了。反正修改掉其中一者最后能跑就行。</p>
+<h2 id="efficiency">Efficiency</h2>
+<p>Efficiency：使用<code>numba</code>并行和CUDA编程等方式提升效率。<br>
+Networks：已经开发出一个很简单的pytorch了，来拿它搞个卷积神经网络进行图像分类这种上游任务吧！</p>
+<p>参考了：</p>
+<ol>
+<li><a href="https://minitorch.github.io/">Minitorch项目文档</a></li>
+<li>numba的文档相关部分（<a href="https://numba.readthedocs.io/en/stable/user/parallel.html">Automatic parallelization with @jit</a>）</li>
+<li>https://github.com/mukobi/Minitorch-Self-Study-Guide-SAIA</li>
+</ol>
+<h3 id="parallelization">parallelization</h3>
+<p>Numba教程属于是。<br>
+比较：</p>
+<pre><code class="language-python">def map(fn):
+    # Change 1: Move function from Python to JIT version.
+    fn = njit()(fn)
+
+    def _map(out, input):
+        for i in range(len(out)):
+            out[i] = fn(input[i])
+
+    # Change 2: Internal _map must be JIT version as well.
+    return njit()(_map)
+</code></pre>
+<pre><code class="language-python">def map(fn): 
+	fn = njit()(fn) 
+	
+	def _map(out, input): 
+		# Change 3: Run the loop in parallel (prange) 
+		for i in prange(len(out)): 
+			out[i] = fn(input[i]) 
+			
+	return njit(parallel=True)(_map)
+</code></pre>
+<p>三个优化目标：</p>
+<ul>
+<li>Main loop in parallel （用 <code>numba.prange</code> 替代 <code>range</code>）</li>
+<li>All indices use numpy buffers （所有索引计算都使用ndarray，而非list或tuple）</li>
+<li>When <code>out</code> and <code>in</code> are stride-aligned, avoid indexing（跳过索引计算，直接线性遍历）<br>
+ps. 搞不懂reduce的不要调用函数是啥意思。查阅了其他github fork的实现，都调用了函数。</li>
+</ul>
+<p>这里有个搞笑的事情：在tensor_data/to_index函数的实现中，要加个trick：<br>
+把ordinal改成cur_pos，为了不是改变同一变量，加个0。</p>
+<pre><code>cur_pos = ordinal + 0 # 为了Module3并行, 不能修改循环变量的trick
+for i in range(len(shape) - 1, -1, -1): # 倒序
+	out_index[i] = cur_pos % shape[i]
+	cur_pos = cur_pos // shape[i]
+</code></pre>
+<p>之后parallel_check三个函数都得到以下结果了：</p>
+<pre><code>------------------------------ After Optimisation ------------------------------
+Parallel structure is already optimal.
+--------------------------------------------------------------------------------
+</code></pre>
+<p>写这个task踩的一些坑：</p>
+<ol>
+<li>把parallel=True关掉再看看。控制变量，从而确定是并行的问题、还是改函数的时候把函数逻辑改错了。</li>
+<li>一点一点改。先跟原来的实现保持完全一致，然后慢慢加prange和快速路径等等，小步快跑，这样出错了可以发现问题在哪里。一口气全加上去了，报错还是得一点一点改。</li>
+<li>到了并行，似乎很多时候调试器也不完全能解决问题。就像我拿pdb调到那里、自己调用相关函数跑发现addConstant确实把<code>[[0.00], [0.00]]</code>加成<code>[[5.00], [5.00]]</code>了，明明跑的跟代码一模一样的函数，结果它并行起来就变成<code>[0.00, 5.00]</code>了。这是什么事嘛。</li>
+</ol>
+<p>之后先把另外两个的parallel给关了，专心调map的问题。</p>
+<h4 id="cannot-determine-numba-type">Cannot determine Numba type</h4>
+<p>这里报了一个神奇的错误 <code>Untyped global name 'exp': Cannot determine Numba type of &lt;class 'function'&gt;</code>，需要回去改operators.py：<br>
+我在sigmoid实现中用到了同模块的exp函数，这是不被numba识别的，将其修改为math.exp或np.exp即可。<br>
+同理，在operators.py中的每个函数都不能互相依赖，而只能引用math或np库。</p>
+<p>一开始：</p>
+<pre><code class="language-python">def sigmoid(x: float) -&gt; float:
+    if x &gt;= 0:
+        return 1.0 / (1.0 + exp(-x))
+    else:
+        return exp(x) / (1.0 + exp(x))
+</code></pre>
+<p>修改后：</p>
+<pre><code class="language-python">def sigmoid(x: float) -&gt; float:
+    if x &gt;= 0:
+        return 1.0 / (1.0 + math.exp(-x))
+    else:
+        return math.exp(x) / (1.0 + math.exp(x))
+</code></pre>
+<p>修改完保险起见把之前的测试用例再跑了一遍，没什么问题。<br>
+开着parallel=False先改完这个bug、task3.1可以全部通过。再把parallel=True打开跑跑看。<br>
+发现直接改prange解决不了问题。去读读numba的文档（<a href="https://numba.readthedocs.io/en/stable/user/parallel.html">Automatic parallelization with @jit</a>）。</p>
+<h4 id="race">race</h4>
+<p>里面讲了一个race的案例。先拿串行测试一下正常情况：</p>
+<pre><code class="language-python">&gt;&gt;&gt; x = np.ones(4)
+&gt;&gt;&gt; n = x.shape[0]
+&gt;&gt;&gt; n
+4
+&gt;&gt;&gt; y = np.zeros(4)
+&gt;&gt;&gt; for i in range(n):
+...     y[:] += x[i]
+...
+&gt;&gt;&gt; y
+array([4., 4., 4., 4.])
+</code></pre>
+<p>如果写得不对，结果会如下：</p>
+<pre><code class="language-python">&gt;&gt;&gt; from numba import njit, prange
+&gt;&gt;&gt; @njit(parallel=True)
+... def prange_wrong_result(x):
+...     n = x.shape[0]
+...     y = np.zeros(4)          # y = [0, 0, 0, 0]
+...     for i in prange(n):      # 并行循环，i 同时跑
+...         y[:] += x[i]         # 每个线程都在改 y 的全部元素
+...     return y
+...
+
+&gt;&gt;&gt; prange_wrong_result(x)
+array([4., 4., 4., 4.])
+&gt;&gt;&gt; prange_wrong_result(x)
+array([3., 3., 4., 4.])
+&gt;&gt;&gt; prange_wrong_result(x)
+array([4., 4., 4., 4.])
+&gt;&gt;&gt; prange_wrong_result(x)
+array([3., 2., 2., 2.])
+&gt;&gt;&gt; prange_wrong_result(x)
+array([2., 2., 2., 2.])
+</code></pre>
+<p>我们可以查一下，发现numba会自动根据CPU核数把循环拆成多个线程来跑：</p>
+<pre><code class="language-python">&gt;&gt;&gt; from numba import config
+&gt;&gt;&gt; print(&quot;Numba 并行线程数：&quot;, config.NUMBA_NUM_THREADS)    
+Numba 并行线程数： 16
+</code></pre>
+<p>所以上述循环会拆成以下的效果，造成同时读写的冲突：</p>
+<pre><code>- 线程 A：执行 `y[:] += 1`
+- 线程 B：执行 `y[:] += 1`
+- 线程 C：执行 `y[:] += 1`
+- 线程 D：执行 `y[:] += 1`
+</code></pre>
+<p>但如果通过 <code>y += x[i]</code> 等 Numba 能识别的 “规约操作”（reduction），Numba 会自动把 <code>y += x[i]</code> 转换成线程安全的加法，不会多个线程同时写同一个位置，不会race。</p>
+<blockquote>
+<p>A reduction is inferred automatically if a variable is updated by a supported binary function/operator using its previous value in the loop body. The following functions/operators are supported: <code>+=</code>, <code>+</code>, <code>-=</code>, <code>-</code>, <code>*=</code>, <code>*</code>, <code>/=</code>, <code>/</code>, <code>max()</code>, <code>min()</code>. The initial value of the reduction is inferred automatically for the supported operators (i.e., not the <code>max</code> and <code>min</code> functions). Note that the <code>//=</code> operator is not supported because in the general case the result depends on the order in which the divisors are applied. However, if all divisors are integers then the programmer may be able to rewrite the <code>//=</code> reduction as a <code>*=</code> reduction followed by a single floor division after the parallel region where the divisor is the accumulated product. For the <code>max</code> and <code>min</code> functions, the reduction variable should hold the identity value right before entering the <code>prange</code> loop. Reductions in this manner are supported for scalars and for arrays of arbitrary dimensions. （numba文档）</p>
+</blockquote>
+<p>因此排除发现，是我把out_index和in_index的初始化拿出循环的锅，出现race了。<br>
+修改后如下：</p>
+<pre><code class="language-python">def tensor_map(
+    fn: Callable[[float], float]
+) -&gt; Callable[[Storage, Shape, Strides, Storage, Shape, Strides], None]:
+    def _map(
+        out: Storage,
+        out_shape: Shape,
+        out_strides: Strides,
+        in_storage: Storage,
+        in_shape: Shape,
+        in_strides: Strides,
+    ) -&gt; None:
+        # 3. stride-aligned, 快速路径
+        if (
+            len(out_shape) == len(in_shape) and
+            (out_shape == in_shape).all() and
+            (out_strides == in_strides).all()
+        ):
+            for i in prange(len(out)): # 1. parallel
+                out[i] = fn(in_storage[i])
+        else:
+            # 2. ndarray
+            for out_i in prange(len(out)): # 1. parallel
+                # 不要把out_index和in_index拿出循环, 不然会race
+                out_index = np.empty(len(out_shape), dtype=np.int32)
+                in_index = np.empty(len(in_shape), dtype=np.int32)
+                to_index(out_i, out_shape, out_index)
+                broadcast_index(out_index, out_shape, in_shape, in_index)
+                out_pos = index_to_position(out_index, out_strides)
+                in_pos = index_to_position(in_index, in_strides)
+                out[out_pos] = fn(in_storage[in_pos])
+
+    return njit(parallel=True)(_map)  # type: ignore
+</code></pre>
+<p>如法炮制、修改zip和reduce，成功通过task3.1。</p>
+<h3 id="matrix-multiplication">Matrix Multiplication</h3>
+<p>根据矩阵微积分的性质有：<br>
+<img src="https://meredith2328.github.io/post-images/20250717195114.png" alt="" loading="lazy"><br>
+优化要求：</p>
+<ul>
+<li>Outer loop in parallel</li>
+<li>No index buffers or function calls</li>
+<li>Inner loop should have no global writes, 1 multiply.</li>
+</ul>
+<p>outer loop很好理解，就是遍历结果矩阵index的那个loop，这个肯定是prange就搞定了的。<br>
+第二行还是没听懂，为了思考方便还是直接调用之前实现的to_index之类的函数了。<br>
+第三个是理所应当的，按照numba优化的写法把reduction变量写在外面、里面+=。</p>
+<h3 id="关于numbacuda">关于numba.cuda</h3>
+<p>之后看了一眼 <code>projects/run_fast_tensor.py</code> ，发现我用pip安装的<code>numba==0.60.0</code>没有<code>numba.cuda</code>，于是<code>pip uninstall</code>了一下，又用<code>conda</code>安装了<code>numba</code>和<code>cudatoolkit</code>。</p>
+<pre><code>pip uninstall numba
+conda install numba==0.60.0 cudatoolkit -c conda-forge -y
+</code></pre>
+<p>然后拿以下指令查了一下：</p>
+<pre><code>&gt;&gt;&gt; from numba import cuda
+&gt;&gt;&gt; print(cuda.gpus)
+&lt;Managed Device 0&gt;
+</code></pre>
+<p>感觉是minitorch的代码和我numba版本不匹配，把<code>numba.cuda.is_available()</code>改了一下：</p>
+<pre><code class="language-python">from numba import cuda
+if cuda.gpus:
+    GPUBackend = minitorch.TensorBackend(minitorch.CudaOps)
+</code></pre>
+<h3 id="cuda-operations-and-matrix-multiplication">CUDA operations and Matrix Multiplication</h3>
+<p>未进行学习，直接在代码中参考了github上可通过测试的开源实现。<br>
+Task3.3: <a href="https://github.com/atgctg/minitorch">atgctg/minitorch: Solutions for http://minitorch.github.io</a><br>
+Task3.4: <a href="https://github.com/feimos32/Minitorch-Learning-Introduction">feimos32/Minitorch-Learning-Introduction: （已完结）斯坦福大学机器学习项目MiniTorch解读——《MiniTorch 学习全攻略》 的随书源码。</a><br>
+（推荐：<a href="https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf">MiniTorch-学习全攻略.pdf</a>）</p>
+<h2 id="附-基于pytorch代码讲讲反向传播和计算图">附: 基于Pytorch代码，讲讲反向传播和计算图</h2>
+<p>以下代码选取自PyTorch官方的 <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">Quickstart — PyTorch Tutorials</a><br>
+省略了<code>import</code>，数据集加载，设置<code>DataLoader</code>，建立模型，设置损失函数和优化器。</p>
+<pre><code class="language-python">def train(dataloader, model, loss_fn, optimizer):
+    size = len(dataloader.dataset)
+    model.train() # 将模型设置为训练模式
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+
+        # Compute prediction error
+        pred = model(X) # 模型前向传播, 得到预测值
+        loss = loss_fn(pred, y) # 根据预测值和实际值, 得到loss
+
+        # Backpropagation
+        loss.backward() # !Autograd主要干了这个函数的事情!
+        optimizer.step() # 优化一轮参数
+        optimizer.zero_grad() # 将梯度清零
+
+        if batch % 100 == 0:
+            loss, current = loss.item(), (batch + 1) * len(X)
+            print(f&quot;loss: {loss:&gt;7f}  [{current:&gt;5d}/{size:&gt;5d}]&quot;)
+</code></pre>
+<pre><code class="language-python">def test(dataloader, model, loss_fn):
+    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    model.eval()
+    test_loss, correct = 0, 0
+    with torch.no_grad(): # 为了加快推理, 所有前向操作都不计算梯度
+        for X, y in dataloader:
+            X, y = X.to(device), y.to(device)
+            pred = model(X) # 上面设置后, 这里面的每一步前向操作都不计算梯度
+            test_loss += loss_fn(pred, y).item()
+            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+    test_loss /= num_batches
+    correct /= size
+    print(f&quot;Test Error: \n Accuracy: {(100*correct):&gt;0.1f}%, Avg loss: {test_loss:&gt;8f} \n&quot;)
+</code></pre>
+<p>我们知道，在前向传播的同时也建立了计算图。用以下数值例子举例。<br>
+ps. 数值例子由GPT生成，可能存在计算错误。</p>
+<h3 id="单变量标量函数">单变量标量函数</h3>
+<p>前向传播：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi><mo>=</mo><mo>(</mo><mi>x</mi><mo>+</mo><mn>2</mn><msup><mo>)</mo><mn>2</mn></msup><mo separator="true">,</mo><mi>x</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">L = (x + 2)^2, x = 1
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span></p>
+<p>计算图：</p>
+<pre><code>    x=1     2
+     \     /
+      + --&gt; a=3
+        \
+         \
+          **2 --&gt; y=9 --&gt; L=9
+</code></pre>
+<p>由<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo separator="true">,</mo><mi>y</mi><mo>=</mo><msup><mi>a</mi><mn>2</mn></msup><mo separator="true">,</mo><mi>L</mi><mo>=</mo><mi>y</mi></mrow><annotation encoding="application/x-tex">a=x+2, y=a^2, L=y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.008548em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span>，依次用<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span></span></span></span>计算<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mo separator="true">,</mo><mi>a</mi><mo separator="true">,</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">y,a,x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">x</span></span></span></span>的偏导数。</p>
+<p>首先计算 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial y} = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3612159999999998em;vertical-align:-0.481108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801079999999999em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>,<br>
+再计算</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>=</mo><mn>1</mn><mo>×</mo><mn>6</mn><mo>=</mo><mn>6</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial a} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial a} = 1 \times 6=6
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.25188em;vertical-align:-0.8804400000000001em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804400000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.0574399999999997em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714399999999998em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">6</span></span></span></span></span></p>
+<p>最后计算</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>6</mn><mo>×</mo><mn>1</mn><mo>=</mo><mn>6</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial x} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial x} = 6 \times 1=6
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">x</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">x</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">6</span></span></span></span></span></p>
+<p>可见每一步的共同点：以计算 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2251079999999999em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801079999999999em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">a</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 为例，<br>
+都是把上一步的梯度计算结果（如 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3612159999999998em;vertical-align:-0.481108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801079999999999em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> ）拿过来，乘以这一步计算出的梯度（如 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>y</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\partial y}{\partial a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.277216em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9322159999999999em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">a</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.446108em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> ）。</p>
+<p>我们可以把<strong>正向</strong>的过程看作正向的一个黑箱操作（即构造的计算图），<br>
+<strong>由上一步传播过来的值进行了函数运算得到另一个值、传播的是函数值，</strong><br>
+而<strong>反向</strong>的过程看作反向的一个黑箱操作（即计算图的逆向），<br>
+<strong>由上一步传播过来的导数值乘以当前步的求导运算得到另一个导数值，传播的是导数值。</strong></p>
+<h3 id="多变量标量函数">多变量标量函数</h3>
+<p>前向传播：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi><mo>=</mo><mo>(</mo><mi>w</mi><mo>⋅</mo><mi>x</mi><mo>+</mo><mi>b</mi><msup><mo>)</mo><mn>2</mn></msup><mo separator="true">,</mo><mi>w</mi><mo>=</mo><mn>2</mn><mo separator="true">,</mo><mi>x</mi><mo>=</mo><mn>3</mn><mo separator="true">,</mo><mi>b</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">L=(w⋅x+b)^2,w=2,x=3,b=1
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mord mathdefault">b</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">b</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span></p>
+<p>计算图：</p>
+<pre><code>  w=2   x=3       b=1
+   \   /          |
+    * --&gt; a=6     |
+      \          /
+       + --&gt; z=7
+         \
+          \
+           **2 --&gt; L=49
+</code></pre>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>=</mo><mn>2</mn><mo>×</mo><mn>7</mn><mo>=</mo><mn>14</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial z} = 2 \times 7 = 14
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">7</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">4</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>=</mo><mn>14</mn><mo>×</mo><mn>1</mn><mo>=</mo><mn>14</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial a} = \frac{\partial L}{\partial z} \cdot \frac{\partial z}{\partial a} = 14 \times 1 = 14
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">4</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac><mo>=</mo><mn>14</mn><mo>×</mo><mn>3</mn><mo>=</mo><mn>42</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial w} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial w} = 14 \times 3 = 42
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord">2</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>a</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>14</mn><mo>×</mo><mn>2</mn><mo>=</mo><mn>28</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial x} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial x} = 14 \times 2 = 28
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">x</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">x</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">8</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow></mfrac><mo>⋅</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>z</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>b</mi></mrow></mfrac><mo>=</mo><mn>14</mn><mo>×</mo><mn>1</mn><mo>=</mo><mn>14</mn></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial b} = \frac{\partial L}{\partial z} \cdot \frac{\partial z}{\partial b} = 14 \times 1 = 14
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">b</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">b</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">4</span></span></span></span></span></p>
+<p>这里重点关注两个点：一是两个变量的加法，二是两个变量的乘法。<br>
+将两个变量加在一起时（如<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>z</mi><mo>=</mo><mi>a</mi><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">z=a+b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">b</span></span></span></span>），对每个变量的偏导值均为1。所以要得到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span></span></span></span>对每个变量的偏导，只需<strong>把上一步传播过来的值乘以1即可</strong>。<br>
+将两个变量乘在一起时（如<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo>=</mo><mi>w</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">a=wx</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">x</span></span></span></span>），<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">a</span></span></span></span>对<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span></span></span></span>求导得到的是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span>的值，反之对<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span>求导得到的是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span></span></span></span>的值。所以要得到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span></span></span></span>对每个变量的偏导，只需<strong>把上一步传播过来的值乘以另一个变量即可</strong>。这一事实也会运用到后面的矩阵乘法上。</p>
+<h3 id="矩阵乘法">矩阵乘法</h3>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>X</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><mi>W</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">X = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \end{bmatrix}, \quad
+W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span></span></span></span></span></p>
+<p>前向传播：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>h</mi><mo>=</mo><mi>X</mi><mi mathvariant="normal">@</mi><mi>W</mi><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>⋅</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>⋅</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>⋅</mo><mn>0</mn><mo>+</mo><mn>2</mn><mo>⋅</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>3</mn><mo>⋅</mo><mn>1</mn><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>2</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>3</mn><mo>⋅</mo><mn>0</mn><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>11</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">h = X @ W = 
+\begin{bmatrix}
+1 \cdot 1 + 2 \cdot 2 &amp; 1 \cdot 0 + 2 \cdot 1 \\
+3 \cdot 1 + 4 \cdot 2 &amp; 3 \cdot 0 + 4 \cdot 1
+\end{bmatrix} =
+\begin{bmatrix}
+5 &amp; 2 \\
+11 &amp; 4
+\end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">h</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mord">@</span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi><mo>=</mo><mi mathvariant="normal">∥</mi><mi>h</mi><msup><mi mathvariant="normal">∥</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msubsup><mi>h</mi><mrow><mi>i</mi><mi>j</mi></mrow><mn>2</mn></msubsup><mo>=</mo><msup><mn>5</mn><mn>2</mn></msup><mo>+</mo><msup><mn>2</mn><mn>2</mn></msup><mo>+</mo><mn>1</mn><msup><mn>1</mn><mn>2</mn></msup><mo>+</mo><msup><mn>4</mn><mn>2</mn></msup><mo>=</mo><mn>25</mn><mo>+</mo><mn>4</mn><mo>+</mo><mn>121</mn><mo>+</mo><mn>16</mn><mo>=</mo><mn>166</mn></mrow><annotation encoding="application/x-tex">L = \|h\|^2 = \sum h_{ij}^2 = 5^2 + 2^2 + 11^2 + 4^2 = 25 + 4 + 121 + 16 = 166
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathdefault">h</span><span class="mord"><span class="mord">∥</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.6000100000000002em;vertical-align:-0.55001em;"></span><span class="mop op-symbol large-op" style="position:relative;top:-0.000004999999999977245em;">∑</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.864108em;"><span style="top:-2.4530000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span style="top:-3.1130000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.383108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">5</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord"><span class="mord">1</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8641079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord">6</span></span></span></span></span></p>
+<p>计算图：</p>
+<pre><code>     X        W
+      \      /
+       @ --&gt; h (2x2)
+         \
+          \
+           sum(h²) --&gt; L=166
+</code></pre>
+<p>反向传播：要求 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>X</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial X}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2251079999999999em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801079999999999em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight" style="margin-right:0.07847em;">X</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>W</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial W}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2251079999999999em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801079999999999em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 。<br>
+根据矩阵微分的知识，</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>h</mi></mrow></mfrac><mo>=</mo><mn>2</mn><mi>h</mi><mo>=</mo><mn>2</mn><mo>⋅</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>11</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>10</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>22</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial h} = 2h = 2 \cdot \begin{bmatrix} 5 &amp; 2 \\ 11 &amp; 4 \end{bmatrix} = \begin{bmatrix} 10 &amp; 4 \\ 22 &amp; 8 \end{bmatrix}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">h</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault">h</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>W</mi></mrow></mfrac><mo>=</mo><msup><mi>X</mi><mi>T</mi></msup><mi mathvariant="normal">@</mi><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>h</mi></mrow></mfrac><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mi mathvariant="normal">@</mi><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>10</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>22</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>⋅</mo><mn>10</mn><mo>+</mo><mn>3</mn><mo>⋅</mo><mn>22</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>1</mn><mo>⋅</mo><mn>4</mn><mo>+</mo><mn>3</mn><mo>⋅</mo><mn>8</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>2</mn><mo>⋅</mo><mn>10</mn><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>22</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>2</mn><mo>⋅</mo><mn>4</mn><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>8</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>76</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>28</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>108</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>40</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial W} = X^T @ \frac{\partial L}{\partial h} =
+\begin{bmatrix} 1 &amp; 3 \\ 2 &amp; 4 \end{bmatrix} @
+\begin{bmatrix} 10 &amp; 4 \\ 22 &amp; 8 \end{bmatrix} =
+\begin{bmatrix}
+1 \cdot 10 + 3 \cdot 22 &amp; 1 \cdot 4 + 3 \cdot 8 \\
+2 \cdot 10 + 4 \cdot 22 &amp; 2 \cdot 4 + 4 \cdot 8
+\end{bmatrix} =
+\begin{bmatrix}
+76 &amp; 28 \\
+108 &amp; 40
+\end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913309999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mord">@</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">h</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">@</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span><span class="mord">2</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">8</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">7</span><span class="mord">6</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">8</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>X</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>h</mi></mrow></mfrac><mi mathvariant="normal">@</mi><msup><mi>W</mi><mi>T</mi></msup><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>10</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>22</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mi mathvariant="normal">@</mi><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>10</mn><mo>⋅</mo><mn>1</mn><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>10</mn><mo>⋅</mo><mn>2</mn><mo>+</mo><mn>4</mn><mo>⋅</mo><mn>1</mn></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>22</mn><mo>⋅</mo><mn>1</mn><mo>+</mo><mn>8</mn><mo>⋅</mo><mn>0</mn></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mn>22</mn><mo>⋅</mo><mn>2</mn><mo>+</mo><mn>8</mn><mo>⋅</mo><mn>1</mn></mrow></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><mo>=</mo><mrow><mo fence="true">[</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>10</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>24</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>22</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>52</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial X} = \frac{\partial L}{\partial h} @ W^T =
+\begin{bmatrix} 10 &amp; 4 \\ 22 &amp; 8 \end{bmatrix} @
+\begin{bmatrix} 1 &amp; 2 \\ 0 &amp; 1 \end{bmatrix} =
+\begin{bmatrix}
+10 \cdot 1 + 4 \cdot 0 &amp; 10 \cdot 2 + 4 \cdot 1 \\
+22 \cdot 1 + 8 \cdot 0 &amp; 22 \cdot 2 + 8 \cdot 1
+\end{bmatrix} =
+\begin{bmatrix}
+10 &amp; 24 \\
+22 &amp; 52
+\end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">h</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathdefault">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord">@</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913309999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">@</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">0</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.40003em;vertical-align:-0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">[</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord">0</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord">4</span></span></span><span style="top:-2.4099999999999997em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9500000000000004em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">]</span></span></span></span></span></span></span></p>
+<p>ps. 这里的矩阵乘法反向传播同样遵循“L对某个变量求导，就是拿传播值乘以另一个变量”，与前述“多变量标量函数”部分有共通之处。</p>
+<h3 id="总结">总结</h3>
+<p>由上述案例可知，<strong>计算图</strong>是描述前向传播、反向传播过程的一个通用手段。<br>
+它将反向传播中每一步的导数计算简化为<strong>上一步传播的值 乘以 这一步的导数</strong>，<br>
+通过记录前向传播中经历的函数过程及相应变量的值，达成了反向传播的计算。</p>
+<p><strong>前向传播</strong>即是由输入变量经过模型（即一系列的函数操作）得到输出变量的过程。<br>
+（输出变量经历激活函数，与实际变量通过损失函数计算出损失）<br>
+<strong>反向传播</strong>即是由损失值逆着模型（即一系列的求导运算）计算出损失函数对各个输入变量的偏导数。<br>
+（得到偏导数是为了优化器可以采用梯度下降等方式更新模型参数）</p>
+<p>在这样观察了之后，对PyTorch的训练与推理的函数过程就了解得比较完整了。</p>
+<blockquote>
+<p>edit time: 2025-07-02 17:07:11 （Fundamentals√）<br>
+edit time: 2025-07-02 17:54:05 （ML Primer√）<br>
+edit time: 2025-07-07 23:33:57 （AutoDiff√）<br>
+edit time: 2025-07-15 17:18:18 （Tensors√）<br>
+edit time: 2025-07-23 22:29:56‎ （Efficiency√）<br>
+edit time: 2025-08-03 22:09:45 （附: 基于Pytorch代码，讲讲反向传播和计算图√）</p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%AE%89%E8%A3%85%E7%8E%AF%E5%A2%83">安装环境</a></li>
+<li><a href="#fundamentals">Fundamentals</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82">实现细节</a></li>
+<li><a href="#%E7%BB%93%E6%9E%9C">结果</a></li>
+</ul>
+</li>
+<li><a href="#ml-primer">ML Primer</a></li>
+<li><a href="#autodiff">AutoDiff</a>
+<ul>
+<li><a href="#autodiff-2">AutoDiff</a></li>
+<li><a href="#scalar">Scalar</a></li>
+<li><a href="#chain-rule">Chain Rule</a></li>
+<li><a href="#backpropagate">Backpropagate</a></li>
+</ul>
+</li>
+<li><a href="#tensors">Tensors</a>
+<ul>
+<li><a href="#tensor_data">tensor_data</a></li>
+<li><a href="#broadcasting">broadcasting</a></li>
+<li><a href="#autograd">Autograd</a></li>
+</ul>
+</li>
+<li><a href="#efficiency">Efficiency</a>
+<ul>
+<li><a href="#parallelization">parallelization</a>
+<ul>
+<li><a href="#cannot-determine-numba-type">Cannot determine Numba type</a></li>
+<li><a href="#race">race</a></li>
+</ul>
+</li>
+<li><a href="#matrix-multiplication">Matrix Multiplication</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8Enumbacuda">关于numba.cuda</a></li>
+<li><a href="#cuda-operations-and-matrix-multiplication">CUDA operations and Matrix Multiplication</a></li>
+</ul>
+</li>
+<li><a href="#%E9%99%84-%E5%9F%BA%E4%BA%8Epytorch%E4%BB%A3%E7%A0%81%E8%AE%B2%E8%AE%B2%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%92%8C%E8%AE%A1%E7%AE%97%E5%9B%BE">附: 基于Pytorch代码，讲讲反向传播和计算图</a>
+<ul>
+<li><a href="#%E5%8D%95%E5%8F%98%E9%87%8F%E6%A0%87%E9%87%8F%E5%87%BD%E6%95%B0">单变量标量函数</a></li>
+<li><a href="#%E5%A4%9A%E5%8F%98%E9%87%8F%E6%A0%87%E9%87%8F%E5%87%BD%E6%95%B0">多变量标量函数</a></li>
+<li><a href="#%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95">矩阵乘法</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/ieee754/">
+              <h3 class="post-title">
+                IEEE754 浮点数与十进制数互相转换流程及例子
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

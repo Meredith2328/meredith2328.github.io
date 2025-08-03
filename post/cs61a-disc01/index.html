@@ -1,0 +1,386 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS61A disc01 “迭代与抽象” | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS61A disc01 “迭代与抽象” | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Discussion 1 | CS 61A Summer 2024
+
+edit time: 2024-07-17 17:57:15
+
+Q1: Race
+eg. race(3, 4)
+以下先考虑前10min中构造无限循环。
+第一个条件显然不符..." />
+    <meta name="keywords" content="CS61A" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS61A disc01 “迭代与抽象”
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-07-17
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/cX9znZti-/" class="post-tag">
+                  # CS61A
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p><a href="https://cs61a.org/disc/disc01/">Discussion 1 | CS 61A Summer 2024</a></p>
+<blockquote>
+<p>edit time: 2024-07-17 17:57:15</p>
+</blockquote>
+<h2 id="q1-race">Q1: Race</h2>
+<p>eg. <code>race(3, 4)</code></p>
+<p>以下先考虑前10min中构造无限循环。<br>
+第一个条件显然不符合我们的需要。<br>
+因为第二个条件是 <code>tortoise - hare</code> ，若其为负值、则仍可以继续循环。<br>
+0-4min 由于<code>y&gt;x</code>，<code>hare=my &gt; tortoise=mx</code>，不可能追上。<br>
+5-9min 此时 <code>hare=5y</code> ，<code>tortoise=mx, m = 6, ..., 10</code>，恰好追上即<code>mx=5y</code>，即<code>6x=5y, 7x=5y, 8x=5y, 9x=5y, 10x=5y</code>这五种情况。<br>
+任意选择不满足这五种情况的值即可。</p>
+<p>关于值有误的情况：举例为 <code>race(3,5)</code> ，按照上面的推理继续往后，实际是满足了 <code>25x=15y</code> 的情况，恰好不是无限循环。</p>
+<p>懒得做一般推理了qwq读者有兴趣自便咯</p>
+<h2 id="q2-fizzbuzz">Q2: Fizzbuzz</h2>
+<pre><code class="language-python">def fizzbuzz(n):
+    for i in range(1, n + 1):
+        if (i % 3 == 0):
+            if (i % 5 == 0):
+                print('fizzbuzz')
+            else:
+                print('fizz')
+        else:
+            if (i % 5 == 0):
+                print('buzz')
+            else:
+                print(i)
+</code></pre>
+<h2 id="q3-is-prime">Q3: Is Prime?</h2>
+<p>虽然这道题实现很容易，而且很可能已经在读者的长期记忆中存下来了，但不妨去跟着hint想一下这个过程。</p>
+<p>（1. Pick an example input and corresponding output.）<br>
+用 <code>n=10, return False</code> 举例，考虑详细过程 ：</p>
+<p>（2. Describe a process (in English) that computes the output from the input using simple steps.）<br>
+检测是否为素数即该正整数（下简写为数）不被 <code>1</code> 和 <code>10</code> 整除。<br>
+<code>10</code> 显然不会被大于<code>10</code>的数整除。<br>
+因此我们要考虑的是：怎样描述一个过程，以检测<code>10</code> 是否被 <code>1</code> 到 <code>10</code> 中间的这些正整数整除。<br>
+可以从小到大按顺序依次递增检测：<br>
+检测<code>10</code>是否被<code>2</code>整除，即<code>10 % 2 == 0</code> ，若满足则返回<code>False</code> ，不满足则继续检测<code>3</code>；<br>
+检测<code>10</code>是否被<code>3</code>整除，即<code>10 % 3 == 0</code> ，若满足则返回<code>False</code> ，不满足则继续检测<code>4</code>；<br>
+...<br>
+直到全部检测完毕（即检测完<code>n-1</code>）为止，返回<code>True</code>。</p>
+<p>（3. Figure out what additional names you'll need to carry out this process.）</p>
+<blockquote>
+<p>这一步最为关键。<br>
+但没有上一步的准确描述，往往不能正确地完成这一步。</p>
+</blockquote>
+<p>那么我们再做<strong>抽象</strong>：前面的步骤都有共同的结构，即检测 <code>10 % i == 0, 1 &lt; i &lt; 10</code>，若满足则返回<code>False</code> ，不满足则继续检测下一个数。<br>
+在这个抽象中，“additional name”是<code>i</code>，表示某一个特定的数。<br>
+我们可以取<code>i</code>初始为<code>2</code>，<code>i</code>的下一个数是<code>i+1</code>，这样可以覆盖到范围内所需的所有的数，达成了我们的需求。</p>
+<p>（4. Implement the process in code using those additional names.）<br>
+那么对于上面这个非常符合直觉的检测过程，<code>python</code>提供了这个循环结构对应的函数：<code>for i in range(2, n)</code>，表示<code>i</code>的范围从<code>2</code>到<code>n-1</code>依次递增。代码如下：</p>
+<pre><code class="language-python">def is_prime(n):
+	&quot;&quot;&quot;Haven't Finished.&quot;&quot;&quot;
+    for i in range(2, n):
+        if (n % i == 0):
+            return False
+    return True
+</code></pre>
+<p>（5. Determine whether the implementation really works on your original example.）<br>
+我们将<code>n=10</code>代入其中考虑，发现<code>i=2</code>时满足<code>10%2==0</code>，得到<code>False</code>符合我们判断的结果。</p>
+<p>（6. Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)）<br>
+可以尝试执行<code>is_prime(n), n = 1, 2, ..., 10</code>这样的方式，人工测试；或者通过确认无误的函数来对照检测该函数的正确性。<br>
+我们意识到（或通过测试发现）存在一个反例：<code>n=1</code>是无法满足的，但对于其他情况，我们上述的过程尚不存在反例。因此，我们考虑将<code>n=1</code>单独处理，见下。<br>
+（我认为，只有对算法过程从数学上严格证明不存在反例，才能保证算法的正确性；否则上述过程可能只能保证对测试用例有效）</p>
+<pre><code class="language-python">def is_prime(n):
+    if n == 1:
+        return False
+    for i in range(2, n):
+        if (n % i == 0):
+            return False
+    return True
+</code></pre>
+<h2 id="q4-unique-digits">Q4: Unique Digits</h2>
+<pre><code class="language-python">def unique_digits(n):
+    &quot;&quot;&quot;Return the number of unique digits in positive integer n.
+    &gt;&gt;&gt; unique_digits(8675309) # All are unique
+    7
+    &gt;&gt;&gt; unique_digits(13173131) # 1, 3, and 7
+    3
+    &gt;&gt;&gt; unique_digits(101) # 0 and 1
+    2
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    count = 0
+    for i in range(0, 10):
+        if has_digit(n, i):
+            count += 1
+    return count
+  
+def has_digit(n, k):
+    &quot;&quot;&quot;Returns whether k is a digit in n.
+    &gt;&gt;&gt; has_digit(10, 1)
+    True
+    &gt;&gt;&gt; has_digit(12, 7)
+    False
+    &quot;&quot;&quot;
+    assert k &gt;= 0 and k &lt; 10
+
+    &quot;*** YOUR CODE HERE ***&quot;
+
+    while (n &gt; 0):
+        if n % 10 == k:
+            return True
+        n //= 10
+    return False
+</code></pre>
+<p>我们当然可以用其他的算法，也可以利用已经完成的函数。</p>
+<p>这里依旧使用上一题的<code>Problem-Solving</code>思想：<br>
+考虑出一种包含基本（这里的simple含义我不是很确定：基本、简单，似乎都能说通）步骤的过程，<br>
+在这个过程中抽象出<code>additional names</code>即更一般的某个“东西”，把过程表示成对这些“东西”的操作。转化为代码，尝试引出这个过程的那个案例，再尝试其他案例，反复迭代修改过程。</p>
+<p>用在本题中，“有数字”可以考虑的判断条件是“某一位数字是否等于已知数”，那么就要考虑怎样将所查数按顺序拆分成各数字，进而引出转化为字符串、或者整除运算等方法。<br>
+整除运算是很常见的用法，可以记忆并熟练运用。</p>
+<h2 id="q5-ordered-digits">Q5: Ordered Digits</h2>
+<pre><code class="language-python">def ordered_digits(x):
+    &quot;&quot;&quot;Return True if the (base 10) digits of X&gt;0 are in non-decreasing
+    order, and False otherwise.
+    &gt;&gt;&gt; ordered_digits(5)
+    True
+    &gt;&gt;&gt; ordered_digits(11)
+    True
+    &gt;&gt;&gt; ordered_digits(127)
+    True
+    &gt;&gt;&gt; ordered_digits(1357)
+    True
+    &gt;&gt;&gt; ordered_digits(21)
+    False
+    &gt;&gt;&gt; result = ordered_digits(1375) # Return, don't print
+    &gt;&gt;&gt; result
+    False
+    &quot;&quot;&quot;
+
+    &quot;*** YOUR CODE HERE ***&quot;
+    while (x &gt; 0):
+        if (x % 10) &lt; (x // 10 % 10):
+            return False
+        x //= 10
+    return True
+</code></pre>
+<p>类似上一题的思考：<br>
+逐个判断“是否有某一位数小于它的高位数”？</p>
+<h2 id="总结">总结</h2>
+<p>很明显，Q3-Q5反映了相同的从一个具体案例，引出解决过程的描述、对该过程描述中的实体的抽象、再反过来利用抽象测试是否满足该案例，以及是否满足其他案例这样的“迭代过程”。<br>
+这个思想贯穿整个课程及教材，务必仔细体会。</p>
+<p>如下摘录相关思想的原文。</p>
+<blockquote>
+<p><strong>Problem-Solving</strong> from <a href="https://cs61a.org/disc/disc01/">Discussion 1 | CS 61A Summer 2024</a></p>
+</blockquote>
+<p>A useful approach to implementing a function is to:</p>
+<ol>
+<li>Pick an example input and corresponding output.</li>
+<li>Describe a process (in English) that computes the output from the input using simple steps.</li>
+<li>Figure out what additional names you'll need to carry out this process.</li>
+<li>Implement the process in code using those additional names.</li>
+<li>Determine whether the implementation really works on your original example.</li>
+<li>Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)</li>
+</ol>
+<p>Importantly, this approach doesn't go straight from reading a question to writing code.</p>
+<p>For example, in the <code>is_prime</code> problem below, you could:</p>
+<ol>
+<li>Pick <code>n</code> is 9 as the input and <code>False</code> as the output.</li>
+<li>Here's a process: Check that <code>9</code> (<code>n</code>) is not a multiple of any integers between 1 and <code>9</code> (<code>n</code>).</li>
+<li>Introduce <code>i</code> to represent each number between 1 and 9 (<code>n</code>).</li>
+<li>Implement <code>is_prime</code> (you get to do this part with your group).</li>
+<li>Check that <code>is_prime(9)</code> will return <code>False</code> by thinking through the execution of the code.</li>
+<li>Check that <code>is_prime(3)</code> will return <code>True</code> and <code>is_prime(1)</code> will return <code>False</code>.</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#q1-race">Q1: Race</a></li>
+<li><a href="#q2-fizzbuzz">Q2: Fizzbuzz</a></li>
+<li><a href="#q3-is-prime">Q3: Is Prime?</a></li>
+<li><a href="#q4-unique-digits">Q4: Unique Digits</a></li>
+<li><a href="#q5-ordered-digits">Q5: Ordered Digits</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/csapp-shelllab/">
+              <h3 class="post-title">
+                CSAPP: shelllab
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

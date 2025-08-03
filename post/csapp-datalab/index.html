@@ -1,0 +1,416 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSAPP: datalab | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CSAPP: datalab | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+最近没写什么其他好玩的东西，拿课堂作业报告水一水blog。
+
+对于浮点数部分，额外写了笔记，欢迎参阅：
+IEEE754浮点数与十进制数互相转换流程及例子
+运行结果
+dlc
+make
+./dlc -e bits.c
+
+
+btest
+./bt..." />
+    <meta name="keywords" content="CSAPP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CSAPP: datalab
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-04-30
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/oq58-HRV4/" class="post-tag">
+                  # CSAPP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://meredith2328.github.io/post-images/csapp-datalab.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>最近没写什么其他好玩的东西，拿课堂作业报告水一水blog。</p>
+</blockquote>
+<p>对于浮点数部分，额外写了笔记，欢迎参阅：<br>
+<a href="https://meredith2328.github.io/post/ieee754/">IEEE754浮点数与十进制数互相转换流程及例子</a></p>
+<h2 id="运行结果">运行结果</h2>
+<h3 id="dlc">dlc</h3>
+<pre><code>make
+./dlc -e bits.c
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1714446458477.png" alt="" loading="lazy"></figure>
+<h3 id="btest">btest</h3>
+<pre><code>./btest
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1714446471662.png" alt="" loading="lazy"></figure>
+<h2 id="思路">思路</h2>
+<h3 id="bitxor">bitXor</h3>
+<ul>
+<li>解法一</li>
+</ul>
+<p>直接考虑所求的两种情况。</p>
+<p>利用对称差公式：x ^ y = (x&amp;~y) | (y&amp;~x)，</p>
+<p>我们需要取这两种情况，所以取两次反，</p>
+<p>并将其中一次取反运用于<em>狄·摩根律</em>完成从|到&amp;的转换，即得所求为</p>
+<p><code>~(~(x &amp; ~y) &amp; ~(y &amp; ~x))</code>。</p>
+<ul>
+<li>解法二</li>
+</ul>
+<p>考虑反面的另外两种情况。</p>
+<p>x和y均为1或0时，x^y返回0。单独取这两种情况即为 (x &amp; y) | (~x &amp; ~y)。</p>
+<p>取其反面即为~( (x &amp; y) | (~x &amp; ~y) )。</p>
+<p>再运用<em>狄·摩根律</em>：~(a|b)=(~a)&amp;(~b) 完成从|到&amp;的转换，即得所求为</p>
+<p><code>~(~(x &amp; y)) &amp; ~(~x &amp; ~y))</code>。</p>
+<h3 id="tmin">tmin</h3>
+<p>32位的Two's complement范围为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>−</mo><msup><mn>2</mn><mn>31</mn></msup></mrow><annotation encoding="application/x-tex">-2^{31}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，</p>
+<p>其中<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mo>−</mo><msup><mn>2</mn><mn>31</mn></msup><mo>=</mo><mo>(</mo><mn>1</mn><mo>&lt;</mo><mo>&lt;</mo><mn>31</mn><mo>)</mo></mrow><annotation encoding="application/x-tex">T_{min}=-2^{31}=(1&lt;&lt;31)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>，即为首位为1、其余全0。</p>
+<h3 id="istmax">isTmax</h3>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>=</mo><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T_{max}=2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，即为首位为0、其余全1，</p>
+<ol>
+<li>正常思路是比较其取反是否为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{min}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，即返回值为 <code>~Tmax == Tmin</code>。</li>
+</ol>
+<p>但本题中不允许使用左移，也不能直接构造<code>Tmin = 0x80000000</code>，</p>
+<p>所以<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T_{min}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>要通过<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">T_{max}+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">m</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>得到，即<code>~x == x + 1</code>。</p>
+<p>根据课本习题，<code>a==b</code>可以表示为 <code>!(a^b)</code> （因为a是自身的加法逆元，a^a=0，取非!即得1），</p>
+<p>符合题目中返回值只有1和0的条件。所以返回值改写为<code>!(~x ^ (x + 1))</code>。</p>
+<ol start="2">
+<li>但根据数据验证，发现-1也满足上述条件<code>~x == x + 1</code>，所以将-1另外排除，即正常思路为<code>x != -1</code>。</li>
+</ol>
+<p>再根据符号限制得到条件为<code>!!(x + 1)</code>。</p>
+<p>（用两次!是因为最终使用位与验证1、2条件同时满足，所以两个条件的值应该为0或1。但<code>x+1</code>的值不一定为0或1，所以用!规格化可以使其他非-1的值全部返回0，符合我们的需求）</p>
+<p>综上得到返回值为 <code>!(~x ^ (x + 1)) &amp; !!(x + 1)</code>，共8 ops，</p>
+<p>为了再简化可以反用前述<em>狄摩根律</em>写为<code>!((~x ^ (x + 1)) | !((x + 1) ^ 0))</code>，共7 ops。</p>
+<h3 id="alloddbits">allOddBits</h3>
+<p>因为所给符号与位数关联的只有左右移，需要人为构造，</p>
+<p>考虑使用掩码(BitMask)，即<code>x &amp; BitMask</code>某一位为1当且仅当x和BitMask该位同时为1。</p>
+<p>由于允许使用的常数范围为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mi>x</mi><mn>00</mn></mrow><annotation encoding="application/x-tex">0x00</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord mathdefault">x</span><span class="mord">0</span><span class="mord">0</span></span></span></span>到<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mi>x</mi><mi>F</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">0xFF</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">0</span><span class="mord mathdefault">x</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span></span></span></span>​，首先考虑长为8 bits的奇数x位置为1，相应掩码为[1010 1010]即<code>int bitMask = 0xAA</code>。其满足的条件应为 <code>x &amp; bitMask == bitMask</code>，即<code>!((x &amp; bitMask) ^ 0xbitMask)</code>。</p>
+<p>如果对x的所有8 Byte均判断，结果需要大量符号，所以构造所需的32 bits掩码即可。即</p>
+<p><code>int bitMask = (0xAA &lt;&lt; 24) | (0xAA &lt;&lt; 16) | (0xAA &lt;&lt; 8) | 0xAA</code>。</p>
+<h3 id="negate">negate</h3>
+<p>根据课本对模数加法构成阿贝尔群的论述，Tmin的加法逆元为Tmin，而其他数x的加法逆元为-x。</p>
+<p>这两种结果都满足 <code>-x == ~x + 1</code> 。</p>
+<h3 id="isasciidigit">isAsciiDigit</h3>
+<p>题目需要人为构造，考虑使用掩码。</p>
+<p>考虑题设条件：[0011 0000] &lt;= x &lt;= [0011 1001]，可以用以下条件逐位判断：</p>
+<pre><code>if ((x &gt;&gt; 4) == 0x3) {
+	int 3rdBit = (x &gt;&gt; 3) &amp; 0x1; // the 3rd bit, counting from 0th
+	if (3rdBit == 0) return 1;
+	else {
+		// if 3rdBit == 1, then 2ndBit and 1stBit must be [00]
+		int 2ndAnd1stBit = (x &gt;&gt; 1) &amp; 0x3;
+		if (2rdAnd1stBit == 0) return 1;
+		else return 0;
+	}
+}
+else return 0;
+</code></pre>
+<p>接下来将上述条件简化并根据所给符号改写即可，改写举例如下：</p>
+<pre><code>int HigherByteCond = !((x &gt;&gt; 4) ^ 0x3);
+int the3rdBit = (x &gt;&gt; 3) &amp; 0x1;
+int the2ndAnd1stBit = (x &gt;&gt; 1) &amp; 0x3;
+return HigherByteCond &amp; ((!the3rdBit) | (the3rdBit &amp; (!the2ndAnd1stBit)));
+</code></pre>
+<p>共计12 ops。</p>
+<h3 id="conditional">conditional</h3>
+<p>首先考虑没有限制的情况，再根据限制改写符号。</p>
+<p>不考虑符号时如下：</p>
+<pre><code>if (x) return z;
+else return y;
+</code></pre>
+<p>因为z和y具有某种程度的对称性，返回z可以拆成z + 0，返回y可以拆成 0 + y，</p>
+<p>所以如果按照python的逻辑与，返回值可以写为<code>(cond &amp;&amp; z) | (!cond &amp;&amp; y)</code>或<code>(cond &amp;&amp; z) + (!cond &amp;&amp; y)</code>。（python中，逻辑与的两侧如果同时非0，则返回其右侧的值）</p>
+<p>但需要考虑多位的返回值时，<code>&amp;&amp;</code>不能简单地改写为位与，所以另寻他法，即掩码运算。</p>
+<p>因为x只有非0和0，所以一定需要首先使用<code>int cond = !x;</code>来规格化，从而只考虑条件值为1和0的情况。</p>
+<p>如果z和y均只有一位，则返回值可以写为 <code>cond &amp; z + (!cond) &amp; y</code>，注意到cond实际扮演了掩码的角色。这为我们提供了灵感：可以根据cond构造所需长度的掩码（0xFFFFFFFF和0x00000000），规避显式的条件判断。即所需返回值为 <code>bitMask &amp; z + ~bitMask &amp; y</code>，只需构造<code>bitMask</code>即可。</p>
+<p>最后注意到取负可以分别将cond为1和0时映射到0xFFFFFFFF即-1与0x00000000即0，完成<code>bitMask</code>的构造。</p>
+<p>综上，本题思路如下：</p>
+<pre><code>int cond = !x;
+int bitMask = ~cond + 1;
+return ((~bitMask) &amp; y) + (bitMask &amp; z);
+</code></pre>
+<h3 id="islessorequal">isLessOrEqual</h3>
+<p>用差实现比较，差通过取负实现。</p>
+<p>根据课本，作和差时需要考虑溢出问题。正溢出得负数，负溢出得正数，判断即可。</p>
+<p>同号则一定不溢出、返回<code>diffSign</code>；前0后1时返回0、前1后0时返回1，即返回<code>xSign</code>。</p>
+<p>注意<code>diffSign</code>最好使用<code>-x + y</code>得到，它的符号位在<code>x &lt;= y</code>时一定为0，反之一定为1；</p>
+<p>而如果使用<code>x + (-y)</code>就不会有这样良好的效果（当<code>x == y</code>时）。</p>
+<pre><code>int xSign = (x &gt;&gt; 31) &amp; 0x1;
+int ySign = (y &gt;&gt; 31) &amp; 0x1;
+int signXor = xSign ^ ySign;
+int negaX = ~x + 1; 
+int diffSign = ((negaX + y) &gt;&gt; 31) &amp; 0x1;
+return ((!signXor) &amp; (!diffSign)) | (signXor &amp; xSign);
+</code></pre>
+<h3 id="logicalneg">logicalNeg</h3>
+<p>能够区分0和非0的性质非常有限，比如<code>x == -x</code>。但如果异或两个完整值，则仍然没有规避规格化问题。</p>
+<ul>
+<li>解法一</li>
+</ul>
+<p>考虑判断<code>x</code>与<code>-x</code>的符号位，并只对这一位做异或得到<code>signXor</code>，</p>
+<p>再将得到的0映射到1，得到的1映射到0即可，可以返回<code>1 - signXor = 2 + ~(signXor)</code>。</p>
+<p>除此之外，之前提到了<code>Tmin</code>的加法逆元也是其本身，需要排除掉。</p>
+<pre><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+return ~(x &gt;&gt; 31) &amp; (2 + ~(signXor));
+</code></pre>
+<p>将0映射到1、将1映射到0也可以通过“加法逆元”即与1异或实现，即返回<code>signXor ^ 0x1</code>。</p>
+<pre><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+return ~(x &gt;&gt; 31) &amp; (signXor ^ 0x1);
+</code></pre>
+<p>共计9 ops。</p>
+<ul>
+<li>解法二</li>
+</ul>
+<p>相比于异或，先“并”再移位之后取反得到的符号判断可以将<code>Tmin</code>也包含在非0的情况中，省去返回值的特判。</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1714446532858.png" alt="" loading="lazy"></figure>
+<pre><code>int sameSign = ((x | (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+return sameSign ^ 0x1;
+</code></pre>
+<p>甚至只有6 ops。</p>
+<h3 id="howmanybits">howManyBits</h3>
+<p>好难，需要多次细分。</p>
+<p>首先要注意这道题<strong>并没有限制字长为32</strong>，所以可以只用符号位的1 bit表示-1。</p>
+<p>正因如此，获得了重要的对称性：某个负值表示需要的比特数恰好等同于其取反需要的比特数，</p>
+<p>所以利用掩码将负值取反得到正值，正值或0不变：</p>
+<p>掩码取<code>x &gt;&gt; 31</code>，类似于前述<em>conditional</em>，置<code>y=x, z=~x</code>。</p>
+<p>之后利用二分思想，将判断区间划分为16、8、4、2、1。</p>
+<p>这基于以下事实：如果高16位不全为0（<code>!!(x &gt;&gt; 16) == 1</code>），则低16位需要被表示出来，即答案加16。</p>
+<p>同理，如果 <code>!!(x &gt;&gt; power) == 1</code>，则答案加<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>o</mi><mi>w</mi><mi>e</mi><mi>r</mi><mo>=</mo><msup><mn>2</mn><mi>m</mi></msup><mo>=</mo><mo>(</mo><mn>1</mn><mo>&lt;</mo><mo>&lt;</mo><mi>m</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">power=2^m=(1 &lt;&lt; m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">m</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">m</span><span class="mclose">)</span></span></span></span>，</p>
+<p>即加 <code>bPower = !!(x &gt;&gt; power) &lt;&lt; m</code>。</p>
+<p>其中写作<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>o</mi><mi>w</mi><mi>e</mi><mi>r</mi></mrow><annotation encoding="application/x-tex">power</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span>而非<code>1 &lt;&lt; m</code>是为了节省符号数。分别取<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>o</mi><mi>w</mi><mi>e</mi><mi>r</mi><mo>=</mo><mn>16</mn><mo separator="true">,</mo><mn>8</mn><mo separator="true">,</mo><mn>4</mn><mo separator="true">,</mo><mn>2</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">power=16,8,4,2,1,0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">0</span></span></span></span>判断、再将x右移<code>bPower</code>位即可。</p>
+<h3 id="floatscale2">floatScale2</h3>
+<p>终于解锁了条件判断和大常数。首先将浮点数拆分得到s, exp, frac分别占1, 8, 23位。</p>
+<p>特判NaN情况，除此之外：</p>
+<p>如果为非规格化（<code>exp == 0</code>），则直接给frac左移一位（注意使用位或的原因：当frac最高位为1时，这样的左移恰好为exp提供1，使其转化为较连续的非规格化值）；</p>
+<p>如果为规格化 （<code>exp != 0 &amp;&amp; exp != 0xFF</code>），则给exp加一。</p>
+<h3 id="floatfloat2int">floatFloat2Int</h3>
+<p>特判：<code>exp == 0xFF</code> 时返回 0x80000000u即<code>1&lt;&lt;31</code>。</p>
+<p>其他情况不妨首先考虑非负数情况，如果为负数则在最后取负。</p>
+<p>非规格化：<code>exp == 0</code>，其表示值范围为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mo>≤</mo><mi>x</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">0 \le x &lt; 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.78041em;vertical-align:-0.13597em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，强制类型转换为<code>int</code>则直接向0取整返回0。可以合并到下述E&lt;0的情况。</p>
+<p>规格化：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><mo>(</mo><mo>−</mo><mn>1</mn><msup><mo>)</mo><mi>s</mi></msup><mo>×</mo><mi>M</mi><mo>×</mo><msup><mn>2</mn><mi>E</mi></msup></mrow><annotation encoding="application/x-tex">V=(-1)^s \times M \times 2^E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">1</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">s</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">E</span></span></span></span></span></span></span></span></span></span></span>，其中<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>E</mi><mo>=</mo><mi>e</mi><mo>−</mo><mi>B</mi><mi>i</mi><mi>a</mi><mi>s</mi><mo>=</mo><mi>e</mi><mo>−</mo><mn>127</mn></mrow><annotation encoding="application/x-tex">E=e-Bias=e-127</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">e</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">i</span><span class="mord mathdefault">a</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">e</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord">7</span></span></span></span>。</p>
+<p>当<code>E&lt;0</code>时，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">V&lt;1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72243em;vertical-align:-0.0391em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，直接返回0；</p>
+<p>当<code>E&gt;=31</code>时，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>&gt;</mo><mi>T</mi><mi>m</mi><mi>a</mi><mi>x</mi><mo>=</mo><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">V&gt;Tmax=2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72243em;vertical-align:-0.0391em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span>，特判返回0x80000000u即<code>1&lt;&lt;31</code>。</p>
+<p>接下来处理其他情况。</p>
+<p>在相乘之前给M补回隐含的1，即 <code>frac |= 0x800000;</code>，则包含一开始的掩码操作在内，我们此时取得的<code>unsigned frac</code> 是一个以1开头的24位的unsigned，相当于已经给规格化公式所需的值<code>M(1 &lt;= M &lt; 2)</code> 左移了23位。</p>
+<p>即当<code>E &gt;= 24</code>时，我们已左移的23位还需继续左移，即再左移<code>E - 23</code>位，总共左移了<code>E</code>位，满足<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>M</mi><mo>×</mo><msup><mn>2</mn><mi>E</mi></msup></mrow><annotation encoding="application/x-tex">M \times 2^E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">E</span></span></span></span></span></span></span></span></span></span></span>，</p>
+<p>当<code>E &lt;= 23</code>时，我们将已左移的23位回退<code>23 - E</code>位，相当于实际左移了<code>E</code>位，满足<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>M</mi><mo>×</mo><msup><mn>2</mn><mi>E</mi></msup></mrow><annotation encoding="application/x-tex">M \times 2^E</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">E</span></span></span></span></span></span></span></span></span></span></span>。</p>
+<p>最后根据符号s返回相应正负值即可。</p>
+<h3 id="floatpower2">floatPower2</h3>
+<p>要注意到答案<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mi>x</mi></msup></mrow><annotation encoding="application/x-tex">2^x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.664392em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">x</span></span></span></span></span></span></span></span></span></span></span>的值一定大于0，则它能取到的最小值是非规格化数表示的最小正值，最大值是规格化数表示的最大正值。</p>
+<p>先考虑非规格化数。考虑除0之外最小的非规格化数，即<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>E</mi><mo>=</mo><mn>1</mn><mo>−</mo><mn>127</mn><mo>=</mo><mo>−</mo><mn>126</mn></mrow><annotation encoding="application/x-tex">E=1-127=-126</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord">7</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord">1</span><span class="mord">2</span><span class="mord">6</span></span></span></span>，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mi>r</mi><mi>a</mi><mi>c</mi><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>23</mn></mrow></msup></mrow><annotation encoding="application/x-tex">frac=2^{-23}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">a</span><span class="mord mathdefault">c</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></span>， 此时<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>126</mn></mrow></msup><mo>×</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>23</mn></mrow></msup><mo>=</mo><msup><mn>2</mn><mrow><mo>−</mo><mn>149</mn></mrow></msup></mrow><annotation encoding="application/x-tex">V=2^{-126} \times 2^{-23}=2^{-149}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span><span class="mord mtight">2</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span><span class="mord mtight">4</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></span>即为可以表示的最小值。因此如果<code>x &lt; -149</code>，则精度太高、无法表示，直接返回<code>0</code>。</p>
+<p>其余非规格化数的情况在精度范围内，<code>frac = x + 149</code>，此时要表示成float串，只有frac部分，表示的值恰好为实际值<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span>，$V=2^{-126} \times 2^{-23} \times 2<sup>x=2</sup>{x-149} $，故返回 <code>1 &lt;&lt; (x + 149)</code> 。直到左移至exp不为0，所以这种情况的边界条件是<code> x &lt;= -127</code>。</p>
+<p>当<code>x + 149 &gt;= 23</code>即<code>x &gt;= -126</code>时，开始规格化表示。对于规格化数，能表示的最大数的数量级应为exp除了第一位以外全为1、即<code>exp==127</code>，因此当<code>x &gt; 127</code>时返回+INF即<code>0xFF &lt;&lt; 23</code>。</p>
+<p>其余规格化数的情况是<code>-126 &lt;= x &lt;= 127</code>，此时要表示成float串，<code>e = E + 127 = x + 127</code>，而frac部分均为0，即返回<code>(x + 127) &lt;&lt; 23</code>。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C">运行结果</a>
+<ul>
+<li><a href="#dlc">dlc</a></li>
+<li><a href="#btest">btest</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%9D%E8%B7%AF">思路</a>
+<ul>
+<li><a href="#bitxor">bitXor</a></li>
+<li><a href="#tmin">tmin</a></li>
+<li><a href="#istmax">isTmax</a></li>
+<li><a href="#alloddbits">allOddBits</a></li>
+<li><a href="#negate">negate</a></li>
+<li><a href="#isasciidigit">isAsciiDigit</a></li>
+<li><a href="#conditional">conditional</a></li>
+<li><a href="#islessorequal">isLessOrEqual</a></li>
+<li><a href="#logicalneg">logicalNeg</a></li>
+<li><a href="#howmanybits">howManyBits</a></li>
+<li><a href="#floatscale2">floatScale2</a></li>
+<li><a href="#floatfloat2int">floatFloat2Int</a></li>
+<li><a href="#floatpower2">floatPower2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/KaguraHikari/">
+              <h3 class="post-title">
+                为什么神乐光很萌？
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

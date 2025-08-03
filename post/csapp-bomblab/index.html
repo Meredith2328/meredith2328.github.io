@@ -1,0 +1,490 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSAPP: bomblab | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CSAPP: bomblab | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。
+因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。
+
+效果截图
+
+各phase答案:
+sudo hostnamectl se..." />
+    <meta name="keywords" content="CSAPP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CSAPP: bomblab
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-04-30
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/oq58-HRV4/" class="post-tag">
+                  # CSAPP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://meredith2328.github.io/post-images/csapp-bomblab.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。<br>
+因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。</p>
+</blockquote>
+<h2 id="效果截图">效果截图</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1714446702306.png" alt="" loading="lazy"></figure>
+<p>各phase答案:</p>
+<pre><code>sudo hostnamectl set-hostname ubuntu
+
+Brownie, you are doing a heck of a job.
+0 1 1 2 3 5
+0 u 81
+5 15 DrEvil
+5&gt;:?70
+5 1 2 3 6 4
+50
+</code></pre>
+<h2 id="secret_phase-二叉树搜索">secret_phase: 二叉树搜索</h2>
+<p>读入整数，整数，字符串<br>
+<code>b secret_phase</code><br>
+edx: a<br>
+esi: 0<br>
+rdi: &amp;input_str<br>
+rbx: rax=int(input_str)=input_int<br>
+rax: input_int - 1<br>
+u&lt;=3e8, so 1 ≤ input_int ≤ 3e9<br>
+esi: input_int<br>
+<code>x/512x 0x604110</code></p>
+<p><img src="https://meredith2328.github.io/post-images/1714446733981.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1714446738318.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/1714446742148.png" alt="" loading="lazy"></p>
+<p>24<br>
+8    <strong>32 (50)</strong><br>
+6  16  2d  6b<br>
+1 7  14 23  28 2f(47)  63 3e9(1001)</p>
+<p>要求fun7的返回值为1<br>
+<strong>fun7</strong><br>
+参数1: edi=edx，开始时是树的根节点<br>
+参数2: esi，input_int</p>
+<p>if (input_int &gt;= 根节点的值):<br>
++28<br>
+eax = 0<br>
+edx = input_int时直接跳出返回<br>
+否则参数1: edi根节点变右节点，嵌套一层，但注意这里是<strong>call</strong>而不是jump，意味着过去完还要回来的，而且保存返回值<br>
+走右边: 返回值翻倍再加一<br>
+&lt; :<br>
++15<br>
+去左节点: 返回值翻倍</p>
+<p>但注意上述返回值的变化是从叶到根生效，是倒序的<br>
+所以大于就往右走，小于就往左走<br>
+既然返回值为1，而返回值初始为0，往右走一步就跳出就可以，意味着被调用函数返回值为0，之后向右执行一步得到1，返回即可。<br>
+注意读到的0x32等于<code>50</code>。</p>
+<h2 id="phase_6-链表排序">phase_6: 链表排序</h2>
+<p>读入六个整数<br>
+rsi: %rsp，其实是&amp;num1</p>
+<p>循环1开头:<br>
+r12: &amp;num1<br>
+r13d: 0<br>
+rbp: &amp;num1<br>
+eax: num1 - 1 unsigned &lt;= 5<br>
+要求num1 - 1 &gt;= 0，1 &lt;= num1 ≤ 6<br>
+r13d: 1<br>
+执行满六次之后跳+134</p>
+<p>循环2:<br>
++73到+98<br>
+ebx: 1<br>
+eax: num2<br>
+要求num1 != num2<br>
+ebx++，小于等于5时继续循环这一块，如上执行五次，<br>
+要求num1 != num2, num2 != num3, num3 != num4, num4 != num5, num5 != num6</p>
+<p>循环1结尾:<br>
++100<br>
+r12: &amp;num1→&amp;num2<br>
+所以意味着以上类似要求执行了6次，<br>
+即要求 1 &lt;= num1, ..., num6 ＜= 6<br>
+之后跳134</p>
+<p>+134<br>
+esi = 0<br>
++139开始是第三循环体<br>
+ecx = num1<br>
+eax = 1<br>
+edx = node1<br>
+if (num1＞1):<br>
+goto 106<br>
+else (num1 == 1):<br>
+goto 117</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/1714446756176.png" alt="" loading="lazy"></figure>
+<p>+117<br>
+rsp+20 = node1<br>
+再执行5次，也就是挑好了合适的，numx的值为y则对应nodey</p>
+<p>+159跳出第三循环体，进入第四循环（其实还有第五循环套在这一层外面）<br>
+rbx=node1，不是-&gt;val</p>
+<p>第四循环<br>
+rax=node1<br>
+rsi=node6<br>
+rcx=node1-&gt;val?还是node1? node1吧<br>
+循环体：+177<br>
+rdx=node2<br>
+node1-&gt;next=node2?<br>
+rax=node2<br>
+rcx=node2<br>
+总之第四循环就是把node1到6按顺序连起来<br>
+吧</p>
+<p>+197跳出第四循环，回到第五循环<br>
+node6-&gt;next = null<br>
+ebp=5<br>
+rax=node2-&gt;val<br>
+要求node1-&gt;val &gt; node2-&gt;val<br>
+rbx变node2，ebp--，循环五次意味着节点值从node1到node6递减<br>
+因此只要找合适的num值使前述节点排列成递减即可，即值顺序为 <code>5 1 2 3 6 4</code>。</p>
+<p>综上，这次phase没有a[i] = 7 - a[i]，应该相对还行。</p>
+<h2 id="phase_5">phase_5</h2>
+<h3 id="版本1-数组对应">版本1: 数组对应</h3>
+<p>输入字符串长度为6<br>
+%rax: &amp;字符串，之后右移，属于循环变量<br>
+%rbx: &amp;字符串<br>
+%rdi: 字符串结尾，属于循环条件<br>
+%ecx: 0<br>
+%edx: 第一个字符与0xf，即取低四位作为数组下标，对应出另一个整数，加到%ecx中<br>
+观察<code>x/16 0x402780</code>得到如下关系：</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/1714446769510.png" alt="" loading="lazy"></figure>
+<p>在跳回之前我们观察结束条件，%ecx=0x3f=63，也就是六个字符的下标对应出的数字之和为63.<br>
+可取16+15+14+13+3+2，即下标为5, 14, 10, 15, 7, 0, 比如可以取48+这些数：<code>5&gt;:?70</code><br>
+注意不能用32+这些数，因为空格会在类scanf的函数中读值时自动被忽略掉。</p>
+<h3 id="版本2-数组跳转">版本2: 数组跳转</h3>
+<table>
+<thead>
+<tr>
+<th>数组下标</th>
+<th>值</th>
+<th></th>
+<th>数组下标</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>a</td>
+<td></td>
+<td>8</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td></td>
+<td>9</td>
+<td>4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>e</td>
+<td></td>
+<td>a</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>7</td>
+<td></td>
+<td>b</td>
+<td>d</td>
+</tr>
+<tr>
+<td>4</td>
+<td>8</td>
+<td></td>
+<td>c</td>
+<td>3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>c</td>
+<td></td>
+<td>d</td>
+<td>9</td>
+</tr>
+<tr>
+<td>6</td>
+<td>f</td>
+<td></td>
+<td>e</td>
+<td>6</td>
+</tr>
+<tr>
+<td>7</td>
+<td>b</td>
+<td></td>
+<td>f</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>第一个数只取最低四位做入口，x/不能等于0xf<br>
+第一个数edx加完后 = 0xf，执行15次<br>
+第二个数等于rcx</p>
+<p>读出该程序干的事情是加15次数组元素，其中最后一次一定加的是f，我们需要输入的是第一个下标以及加和。<br>
+不妨倒推，f+6+e+2+1 +a+0+8+4+9 +d+b+7+3+c = 115<br>
+那么我们第一个下标对应值c，即入口是5，加和是115。</p>
+<h2 id="phase_4-二分查找">phase_4: 二分查找</h2>
+<p>读入整数：<br>
+rcx(arg4) = rsp + 4 = &amp;num2<br>
+rdx(arg3) = rsp = &amp;num1<br>
+esi(arg2) = &quot;%d %d&quot;</p>
+<p>需要我们输入两个整数，盲猜可以进secret phase。<br>
+要求0 &lt;= num1 &lt;= 0xe，<br>
+rdx = 0xe(arg3) 上界<br>
+esi = 0(arg2) 下界<br>
+edi = num1(arg1)<br>
+call func4, <strong>要求返回值等于0xf</strong><br>
+要求num2=0xf，此时phase_4全部结束</p>
+<p><strong>func4</strong><br>
+传入了三个参数: num1(edi), 0(下界, esi)，0xe(上界, rdx)<br>
+eax = 0xe - 0 = 0xe<br>
+ebx = 0xe 逻辑右移 0x1f=31位，变0了吧，目测是看符号位<br>
+eax = 0xe + 0 = 0xe，算术右移变0x111=7，也就是做了作差除以2下取整<br>
+ebx = 0x(7 + 0)=0x7，中点值<br>
+跳+33<br>
+eax=0x7<br>
+ebx&gt;=num1时直接返回<br>
+...<br>
+是二分查找，差值是符号判断，如果上面的差值为负值，则ebx得1，挪一挪eax，防止死循环的，所以不去考虑它也完全没关系</p>
+<p>可以暴力从0x0到0xe直接试一遍，虽然容易手误<br>
+如果要仔细推理：在num为0到14，low初始为0，high初始为14的情况下怎样返回15呢？<br>
+尤其是，为什么num == 5时会返回15？因为我们每次都加了每次计算出的中间值，<br>
+所以：<br>
+左右端点为0和14时返回值+7，<br>
+左右端点为0和6时返回值+3；<br>
+左右端点为4和6时返回值+5。<br>
+返回值初始为0，完成上述查找得到返回15。</p>
+<h2 id="phase_3-跳转表">phase_3: 跳转表</h2>
+<p>注意输入是 <code>%d %c %d</code><br>
+分别传到 %rsp+10, %rsp+f, %rsp+14，换回了数字 数字 字符的顺序<br>
+num1 unsigned &gt; 7时，炸<br>
+也就是说0 &lt;= num1 ≤ 6，<br>
+根据num1的值跳到跳转表相应位置，从而执行相应switch的结构。<br>
+既然switch的default执行+319，我们先不看跳转表，直接看+319。<br>
+传入的%c等于%rax的最低位字符即可。<br>
+接下来看跳转表。<br>
+我们用 <code>x/a 0x402740</code>发现为+77，意味着%rax=num1=0时，执行+77，此时：<br>
+%eax=0x75，num2 = 0x51=81。所以c = 0x75=<code>u</code>即可，这个字符可通过 <code>Alt + 小键盘117</code> 得到。<br>
+答案为 <code>0 u 81</code></p>
+<h2 id="phase_2-斐波那契数列">phase_2: 斐波那契数列</h2>
+<p>%rsi参数2的值是%rsp，给read_six_numbers<br>
+利用read_six_numbers将参数3-8读入%rsi, %rsi+4, ..., %rsi+14共六处，对应于%rsp, %rsp+4, ..., %rsp+14共六处<br>
+num1=0<br>
+num2=1<br>
+%rbx=&amp;num1<br>
+%rbp=&amp;num5</p>
+<p>%eax = num2 = 1<br>
+num2 += num1 = 1<br>
+num3 = %eax = 1<br>
+%rbx = &amp;num2</p>
+<p>%eax = num3 = 1<br>
+%eax += num2 = 1+1=2<br>
+num4 = %eax = 2</p>
+<p>0 1 1 2 3 5</p>
+<h2 id="phase_1-比较字符串">phase_1: 比较字符串</h2>
+<p>strings_not_equal的返回值(%eax)为0就跳出去，意味着要求All strings are created equal. 识得唔识得啊。</p>
+<p>从相应位置读入所需字符串即可。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%95%88%E6%9E%9C%E6%88%AA%E5%9B%BE">效果截图</a></li>
+<li><a href="#secret_phase-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%90%9C%E7%B4%A2">secret_phase: 二叉树搜索</a></li>
+<li><a href="#phase_6-%E9%93%BE%E8%A1%A8%E6%8E%92%E5%BA%8F">phase_6: 链表排序</a></li>
+<li><a href="#phase_5">phase_5</a>
+<ul>
+<li><a href="#%E7%89%88%E6%9C%AC1-%E6%95%B0%E7%BB%84%E5%AF%B9%E5%BA%94">版本1: 数组对应</a></li>
+<li><a href="#%E7%89%88%E6%9C%AC2-%E6%95%B0%E7%BB%84%E8%B7%B3%E8%BD%AC">版本2: 数组跳转</a></li>
+</ul>
+</li>
+<li><a href="#phase_4-%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE">phase_4: 二分查找</a></li>
+<li><a href="#phase_3-%E8%B7%B3%E8%BD%AC%E8%A1%A8">phase_3: 跳转表</a></li>
+<li><a href="#phase_2-%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97">phase_2: 斐波那契数列</a></li>
+<li><a href="#phase_1-%E6%AF%94%E8%BE%83%E5%AD%97%E7%AC%A6%E4%B8%B2">phase_1: 比较字符串</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/csapp-datalab/">
+              <h3 class="post-title">
+                CSAPP: datalab
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

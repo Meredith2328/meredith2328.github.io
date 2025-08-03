@@ -1,0 +1,465 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS61A disc03 递归 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS61A disc03 递归 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+edit time: 2024-07-18 20:57:12
+
+依旧遵从disc01的案例-过程-抽象-实现的思路。
+为了简化本blog及之后的blog，对于部分题目，首先会省略写出实现后、代入案例检验的过程；也可能会只取一个案例做分析，..." />
+    <meta name="keywords" content="CS61A" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS61A disc03 递归
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-08-30
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/cX9znZti-/" class="post-tag">
+                  # CS61A
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>edit time: 2024-07-18 20:57:12</p>
+</blockquote>
+<p>依旧遵从disc01的<strong>案例-过程-抽象-实现</strong>的思路。</p>
+<p>为了简化本blog及之后的blog，对于部分题目，首先会省略写出实现后、代入案例检验的过程；也可能会只取一个案例做分析，其他案例请自行思考；还可能会省略从案例抽象出某些符号的观察思考过程，直接给出实现。<br>
+在分析案例时可能会尽量将案例拆分开、遵照由简单到复杂的思考过程。如果某些步骤整合后一次性给出不易理解，可以尝试自行拆分。<br>
+还请读者自行对比思考，尽量完整理解，注意掌握分析思想。如果对理解上述思路有疑惑，可以看看本blog中讲解比较详细的题目，或者之前讲解的<code>disc01</code>等。</p>
+<h2 id="q1-warm-up-recursive-multiplication">Q1: Warm Up: Recursive Multiplication</h2>
+<p>思考过程省略。</p>
+<pre><code class="language-python">def multiply(m, n):
+    &quot;&quot;&quot;Takes two positive integers and returns their product using recursion.
+    &gt;&gt;&gt; multiply(5, 3)
+    15
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    # Guarantee that m &gt;= n, to simplify recursion.
+    if m &lt; n:
+        m, n = n, m
+    if n == 1:
+        return m
+    else:
+        return m + multiply(m, n - 1)
+</code></pre>
+<h2 id="q2-swipe">Q2: Swipe</h2>
+<p>base: n &lt; 10<br>
+取案例。考虑两位数的情况：eg. <code>swipe(28)</code><br>
+将其转化为：一些操作，以及对降一阶（在这里就是位数少一位）的值执行<code>swipe</code>，一种可行操作如下：</p>
+<pre><code class="language-python">print(8)
+swipe(2)
+print(8)
+</code></pre>
+<p>注意中间一定要化用位数少一位的<code>swipe(2)</code>函数，而不是直接<code>print(2)</code>，这是为了构造递归，即从描述过程中取出某种抽象的、一般的物体；<br>
+在递归时，我们只考虑本情况和“<strong>相对低阶一点</strong>”的情况，而不考虑无关的情况。如题目给出的调用<strong>四</strong>位数，我们只考虑怎样将其转化为一些操作和调用<strong>三</strong>位数；或者从调用<strong>三</strong>位数考虑转化为一些操作和调用<strong>两</strong>位数。<br>
+将上述的<code>2</code>和<code>8</code>抽象为<code>n // 10</code>和<code>n % 10</code>，考虑一种实现如下：</p>
+<pre><code class="language-python">def swipe(n):
+    &quot;&quot;&quot;Print the digits of n, one per line, first backward then forward.
+
+    &gt;&gt;&gt; swipe(2837)
+    7
+    3
+    8
+    2
+    8
+    3
+    7
+    &quot;&quot;&quot;
+    if n &lt; 10:
+        print(n)
+    else:
+        &quot;*** YOUR CODE HERE ***&quot;
+        print(n % 10)
+        swipe(n // 10)
+        print(n % 10)
+</code></pre>
+<h2 id="q3-skip-factorial">Q3: Skip Factorial</h2>
+<p>思考省略。</p>
+<pre><code class="language-python">def skip_factorial(n):
+    &quot;&quot;&quot;Return the product of positive integers n * (n - 2) * (n - 4) * ...
+
+    &gt;&gt;&gt; skip_factorial(5) # 5 * 3 * 1
+    15
+    &gt;&gt;&gt; skip_factorial(8) # 8 * 6 * 4 * 2
+    384
+    &quot;&quot;&quot;
+    if n == 1 or n == 2:
+        return n
+    else:
+        return n * skip_factorial(n - 2)
+</code></pre>
+<h2 id="q4-recursive-hailstone">Q4: Recursive Hailstone</h2>
+<p>这是第一次在递归中使用返回值计数。因为比较重要，这里多写一点。<br>
+仍然从取案例开始，从案例中整理过程，从过程中抽象，从抽象到实现。</p>
+<p><code>b = hailstone(1)</code>相对更简，取该案例分析。执行时首先打印，之后它的返回值是通过<code>return odd(1)</code>得到的，值为<code>1</code>。总结出一个命题：<code>odd(1) = 1</code> (1)。</p>
+<p>再考虑稍微复杂一点：<code>c = hailstone(2)</code>，思考经历的过程。<br>
+为了更加简化，我们可以先不考虑计数，只考虑<code>2</code>是怎么变成<code>1</code>的，以及其中经历的打印过程：<br>
+首先打印2，之后返回<code>even(2)</code>，<br>
+而<code>even(2)</code>的计算过程应当为 <code>2 // 2</code> 得到<code>1</code> ，相当于完成了与<code>2</code>相关的一步，<br>
+在<code>2</code>完成之后，要对<code>1</code>执行完全相同的操作，所以应当调用<code>hailstone(1)</code> (2)。<br>
+再考虑计数，我们利用递归的返回值而非全局变量进行计数，每执行一步返回值加一，意味着<code>even(2)</code>的返回值要在<code>hailstone(1)</code>的值基础上加一。(3)</p>
+<p>基于以上命题(1)(2)(3)，我们考虑在递归的返回值处调用相对低阶的函数。下述还把计算写到了参数中，读者当然可以在思考时拆分开，先用临时变量做计算，再将临时变量作为参数。</p>
+<pre><code class="language-python">def hailstone(n):
+    &quot;&quot;&quot;Print out the hailstone sequence starting at n, 
+    and return the number of elements in the sequence.
+    &gt;&gt;&gt; a = hailstone(10)
+    10
+    5
+    16
+    8
+    4
+    2
+    1
+    &gt;&gt;&gt; a
+    7
+    &gt;&gt;&gt; b = hailstone(1)
+    1
+    &gt;&gt;&gt; b
+    1
+    &quot;&quot;&quot;
+    print(n)
+    if n % 2 == 0:
+        return even(n)
+    else:
+        return odd(n)
+
+def even(n):
+    return 1 + hailstone(n // 2)
+
+def odd(n):
+    &quot;*** YOUR CODE HERE ***&quot;
+    if n == 1:
+        return 1
+    return 1 + hailstone(3 * n + 1)
+</code></pre>
+<h2 id="q5-count-stair-ways">Q5: Count Stair Ways</h2>
+<p>题目引导超级详细，没有其他补充。</p>
+<pre><code class="language-python">def count_stair_ways(n):
+    &quot;&quot;&quot;Returns the number of ways to climb up a flight of
+    n stairs, moving either one step or two steps at a time.
+    &gt;&gt;&gt; count_stair_ways(1)
+    1
+    &gt;&gt;&gt; count_stair_ways(2)
+    2
+    &gt;&gt;&gt; count_stair_ways(4)
+    5
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if (n == 1):
+        return 1
+    elif (n == 2):
+        return 2
+    else:
+        return count_stair_ways(n - 1) + count_stair_ways(n - 2)
+</code></pre>
+<h2 id="q6-sevens">Q6: Sevens</h2>
+<p>有一个坑点：题目给的<code>has_seven</code>函数只实现了函数中是否含<code>7</code>的判断，而题目要求还要判断是否为<code>7</code>的倍数。</p>
+<p>相比于从头到尾模拟，更适合这道题的可能是“取一个切面来模拟”。<br>
+首先假定读者已经搞清楚了<code>helper function</code>封装起来的想法：如果<code>f(i, who, direction)</code>的<code>i</code>恰好等于<code>n</code>，则此时的<code>who</code>就是我们要找的<code>who</code>。用下面的案例说明，我们不妨找找内层函数<code>f</code>返回时，各参数值为多少？</p>
+<pre><code class="language-python">    &gt;&gt;&gt; sevens(6, 5)
+    1
+    &gt;&gt;&gt; sevens(7, 5)
+    2
+    &gt;&gt;&gt; sevens(8, 5)
+    1
+</code></pre>
+<p>很明显，<code>sevens(6, 5)</code>是<code>f(6, 1, 1)</code>，<code>sevens(7, 5)</code>是<code>f(7, 2, 1)</code>，<code>sevens(8, 5)</code>是<code>f(8, 1, -1)</code>。</p>
+<p>以<code>sevens(7, 5)</code>从<code>f(6, 1, 1)</code>开始的思考过程为例：</p>
+<p>此时<code>f(6, 1, 1)</code>这几个参数不满足<code>i == n</code>，所以经过“一些过程”，下次测试（即返回）<code>f(7, 2, -1)</code>。<code>f(7, 2, -1)</code>这几个参数满足<code>i == n</code>，返回<code>who</code>。<br>
+考虑上述的“一些过程”。<code>i</code>从<code>6</code>到<code>7</code>，<code>who</code>从<code>1</code>到<code>2</code>，<code>direction</code>从<code>1</code>到<code>-1</code>。那么我们在执行<code>f(6, 1, 1)</code>的过程中，<code>who</code>是根据当前的<code>direction == 1</code>来修改的，而<code>direction</code>却是根据新的<code>(i + 1) == 7</code>来修改的，务必注意。</p>
+<pre><code class="language-python">def sevens(n, k):
+    &quot;&quot;&quot;Return the (clockwise) position of who says n among k players.
+
+    &gt;&gt;&gt; sevens(2, 5)
+    2
+    &gt;&gt;&gt; sevens(6, 5)
+    1
+    &gt;&gt;&gt; sevens(7, 5)
+    2
+    &gt;&gt;&gt; sevens(8, 5)
+    1
+    &gt;&gt;&gt; sevens(9, 5)
+    5
+    &gt;&gt;&gt; sevens(18, 5)
+    2
+    &quot;&quot;&quot;
+
+    def f(i, who, direction):
+        if i == n:
+            return who
+        &quot;*** YOUR CODE HERE ***&quot;
+        # change person
+        who = who + direction
+
+        # boundary and round
+        if who == (k + 1):
+            who = 1
+        elif who == 0:
+            who = k
+            
+        # switch direction
+        i += 1
+        if has_seven(i) or ((i % 7) == 0):
+            direction = -direction
+        return f(i, who, direction)
+
+    return f(1, 1, 1)
+
+
+def has_seven(n):
+    if n == 0:
+        return False
+    elif n % 10 == 7:
+        return True
+    else:
+        return has_seven(n // 10)
+
+</code></pre>
+<h2 id="hw02-q6-count-coins">HW02 Q6: Count Coins</h2>
+<p>hw02懒得再开新一篇，于是写到这里了。</p>
+<p>题目给出了一个案例：</p>
+<p>For example, the following sets make change for <code>15</code>:</p>
+<ul>
+<li>15 1-cent coins</li>
+<li>10 1-cent, 1 5-cent coins</li>
+<li>5 1-cent, 2 5-cent coins</li>
+<li>5 1-cent, 1 10-cent coins</li>
+<li>3 5-cent coins</li>
+<li>1 5-cent, 1 10-cent coin</li>
+</ul>
+<p>一种树状图思路如下：</p>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1724983148922.jpg" alt="" loading="lazy"></figure>
+<p>我们从上往下考虑。对于每一个金额（节点），分支上的数字是小于该金额的所有金币，并且要求下面的分支的金币面额不能大于上面的分支。则题目所示的所有情况就是从根节点（值为总金额）到叶节点（值为0）路径的总数。</p>
+<p>观察发现以下命题 <s>规则类怪谈</s> ：</p>
+<ol>
+<li>如果减到剩余的值恰为0，则计数为一。</li>
+<li>（可以合并到 1. 中，用于提升计算效率）如果用到的金币面额为1，仅有后面一直用面额为1的一种情况，计数为一。</li>
+<li>可以把单个节点连接三个、四个及以上的分支拆解成两个分支的情况，即图中的最小单元，且这两个分支用到的金额关系是较大和较小相邻的。两个分支总共的可能性是两个分支各自的可能性之和。</li>
+</ol>
+<p>从而可能的方法如下：<br>
+（以下Solution1 和 Solution 1 another implement都能跑，至于Solution 2, 3, 4, ..., 114514就交给你啦（））</p>
+<pre><code class="language-python">    # Solution 1
+
+    # def helper(remain, coin):
+    #     if coin == None:
+    #         return 0
+    #     if remain == 0:
+    #         return 1 # Sum up to total.
+    #     elif (coin &gt; remain):
+    #         return helper(remain, next_smaller_coin(coin))
+    #     else:
+    #         return helper(remain - coin, coin) + helper(remain, next_smaller_coin(coin))
+
+    # Solution 1 another implement
+    def helper(remain, coin):
+        if coin == 1:
+            return 1
+        if remain == 0:
+            return 1
+        elif remain &lt; 0:
+            return 0
+        else:
+            return helper(remain - coin, coin) + helper(remain, next_smaller_coin(coin))
+    return helper(remain = total, coin = 25)
+</code></pre>
+<p>当然，如果认真听了课，学会了 <code>count_partition</code> 那道更一般的情况，这一道题也是相似的。最终要总结出类似于以下这样的命题：</p>
+<ul>
+<li>In <code>count_partitions</code> from lecture, the recursive case is to partition <code>n-m</code> using parts up to size <code>m</code> <strong>and</strong> to partition <code>n</code> using parts up to size <code>m-1</code>. （引自 <a href="https://cs61a.org/disc/disc04/">Discussion 4 | CS 61A Summer 2024</a> ）</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#q1-warm-up-recursive-multiplication">Q1: Warm Up: Recursive Multiplication</a></li>
+<li><a href="#q2-swipe">Q2: Swipe</a></li>
+<li><a href="#q3-skip-factorial">Q3: Skip Factorial</a></li>
+<li><a href="#q4-recursive-hailstone">Q4: Recursive Hailstone</a></li>
+<li><a href="#q5-count-stair-ways">Q5: Count Stair Ways</a></li>
+<li><a href="#q6-sevens">Q6: Sevens</a></li>
+<li><a href="#hw02-q6-count-coins">HW02 Q6: Count Coins</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/freshdan-xin-sheng-wiki-xiang-mu/">
+              <h3 class="post-title">
+                freshdan 新生wiki项目
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

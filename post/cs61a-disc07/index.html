@@ -1,0 +1,491 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS61A disc07 树、链表 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS61A disc07 树、链表 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Q1: Is BST
+左子树的所有节点的值都小于等于父节点的值，
+右子树的所有节点的值都大于父节点的值。
+def is_bst(t):
+    &quot;&quot;&quot;Returns True if the Tree t has..." />
+    <meta name="keywords" content="CS61A" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS61A disc07 树、链表
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-08-30
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/cX9znZti-/" class="post-tag">
+                  # CS61A
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="q1-is-bst">Q1: Is BST</h2>
+<p>左子树的所有节点的值都小于等于父节点的值，<br>
+右子树的所有节点的值都大于父节点的值。</p>
+<pre><code class="language-python">def is_bst(t):
+    &quot;&quot;&quot;Returns True if the Tree t has the structure of a valid BST.
+
+    &gt;&gt;&gt; t1 = Tree(6, [Tree(2, [Tree(1), Tree(4)]), Tree(7, [Tree(7), Tree(8)])])
+    &gt;&gt;&gt; is_bst(t1)
+    True
+    &gt;&gt;&gt; t2 = Tree(8, [Tree(2, [Tree(9), Tree(1)]), Tree(3, [Tree(6)]), Tree(5)])
+    &gt;&gt;&gt; is_bst(t2)
+    False
+    &gt;&gt;&gt; t3 = Tree(6, [Tree(2, [Tree(4), Tree(1)]), Tree(7, [Tree(7), Tree(8)])])
+    &gt;&gt;&gt; is_bst(t3)
+    False
+    &gt;&gt;&gt; t4 = Tree(1, [Tree(2, [Tree(3, [Tree(4)])])])
+    &gt;&gt;&gt; is_bst(t4)
+    True
+    &gt;&gt;&gt; t5 = Tree(1, [Tree(0, [Tree(-1, [Tree(-2)])])])
+    &gt;&gt;&gt; is_bst(t5)
+    True
+    &gt;&gt;&gt; t6 = Tree(1, [Tree(4, [Tree(2, [Tree(3)])])])
+    &gt;&gt;&gt; is_bst(t6)
+    True
+    &gt;&gt;&gt; t7 = Tree(2, [Tree(1, [Tree(5)]), Tree(4)])
+    &gt;&gt;&gt; is_bst(t7)
+    False
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    def bst_max(t):
+        if t.is_leaf():
+            return t.label
+        return max(t.label, max([bst_max(b) for b in t.branches]))
+
+    def bst_min(t):
+        if t.is_leaf():
+            return t.label
+        return min(t.label, min([bst_min(b) for b in t.branches]))
+
+    if t.is_leaf():
+        return True
+    if len(t.branches) &gt; 2:
+        return False
+    elif len(t.branches) == 1:
+        branch = t.branches[0]
+        if is_bst(branch):
+            return True
+        else:
+            return False
+    else: # len(t.branches) == 2
+        l, r = t.branches
+        if bst_max(l) &lt;= t.label and t.label &lt; bst_min(r) and is_bst(l) and is_bst(r):
+            return True
+        else:
+            return False
+</code></pre>
+<h2 id="q2-prune-small">Q2: Prune Small</h2>
+<p>Solution 1</p>
+<pre><code class="language-python">def prune_small(t, n):
+    &quot;&quot;&quot;Prune the tree mutatively, keeping only the n branches
+    of each node with the smallest labels.
+
+    &gt;&gt;&gt; t1 = Tree(6)
+    &gt;&gt;&gt; prune_small(t1, 2)
+    &gt;&gt;&gt; t1
+    Tree(6)
+    &gt;&gt;&gt; t2 = Tree(6, [Tree(3), Tree(4)])
+    &gt;&gt;&gt; prune_small(t2, 1)
+    &gt;&gt;&gt; t2
+    Tree(6, [Tree(3)])
+    &gt;&gt;&gt; t3 = Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2), Tree(3)]), Tree(5, [Tree(3), Tree(4)])])
+    &gt;&gt;&gt; prune_small(t3, 2)
+    &gt;&gt;&gt; t3
+    Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])
+    &quot;&quot;&quot;
+    if t.is_leaf():
+        return
+    if len(t.branches) &gt; n:
+        t.branches = [t.branches[i] for i in range(n)] # Only n left
+    for b in t.branches:
+        prune_small(b, n)
+</code></pre>
+<p>Solution 2</p>
+<pre><code class="language-python">    while len(t.branches) &gt; n:
+        largest = max(t.branches, key=lambda x: x.label)
+        t.branches.remove(largest)
+    for b in t.branches:
+        prune_small(b, n)
+</code></pre>
+<h2 id="q3-sum-two-ways">Q3: Sum Two Ways</h2>
+<pre><code class="language-python">def sum_rec(s):
+    &quot;&quot;&quot;
+    Returns the sum of the elements in s.
+
+    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))
+    &gt;&gt;&gt; sum_rec(a)
+    14
+    &gt;&gt;&gt; sum_rec(Link.empty)
+    0
+    &quot;&quot;&quot;
+    # Use a recursive call to sum_rec
+    &quot;*** YOUR CODE HERE ***&quot;
+    if s is Link.empty:
+        return 0
+    return s.first + sum_rec(s.rest)
+
+def sum_iter(s):
+    &quot;&quot;&quot;
+    Returns the sum of the elements in s.
+
+    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))
+    &gt;&gt;&gt; sum_iter(a)
+    14
+    &gt;&gt;&gt; sum_iter(Link.empty)
+    0
+    &quot;&quot;&quot;
+    # Don't call sum_rec or sum_iter
+    &quot;*** YOUR CODE HERE ***&quot;
+    sum = 0
+    p = s
+    while p is not Link.empty:
+        sum += p.first
+        p = p.rest
+    return sum
+</code></pre>
+<h2 id="q4-overlap">Q4: Overlap</h2>
+<pre><code class="language-python">def overlap(s, t):
+    &quot;&quot;&quot;For increasing s and t, count the numbers that appear in both.
+
+    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))
+    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))
+    &gt;&gt;&gt; overlap(a, b)  # 3 and 7
+    2
+    &gt;&gt;&gt; overlap(a.rest, b)  # just 7
+    1
+    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))
+    3
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if s is Link.empty or t is Link.empty:
+        return 0
+    if s.first == t.first:
+        return 1 + overlap(s.rest, t.rest)
+    elif s.first &lt; t.first:
+        return overlap(s.rest, t)
+    else:
+        return overlap(s, t.rest)
+
+def overlap_iterative(s, t):
+    &quot;&quot;&quot;For increasing s and t, count the numbers that appear in both.
+
+    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))
+    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))
+    &gt;&gt;&gt; overlap(a, b)  # 3 and 7
+    2
+    &gt;&gt;&gt; overlap(a.rest, b)  # just 7
+    1
+    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))
+    3
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    count = 0
+    while (s is not Link.empty and t is not Link.empty):
+        if s.first == t.first:
+            count += 1
+            s, t = s.rest, t.rest
+        elif s.first &lt; t.first:
+            s = s.rest
+        else:
+            t = t.rest
+    return count
+</code></pre>
+<h2 id="q5-duplicate-link">Q5: Duplicate Link</h2>
+<pre><code class="language-python">def duplicate_link(s, val):
+    &quot;&quot;&quot;Mutates s so that each element equal to val is followed by another val.
+
+    &gt;&gt;&gt; x = Link(5, Link(4, Link(5)))
+    &gt;&gt;&gt; duplicate_link(x, 5)
+    &gt;&gt;&gt; x
+    Link(5, Link(5, Link(4, Link(5, Link(5)))))
+    &gt;&gt;&gt; y = Link(2, Link(4, Link(6, Link(8))))
+    &gt;&gt;&gt; duplicate_link(y, 10)
+    &gt;&gt;&gt; y
+    Link(2, Link(4, Link(6, Link(8))))
+    &gt;&gt;&gt; z = Link(1, Link(2, (Link(2, Link(3)))))
+    &gt;&gt;&gt; duplicate_link(z, 2) # ensures that back to back links with val are both duplicated
+    &gt;&gt;&gt; z
+    Link(1, Link(2, Link(2, Link(2, Link(2, Link(3))))))
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    p = s
+    while (p is not Link.empty):
+        if p.first == val:
+            p.rest = Link(val, p.rest)
+            p = p.rest.rest
+        else:
+            p = p.rest
+</code></pre>
+<h2 id="q6-decimal-expansion">Q6: Decimal Expansion</h2>
+<p>Hint写得很清楚，摘抄一下。</p>
+<p><strong>Hint: Approach</strong><br>
+Place the division pattern from the example above in a <code>while</code> statement:</p>
+<pre><code>&gt;&gt;&gt; q, r = 10 * n // d, 10 * n % d
+&gt;&gt;&gt; tail.rest = Link(q)
+&gt;&gt;&gt; tail = tail.rest
+&gt;&gt;&gt; n = r
+</code></pre>
+<p>While constructing the decimal expansion, store the <code>tail</code> for each <code>n</code> in a dictionary keyed by <code>n</code>. When some <code>n</code> appears a second time, instead of constructing a new <code>Link</code>, set its original link as the rest of the previous link. That will form a cycle of the appropriate length.</p>
+<pre><code class="language-python">def divide(n, d):
+    &quot;&quot;&quot;Return a linked list with a cycle containing the digits of n/d.
+
+    &gt;&gt;&gt; display(divide(5, 6))
+    0.8333333333...
+    &gt;&gt;&gt; display(divide(2, 7))
+    0.2857142857...
+    &gt;&gt;&gt; display(divide(1, 2500))
+    0.0004000000...
+    &gt;&gt;&gt; display(divide(3, 11))
+    0.2727272727...
+    &gt;&gt;&gt; display(divide(3, 99))
+    0.0303030303...
+    &gt;&gt;&gt; display(divide(2, 31), 50)
+    0.06451612903225806451612903225806451612903225806451...
+    &quot;&quot;&quot;
+    assert n &gt; 0 and n &lt; d
+    result = Link(0)  # The zero before the decimal point
+    &quot;*** YOUR CODE HERE ***&quot;
+    tail_dict = {}
+    tail = result
+    while (n not in tail_dict):
+        q, r = 10 * n // d, 10 * n % d # eg. 8, 2
+        tail.rest = Link(q)
+        tail = tail.rest
+        tail_dict[n] = tail
+        n = r
+    tail.rest = tail_dict[n]
+    return result
+
+</code></pre>
+<h2 id="hw05q6-store-digits">HW05Q6: Store Digits</h2>
+<p>（懒得再开一个HW05页了，这一道题比较经典，顺手标记一下）<br>
+经典老题，把整数的每一位作为链表的节点值构造链表。<br>
+关键是要想到：我们容易得到的是 <code>n // 10</code> 和 <code>n % 10</code>。<br>
+以<code>2345</code>举例，构造<code>2345</code>时是在已知<code>234</code>而非<code>345</code>的构造的情况下。<br>
+因此我们要做的就是在<code>234</code>构造的末尾加上一个<code>5</code>（先遍历到末尾节点、再添加），<br>
+而非在<code>345</code>的开头加上一个<code>2</code>（直接构造 <code>Link(2, 345的Link)</code>。</p>
+<pre><code class="language-python">def store_digits(n):
+    &quot;&quot;&quot;Stores the digits of a positive number n in a linked list.
+
+    &gt;&gt;&gt; s = store_digits(1)
+    &gt;&gt;&gt; s
+    Link(1)
+    &gt;&gt;&gt; store_digits(2345)
+    Link(2, Link(3, Link(4, Link(5))))
+    &gt;&gt;&gt; store_digits(876)
+    Link(8, Link(7, Link(6)))
+    &gt;&gt;&gt; store_digits(2450)
+    Link(2, Link(4, Link(5, Link(0))))
+    &gt;&gt;&gt; # a check for restricted functions
+    &gt;&gt;&gt; import inspect, re
+    &gt;&gt;&gt; cleaned = re.sub(r&quot;#.*\\n&quot;, '', re.sub(r'&quot;{3}[\s\S]*?&quot;{3}', '', inspect.getsource(store_digits)))
+    &gt;&gt;&gt; print(&quot;Do not use str or reversed!&quot;) if any([r in cleaned for r in [&quot;str&quot;, &quot;reversed&quot;]]) else None
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    if n &lt; 10:
+        return Link(n)
+    before = store_digits(n // 10)
+    p = before
+    while p.rest != Link.empty:
+        p = p.rest
+    p.rest = Link(n % 10)
+    return before
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#q1-is-bst">Q1: Is BST</a></li>
+<li><a href="#q2-prune-small">Q2: Prune Small</a></li>
+<li><a href="#q3-sum-two-ways">Q3: Sum Two Ways</a></li>
+<li><a href="#q4-overlap">Q4: Overlap</a></li>
+<li><a href="#q5-duplicate-link">Q5: Duplicate Link</a></li>
+<li><a href="#q6-decimal-expansion">Q6: Decimal Expansion</a></li>
+<li><a href="#hw05q6-store-digits">HW05Q6: Store Digits</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/cs61a-disc05/">
+              <h3 class="post-title">
+                CS61A disc05 迭代、时空复杂度
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

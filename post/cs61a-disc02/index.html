@@ -1,0 +1,329 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS61A disc02 高阶函数 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1754230662190">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS61A disc02 高阶函数 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Discussion 2 | CS 61A Summer 2024
+Q1: Warm Up
+这里的等号是数学等号，不是赋值↓
+(lambda x:3)(4) = 3
+(lambda x:  2 * 3 * x)(5) = 30
+Q2/Q3
+..." />
+    <meta name="keywords" content="CS61A" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1754230662190" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/tags" class="menu">
+          标签们
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          自设
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/you-qing-lian-jie-men" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS61A disc02 高阶函数
+            </h2>
+            <div class="post-info">
+              <span>
+                2024-07-17
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/cX9znZti-/" class="post-tag">
+                  # CS61A
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p><a href="https://cs61a.org/disc/disc02/">Discussion 2 | CS 61A Summer 2024</a></p>
+<h2 id="q1-warm-up">Q1: Warm Up</h2>
+<p>这里的等号是数学等号，不是赋值↓</p>
+<p><code>(lambda x:3)(4)</code> = 3<br>
+<code>(lambda x:  2 * 3 * x)(5)</code> = 30</p>
+<h2 id="q2q3"><s>Q2/Q3</s></h2>
+<p>对Environment Diagram不太有兴趣，Q2和Q3就跳过了qwq</p>
+<h2 id="q4-make-keeper">Q4: Make Keeper</h2>
+<p>思路：还是符合上一次disc提到的解决问题的迭代与抽象方式。<br>
+首先取<code>make_keeper(5)(is_even)</code>，描述它的执行过程：<br>
+<code>make_keeper(5)</code>返回一个这样的函数，它的循环变量<code>i</code>从1到5递增，如果<code>cond(i)</code>，则打印<code>i</code>。<br>
+根据这个抽象，我们发现我们并不需要知道<code>cond</code>函数的具体细节，只是“用”就好了。因此，我们先描述出符合上述要求的函数，再把该函数的函数名（函数指针）作为外层函数的返回值即可。<br>
+完成函数编写之后，将已有例子代入考虑执行过程，发现是合理的。</p>
+<pre><code class="language-python">def make_keeper(n):
+    &quot;&quot;&quot;Returns a function that takes one parameter cond and prints
+    out all integers 1..i..n where calling cond(i) returns True.
+
+    &gt;&gt;&gt; def is_even(x): # Even numbers have remainder 0 when divided by 2.
+    ...     return x % 2 == 0
+    &gt;&gt;&gt; make_keeper(5)(is_even)
+    2
+    4
+    &gt;&gt;&gt; make_keeper(5)(lambda x: True)
+    1
+    2
+    3
+    4
+    5
+    &gt;&gt;&gt; make_keeper(5)(lambda x: False)  # Nothing is printed
+    &quot;&quot;&quot;
+    &quot;*** YOUR CODE HERE ***&quot;
+    def printer(cond):
+        for i in range(1, n + 1):
+            if cond(i):
+                print(i)
+    return printer
+</code></pre>
+<p>额外一点话：<br>
+这道题体现出了Python中的函数名可以作为返回值、函数参数。<br>
+Higher Order Function/高阶函数看起来很有趣。我们返回的函数作用域以内实际上可以用到内外作用域的两个变量，但我们把这两个变量拆分给两个函数分别构造。</p>
+<h2 id="q5-digit-finder">Q5: Digit Finder</h2>
+<p>先简化问题：我们不考虑<code>lambda</code>表达式，怎样构造符合题目条件的函数，将其函数名返回？</p>
+<pre><code class="language-python">def find_digit(k):
+    &quot;&quot;&quot;Returns a function that returns the kth digit of x.
+
+    &gt;&gt;&gt; find_digit(2)(3456)
+    5
+    &gt;&gt;&gt; find_digit(2)(5678)
+    7
+    &gt;&gt;&gt; find_digit(1)(10)
+    0
+    &gt;&gt;&gt; find_digit(4)(789)
+    0
+    &quot;&quot;&quot;
+    assert k &gt; 0
+    &quot;*** YOUR CODE HERE ***&quot;
+
+    def get_kth_digit(x):
+        return (x // (pow(10, k - 1))) % 10
+    return get_kth_digit
+</code></pre>
+<p>之后再根据题目将其写为<code>lambda</code>表达式，是很自然的。</p>
+<pre><code class="language-python">return lambda x : (x // (pow(10, k - 1))) % 10
+</code></pre>
+<h2 id="q6-match-maker">Q6: Match Maker</h2>
+<p>依旧将循环拆分，通过迭代抽象来完成题目目标。<br>
+我个人的习惯是先不看题目给出的函数结构、试着自己做一下。<br>
+取案例<code>match_k(2)(1010)</code>，它可能经过这样的过程：<br>
+首先取最低位<code>0</code>（<code>x % 10</code>），<br>
+取与其相差距离为 <code>2</code> 的较高位（<code>x // (pow(10, 2)) % 10</code>，<br>
+判断这两位是否相同，如不相同，返回<code>False</code>，否则令<code>x //= 10</code>，重新执行上一步，除非较高位即<code>x // (pow(10, 2)) % 10</code>为0，跳出循环，返回<code>True</code>。<br>
+再把距离换为<code>k</code>即可。<br>
+对照题目模板，恰好匹配，塔诺西。</p>
+<pre><code class="language-python">def match_k(k):
+    &quot;&quot;&quot;Returns a function that checks if digits k apart match.
+
+    &gt;&gt;&gt; match_k(2)(1010)
+    True
+    &gt;&gt;&gt; match_k(2)(2010)
+    False
+    &gt;&gt;&gt; match_k(1)(1010)
+    False
+    &gt;&gt;&gt; match_k(1)(1)
+    True
+    &gt;&gt;&gt; match_k(1)(2111111111111111)
+    False
+    &gt;&gt;&gt; match_k(3)(123123)
+    True
+    &gt;&gt;&gt; match_k(2)(123123)
+    False
+    &quot;&quot;&quot;
+    def check(x):
+        while x // (10 ** k) &gt; 0:
+            if (x % 10) != (x // (10 ** k) % 10):
+                return False
+            x //= 10
+        return True
+    return check
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>上一次disc用到的那些思想的含金量还在增加！</p>
+<p>Remember the problem-solving approach from last discussion; it works just as well for implementing higher-order functions.</p>
+<ol>
+<li>Pick an example input and corresponding output. <em>(This time it might be a function.)</em></li>
+<li>Describe a process (in English) that computes the output from the input using simple steps.</li>
+<li>Figure out what additional names you'll need to carry out this process.</li>
+<li>Implement the process in code using those additional names.</li>
+<li>Determine whether the implementation really works on your original example.</li>
+<li>Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#q1-warm-up">Q1: Warm Up</a></li>
+<li><a href="#q2q3"><s>Q2/Q3</s></a></li>
+<li><a href="#q4-make-keeper">Q4: Make Keeper</a></li>
+<li><a href="#q5-digit-finder">Q5: Digit Finder</a></li>
+<li><a href="#q6-match-maker">Q6: Match Maker</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/cs61a-disc01/">
+              <h3 class="post-title">
+                CS61A disc01 “迭代与抽象”
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '10pi',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by  <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
