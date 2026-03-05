@@ -1,0 +1,757 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1772701902676">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。
+edit time: 2026-03-05 17:03:20
+
+本文的LLM基于Transformer Decoder结构，以 GPT2-..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1772701902676" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/cs" class="menu">
+          CS相关
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/zi-she" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              怎么估算LLM的参数量和FLOPs？推一推、测一测
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-03
+              </span>
+              <span>
+                16 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <blockquote>
+<p>本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。<br>
+edit time: 2026-03-05 17:03:20</p>
+</blockquote>
+<p>本文的LLM基于Transformer Decoder结构，以 <a href="https://huggingface.co/openai-community/gpt2-xl">GPT2-XL</a> 为例。它有以下超参数设置：</p>
+<pre><code>GPT2-XL
+vocab_size: 50257
+context_length: 1024
+num_layers: 48
+d_models: 1600
+num_heads: 25
+d_ff: 6400
+</code></pre>
+<p>实测得到的可训练参数量为 <code>1,557,611,200</code> = 1.56B。</p>
+<h2 id="参数量实测结果">参数量实测结果</h2>
+<p>以下是使用HuggingFace Transformers库实际加载了GPT2 XL并统计可训练参数量的结果。代码见下述附录A。</p>
+<pre><code>==========================================================================
+总参数量                 params: 1,557,611,200
+单位换算                 1557.61M 参数 / 1.56B 参数
+==========================================================================
+
+==========================================================================
+单层结构验证（以 Layer 0 为例）
+==========================================================================
+LayerNorm 1              :      3,200 (0.00M)
+Attention QKV            :  7,684,800 (7.68M)
+Attention Output         :  2,561,600 (2.56M)
+LayerNorm 2              :      3,200 (0.00M)
+FFN Input (c_fc)         : 10,246,400 (10.25M)
+FFN Output (c_proj)      : 10,241,600 (10.24M)
+Layer 0 总计               : 30,740,800 (30.74M)
+</code></pre>
+<h2 id="最常用的参数量估算公式">最常用的参数量估算公式</h2>
+<p>可训练参数量的估算公式为：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">12Nd^2+Vd
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span></span></p>
+<p>其中 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span> 为层数 <code>num_layers</code> ， <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> 为维度 <code>d_models</code> ，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span> 为词表大小 <code>vocab_size</code> 。<br>
+适用于 <code>d_ff = 4 * d_models</code> 且多头注意力不改变整体参数大小的情况。</p>
+<p>直接代入得到：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><mo>×</mo><mn>48</mn><mo>×</mo><mn>160</mn><msup><mn>0</mn><mn>2</mn></msup><mo>+</mo><mn>50257</mn><mo>×</mo><mn>1600</mn><mo>=</mo><mn>1554971200</mn><mo>=</mo><mn>1.55</mn><mi>B</mi></mrow><annotation encoding="application/x-tex">12 \times 48 \times 1600^2 + 50257 \times 1600=1554971200=1.55B
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">4</span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord">0</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">5</span><span class="mord">0</span><span class="mord">2</span><span class="mord">5</span><span class="mord">7</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord">0</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">5</span><span class="mord">5</span><span class="mord">4</span><span class="mord">9</span><span class="mord">7</span><span class="mord">1</span><span class="mord">2</span><span class="mord">0</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">5</span><span class="mord">5</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span></span></p>
+<p>相比于实际值1.56B，这已经是一个非常好的估计了。</p>
+<h2 id="最常用的参数量估算公式推导">“最常用的参数量估算公式”推导</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/20260303103200.png" alt="" loading="lazy"></figure>
+<p>我们需要确定这个公式适用于什么情况，所以需要引入它的适用范围。</p>
+<p>(1) Embedding<br>
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Vd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span> 很好理解：这是Embedding层的大小，可训练参数量就是一个大小为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Vd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span> 的二维大矩阵。并且我们在把表示换回token时，使用的LM_head权重是和Embedding共享的、而不需要额外再训练一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Vd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span> ，所以它们总共只需要训练一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Vd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span> 。</p>
+<p>(2) Attention &amp; FFN<br>
+那么 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">12Nd^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 又是怎么来的呢？答案就是Attention和FFN。<br>
+对于Attention，有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>W</mi><mi>Q</mi></msub><mo separator="true">,</mo><msub><mi>W</mi><mi>K</mi></msub><mo separator="true">,</mo><msub><mi>W</mi><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">W_Q,W_K,W_V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.328331em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">Q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.07153em;">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.22222em;">V</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> ，还有输出使用的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>W</mi><mi>O</mi></msub></mrow><annotation encoding="application/x-tex">W_O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.32833099999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">O</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> ，它们都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo>×</mo><mi>d</mi><mo>=</mo><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">d \times d = d^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 的方阵，总共就是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">4d^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>。<br>
+对于FFN，它首先负责把维度从 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> 扩大到 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mn>4</mn><mi>d</mi></mrow><annotation encoding="application/x-tex">d_{ff}=4d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span></span></span></span> ，然后再从 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub></mrow><annotation encoding="application/x-tex">d_{ff}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 缩小回 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> 。因此前者为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo>×</mo><mn>4</mn><mi>d</mi><mo>=</mo><mn>4</mn><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">d \times 4d=4d^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> ，后者是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>d</mi><mo>×</mo><mi>d</mi><mo>=</mo><mn>4</mn><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">4d \times d = 4d^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> ，总共 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>8</mn><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">8d^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">8</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 。<br>
+因此，一个Transformer Block内的Attention和FFN加起来应该是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">12d^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 。<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span> 层堆叠起来就是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">12Nd^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 。</p>
+<h2 id="怎么更精确地估算参数量">怎么更精确地估算参数量？</h2>
+<p>(1) Layer Norm<br>
+由上可见，我们忽略了Layer Norm里面的可训练参数开销（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>β</mi></mrow><annotation encoding="application/x-tex">\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05278em;">β</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>γ</mi></mrow><annotation encoding="application/x-tex">\gamma</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05556em;">γ</span></span></span></span>），它们都是用于缩放的可训练向量（防止归一化不合适而添加的缩放因子），大小均为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> ，所以每个 LayerNorm 应该还有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mi>d</mi></mrow><annotation encoding="application/x-tex">2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault">d</span></span></span></span> ，符合实测的 <code>3,200</code> 。</p>
+<p>(2) Attention &amp; FFN?<br>
+我们之前算下来，Attention的每个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span> 按理来说应该是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>d</mi><mn>2</mn></msup><mo>=</mo><mn>160</mn><msup><mn>0</mn><mn>2</mn></msup><mo>=</mo><mn>2560000</mn></mrow><annotation encoding="application/x-tex">d^2=1600^2=2560000</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord">0</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">5</span><span class="mord">6</span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span></span></span></span> 的方阵，可实测结果是 <code>2,561,600</code> ；<br>
+FFN也有类似的差距，FFN Input和FFN Output都应该是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><msup><mi>d</mi><mn>2</mn></msup><mo>=</mo><mn>10240000</mn></mrow><annotation encoding="application/x-tex">4d^2=10240000</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mord">2</span><span class="mord">4</span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span></span></span></span> ，可它们一个是 <code>10,246,400</code> ，另一个是 <code>10,241,600</code> 。<br>
+相信对数字敏感的话已经知道问题在哪里了。我们估算时假定可训练参数只有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span> ，可这是GPT-2，不是llama等更加现代的模型，在GPT-2的时代还是有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi><mi>x</mi><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">Wx+b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">b</span></span></span></span> 中这个 <code>bias</code> 的！<br>
+加上之后马上符合事实了：<br>
+Attention输入和输出维度都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> ，所以 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">b</span></span></span></span> 总共 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>d</mi><mo>=</mo><mn>2561600</mn></mrow><annotation encoding="application/x-tex">d^2+d=2561600</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">5</span><span class="mord">6</span><span class="mord">1</span><span class="mord">6</span><span class="mord">0</span><span class="mord">0</span></span></span></span> 正确；<br>
+FFN Input输入维度是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> 、输出维度是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>d</mi></mrow><annotation encoding="application/x-tex">4d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span></span></span></span> ，所以总共 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><mi>d</mi><mo>=</mo><mn>10246400</mn></mrow><annotation encoding="application/x-tex">4d^2+4d = 10246400</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mord">2</span><span class="mord">4</span><span class="mord">6</span><span class="mord">4</span><span class="mord">0</span><span class="mord">0</span></span></span></span> 正确；<br>
+FFN Output输入维度是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>d</mi></mrow><annotation encoding="application/x-tex">4d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span></span></span></span> 、输出维度是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> ，所以总共 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>d</mi><mo>=</mo><mn>10241600</mn></mrow><annotation encoding="application/x-tex">4d^2+d=10241600</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mord">2</span><span class="mord">4</span><span class="mord">1</span><span class="mord">6</span><span class="mord">0</span><span class="mord">0</span></span></span></span> 正确。</p>
+<p>参数量部分完结撒花！</p>
+<h2 id="怎么估算llm的训练flops">怎么估算LLM的训练FLOPs？</h2>
+<blockquote>
+<p>参数量决定了模型的“内存占用”，而FLOPs（浮点运算次数）决定了模型的“计算成本”。</p>
+</blockquote>
+<p>FLOPs（Floating Point Operations）指的是模型进行一次前向传播所需的浮点运算次数。对于矩阵乘法，<strong>一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>m</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">m \times n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">m</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的矩阵乘以 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mo>×</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">n \times p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span> 的矩阵，FLOPs大约是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mi>m</mi><mi>n</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">2mnp</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">2</span><span class="mord mathdefault">m</span><span class="mord mathdefault">n</span><span class="mord mathdefault">p</span></span></span></span></strong> ，因为：</p>
+<ul>
+<li>结果矩阵有 m×p 个元素，</li>
+<li>每个元素由两个长度为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的向量点积得到，因此大约需要 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 次乘法和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 次加法（共 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mi>n</mi></mrow><annotation encoding="application/x-tex">2n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault">n</span></span></span></span> 次运算）。</li>
+</ul>
+<p>下表汇总了Transformer Decoder层中各操作的FLOPs计算方式。<br>
+（记 <code>batch_size = 1</code>，<code>context_length = n</code>，维度为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> ，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mn>4</mn><mi>d</mi></mrow><annotation encoding="application/x-tex">d_{ff}=4d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span></span></span></span>）</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>输入形状</th>
+<th>权重形状</th>
+<th>输出形状</th>
+<th>FLOPs计算公式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Attention部分</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>8</mn><mi>n</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">8nd^2+4n^2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">8</span><span class="mord mathdefault">n</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span></td>
+<td></td>
+</tr>
+<tr>
+<td>Q线性映射</td>
+<td>(n, d)</td>
+<td>(d, d)</td>
+<td>(n, d)</td>
+<td>2 × n × d × d</td>
+<td></td>
+</tr>
+<tr>
+<td>K线性映射</td>
+<td>(n, d)</td>
+<td>(d, d)</td>
+<td>(n, d)</td>
+<td>2 × n × d × d</td>
+<td></td>
+</tr>
+<tr>
+<td>V线性映射</td>
+<td>(n, d)</td>
+<td>(d, d)</td>
+<td>(n, d)</td>
+<td>2 × n × d × d</td>
+<td></td>
+</tr>
+<tr>
+<td>Q·K^T</td>
+<td>(n, d)</td>
+<td>(d, n)</td>
+<td>(n, n)</td>
+<td>2 × n × d × n</td>
+<td>注意力分数矩阵</td>
+</tr>
+<tr>
+<td>Attention·V</td>
+<td>(n, n)</td>
+<td>(n, d)</td>
+<td>(n, d)</td>
+<td>2 × n × n × d</td>
+<td>加权求和</td>
+</tr>
+<tr>
+<td>输出映射WO</td>
+<td>(n, d)</td>
+<td>(d, d)</td>
+<td>(n, d)</td>
+<td>2 × n × d × d</td>
+<td>多头输出融合</td>
+</tr>
+<tr>
+<td><strong>FFN部分</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>16</mn><mi>n</mi><msup><mi>d</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">16nd^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord mathdefault">n</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></td>
+<td></td>
+</tr>
+<tr>
+<td>FFN第一层</td>
+<td>(n, d)</td>
+<td>(d, 4d)</td>
+<td>(n, 4d)</td>
+<td>2 × n × d × 4d</td>
+<td>维度扩展</td>
+</tr>
+<tr>
+<td>FFN第二层</td>
+<td>(n, 4d)</td>
+<td>(4d, d)</td>
+<td>(n, d)</td>
+<td>2 × n × 4d × d</td>
+<td>维度压缩</td>
+</tr>
+<tr>
+<td><strong>输出部分</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mi>n</mi><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">2nVd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span></td>
+<td></td>
+</tr>
+<tr>
+<td>LM Head</td>
+<td>(n, d)</td>
+<td>(d, V)</td>
+<td>(n, V)</td>
+<td>2 × n × d × V</td>
+<td>映射到词表</td>
+</tr>
+</tbody>
+</table>
+<p>（LayerNorm、残差连接等操作：复杂度O(dn)，相比矩阵乘法可忽略）</p>
+<p>每个Transformer块总和为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>24</mn><mi>n</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">24nd^2+4n^2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mord">4</span><span class="mord mathdefault">n</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span> ， <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span> 层总计为</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mi>L</mi><mi>O</mi><mi>P</mi><mi>s</mi><mo>=</mo><mn>2</mn><mi>n</mi><mo>⋅</mo><mo>(</mo><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi><mo>)</mo><mo>+</mo><mn>4</mn><mi>N</mi><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi><mo>=</mo><mn>2</mn><mi>n</mi><mi>P</mi><mo>+</mo><mn>4</mn><mi>N</mi><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">FLOPs=2n \cdot (12Nd^2 + Vd) + 4Nn^2d=2nP+4Nn^2d
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault">L</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8641079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8641079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span></span></p>
+<p>其实就是之前提到的参数量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">P = 12Nd^2 + Vd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span> ，再多出注意力<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">QK^T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.035771em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">Q</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span>和<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>⋅</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">Attention \cdot V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault">t</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mord mathdefault">i</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span>两个矩阵乘法的额外开销 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>N</mi><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">4Nn^2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span> 。<br>
+从而有了以下三条观察：</p>
+<ol>
+<li><strong>Attention的上下文平方复杂度</strong>：当 <code>context_length = n</code> 较大时， <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>N</mi><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">4Nn^2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span> 项占主导，这使得长上下文时，Attention项成为毫无疑问的瓶颈。</li>
+<li><strong>训练 vs 推理</strong>：
+<ul>
+<li>前向传播：使用上述表格的FLOPs，即2倍训练token数乘以参数量</li>
+<li>后向传播：约2倍前向FLOPs</li>
+<li>总训练FLOPs ≈ 3倍前向FLOPs</li>
+</ul>
+</li>
+<li><strong>经验公式</strong>：训练总FLOPs ≈ 6 × 参数量 × 训练token数</li>
+</ol>
+<p>代入GPT2-XL参数： <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mo>=</mo><mn>48</mn></mrow><annotation encoding="application/x-tex">N=48</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord">8</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo>=</mo><mn>1600</mn></mrow><annotation encoding="application/x-tex">d=1600</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord">0</span><span class="mord">0</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mo>=</mo><mn>1024</mn></mrow><annotation encoding="application/x-tex">n=1024</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mord">2</span><span class="mord">4</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><mn>50257</mn></mrow><annotation encoding="application/x-tex">V=50257</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">5</span><span class="mord">0</span><span class="mord">2</span><span class="mord">5</span><span class="mord">7</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mn>1.56</mn><mi>B</mi></mrow><annotation encoding="application/x-tex">P=1.56B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">.</span><span class="mord">5</span><span class="mord">6</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span><br>
+得到的前向 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mi>L</mi><mi>O</mi><mi>P</mi><mi>s</mi><mo>≈</mo><mn>3.507</mn><mi>T</mi></mrow><annotation encoding="application/x-tex">FLOPs \approx 3.507T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault">L</span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">3</span><span class="mord">.</span><span class="mord">5</span><span class="mord">0</span><span class="mord">7</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span> 。</p>
+<h2 id="维度d增大-vs-上下文长度n增大flops瓶颈在哪里">维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里？</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>公式</th>
+<th>对上下文长度n</th>
+<th>对维度d</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attention的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">QK^T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.035771em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">Q</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>⋅</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">Attention \cdot V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span><span class="mord mathdefault">t</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mord mathdefault">i</span><span class="mord mathdefault">o</span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>N</mi><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">4Nn^2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><msup><mi>n</mi><mn>2</mn></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><mi>d</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">O(d)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault">d</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td>Attention其余部分，FFN，LM Head</td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mi>n</mi><mo>(</mo><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">2n(12Nd^2+Vd)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathdefault">n</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span><span class="mclose">)</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span></td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><msup><mi>d</mi><mn>2</mn></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">O(d^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+</tr>
+</tbody>
+</table>
+<p>从上述FLOPs的公式可以看到，<br>
+随着模型大小的显著增大（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> 增大、<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span> 增大），Attention其余部分，FFN，LM Head将会占主导。<br>
+而随着上下文增长（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 增大，或者一般常用的字母是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span></span></span></span> ），Attention的两个矩阵乘法将会占主导。</p>
+<p>可以代入一些数据实际比较一下：</p>
+<pre><code>vocab_size = 50257
+d_ff = 4 \times d_model
+
+GPT-2 small (12 layers, 768 d_model, 12 heads)
+GPT-2 medium (24 layers, 1024 d_model, 16 heads)
+GPT-2 large (36 layers, 1280 d_model, 20 heads)
+GPT2-XL (48 layers, 1600 d_model, 25 heads)
+
+context length: from 1024 to 16,384
+</code></pre>
+<p>以下是结果（代码见附录B）。可见，<br>
+显著增大 context length 之后，Attention两个乘法（红色部分）马上成为了所有模型的绝对主导。<br>
+而在相同的context length情况下，随着模型增大，其余部分比Attention两个乘法增大得快一些（绿色占比上升，红色占比下降）。</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/flops.png" alt="" loading="lazy"></figure>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>N</th>
+<th>d</th>
+<th>context length n</th>
+<th><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mi>N</mi><msup><mi>n</mi><mn>2</mn></msup><mi>d</mi></mrow><annotation encoding="application/x-tex">4Nn^2d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span></span></span></span> (A)</th>
+<th><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><mi>n</mi><mo>(</mo><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">2n(12Nd^2+Vd)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathdefault">n</span><span class="mopen">(</span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span><span class="mclose">)</span></span></span></span> (B)</th>
+<th>总FLOPs (A+B)</th>
+<th>A占比</th>
+<th>B占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-2 small</td>
+<td>12</td>
+<td>768</td>
+<td>1,024</td>
+<td>3.87e+10</td>
+<td>2.53e+11</td>
+<td>2.92e+11</td>
+<td>13.3%</td>
+<td>86.7%</td>
+</tr>
+<tr>
+<td>GPT-2 small</td>
+<td>12</td>
+<td>768</td>
+<td>16,384</td>
+<td>9.90e+12</td>
+<td>4.05e+12</td>
+<td>1.39e+13</td>
+<td>71.0%</td>
+<td>29.0%</td>
+</tr>
+<tr>
+<td>GPT-2 medium</td>
+<td>24</td>
+<td>1024</td>
+<td>1,024</td>
+<td>1.03e+11</td>
+<td>7.24e+11</td>
+<td>8.27e+11</td>
+<td>12.5%</td>
+<td>87.5%</td>
+</tr>
+<tr>
+<td>GPT-2 medium</td>
+<td>24</td>
+<td>1024</td>
+<td>16,384</td>
+<td>2.64e+13</td>
+<td>1.16e+13</td>
+<td>3.80e+13</td>
+<td>69.5%</td>
+<td>30.5%</td>
+</tr>
+<tr>
+<td>GPT-2 large</td>
+<td>36</td>
+<td>1280</td>
+<td>1,024</td>
+<td>1.93e+11</td>
+<td>1.58e+12</td>
+<td>1.77e+12</td>
+<td>10.9%</td>
+<td>89.1%</td>
+</tr>
+<tr>
+<td>GPT-2 large</td>
+<td>36</td>
+<td>1280</td>
+<td>16,384</td>
+<td>4.95e+13</td>
+<td>2.53e+13</td>
+<td>7.48e+13</td>
+<td>66.2%</td>
+<td>33.8%</td>
+</tr>
+<tr>
+<td>GPT-2 XL</td>
+<td>48</td>
+<td>1600</td>
+<td>1,024</td>
+<td>3.22e+11</td>
+<td>3.18e+12</td>
+<td>3.51e+12</td>
+<td>9.2%</td>
+<td>90.8%</td>
+</tr>
+<tr>
+<td>GPT-2 XL</td>
+<td>48</td>
+<td>1600</td>
+<td>16,384</td>
+<td>8.25e+13</td>
+<td>5.10e+13</td>
+<td>1.33e+14</td>
+<td>61.8%</td>
+<td>38.2%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="附录a-参数量实测结果使用的代码">附录A: “参数量实测结果”使用的代码</h2>
+<pre><code class="language-python">from transformers import GPT2LMHeadModel
+import torch
+from collections import defaultdict
+
+# 加载模型
+print(&quot;正在加载 GPT-2 XL 模型...&quot;)
+model = GPT2LMHeadModel.from_pretrained('gpt2-xl')
+print(&quot;加载完成！\n&quot;)
+
+print(&quot;=&quot;*80)
+print(&quot;GPT-2 XL 按层参数量统计&quot;)
+print(&quot;=&quot;*80)
+
+# 统计各层参数量
+layer_params = defaultdict(int)
+total_params = 0
+
+# 按参数名分类统计
+for name, param in model.named_parameters():
+    params = param.numel()
+    total_params += params
+    
+    # 解析层级
+    if name.startswith('transformer.h.'):
+        # 提取层号，格式如：transformer.h.0.attn.c_attn.weight
+        parts = name.split('.')
+        layer_num = parts[2]  # '0', '1', '2', ...
+        layer_name = f&quot;Layer {layer_num}&quot;
+        
+        # 进一步细分是 attention 还是 mlp
+        if 'attn' in name:
+            if 'c_attn' in name:
+                sub_type = &quot;  ├─ Attention QKV (c_attn)&quot;
+            elif 'c_proj' in name:
+                sub_type = &quot;  ├─ Attention Output (c_proj)&quot;
+            else:
+                sub_type = &quot;  ├─ Attention Other&quot;
+        elif 'mlp' in name:
+            if 'c_fc' in name:
+                sub_type = &quot;  ├─ FFN Input (c_fc)&quot;
+            elif 'c_proj' in name:
+                sub_type = &quot;  ├─ FFN Output (c_proj)&quot;
+            else:
+                sub_type = &quot;  ├─ FFN Other&quot;
+        elif 'ln_' in name:
+            if 'ln_1' in name:
+                sub_type = &quot;  ├─ LayerNorm 1 (pre-attention)&quot;
+            elif 'ln_2' in name:
+                sub_type = &quot;  ├─ LayerNorm 2 (pre-ffn)&quot;
+            else:
+                sub_type = &quot;  ├─ LayerNorm Other&quot;
+        else:
+            sub_type = &quot;  ├─ Other&quot;
+        
+        print(f&quot;{layer_name:10s} {sub_type:35s} {name:40s} params: {params:10,d}&quot;)
+        layer_params[f&quot;Layer {layer_num} Total&quot;] += params
+        
+    elif 'transformer.wte' in name:
+        print(f&quot;{'Embedding':10s} {'  └─ Token Embedding':35s} {name:40s} params: {params:10,d}&quot;)
+        layer_params['Embedding'] += params
+    elif 'transformer.wpe' in name:
+        print(f&quot;{'Embedding':10s} {'  └─ Position Embedding':35s} {name:40s} params: {params:10,d}&quot;)
+        layer_params['Embedding'] += params
+    elif 'transformer.ln_f' in name:
+        print(f&quot;{'Final':10s} {'  └─ Final LayerNorm':35s} {name:40s} params: {params:10,d}&quot;)
+        layer_params['Final Norm'] += params
+    elif 'lm_head' in name:
+        print(f&quot;{'LM Head':10s} {'  └─ Language Model Head':35s} {name:40s} params: {params:10,d}&quot;)
+        layer_params['LM Head'] += params
+    else:
+        print(f&quot;{'Other':10s} {'  └─':35s} {name:40s} params: {params:10,d}&quot;)
+        layer_params['Other'] += params
+
+print(&quot;\n&quot; + &quot;=&quot;*80)
+print(&quot;各层总参数汇总&quot;)
+print(&quot;=&quot;*80)
+
+# 按层汇总
+for layer_name in sorted(layer_params.keys()):
+    params = layer_params[layer_name]
+    percentage = (params / total_params) * 100
+    print(f&quot;{layer_name:20s} params: {params:12,d} ({params/1e6:.2f}M) {percentage:.1f}%&quot;)
+
+print(&quot;\n&quot; + &quot;=&quot;*80)
+print(f&quot;{'总参数量':20s} params: {total_params:12,d}&quot;)
+print(f&quot;{'单位换算':20s} {total_params/1e6:.2f}M 参数 / {total_params/1e9:.2f}B 参数&quot;)
+print(&quot;=&quot;*80)
+
+# 验证单层参数量是否匹配理论计算
+print(&quot;\n&quot; + &quot;=&quot;*80)
+print(&quot;单层结构验证（以 Layer 0 为例）&quot;)
+print(&quot;=&quot;*80)
+
+# 计算第一层的详细结构
+layer_0_params = defaultdict(int)
+for name, param in model.named_parameters():
+    if name.startswith('transformer.h.0.'):
+        if 'attn.c_attn' in name:
+            layer_0_params['Attention QKV'] += param.numel()
+        elif 'attn.c_proj' in name:
+            layer_0_params['Attention Output'] += param.numel()
+        elif 'mlp.c_fc' in name:
+            layer_0_params['FFN Input (c_fc)'] += param.numel()
+        elif 'mlp.c_proj' in name:
+            layer_0_params['FFN Output (c_proj)'] += param.numel()
+        elif 'ln_1' in name:
+            layer_0_params['LayerNorm 1'] += param.numel()
+        elif 'ln_2' in name:
+            layer_0_params['LayerNorm 2'] += param.numel()
+
+for comp, params in layer_0_params.items():
+    print(f&quot;{comp:25s}: {params:10,d} ({params/1e6:.2f}M)&quot;)
+
+layer_0_total = sum(layer_0_params.values())
+print(f&quot;{'Layer 0 总计':25s}: {layer_0_total:10,d} ({layer_0_total/1e6:.2f}M)&quot;)
+
+# 验证是否与理论计算一致
+print(f&quot;\n理论计算值: 30.72M&quot;)
+print(f&quot;实际统计值: {layer_0_total/1e6:.2f}M&quot;)
+print(f&quot;差异: {abs(30.72 - layer_0_total/1e6):.2f}M&quot;)
+</code></pre>
+<h2 id="附录b-维度d增大-vs-上下文长度n增大flops瓶颈在哪里使用的代码">附录B: “维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里”使用的代码</h2>
+<pre><code class="language-python">import numpy as np
+
+# 模型配置
+models = [
+    {&quot;name&quot;: &quot;GPT-2 small&quot;, &quot;N&quot;: 12, &quot;d&quot;: 768},
+    {&quot;name&quot;: &quot;GPT-2 medium&quot;, &quot;N&quot;: 24, &quot;d&quot;: 1024},
+    {&quot;name&quot;: &quot;GPT-2 large&quot;, &quot;N&quot;: 36, &quot;d&quot;: 1280},
+    {&quot;name&quot;: &quot;GPT-2 XL&quot;, &quot;N&quot;: 48, &quot;d&quot;: 1600},
+]
+
+# 固定参数
+vocab_size = 50257
+context_lengths = [1024, 16384]
+
+def calculate_flops(N, d, n, V):
+    &quot;&quot;&quot;
+    计算FLOPs
+    A = 4Nn²d  (Attention的QK^T和Attention·V)
+    B = 2n(12Nd² + Vd)  (Attention其余部分 + FFN + LM Head)
+    &quot;&quot;&quot;
+    # 计算A: 4Nn²d
+    A = 4 * N * (n ** 2) * d
+    
+    # 计算B: 2n(12Nd² + Vd)
+    B = 2 * n * (12 * N * (d ** 2) + V * d)
+    
+    total = A + B
+    
+    return {
+        &quot;A&quot;: A,
+        &quot;B&quot;: B,
+        &quot;total&quot;: total,
+        &quot;A_ratio&quot;: A / total * 100,
+        &quot;B_ratio&quot;: B / total * 100
+    }
+
+# 生成Markdown表格
+print(&quot;| 模型 | N | d | context length n | $4Nn^2d$ (A) | $2n(12Nd^2+Vd)$ (B) | 总FLOPs (A+B) | A占比 | B占比 |&quot;)
+print(&quot;|------|---|---|-------------------|--------------|---------------------|---------------|-------|-------|&quot;)
+
+for model in models:
+    for n in context_lengths:
+        result = calculate_flops(model[&quot;N&quot;], model[&quot;d&quot;], n, vocab_size)
+        
+        # 格式化数字为科学计数法
+        A_str = f&quot;{result['A']:.2e}&quot;
+        B_str = f&quot;{result['B']:.2e}&quot;
+        total_str = f&quot;{result['total']:.2e}&quot;
+        
+        print(f&quot;| {model['name']} | {model['N']} | {model['d']} | {n:,} | {A_str} | {B_str} | {total_str} | {result['A_ratio']:.1f}% | {result['B_ratio']:.1f}% |&quot;)
+
+# 打印详细数值（可选）
+print(&quot;\n## 详细数值\n&quot;)
+
+for model in models:
+    for n in context_lengths:
+        result = calculate_flops(model[&quot;N&quot;], model[&quot;d&quot;], n, vocab_size)
+        print(f&quot;\n{model['name']}, n={n}:&quot;)
+        print(f&quot;  A = 4 × {model['N']} × {n}² × {model['d']} = {result['A']:.2e}&quot;)
+        print(f&quot;  B = 2 × {n} × (12 × {model['N']} × {model['d']}² + {vocab_size} × {model['d']}) = {result['B']:.2e}&quot;)
+        print(f&quot;  Total = {result['total']:.2e}&quot;)
+        print(f&quot;  A占比 = {result['A_ratio']:.1f}%, B占比 = {result['B_ratio']:.1f}%&quot;)
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E9%87%8F%E5%AE%9E%E6%B5%8B%E7%BB%93%E6%9E%9C">参数量实测结果</a></li>
+<li><a href="#%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%8F%82%E6%95%B0%E9%87%8F%E4%BC%B0%E7%AE%97%E5%85%AC%E5%BC%8F">最常用的参数量估算公式</a></li>
+<li><a href="#%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%8F%82%E6%95%B0%E9%87%8F%E4%BC%B0%E7%AE%97%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC">“最常用的参数量估算公式”推导</a></li>
+<li><a href="#%E6%80%8E%E4%B9%88%E6%9B%B4%E7%B2%BE%E7%A1%AE%E5%9C%B0%E4%BC%B0%E7%AE%97%E5%8F%82%E6%95%B0%E9%87%8F">怎么更精确地估算参数量？</a></li>
+<li><a href="#%E6%80%8E%E4%B9%88%E4%BC%B0%E7%AE%97llm%E7%9A%84%E8%AE%AD%E7%BB%83flops">怎么估算LLM的训练FLOPs？</a></li>
+<li><a href="#%E7%BB%B4%E5%BA%A6d%E5%A2%9E%E5%A4%A7-vs-%E4%B8%8A%E4%B8%8B%E6%96%87%E9%95%BF%E5%BA%A6n%E5%A2%9E%E5%A4%A7flops%E7%93%B6%E9%A2%88%E5%9C%A8%E5%93%AA%E9%87%8C">维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里？</a></li>
+<li><a href="#%E9%99%84%E5%BD%95a-%E5%8F%82%E6%95%B0%E9%87%8F%E5%AE%9E%E6%B5%8B%E7%BB%93%E6%9E%9C%E4%BD%BF%E7%94%A8%E7%9A%84%E4%BB%A3%E7%A0%81">附录A: “参数量实测结果”使用的代码</a></li>
+<li><a href="#%E9%99%84%E5%BD%95b-%E7%BB%B4%E5%BA%A6d%E5%A2%9E%E5%A4%A7-vs-%E4%B8%8A%E4%B8%8B%E6%96%87%E9%95%BF%E5%BA%A6n%E5%A2%9E%E5%A4%A7flops%E7%93%B6%E9%A2%88%E5%9C%A8%E5%93%AA%E9%87%8C%E4%BD%BF%E7%94%A8%E7%9A%84%E4%BB%A3%E7%A0%81">附录B: “维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里”使用的代码</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/algorithm-5/">
+              <h3 class="post-title">
+                【数据结构与算法5】LeetCode HOT 100 in Python（后50）
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('') {
+  options.api = ''
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
