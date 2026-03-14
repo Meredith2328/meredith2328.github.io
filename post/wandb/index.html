@@ -1,0 +1,645 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WanDB基础使用教程总结 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1773480611148">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="WanDB基础使用教程总结 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="WanDB是一个python库/日志托管平台，帮我们详细记录并整理了训练过程中的各种参数和指标变化，
+省去了需要自己详细记录日志、绘制图表的麻烦，并且可以做超参数搜索等进阶用法。
+
+
+感谢DeepSeek v3.2提供了所有的代码使用例。
+..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1773480611148" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              WanDB基础使用教程总结
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-08
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>WanDB是一个python库/日志托管平台，帮我们详细记录并整理了训练过程中的各种参数和指标变化，<br>
+省去了需要自己<strong>详细记录日志</strong>、<strong>绘制图表</strong>的麻烦，并且可以做<strong>超参数搜索</strong>等进阶用法。</p>
+<!-- more -->
+<blockquote>
+<p>感谢DeepSeek v3.2提供了所有的代码使用例。<br>
+edit time: 2026-03-09 13:48:37</p>
+</blockquote>
+<p>整合入训练循环的最小模板：</p>
+<pre><code class="language-python">import wandb
+
+# 初始化
+wandb.init(project=&quot;my-project&quot;, config={
+    &quot;param1&quot;: 0.1,
+    &quot;param2&quot;: 100,
+})
+
+# 训练循环
+for epoch in range(10):
+    # 您的训练代码...
+    
+    # 记录指标
+    wandb.log({
+        &quot;loss&quot;: 0.5,
+        &quot;accuracy&quot;: 0.8,
+    })
+
+wandb.finish()
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>在W&amp;B quickstart中提到了两款产品，我们主要使用的是前者，用于记录acc、loss、运行环境和模型权重等日志信息，并且便于做简单的绘图。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>W&amp;B Models (你熟悉的)</th>
+<th>W&amp;B Weave (你可能陌生的)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>核心定位</strong></td>
+<td><strong>实验跟踪平台</strong>：记录训练过程的指标、超参数和模型版本。<a href="https://blog.csdn.net/qq_63129682/article/details/144069920"></a></td>
+<td><strong>AI应用开发平台</strong>：跟踪、评估和监控基于LLM的应用。<a href="https://qa.wandb.ai/site/weave/"></a></td>
+</tr>
+<tr>
+<td><strong>适用对象</strong></td>
+<td>训练深度学习的<strong>研究员/工程师</strong>（CV、NLP、语音等）。</td>
+<td>开发LLM应用的<strong>工程师</strong>（聊天机器人、RAG、Agent、提示词调优）。<a href="https://qa.wandb.ai/site/weave/"></a></td>
+</tr>
+<tr>
+<td><strong>关注焦点</strong></td>
+<td><strong>模型性能</strong>：损失、准确率、梯度、GPU利用率。</td>
+<td><strong>应用质量</strong>：模型回复内容、Token消耗、延迟、成本、安全性（幻觉、毒性）。<a href="https://qa.wandb.ai/site/weave/"></a></td>
+</tr>
+<tr>
+<td><strong>核心抽象</strong></td>
+<td><strong>Run</strong> (一次训练实验)、<strong>Artifact</strong> (数据集/模型)、<strong>Sweep</strong> (超参数搜索)。</td>
+<td><strong>Op</strong> (被追踪的函数，如一个LLM调用)、<strong>Trace</strong> (函数调用链)、<strong>Evaluation</strong> (对模型输出的打分)。<a href="https://qa.wandb.ai/site/weave/"></a><a href="https://docs.wandb.ai/weave/quickstart-inference"></a></td>
+</tr>
+<tr>
+<td><strong>典型场景</strong></td>
+<td>“我想试试把学习率调到0.001，看看loss能不能降到0.1以下。”</td>
+<td>“我想看看我的RAG应用对用户‘今天天气咋样’这个问题，到底检索了什么文档，最后生成了什么答案，花了多少钱。”</td>
+</tr>
+</tbody>
+</table>
+<h2 id="基础使用记录acc和loss的变化">基础使用：记录acc和loss的变化</h2>
+<p>wanDB最本源的使用方式是通过 <code>wandb.log</code> 函数，记录 <code>epoch</code>， <code>accuracy</code> 和 <code>loss</code> ，只要在相关的地方把变量传给它就行。<br>
+生成一些数字看看它的效果：</p>
+<pre><code class="language-python">import wandb
+import random
+import time
+
+# 1. 初始化一个新的run
+wandb.init(project=&quot;colab-demo&quot;, name=&quot;basic-example&quot;)
+
+# 2. 模拟训练过程
+for epoch in range(10):
+    # 模拟一些指标
+    loss = 1 / (epoch + 1) + random.random() * 0.1
+    accuracy = epoch / 10 + random.random() * 0.05
+    
+    # 3. 记录指标
+    wandb.log({
+        &quot;epoch&quot;: epoch,
+        &quot;loss&quot;: loss,
+        &quot;accuracy&quot;: accuracy
+    })
+    
+    time.sleep(1)  # 模拟训练时间
+
+# 4. 结束run
+wandb.finish()
+print(&quot;实验完成！请查看wandb仪表板&quot;)
+</code></pre>
+<p>发现它帮我在终端生成了直观的变化图和总结。</p>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/20260308214955.png" alt="" loading="lazy"></figure>
+<p>当然这两个就是最核心的内容。但在网页上，我看到了折线图，还看到了完全固定下来的 <code>requirements.txt</code> 等信息，充分地表现了日志的强大之处：复现一次实验所需的所有信息。</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/20260308215554.png" alt="" loading="lazy"></figure>
+<h2 id="基础使用记录超参数config">基础使用：记录超参数config</h2>
+<p>我们想记录更多的东西！那就记录吧！<br>
+这一次还记录了 <code>config</code> 。 用sklearn跑了一个随机森林，看看特征的相对重要性。</p>
+<pre><code class="language-python">import wandb
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+# 初始化wandb并记录配置
+wandb.init(
+    project=&quot;colab-demo&quot;,
+    name=&quot;sklearn-example&quot;,
+    config={
+        &quot;learning_rate&quot;: 0.01,
+        &quot;batch_size&quot;: 32,
+        &quot;n_estimators&quot;: 100,
+        &quot;max_depth&quot;: 10,
+        &quot;random_state&quot;: 42,
+        &quot;dataset_size&quot;: 1000,
+        &quot;model_type&quot;: &quot;RandomForest&quot;
+    }
+)
+
+# 获取配置
+config = wandb.config
+
+# 生成示例数据
+X, y = make_classification(
+    n_samples=config.dataset_size, 
+    n_features=20, 
+    random_state=config.random_state
+)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=config.random_state
+)
+
+# 训练模型
+model = RandomForestClassifier(
+    n_estimators=config.n_estimators,
+    max_depth=config.max_depth,
+    random_state=config.random_state
+)
+model.fit(X_train, y_train)
+
+# 预测和评估
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+
+# 记录最终的指标
+wandb.log({
+    &quot;test_accuracy&quot;: accuracy,
+    &quot;test_precision&quot;: precision,
+    &quot;test_recall&quot;: recall,
+    &quot;feature_importance&quot;: wandb.plot.bar(
+        wandb.Table(
+            data=[[f&quot;feature_{i}&quot;, imp] for i, imp in enumerate(model.feature_importances_)],
+            columns=[&quot;feature&quot;, &quot;importance&quot;]
+        ),
+        &quot;feature&quot;, &quot;importance&quot;,
+        title=&quot;Feature Importance&quot;
+    )
+})
+
+wandb.finish()
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/20260308215748.png" alt="" loading="lazy"></figure>
+<p>注意以下这个图表完全是借助 <code>wandb</code> 提供的接口绘制的。</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/20260308215916.png" alt="" loading="lazy"></figure>
+<h2 id="基础使用pytorch和huggingface-transformers的集成">基础使用：PyTorch和Huggingface Transformers的集成</h2>
+<p>都一样，把变量传进去就行。某个指标、某个结果，甚至是模型权重文件 <code>model.pth</code> 。<br>
+但wandb的免费似乎只支持200GB的存储，需要注意。</p>
+<p>Huggingface Transformers甚至还要更加省事：<br>
+连那些参数都不需要自己传了， <code>Trainer</code> 已经封装好了，只要 <code>report_to=&quot;wandb&quot;</code> 就可以了。</p>
+<pre><code class="language-python">import wandb
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+import numpy as np
+
+# 初始化wandb
+wandb.init(
+    project=&quot;colab-demo&quot;,
+    name=&quot;pytorch-example&quot;,
+    config={
+        &quot;learning_rate&quot;: 0.01,
+        &quot;batch_size&quot;: 32,
+        &quot;epochs&quot;: 20,
+        &quot;hidden_size&quot;: 128,
+        &quot;optimizer&quot;: &quot;Adam&quot;
+    }
+)
+
+config = wandb.config
+
+# 生成简单的回归数据
+X = torch.randn(1000, 10)
+y = torch.randn(1000, 1) * 2 + 3 + torch.randn(1000, 1) * 0.1
+
+dataset = TensorDataset(X, y)
+dataloader = DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
+
+# 定义简单的神经网络
+class SimpleNN(nn.Module):
+    def __init__(self, input_size=10, hidden_size=128, output_size=1):
+        super().__init__()
+        self.layer1 = nn.Linear(input_size, hidden_size)
+        self.layer2 = nn.Linear(hidden_size, hidden_size)
+        self.layer3 = nn.Linear(hidden_size, output_size)
+        self.relu = nn.ReLU()
+        
+    def forward(self, x):
+        x = self.relu(self.layer1(x))
+        x = self.relu(self.layer2(x))
+        x = self.layer3(x)
+        return x
+
+model = SimpleNN(hidden_size=config.hidden_size)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
+
+# 训练循环
+for epoch in range(config.epochs):
+    total_loss = 0
+    for batch_x, batch_y in dataloader:
+        optimizer.zero_grad()
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    
+    avg_loss = total_loss / len(dataloader)
+    
+    # 记录训练损失
+    wandb.log({
+        &quot;epoch&quot;: epoch,
+        &quot;train_loss&quot;: avg_loss,
+        &quot;learning_rate&quot;: optimizer.param_groups[0]['lr']
+    })
+    
+    # 可选：记录模型梯度直方图
+    if epoch % 5 == 0:
+        wandb.log({
+            &quot;gradients&quot;: wandb.Histogram(
+                torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None])
+            )
+        })
+    
+    print(f&quot;Epoch {epoch+1}/{config.epochs}, Loss: {avg_loss:.4f}&quot;)
+
+# 保存模型
+torch.save(model.state_dict(), &quot;model.pth&quot;)
+wandb.save(&quot;model.pth&quot;)  # 将模型文件保存到wandb
+
+wandb.finish()
+</code></pre>
+<pre><code class="language-python">import wandb
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForSequenceClassification,
+    TrainingArguments, 
+    Trainer
+)
+from datasets import load_dataset
+import numpy as np
+from sklearn.metrics import accuracy_score
+
+# 1. 初始化wandb（这里可以指定项目名和实验名）
+wandb.init(project=&quot;huggingface-colab-demo&quot;, name=&quot;automatic-logging-run&quot;)
+
+# 2. 准备数据
+dataset = load_dataset(&quot;imdb&quot;, split=&quot;train[:100]&quot;)  # 只取100条，让实验更快
+tokenizer = AutoTokenizer.from_pretrained(&quot;distilbert-base-uncased&quot;)
+
+def tokenize_function(examples):
+    return tokenizer(examples[&quot;text&quot;], padding=&quot;max_length&quot;, truncation=True, max_length=128)
+
+tokenized_dataset = dataset.map(tokenize_function, batched=True)
+
+# 3. 加载模型
+model = AutoModelForSequenceClassification.from_pretrained(&quot;distilbert-base-uncased&quot;, num_labels=2)
+
+# 4. 配置TrainingArguments，关键就是 report_to=&quot;wandb&quot;
+training_args = TrainingArguments(
+    output_dir=&quot;./results&quot;,
+    num_train_epochs=2,
+    per_device_train_batch_size=8,
+    logging_steps=10,              # 每10步记录一次日志
+    report_to=&quot;wandb&quot;,              # 👈 告诉Trainer用wandb记录
+    run_name=&quot;bert-imdb-quick-test&quot;, # 这次运行的名字
+)
+
+# 5. 定义评估指标
+def compute_metrics(eval_pred):
+    predictions, labels = eval_pred
+    predictions = np.argmax(predictions, axis=1)
+    return {&quot;accuracy&quot;: accuracy_score(labels, predictions)}
+
+# 6. 创建Trainer并开始训练
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_dataset,
+    eval_dataset=tokenized_dataset,  # 简单起见，用训练集评估
+    compute_metrics=compute_metrics,
+)
+
+trainer.train()
+
+# 7. 结束实验
+wandb.finish()
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://meredith2328.github.io/post-images/20260308220445.png" alt="" loading="lazy"></figure>
+<h2 id="进阶使用超参数搜索">进阶使用：超参数搜索</h2>
+<p>定义搜索空间后，wandb可用于超参数搜索。<br>
+例如下述定义了 <code>learning_rate</code> 在 <code>[1e-5, 1e-4]</code> 之间，服从对数均匀分布。</p>
+<blockquote>
+<p>对数均匀分布意味着在数量级上均匀采样。比如从1e-5到1e-4，虽然数值看起来“偏向”小值，但在对数尺度上是均匀的——这正好适合学习率这种需要跨数量级尝试的参数。</p>
+</blockquote>
+<p>之后我利用for循环串行运行了三次，wandb帮我测试的 <code>lr</code> 分别为 <code>2.213804440450783e-05</code> ，<code>1.6808858635707506e-05</code> ，<code>1.1746289104917436e-05</code> 。<br>
+还定义了 <code>per_device_train_batch_size</code> 为 <code>8</code> 或 <code>16</code> ，实际跑了一次 <code>8</code> 、两次 <code>16</code> 。</p>
+<pre><code class="language-python">import wandb
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForSequenceClassification,
+    TrainingArguments, 
+    Trainer
+)
+from datasets import load_dataset
+import numpy as np
+from sklearn.metrics import accuracy_score
+import time
+import random
+
+# 设置随机种子避免冲突
+random.seed(int(time.time()))
+
+sweep_config = {
+    &quot;method&quot;: &quot;random&quot;,
+    &quot;metric&quot;: {&quot;name&quot;: &quot;eval_accuracy&quot;, &quot;goal&quot;: &quot;maximize&quot;},
+    &quot;parameters&quot;: {
+        &quot;learning_rate&quot;: {
+            &quot;distribution&quot;: &quot;log_uniform_values&quot;,
+            &quot;min&quot;: 1e-5,
+            &quot;max&quot;: 1e-4
+        },
+        &quot;per_device_train_batch_size&quot;: {&quot;values&quot;: [8, 16]},
+        &quot;num_train_epochs&quot;: {&quot;values&quot;: [2]}
+    }
+}
+
+def train():
+    # 每个run完全独立初始化
+    run = wandb.init(project=&quot;huggingface-colab-demo&quot;, reinit=True)
+    config = wandb.config
+    
+    try:
+        print(f&quot;开始训练 {run.id}&quot;)
+        
+        # 数据准备
+        dataset = load_dataset(&quot;imdb&quot;, split=&quot;train[:200]&quot;)
+        tokenizer = AutoTokenizer.from_pretrained(&quot;distilbert-base-uncased&quot;)
+        
+        def tokenize_function(examples):
+            return tokenizer(examples[&quot;text&quot;], padding=&quot;max_length&quot;, truncation=True, max_length=128)
+        
+        tokenized_dataset = dataset.map(tokenize_function, batched=True)
+        train_valid_split = tokenized_dataset.train_test_split(test_size=0.2, seed=42)
+        
+        model = AutoModelForSequenceClassification.from_pretrained(
+            &quot;distilbert-base-uncased&quot;, 
+            num_labels=2
+        )
+
+        training_args = TrainingArguments(
+            output_dir=f&quot;./results/sweep_{run.id}&quot;,
+            num_train_epochs=config.num_train_epochs,
+            per_device_train_batch_size=config.per_device_train_batch_size,
+            learning_rate=config.learning_rate,
+            logging_steps=10,
+            eval_strategy=&quot;epoch&quot;,
+            save_strategy=&quot;no&quot;,
+            report_to=&quot;wandb&quot;,
+            run_name=f&quot;sweep-{run.id}&quot;,
+        )
+
+        def compute_metrics(eval_pred):
+            predictions, labels = eval_pred
+            predictions = np.argmax(predictions, axis=1)
+            return {&quot;accuracy&quot;: accuracy_score(labels, predictions)}
+
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=train_valid_split[&quot;train&quot;],
+            eval_dataset=train_valid_split[&quot;test&quot;],
+            compute_metrics=compute_metrics,
+        )
+
+        trainer.train()
+        
+    except Exception as e:
+        print(f&quot;错误: {e}&quot;)
+        wandb.log({&quot;error&quot;: str(e)})
+    finally:
+        wandb.finish()
+        # 强制等待一小段时间，避免资源竞争
+        time.sleep(2)
+
+# 创建sweep
+sweep_id = wandb.sweep(sweep_config, project=&quot;huggingface-colab-demo&quot;)
+
+# 串行运行，每次只跑一个
+for i in range(3):  # 跑3次
+    print(f&quot;\n=== 开始第 {i+1}/3 次运行 ===\n&quot;)
+    wandb.agent(sweep_id, function=train, count=1)  # 每次只跑1个
+    time.sleep(3)  # 间隔3秒
+</code></pre>
+<p>而在wandb的后台中，这三次 <code>run</code> 被整理到同一个 <code>sweep</code> 中，便于互相比较。</p>
+<p><img src="https://meredith2328.github.io/post-images/20260309134622.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/20260309134635.png" alt="" loading="lazy"></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+<li><a href="#%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95acc%E5%92%8Closs%E7%9A%84%E5%8F%98%E5%8C%96">基础使用：记录acc和loss的变化</a></li>
+<li><a href="#%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95%E8%B6%85%E5%8F%82%E6%95%B0config">基础使用：记录超参数config</a></li>
+<li><a href="#%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8pytorch%E5%92%8Chuggingface-transformers%E7%9A%84%E9%9B%86%E6%88%90">基础使用：PyTorch和Huggingface Transformers的集成</a></li>
+<li><a href="#%E8%BF%9B%E9%98%B6%E4%BD%BF%E7%94%A8%E8%B6%85%E5%8F%82%E6%95%B0%E6%90%9C%E7%B4%A2">进阶使用：超参数搜索</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/LLMestimate/">
+              <h3 class="post-title">
+                怎么估算LLM的参数量和训练FLOPs？推一推、测一测
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('https://discus.skk.moe/discus/') {
+  options.api = 'https://discus.skk.moe/discus/'
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

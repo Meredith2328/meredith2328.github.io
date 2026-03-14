@@ -1,0 +1,535 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS336 Assignment 1 后半段记录：实验 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1773480611148">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS336 Assignment 1 后半段记录：实验 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="已经搭建起了训练循环，接下来做一些实验。训得有多快？有多好？
+
+BPE Tokenizer
+之前的实现接口不是很好用，更进一步包装了一下，并麻烦GPT帮我优化了naive实现。
+由于 test_tokenizer 中 import reso..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1773480611148" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS336 Assignment 1 后半段记录：实验
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-10
+              </span>
+              <span>
+                14 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>已经搭建起了训练循环，接下来做一些实验。训得有多快？有多好？</p>
+<!-- more -->
+<h2 id="bpe-tokenizer">BPE Tokenizer</h2>
+<p>之前的实现接口不是很好用，更进一步包装了一下，并麻烦GPT帮我优化了naive实现。</p>
+<p>由于 <code>test_tokenizer</code> 中 <code>import resource</code> 这个库只能在linux中使用，决定将核心代码拷贝到linux环境下进行测试。<br>
+而为了保证实现的正确性，在原来的windows环境下利用gpt撰写了 <code>test_tokenizer_windows.py</code> 用于替换。<br>
+成功通过了所有测试。</p>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/20260309150757.png" alt="" loading="lazy"></figure>
+<p>在实际的训练过程中大约有如下的日志：</p>
+<pre><code>============================================================
+Step 1/3: train BPE tokenizer
+BPE training configuration:
+  input_path: data/TinyStoriesV2-GPT4-train.txt
+  vocab_size: 10000
+  special_tokens: ['&lt;|endoftext|&gt;']
+  progress_every: 100
+  heartbeat_seconds: 15
+  vocab_out: tokenizer/tinystories_bpe_vocab.pkl
+  merges_out: tokenizer/tinystories_bpe_merges.pkl
+[progress] read_corpus done in 12.2s, chars=2226845268
+[heartbeat] elapsed=15.0s | stage=pretokenize
+...
+[heartbeat] elapsed=11m00.2s | stage=pretokenize[progress] pretokenize done in 10m48.0s, unique_words=59933, word_instances=536592168
+[progress] init_vocab done, size=257
+
+[progress] merge stage started. target_merges=9743
+[progress] merges 1/9743 (0.0%) | rate 46.72/s | eta 3m28.5s
+[progress] merges 100/9743 (1.0%) | rate 69.60/s | eta 2m18.5s
+[progress] merges 200/9743 (2.1%) | rate 111.81/s | eta 1m25.3s
+[progress] merges 300/9743 (3.1%) | rate 147.55/s | eta 1m04.0s
+[progress] merges 400/9743 (4.1%) | rate 174.47/s | eta 53.5s
+[progress] merges 500/9743 (5.1%) | rate 196.80/s | eta 47.0s
+[progress] merges 600/9743 (6.2%) | rate 213.98/s | eta 42.7s
+[progress] merges 700/9743 (7.2%) | rate 230.18/s | eta 39.3s
+[progress] merges 800/9743 (8.2%) | rate 234.73/s | eta 38.1s
+[progress] merges 900/9743 (9.2%) | rate 245.64/s | eta 36.0s
+[progress] merges 1000/9743 (10.3%) | rate 254.83/s | eta 34.3s
+[progress] merges 1100/9743 (11.3%) | rate 263.16/s | eta 32.8s
+[progress] merges 1200/9743 (12.3%) | rate 269.57/s | eta 31.7s
+[progress] merges 1300/9743 (13.3%) | rate 274.76/s | eta 30.7s
+[progress] merges 1400/9743 (14.4%) | rate 277.75/s | eta 30.0s
+[progress] merges 1500/9743 (15.4%) | rate 280.87/s | eta 29.3s
+[progress] merges 1600/9743 (16.4%) | rate 282.89/s | eta 28.8s
+...
+[progress] merges 9700/9743 (99.6%) | rate 234.68/s | eta 183ms
+[progress] merges 9743/9743 (100.0%) | rate 234.48/s | eta 0ms
+[progress] merge stage finished. completed=9743 in 41.6s
+[progress] train done in 11m41.9s, merges=9743, final_vocab=10000
+Saved tokenizer artifacts:
+  vocab_path: tokenizer/tinystories_bpe_vocab.pkl
+  merges_path: tokenizer/tinystories_bpe_merges.pkl
+  longest_token: b' accomplishment'
+  longest_token_len: 15
+  total_elapsed: 11m42.2s
+============================================================
+Step 2/3: tokenize txt -&gt; bin
+Tokenization config:
+  input_text: data/TinyStoriesV2-GPT4-train.txt
+  vocab_pkl: tokenizer/tinystories_bpe_vocab.pkl
+  merges_pkl: tokenizer/tinystories_bpe_merges.pkl
+  output_bin: data/tinystories_train.bin
+  output_meta: data/tinystories_train.bin.meta.json
+  special_tokens: ['&lt;|endoftext|&gt;']
+Loaded tokenizer in 0.02s, selected dtype=uint16
+[count] lines=10,000 tokens=346,490 rate=757,865 tok/s
+[count] lines=20,000 tokens=688,564 rate=920,827 tok/s
+[count] lines=30,000 tokens=1,030,877 rate=1,050,978 tok/s
+...
+[count] lines=15,560,000 tokens=539,410,167 rate=1,686,385 tok/s
+[count] lines=15,570,000 tokens=539,755,742 rate=1,686,406 tok/s
+[count] lines=15,580,000 tokens=540,104,767 rate=1,686,436 tok/s
+[count] lines=15,590,000 tokens=540,453,813 rate=1,686,456 tok/s
+[count] lines=15,600,000 tokens=540,794,508 rate=1,686,484 tok/s
+Count pass done: lines=15,600,057, tokens=540,796,778, elapsed=320.67s
+[write] lines=10,000 tokens_written=346,490/540,796,778 rate=799,121 tok/s
+[write] lines=20,000 tokens_written=688,564/540,796,778 rate=1,021,996 tok/s
+[write] lines=30,000 tokens_written=1,030,877/540,796,778 rate=1,127,432 tok/s
+[write] lines=40,000 tokens_written=1,378,058/540,796,778 rate=1,005,091 tok/s
+...
+[write] lines=150,000 tokens_written=5,191,898/5,461,210 rate=179,838 tok/s Write pass done: output=data/tinystories_val.bin, elapsed=29.08s Metadata written: data/tinystories_val.bin.meta.json ============================================================
+</code></pre>
+<h2 id="training-loop-generating-text">Training loop / Generating text</h2>
+<blockquote>
+<p>我们要做什么？</p>
+</blockquote>
+<p>5.1 Data Loader<br>
+编写DataLoader，从输入序列，生成一系列的batch。<br>
+还包括 <code>np.memmap</code> 这样的数据集加载工程优化。</p>
+<p>5.2 Checkpointing<br>
+编写Checkpointing，将模型存储下来。</p>
+<p>5.3 Training Loop<br>
+编写训练循环，并且要求具有日志功能（例如接到WanDB上）。</p>
+<p>6 Generating Text<br>
+使用训练出的模型进行next token prediction，从而实现生成文本。</p>
+<h3 id="dataloader">DataLoader</h3>
+<p>tokenized data是一个token序列 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>=</mo><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo></mrow><annotation encoding="application/x-tex">x=(x_1,x_2, \dots, x_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> ，<br>
+DataLoader把它变成batch流，<br>
+每个batch包含 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> 个 (sequence, next_tokens)  ，其中 sequence 和 next_tokens 的长度均为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">m</span></span></span></span> 。<br>
+例如一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi><mo>=</mo><mn>1</mn><mo separator="true">,</mo><mi>m</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">B=1,m=3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">m</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">3</span></span></span></span> 的batch可以为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>(</mo><mo>[</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>4</mn></msub><mo>]</mo><mo separator="true">,</mo><mo>[</mo><msub><mi>x</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>4</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>5</mn></msub><mo>]</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">([x_2,x_3,x_4],[x_3,x_4,x_5])</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mopen">[</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">]</span><span class="mclose">)</span></span></span></span> 。用于next token prediction的原始序列是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>[</mo><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>4</mn></msub><mo>]</mo></mrow><annotation encoding="application/x-tex">[x_2,x_3,x_4]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span> ，它需要预测出的 token 是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>[</mo><msub><mi>x</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>4</mn></msub><mo separator="true">,</mo><msub><mi>x</mi><mn>5</mn></msub><mo>]</mo></mrow><annotation encoding="application/x-tex">[x_3,x_4,x_5]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span> ，正好是原始序列整体往后一个的窗口。<br>
+具体而言，这个任务是masked的：</p>
+<ul>
+<li>看到 <code>x₂</code>，预测 <code>x₃</code></li>
+<li>看到 <code>x₂, x₃</code>，预测 <code>x₄</code></li>
+<li>看到 <code>x₂, x₃, x₄</code>，预测 <code>x₅</code></li>
+</ul>
+<pre><code class="language-python">def get_batch(
+    dataset: np.ndarray,
+    batch_size: int,
+    context_length: int,
+    device: str
+) -&gt; Tuple[torch.Tensor, torch.Tensor]:
+    &quot;&quot;&quot;
+    从数据集采样batch
+    
+    Args:
+        dataset: 1D numpy数组，包含所有token IDs
+        batch_size: 批次大小 B
+        context_length: 上下文长度 m
+        device: PyTorch设备字符串
+    
+    Returns:
+        (inputs, targets): 两个形状为 (batch_size, context_length) 的张量
+    &quot;&quot;&quot;
+    dataset_len = len(dataset)
+    inputs = torch.empty(batch_size, context_length, dtype=torch.long)
+    targets = torch.empty(batch_size, context_length, dtype=torch.long)
+    
+    for i in range(batch_size):
+        start_idx = torch.randint(0, dataset_len-context_length, (1, )).item()
+        input_seq = dataset[start_idx: start_idx+context_length]
+        input_target = dataset[start_idx+1: start_idx+context_length+1]
+        
+        inputs[i] = torch.tensor(input_seq, dtype=torch.long)
+        targets[i] = torch.tensor(input_target, dtype=torch.long)
+    
+    inputs = inputs.to(device=device)
+    targets = targets.to(device=device)
+    return (inputs, targets)
+</code></pre>
+<h2 id="experiments">Experiments</h2>
+<blockquote>
+<p>我们要做什么？<br>
+一个小的数据集（TinyStories）的反复训练，四处模块作用的消融实验，然后是一个更大的数据集的训练。</p>
+</blockquote>
+<p>7.1 How to Run Experiments and Deliverables<br>
+确认wanDB等日志系统成功接入。</p>
+<pre><code>uv sync --upgrade-package wandb
+</code></pre>
+<p>7.2 TinyStories<br>
+给定初始参数，尝试在TinyStories训练，并寻找下述参数的好的初始值。<br>
+learning rate, learning rate warmup, other AdamW hyperparameters (β1, β2, ϵ), and weight decay.<br>
+然后进行文本生成。</p>
+<p>7.3 Ablations and architecture modification<br>
+做RMSNorm，pre-norm，RoPE，SwiGLU的消融实验。</p>
+<p>7.4 Running on OpenWebText<br>
+使用更大的数据集，训练语言模型。</p>
+<p>7.5 Your own modification + leaderboard<br>
+提供了一些其他的工程实践参考（比如权重共享），以及打榜。</p>
+<h3 id="第一次实验">第一次实验</h3>
+<blockquote>
+<p>我当前做了什么？</p>
+</blockquote>
+<p>√完成了训练循环的最小化测试。<br>
+√在5090环境中配置了cs336和minitorch两个环境，并正在上传数据，用于训练。<br>
+√启动第一个默认训练，tokenize正常，但默认的pytorch版本在5090有点小问题。需要改到2.7.1。</p>
+<pre><code>--skip-bpe 用于跳过tokenizer训练,
+--skip-tokenize 用于跳过将tinystories从txt转为bin的过程.
+</code></pre>
+<blockquote>
+<p>我当前做了什么？</p>
+</blockquote>
+<p>√正在准备minitorch和cs336的数据。<br>
+√跑起来cs336的第一次模型训练。</p>
+<p>训练指令如下：（我提前跑过bpe和数据转二进制了，所以skip）</p>
+<pre><code>bash scripts/run_tinystories_train.sh --use-wandb --skip-bpe --skip-tokenize
+</code></pre>
+<p>第一次模型训练大致如下。</p>
+<ul>
+<li>检查一下，文档要求的<strong>token budget</strong>是 <code>327,680,000</code> ，符合我们的 <code>batch size * context_length * steps = 64 * 256 * 20000</code> 。这个budget大约是题目所示的参数量（17M）的20倍，符合Chinchilla定律。</li>
+<li>检查一下，发现<strong>模型大小</strong>大约是22M，这与文档中提到的约17M有所差别。（简单思考一下，应该是LM head和embedding层没有共享权重（测试要求），那么按照估算公式，差个 <code>Vd = 10000 * 512</code> 刚好是5M。完美！）</li>
+<li>检查一下，<strong>learning rate的变化</strong>是先急剧上升到 <code>6e-4</code> ，然后先缓、再快、再缓地下降到 <code>6e-5</code> 。这符合cosine学习率调度的想法：最开始lr急剧上升而不是直接设置为 <code>6e-4</code> 是因为一开始模型随机初始化、对数据分布没有什么了解，如果贸然采取大学习率，可能使得它陷入不稳定的初始状态；再之后保持一段时间的大学习率，快速探索搜索空间，使得模型快速收敛；再快速转到小学习率，在最优解附近稳定且精细地探索。</li>
+</ul>
+<pre><code>============================================================
+Step 3/3: train model
+train_bin: data/tinystories_train.bin
+val_bin: data/tinystories_val.bin
+steps: 20000
+warmup: 400
+save_dir: runs/tinystories_base
+
+Configuration:
+train_data: data/tinystories_train.bin
+val_data: data/tinystories_val.bin
+data_dtype: uint16
+vocab_size: 10000
+context_length: 256
+d_model: 512
+num_heads: 16
+d_ff: 1344
+num_layers: 4
+rope_theta: 10000.0
+optimizer: custom_adamw
+learning_rate: 0.0006
+min_learning_rate: 6e-05
+warmup_iters: 400
+total_iters: 20000
+beta1: 0.9
+beta2: 0.95
+eps: 1e-08
+weight_decay: 0.1
+grad_clip: 1.0
+batch_size: 64
+device: auto
+seed: 1337
+log_interval: 50
+eval_interval: 500
+eval_iters: 50
+save_interval: 1000
+save_dir: runs/tinystories_base
+resume: None
+wandb: True
+wandb_project: cs336-assignment1
+wandb_entity: None
+wandb_run_name: tinystories_base_bs64_ctx256_20260310_000840
+wandb_mode: online
+
+Loading train data from: data/tinystories_train.bin
+Loading val data from: data/tinystories_val.bin
+Device: cuda
+Trainable parameters: 22,696,448
+
+wandb: Currently logged in as: 10pi (10pi-fudan-university-school-of-management) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: WARNING Changes to your `wandb` environment variables will be ignored because your `wandb` session has already started. For more information on how to modify your settings with `wandb.init()` arguments, please refer to https://wandb.me/wandb-init.
+wandb: Tracking run with wandb version 0.21.2
+wandb: Run data is saved locally in runs/tinystories_base/wandb/run-20260310_000927-d0vkurgn
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run tinystories_base_bs64_ctx256_20260310_000840
+wandb: ⭐️ View project at https://wandb.ai/10pi-fudan-university-school-of-management/cs336-assignment1
+wandb: 🚀 View run at https://wandb.ai/10pi-fudan-university-school-of-management/cs336-assignment1/runs/d0vkurgn
+
+Starting training...
+step 50 | train_loss 8.5434 | lr 7.500e-05 | tok/s 94,349
+...
+step   19950 | train_loss 1.4084 | lr 6.001e-05 | tok/s 266,695
+step   20000 | train_loss 1.3999 | lr 6.000e-05 | tok/s 266,221
+step   20000 | val_loss 1.4049
+  saved new best checkpoint to runs/tinystories_base/best.pt (val_loss=1.4049)
+  checkpoint saved: runs/tinystories_base/step_00020000.pt
+wandb:                                                                                
+wandb: 
+wandb: Run history:
+wandb:                    step ▁▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▅▅▅▆▆▆▆▆▆▆▇▇▇▇▇▇█████
+wandb:              train/loss ██▇▆▅▄▄▄▄▃▃▃▃▃▃▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                train/lr ███████▇▇▇▆▆▆▆▆▆▅▅▅▅▅▄▄▄▄▄▃▃▃▃▃▂▂▂▁▁▁▁▁▁
+wandb: train/tokens_per_second ▇▇▇█████▁██████████▂▃█████▃██▄██████████
+wandb:                val/loss █▅▄▄▃▃▃▃▃▃▂▂▂▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: 
+wandb: Run summary:
+wandb:                    step 20000
+wandb:              train/loss 1.39992
+wandb:                train/lr 6e-05
+wandb: train/tokens_per_second 266221.25455
+wandb:                val/loss 1.40486
+wandb: 
+wandb: 🚀 View run tinystories_base_bs64_ctx256_20260310_000840 at: https://wandb.ai/10pi-fudan-university-school-of-management/cs336-assignment1/runs/d0vkurgn
+wandb: ⭐️ View project at: https://wandb.ai/10pi-fudan-university-school-of-management/cs336-assignment1
+wandb: Synced 5 W&amp;B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: runs/tinystories_base/wandb/run-20260310_000927-d0vkurgn/logs
+Training complete in 1320.5s. Final checkpoint: runs/tinystories_base/final.pt
+Best validation loss 1.4049 at step 20000.
+============================================================
+Done.
+Tokenizer:
+  tokenizer/tinystories_bpe_vocab.pkl
+  tokenizer/tinystories_bpe_merges.pkl
+Tokenized data:
+  data/tinystories_train.bin
+  data/tinystories_val.bin
+Checkpoints:
+  runs/tinystories_base
+</code></pre>
+<p>再看看图表，发现loss按照幂律（Scaling Law）下降得很健康，lr也是很合理的cosine，先快后慢半个周期。<br>
+我在5090的分词器训练大约11分钟，不包含分词器在内模型训练大约运行了22分钟，整体符合文档中30-40分钟的预期。</p>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/20260310003516.png" alt="" loading="lazy"></figure>
+<h3 id="更多次实验">更多次实验</h3>
+<p>白天的目标是给minitorch改造出一套pytorch+transformers的运行脚本，现代一点，训练。<br>
+继续，cs336的各参数的sweep。</p>
+<h4 id="sweep-learning-rate">sweep: learning rate</h4>
+<pre><code class="language-bash">uv run scripts/lr_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.bin
+</code></pre>
+<p>实际训练花了两个小时（每次20分钟）。图像真的很漂亮。</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/20260310105857.png" alt="" loading="lazy"></figure>
+<p>普遍来说，learning rate偏大时，loss会下降得快一些，绝对数值也会更小。</p>
+<h4 id="sweep-batch-size">sweep: batch size</h4>
+<pre><code class="language-bash">uv run scripts/batch_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.bin --batch-sizes 128,64,32,16,8,1
+</code></pre>
+<p>在经历了bs=1存了过多的中间态checkpoint、爆了硬盘之后，痛定思痛添加了一个只保留最近三个以及最好的checkpoint的功能，并且强化了断点续训。</p>
+<p>我发现，对于bs=1这样太小的情况下， <code>tok/s</code> 会很小（大约1.5w tok/s左右？），只有在bs足够大（如64、128）时才能充分提升 <code>tok/s</code> （稳定在26w tok/s）。因此，如果要训练更快一些，似乎应该在支持的情况下充分扩大batch size。</p>
+<p>猜测是因为瓶颈不同（时间原因，未用profiler测试）：<br>
+bs较小时瓶颈在写入GPU内存和启动kernel；<br>
+bs较大时瓶颈在GPU的算力。</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/20260311155941.png" alt="" loading="lazy"></figure>
+<p>val loss成功达成1.45以下（约为1.37）。好诶！<br>
+<img src="https://meredith2328.github.io/post-images/20260311160057.png" alt="" loading="lazy"></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#bpe-tokenizer">BPE Tokenizer</a></li>
+<li><a href="#training-loop-generating-text">Training loop / Generating text</a>
+<ul>
+<li><a href="#dataloader">DataLoader</a></li>
+</ul>
+</li>
+<li><a href="#experiments">Experiments</a>
+<ul>
+<li><a href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%AE%9E%E9%AA%8C">第一次实验</a></li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E6%AC%A1%E5%AE%9E%E9%AA%8C">更多次实验</a>
+<ul>
+<li><a href="#sweep-learning-rate">sweep: learning rate</a></li>
+<li><a href="#sweep-batch-size">sweep: batch size</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/CS336-hw1-1/">
+              <h3 class="post-title">
+                CS336 Assignment 1 前半段记录：架构
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('https://discus.skk.moe/discus/') {
+  options.api = 'https://discus.skk.moe/discus/'
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

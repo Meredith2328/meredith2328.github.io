@@ -1,0 +1,774 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>怎么估算LLM训练的内存和计算需求？推一推、测一测 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1773480611148">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="怎么估算LLM训练的内存和计算需求？推一推、测一测 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="本部分适合于知道AdamW更新流程、但没有尝试推导过peak memory和计算量、计算时间的朋友。
+省流：
+A_{per_layer} ≈ 9BLd + 2BhL^2
+C ≈ 6 × P × D
+
+
+上接前文： 怎么估算LLM的参数量和F..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1773480611148" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              怎么估算LLM训练的内存和计算需求？推一推、测一测
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-12
+              </span>
+              <span>
+                22 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>本部分适合于知道AdamW更新流程、但没有尝试推导过peak memory和计算量、计算时间的朋友。<br>
+省流：<br>
+A_{per_layer} ≈ 9BLd + 2BhL^2<br>
+C ≈ 6 × P × D</p>
+<!-- more -->
+<blockquote>
+<p>上接前文： <a href="https://meredith2328.github.io/post/LLMestimate/">怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</a><br>
+本部分推导与验证的公式基于<strong>激活值不会提前释放、而是全部保留</strong>的假设，得到了 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>y</mi><mi>e</mi><mi>r</mi></mrow></msub><mo>≈</mo><mn>16</mn><mi>B</mi><mi>L</mi><mi>d</mi><mo>+</mo><mn>2</mn><mi>B</mi><mi>h</mi><msup><mi>L</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">A_{per\_layer} \approx 16BLd+2BhL^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.05033em;vertical-align:-0.367em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mtight" style="margin-right:0.02778em;">_</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.367em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">6</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">L</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">h</span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 的结论，后续实测也是基于这个结论。另外引言中的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>C</mi><mo>≈</mo><mn>6</mn><mo>×</mo><mi>P</mi><mo>×</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">C \approx 6 × P × D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span></span></span></span> 指计算量约等于六倍的参数量乘以训练token数。<br>
+事实上，许多中间值通常在后续层进行计算时就已经释放了，相关讨论在 (a) 的“如果会提前释放，不同时保存所有激活值？”部分，结论应为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>y</mi><mi>e</mi><mi>r</mi></mrow></msub><mo>=</mo><mn>9</mn><mi>B</mi><mi>L</mi><mi>d</mi><mo>+</mo><mn>2</mn><mi>B</mi><mi>h</mi><msup><mi>L</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">A_{per\_layer}=9BLd+2BhL^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.05033em;vertical-align:-0.367em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mtight" style="margin-right:0.02778em;">_</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.367em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord">9</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">L</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">h</span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> 。<br>
+撰写过程中借助了DeepSeek v3.2生成相关代码、以及处理一部分计算工作。<br>
+另外，本篇只是个人基于现在已知的知识做的具有阶段性、一定合理性的推测，不代表真正的事实：不代表PyTorch、CUDA的实际工程实现。后者还需要更多的调查研究才能得出更好的结论。<br>
+edit time: 2026-03-13 11:12:50</p>
+</blockquote>
+<h2 id="原始问题整理">原始问题整理</h2>
+<blockquote>
+<p>来自CS336。自己翻的，可能有错，欢迎在 <a href="https://github.com/Meredith2328/meredith2328.github.io/issues">Issues · Meredith2328/meredith2328.github.io</a> 指正。</p>
+</blockquote>
+<p>Problem (adamwAccounting): Resource accounting for training with AdamW<br>
+接下来我们计算一下使用AdamW需要多少内存和计算。tensor一律使用float32。<br>
+<strong>(a) 运行AdamW的peak memory是多少？</strong><br>
+（内存需求=参数+激活值+梯度+优化器状态，基于 <code>batch_size</code> 和 <code>(vocab_size, context_length, num_layers, d_model, num_heads)</code> ，假设 <code>d_ff = 4 × d_model</code> ）<br>
+只考虑以下部分：<br>
+• Transformer block<br>
+– RMSNorm(s)<br>
+– Multi-head self-attention sublayer: QKV projections, <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>Q</mi><mi>T</mi></msup><mi>K</mi></mrow><annotation encoding="application/x-tex">Q^TK</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.035771em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault">Q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mord mathdefault" style="margin-right:0.07153em;">K</span></span></span></span> matrix multiply, softmax, weighted sum of values, output projection.<br>
+– Position-wise feed-forward: W1 matrix multiply, SiLU, W2 matrix multiply<br>
+• final RMSNorm<br>
+• output embedding<br>
+• cross-entropy on logits<br>
+<strong>(b) 对于GPT-2 XL-shaped model，回答(a)。在80GB内存的前提下，最大可用的batch size是多少？</strong><br>
+<strong>(c) 运行AdamW的一个step需要多少的FLOPs？</strong><br>
+<strong>(d)</strong> Model FLOPs utilization (MFU)定义为 the ratio of observed throughput (tokens per second) / the hardware’s theoretical peak FLOP throughput [Chowdhery et al., 2022] 。单台NVIDIA A100 GPU对于float32操作的理论峰值是19.5T FLOPs。<strong>假设你能获得50%的MFU，在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天</strong>（400K steps，batch size 1024）？<br>
+（基于 [Kaplan et al. ,2020] and [Hoffmann et al. ,2022] ，假设反向FLOPs是前向FLOPs的两倍）</p>
+<h2 id="a-运行adamw的peak-memory是多少">(a) 运行AdamW的peak memory是多少？</h2>
+<p>记 <code>B = batch_size, V = vocab_size, T = context_length, L = num_layers, D = d_model, H = num_heads, D_ff = 4D</code> 。<br>
+peak memory由参数+激活值+梯度+优化器状态四部分组成： <code>M_total = M_params + M_acts + M_grads + M_opt</code> 。<br>
+所有tensor都是float32，所以每个元素应为4 bytes。</p>
+<h3 id="参数量">参数量</h3>
+<p><strong>参数量</strong>如果按 <a href="https://meredith2328.github.io/post/LLMestimate/">以前推导过的参数量估算公式</a> 来，则有：（假设embedding层和LM Head参数共享，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>d</mi><mrow><mi>f</mi><mi>f</mi></mrow></msub><mo>=</mo><mn>4</mn><mi>d</mi></mrow><annotation encoding="application/x-tex">d_{ff}=4d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">4</span><span class="mord mathdefault">d</span></span></span></span> ，RMS Norm的参数量忽略不计）</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">P=12Nd^2+Vd
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span></span></p>
+<p>用上面的记号就是：</p>
+<pre><code>P=12LD^2+VD
+</code></pre>
+<h3 id="激活值">激活值</h3>
+<p>激活值指某层的输出值，激活量指某层的输出值的数量。<br>
+（但其实实际语境中分得没有这么清，可以从上下文判断指的是数量还是值）</p>
+<ul>
+<li>RMS Norm输出矩阵为 <code>(B, T, D)</code> ，输出矩阵元素数量应为 <code>BTD</code> ；</li>
+<li>Q、K、V 是 <code>(B, T, D) × (D, D) = (B, T, D)</code> ，输出数量均为 <code>BTD</code> ；</li>
+<li>QK^T 是 <code>(B, H, T, D/H) × (B, H, D/H, T)</code> ，输出数量为 <code>BHT^2</code> 。</li>
+<li>AttnV 是 <code>(B, H, T, T) × (B, H, T, D/H)</code> ，输出数量为 <code>BTD</code> 。</li>
+<li>O是 <code>(B, T, D) × (D, D) = (B, T, D)</code> ，输出数量为 <code>BTD</code> 。</li>
+<li>FFN第一步是 <code>(B, T, D) × (D, 4D) = (B, T, 4D)</code> ，输出数量为 <code>4BTD</code> 。</li>
+<li>FFN第二步是SiLU： <code>(B, T, 4D)</code> 和它的 sigmoid 的逐元素相乘，输出数量为 <code>4BTD</code> 。（注意不考虑Gate，因为使用的是SiLU而不是SwiGLU，只有两个W）</li>
+<li>FFN第三步是 <code>(B, T, 4D) × (4D, D) = (B, T, D)</code> ，输出数量为 <code>BTD</code> 。</li>
+<li>output embedding是 <code>(B, T, D) × (D, V)</code> ，输出数量为 <code>BTV</code> 。</li>
+<li>CrossEntropyLoss在分析中间最大激活值内存（peak memory）时，首先对输入的logits <code>(B, T, V)</code>做一个softmax，这里得到了 <code>BTV</code> 。然后对于 <code>(B, T)</code> 个label，取对应label位置的负对数，求平均得到标量loss。peak memory意味着只要计算出了一团新的东西，我们就要把它考虑在内。所以应为 <code>BTV</code> 。</li>
+</ul>
+<p>其余同理，慢慢算一下。<br>
+我们按照题目要求细细算一下一个Transformer Block的激活值：</p>
+<pre><code>A_block
+## RMS Norm 1
+= (BTD) 
+## MHA
++ 3(BTD)   # Q, K, V
++ (BHT^2)  # QK^T
++ (BHT^2)  # softmax
++ (BTD)    # AttnV
++ (BTD)    # O
+## RMS Norm 2
++ (BTD)
+## FFN
++ (4BTD)   # W1
++ (4BTD)   # SiLU
++ (BTD)    # W2
+= 16BTD + 2BHT^2
+</code></pre>
+<p>因此，<strong>全模型激活</strong>应该为：</p>
+<pre><code>A
+= L(16BTD + 2BHT^2)  # L layers of A_block
++ BTD                # final RMSNorm
++ BTV                # output embedding
++ BTV                # CrossEntropyLoss
+= L(16BTD + 2BHT^2) + BTD + 2BTV
+</code></pre>
+<p>考虑到 <code>BTD &lt;&lt; LBTD</code> ，可以略微简化为</p>
+<pre><code>A = L(16BTD + 2BHT^2) + 2BTV
+</code></pre>
+<h3 id="peak-memory">peak memory</h3>
+<p><strong>梯度</strong>等于参数量。</p>
+<pre><code>G = P
+</code></pre>
+<p>根据附录A里的实现，AdamW优化器每个参数都有两个同形状的张量 <code>m</code> 和 <code>v</code> ，外加一个可以忽略的标量 <code>step</code> 。所以AdamW优化器状态：</p>
+<pre><code>O = 2P
+</code></pre>
+<p>再代入每个元素4 Bytes，有：（单位为Bytes）</p>
+<pre><code>M_params = 4P
+M_acts   = 4A
+M_grads  = 4P
+M_opt    = 8P
+</code></pre>
+<p>故peak memory应为：</p>
+<pre><code>M_total = M_params + M_acts + M_grads + M_opt
+        = 16P + 4A
+# P = 12LD^2+VD
+# A = L(16BTD + 2BHT^2) + BTD + 2BTV
+        = 16(12LD^2+VD) + 4(L(16BTD + 2BHT^2) + 2BTV)
+        = 192LD^2 + 16VD + 64LBTD + 8LBHT^2 + 8BTV
+</code></pre>
+<p>注意， <code>M_total = 16P + 4A</code> 这个整体系数4是来自于FP32每个元素4 Bytes的前提假设的。<br>
+因此我们可以很方便地去估算别的：比如FP16等等。</p>
+<h3 id="如果会提前释放不同时保存所有激活值">如果会提前释放，不同时保存所有激活值？</h3>
+<p>在机器学习系统的课程上，有这样一个PPT引起了我的疑惑。<br>
+<img src="https://meredith2328.github.io/post-images/20260312234704.png" alt="" loading="lazy"></p>
+<p>把它的内容转写下来：<br>
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi><mo>=</mo><mn>2048</mn></mrow><annotation encoding="application/x-tex">d = 2048</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mord">4</span><span class="mord">8</span></span></span></span> (hidden dimension), <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mo>=</mo><mn>24</mn></mrow><annotation encoding="application/x-tex">N = 24</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">4</span></span></span></span> (layers), <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><mn>50</mn><mo separator="true">,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">V = 50,000</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">5</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">0</span><span class="mord">0</span><span class="mord">0</span></span></span></span> (vocab size),<br>
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">B = 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span></span></span></span> (batch size), <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>L</mi><mo>=</mo><mn>1024</mn></mrow><annotation encoding="application/x-tex">L = 1024</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">L</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">0</span><span class="mord">2</span><span class="mord">4</span></span></span></span> (sequence length), <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>h</mi><mo>=</mo><mn>16</mn></mrow><annotation encoding="application/x-tex">h = 16</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">h</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">6</span></span></span></span> (attention heads).</p>
+<ul>
+<li>Parameters: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">12Nd^2+Vd</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span></li>
+<li>Forward activations: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>9</mn><mi>B</mi><mi>L</mi><mi>d</mi><mo>+</mo><mn>2</mn><mi>B</mi><mi>h</mi><msup><mi>L</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">9BLd+2BhL^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord">9</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">L</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">h</span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> per layer</li>
+<li>Backpropagation: ~ 2-3× activations + gradients + optimizer states<br>
+Example (d=2048, N=24, L=1024, B=8, h=16, V=50k):</li>
+<li>Parameters: ≈ 1.31B (≈ 2.4 GB in FP16, ≈ 21 GB with Adam states)</li>
+<li>Forward activations: ≈ 18.7 GB</li>
+<li>Backprop: ≈ 40-75 GB</li>
+</ul>
+<p>它为什么是以下两个公式呢？</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mn>12</mn><mi>N</mi><msup><mi>d</mi><mn>2</mn></msup><mo>+</mo><mi>V</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">P=12Nd^2+Vd
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.9474379999999999em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord"><span class="mord mathdefault">d</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">d</span></span></span></span></span></p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>A</mi><mrow><mi>p</mi><mi>e</mi><mi>r</mi><mi mathvariant="normal">_</mi><mi>l</mi><mi>a</mi><mi>y</mi><mi>e</mi><mi>r</mi></mrow></msub><mo>=</mo><mn>9</mn><mi>B</mi><mi>L</mi><mi>d</mi><mo>+</mo><mn>2</mn><mi>B</mi><mi>h</mi><msup><mi>L</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">A_{per\_layer}=9BLd+2BhL^2
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.05033em;vertical-align:-0.367em;"></span><span class="mord"><span class="mord mathdefault">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mtight" style="margin-right:0.02778em;">_</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.367em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord">9</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">L</span><span class="mord mathdefault">d</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8641079999999999em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span><span class="mord mathdefault">h</span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>注意到，这里与我们推得的公式唯一区别就在于这个 <strong>9</strong> 。<br>
+恰好我对数字很敏感，意识到它是4+4+1——峰值激活值只计入了FFN里面的。<br>
+我们知道，Transformer块里面一层一层是顺序执行的，按理说计算到后面的时候，前面的就可以释放了。所以就有了这样的公式。</p>
+<h2 id="b-对于gpt-2-xl-shaped-model回答a-在80gb内存的前提下最大可用的batch-size是多少">(b) 对于GPT-2 XL-shaped model，回答(a)。在80GB内存的前提下，最大可用的batch size是多少？</h2>
+<h3 id="gpt2-xl代入计算">GPT2-XL代入计算</h3>
+<p><a href="https://huggingface.co/openai-community/gpt2-xl">GPT2-XL</a></p>
+<pre><code>GPT2-XL
+V = vocab_size: 50257
+T = context_length: 1024
+L = num_layers: 48
+D = d_models: 1600
+H = num_heads: 25
+D_ff = 4D
+</code></pre>
+<p>代入(a)得到的 <code>M_total = 16P + 4A = 192LD^2 + 16VD + 64LBTD + 8LBHT^2 + 8BTV</code> 有：</p>
+<pre><code>M_total = 192 * 48 * 1600 * 1600 + 16 * 50257 * 1600 + 64 * 48 * B * 1024 * 1600 + 8 * 48 * B * 25 * 1024 * 1024 + 8 * B * 1024 * 50257
+        = 23592960000 + 1286579200 + 5033164800B + 10066329600B + 411705344B
+        = 24 879 539 200 + 15 511 199 744B
+        ≈ (24.88 + 15.51 batch_size) GB
+</code></pre>
+<p>即最终的结论：（单位为GB）</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>M</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>(</mo><mi>b</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi><mo>)</mo><mo>=</mo><mn>24.88</mn><mo>+</mo><mn>15.51</mn><mo>×</mo><mi>b</mi><mi>a</mi><mi>t</mi><mi>c</mi><mi>h</mi><mi mathvariant="normal">_</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">M_{total}(batch\_size)=24.88+15.51 \times batch\_size
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.10903em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">t</span><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">t</span><span class="mord mathdefault mtight">a</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">b</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">c</span><span class="mord mathdefault">h</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault">s</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mord mathdefault">e</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mord">4</span><span class="mord">.</span><span class="mord">8</span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mord">5</span><span class="mord">.</span><span class="mord">5</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1.00444em;vertical-align:-0.31em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault">a</span><span class="mord mathdefault">t</span><span class="mord mathdefault">c</span><span class="mord mathdefault">h</span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault">s</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mord mathdefault">e</span></span></span></span></span></p>
+<p>这么看来，在80GB内存的前提下，最大可用的batch_size不超过 (80-24.88)/15.51≈3.55 。在单卡条件下，最大的batch_size为3。</p>
+<h3 id="使用gpt2-small实际环境验证上述公式">使用GPT2-small实际环境验证上述公式</h3>
+<blockquote>
+<p>TODO 本部分的验证似乎有一定问题，之后会重写本部分。</p>
+</blockquote>
+<p>GPT2-XL的实机验证有心无力。我的5090显卡显存为32GB，而上述峰值内存即使 <code>batch_size = 1</code> 也要40GB。<br>
+因此换用以下GPT2家族其他模型的参数，重新计算一下并实际跑一下看看：</p>
+<pre><code>vocab_size = 50257
+d_ff = 4 \times d_model
+context length = 1024
+
+GPT-2 small  (12 layers, 768  d_model, 12 heads)
+GPT-2 medium (24 layers, 1024 d_model, 16 heads)
+GPT-2 large  (36 layers, 1280 d_model, 20 heads)
+GPT-2 XL     (48 layers, 1600 d_model, 25 heads)
+</code></pre>
+<p>实际验证结果如下（代码、详细结果及说明见附录B）。<br>
+发现PyTorch运行的内存峰值比我们算的要高效不少。在已经显式禁用梯度检查点（gradient checkpointing）的情况下，仍然比我们计算的值节省了4.20-2.47=1.73 GB，这对于GPT2-small这样一个峰值显存为3~4GB的模型是很好的。</p>
+<pre><code>Using device: cuda
+GPU: Tesla P100-PCIE-16GB
+Total GPU memory: 17.06 GB
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   2.47       4.20       41.2% 
+MEDIUM   353.5M   6.17       10.90      43.4% 
+LARGE    772.1M   12.56      21.83      42.5% 
+============================================================
+</code></pre>
+<h2 id="c-运行adamw的一个step需要多少的flops">(c) 运行AdamW的一个step需要多少的FLOPs？</h2>
+<p>先根据附录A中的AdamW代码实现，详细地数AdamW一次优化器更新需要的FLOPs，后面再加上前向和后向的FLOPs，得到一个step完整的FLOPs。</p>
+<p>一阶矩更新：3FLOPs/元素（ <code>m &lt;- beta1 * m + (1 - beta1) * g</code> ）</p>
+<pre><code class="language-python">state['m'].mul_(beta1).add_(grad, alpha=1 - beta1)
+</code></pre>
+<p>对每个元素， <code>beta1 * m</code> ， <code>(1 - beta1) * g</code> 和这两项相加共计三次运算。<br>
+ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次计算，但并不是每次元素运算都需要重新计算。因此，这里不需要计入。后续偏差修正、step_size同理。</p>
+<p>二阶矩更新：4FLOPs/元素（ <code>v &lt;- beta2 * v + (1 - beta2) * g * g</code> ）</p>
+<pre><code class="language-python">state['v'].mul_(beta2).addcmul_(grad, grad, value=1 - beta2)
+</code></pre>
+<p><code>beta2 * v</code> ， <code>g * g</code> ，再乘 <code>1 - beta2</code> ，再加起来。</p>
+<p>分母构造：2FLOPs/元素 （ <code>denom &lt;- sqrt(v) + eps</code> ）</p>
+<pre><code class="language-python">denom = state['v'].sqrt().add_(eps)
+</code></pre>
+<p><code>sqrt(v)</code> ，<code>+ eps</code> 。</p>
+<p>参数Adam更新：3FLOPs/元素 （ <code>p &lt;- p + (-step_size) * m / denom</code> ）</p>
+<pre><code class="language-python">p.data.addcdiv_(state['m'], denom, value=-step_size)
+</code></pre>
+<p><code>m / denom</code> ，加上 <code>-step_size</code> ，加上 <code>p</code> 。</p>
+<p>解耦权重衰减：2FLOPs/元素（ <code>p &lt;- p + (-lr * weight_decay) * p</code> ）</p>
+<pre><code class="language-python">p.data.add_(p.data, alpha=-lr * weight_decay)
+</code></pre>
+<p><code>(-lr * weight_decay) * p</code> ， 加上 <code>p</code> 。注意 <code>-lr</code> 和 <code>weight_decay</code> 是标量。</p>
+<p>总之，有运行AdamW一次优化器更新需要14 FLOPs。</p>
+<pre><code>F_AdamW_step ≈ 14P
+</code></pre>
+<p>注意，一个step前向的过程包括了前向和后向所包含的各种矩阵乘法（见下），再加上这里提到的优化器更新的过程。前者随着 <code>B</code> 、 <code>L</code> 、 <code>D</code> 等因素增长，而后者只与 <code>P</code> 线性相关。训练时只要 <code>B</code> 和 <code>T</code> 不是特别小，矩阵乘的 FLOPs 会远大于 AdamW 更新。</p>
+<p>如果完整加起来，应该为</p>
+<pre><code>F_step ≈ 3F_fwd + F_AdamW_step
+</code></pre>
+<p>其中 <code>3F_fwd</code> 是因为 backward 约等于 forward 的 2 倍，<code>14P</code> 是优化器更新本身。实际里 <code>14P</code> 相比 <code>3F_fwd</code> 很小，通常可忽略。</p>
+<p>精确推导 <code>F_fwd</code>（ <a href="https://meredith2328.github.io/post/LLMestimate/#%E6%80%8E%E4%B9%88%E4%BC%B0%E7%AE%97llm%E7%9A%84%E8%AE%AD%E7%BB%83flops">怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</a> ）的话，有</p>
+<pre><code>F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
+</code></pre>
+<p>（当然 <code>3F_fwd</code> 也可以使用经验公式 <code>6 × 参数量 × 训练 token 数</code> 进行近似。）</p>
+<h2 id="d-在单台nvidia-a100-gpu上训练gpt-2-xl需要多少天">(d) 在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天？</h2>
+<blockquote>
+<p>本部分数值是GPT算的，本人没有核对。</p>
+</blockquote>
+<p>先算 GPT-2 XL、B = 1024 的 forward FLOPs：</p>
+<pre><code>F_fwd(step)
+= 1024 * (48 * (24 * 1024 * 1600^2 + 4 * 1024^2 * 1600) + 2 * 1024 * 50257 * 1600)
+= 3590864450355200
+= 3.5908644503552e15
+</code></pre>
+<p>训练一步：</p>
+<pre><code>F_train(step)
+≈ 3 * F_fwd(step)
+= 1.07725933510656e16 FLOPs
+</code></pre>
+<p>A100 的 float32 峰值是 19.5e12 FLOP/s。<br>
+50% MFU 下的有效吞吐：</p>
+<pre><code>0.5 * 19.5e12 = 9.75e12 FLOP/s
+</code></pre>
+<p>400K steps 的总时间：</p>
+<pre><code>time
+= 400000 * 1.07725933510656e16 / 9.75e12
+= 4.4195e8 s
+≈ 5115 days
+≈ 14.0 years
+</code></pre>
+<p>所以答案是：大约 5115 天，约 14 年。</p>
+<p>利用Python进行验证：</p>
+<pre><code>&gt;&gt;&gt; 1024 * (48 * (24 * 1024 * 1600 * 1600 + 4 * 1024 * 1024 * 1600) + 2 * 1024 * 50257 * 1600)
+3590864450355200
+&gt;&gt;&gt; a = 1024 * (48 * (24 * 1024 * 1600 * 1600 + 4 * 1024 * 1024 * 1600) + 2 * 1024 * 50257 * 1600)
+&gt;&gt;&gt; 3 * a
+10772593351065600
+&gt;&gt;&gt; 3 * a * 400000 / 9.75e12
+441952547.7360246
+&gt;&gt;&gt; 3 * a * 400000 / 9.75e12 / 3600 / 24
+5115.191524722507
+</code></pre>
+<h2 id="附录a-adamw代码实现">附录A: AdamW代码实现</h2>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/20260311191813.png" alt="" loading="lazy"></figure>
+<pre><code class="language-python">class AdamW(torch.optim.Optimizer):
+
+    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01):
+        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay)
+        super().__init__(params, defaults)
+    
+    def step(self, closure=None):
+        loss = None
+        if closure is not None:
+            loss = closure()
+        
+        for group in self.param_groups:
+            beta1, beta2 = group['betas']
+            lr = group['lr']
+            eps = group['eps']
+            weight_decay = group['weight_decay']
+            
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                
+                grad = p.grad.data
+                
+                # 初始化状态
+                state = self.state[p]
+                if len(state) == 0:
+                    state['step'] = 0
+                    state['m'] = torch.zeros_like(p.data)  # 一阶矩
+                    state['v'] = torch.zeros_like(p.data)  # 二阶矩
+                
+                # 更新步数
+                state['step'] += 1
+                t = state['step']
+                
+                # 更新矩估计
+                state['m'].mul_(beta1).add_(grad, alpha=1 - beta1)
+                state['v'].mul_(beta2).addcmul_(grad, grad, value=1 - beta2)
+                
+                # 偏差修正
+                bias_correction1 = 1 - beta1 ** t
+                bias_correction2 = 1 - beta2 ** t
+                
+                # Adam更新
+                denom = state['v'].sqrt().add_(eps)
+                step_size = lr * (bias_correction2 ** 0.5) / bias_correction1
+                p.data.addcdiv_(state['m'], denom, value=-step_size)
+                
+                # 权重衰减（解耦）
+                if weight_decay != 0:
+                    p.data.add_(p.data, alpha=-lr * weight_decay)
+        
+        return loss
+</code></pre>
+<h2 id="附录b-peak-memory验证程序与结果">附录B: peak memory验证程序与结果</h2>
+<p>通过以下实验验证，发现对于GPT-2 SMALL/MEDIUM/LARGE，实际的内存占用均为我们预估值的41-43%左右，这个比例非常稳定（无论设备、模型大小），可能来自于各种各样的工程优化，可以直接作为修正系数，初步显示我们的预估公式的可用性。<br>
+按理说，实际值一定是比我们的预估值小的，因为降低内存占用是很关键的工程需求，一定会有各种各样的优化（PyTorch、CUDA、操作系统、硬盘等等），同时内存占用也可能受到各种难以仔细分析的因素的影响。我们能够获得一个大致稳定的估算公式，应该已经还可以了。</p>
+<hr>
+<p>以下是来自colab的三次Tesla T4验证结果。</p>
+<pre><code>Using device: cuda 
+GPU: Tesla T4 
+Total GPU memory: 15.64 GB
+============================================================
+ Validation Results (FP32) ============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------ 
+SMALL    123.5M   8.99       4.20       114.0% 
+MEDIUM   353.5M   6.23       10.90      42.8% 
+LARGE    772.1M   12.60      21.83      42.3% ============================================================
+</code></pre>
+<pre><code>Using device: cuda 
+GPU: Tesla T4 
+Total GPU memory: 15.64 GB
+============================================================ 
+Validation Results (FP32) ============================================================ 
+Model    Params   Actual(GB) Pred(GB)   Error
+------------------------------------------------------------ 
+SMALL    123.5M   2.48       4.20       40.9% 
+MEDIUM   353.5M   6.20       10.90      43.2% 
+LARGE    772.1M   12.60      21.83      42.3% ============================================================
+</code></pre>
+<pre><code>Using device: cuda 
+GPU: Tesla T4 
+Total GPU memory: 15.64 GB
+============================================================ 
+Validation Results (FP32) ============================================================ 
+Model    Params   Actual(GB) Pred(GB)   Error
+------------------------------------------------------------ 
+SMALL    123.5M   9.01       4.20       114.5% 
+MEDIUM   353.5M   6.22       10.90      42.9% 
+LARGE    772.1M   12.60      21.83      42.3% ============================================================
+</code></pre>
+<hr>
+<p>以下是来自Kaggle的三次Tesla P100验证结果。</p>
+<pre><code>Using device: cuda
+GPU: Tesla P100-PCIE-16GB
+Total GPU memory: 17.06 GB
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   2.47       4.20       41.2% 
+MEDIUM   353.5M   6.17       10.90      43.4% 
+LARGE    772.1M   12.56      21.83      42.5% 
+============================================================
+</code></pre>
+<pre><code>Using device: cuda
+GPU: Tesla P100-PCIE-16GB
+Total GPU memory: 17.06 GB
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   2.47       4.20       41.2% 
+MEDIUM   353.5M   6.17       10.90      43.4% 
+LARGE    772.1M   12.56      21.83      42.5% 
+============================================================
+</code></pre>
+<pre><code>Using device: cuda
+GPU: Tesla P100-PCIE-16GB
+Total GPU memory: 17.06 GB
+
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   8.97       4.20       113.6%
+MEDIUM   353.5M   6.22       10.90      42.9% 
+LARGE    772.1M   12.56      21.83      42.4% 
+============================================================
+</code></pre>
+<hr>
+<p>以下是来自Kaggle的三次Tesla T4验证结果。</p>
+<pre><code>Using device: cuda
+GPU: Tesla T4
+Total GPU memory: 15.64 GB
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   2.47       4.20       41.2% 
+MEDIUM   353.5M   6.17       10.90      43.4% 
+LARGE    772.1M   12.56      21.83      42.5% 
+============================================================
+</code></pre>
+<pre><code>Using device: cuda
+GPU: Tesla T4
+Total GPU memory: 15.64 GB
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   8.99       4.20       114.2%
+MEDIUM   353.5M   6.20       10.90      43.1% 
+LARGE    772.1M   12.57      21.83      42.4% 
+============================================================
+</code></pre>
+<pre><code>Using device: cuda
+GPU: Tesla T4
+Total GPU memory: 15.64 GB
+============================================================
+Validation Results (FP32)
+============================================================
+Model    Params   Actual(GB) Pred(GB)   Error 
+------------------------------------------------------------
+SMALL    123.5M   8.99       4.20       114.1%
+MEDIUM   353.5M   6.20       10.90      43.1% 
+LARGE    772.1M   12.56      21.83      42.4% 
+============================================================
+</code></pre>
+<hr>
+<p>关于异常值（GPT-2 SMALL的 <code>Actual 8.99GB</code> ）：<br>
+我发现SMALL的这个有一定规律性。我固定了GPU（Tesla T4，Total GPU memory: 15.64 GB），在启动机器之后，利用连续的cell运行完全相同的代码三次。第一次运行时权重从网上下载，此时运行分配的SMALL是2.47GB，连着第二次运行时SMALL稳定飙升到8.99GB，第三次也是8.99GB左右。<br>
+我尝试静置五分钟（运行时没有关闭、仍然停在运行完之前代码的状态），再新建一个cell跑，第四次仍然是8.99GB左右。<br>
+我的看法是，它似乎是各次运行循环互相之间有影响，而且基本上只影响到了SMALL。不知道是哪一环——把跟SMALL无关的内存消耗算进去了？各个运行之间互相有影响？我静置个很久（比如1h）就会不一样？<br>
+但不得不说，排除掉这个导致110%的8.99GB异常，三个模型40%、41%、42%这样的比例极其稳定。</p>
+<hr>
+<p>验证代码如下。<br>
+最关键的是</p>
+<pre><code class="language-python">model.gradient_checkpointing_disable()
+model = model.to(device)
+</code></pre>
+<p>这两行代码。后者移入GPU中分配内存并进行训练，前者GPT说是如果不关闭则可能在运行过程中不会完全保留激活值、而是实时清理。</p>
+<pre><code class="language-python">from transformers import GPT2LMHeadModel
+import torch
+
+# ==================== 配置开关 ====================
+RUN_CONFIG = {
+    'small': True,   # gpt2
+    'medium': True,  # gpt2-medium
+    'large': True,   # gpt2-large
+    'xl': False,      # gpt2-xl
+}
+# =================================================
+
+MODEL_CONFIGS = {
+    'small': {'name': 'gpt2', 'L': 12, 'D': 768, 'H': 12},
+    'medium': {'name': 'gpt2-medium', 'L': 24, 'D': 1024, 'H': 16},
+    'large': {'name': 'gpt2-large', 'L': 36, 'D': 1280, 'H': 20},
+    'xl': {'name': 'gpt2-xl', 'L': 48, 'D': 1600, 'H': 25},
+}
+
+V = 50257
+T = 1024
+B = 1
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f&quot;\nUsing device: {device}&quot;)
+if device.type == 'cuda':
+    print(f&quot;GPU: {torch.cuda.get_device_name(0)}&quot;)
+    print(f&quot;Total GPU memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB&quot;)
+print(&quot;\n&quot; + &quot;=&quot; * 80)
+
+results = []
+
+for model_key, config in MODEL_CONFIGS.items():
+    if not RUN_CONFIG.get(model_key):
+        continue
+
+    print(f&quot;\nValidating {model_key.upper()}...&quot;)
+
+    try:
+        # Load model
+        model = GPT2LMHeadModel.from_pretrained(config['name'])
+        model.gradient_checkpointing_disable()
+        model = model.to(device)
+
+        # Prepare input
+        input_ids = torch.randint(0, V, (B, T)).to(device)
+        labels = input_ids.clone()
+
+        # Reset stats
+        torch.cuda.reset_peak_memory_stats()
+        torch.cuda.empty_cache()
+
+        # Forward + backward
+        outputs = model(input_ids, labels=labels)
+        outputs.loss.backward()
+
+        # Peak memory
+        peak_memory = torch.cuda.max_memory_allocated() / 1e9
+
+        # Formula prediction (FP32 only)
+        L, D, H = config['L'], config['D'], config['H']
+        P = 12 * L * D * D + V * D
+        A = L * (16 * B * T * D + 2 * B * H * T * T) + 2 * B * T * V
+        # TODO: 9
+        pred = (16 * P + 4 * A) / 1e9
+
+        results.append({
+            'model': model_key.upper(),
+            'params': f&quot;{P/1e6:.1f}M&quot;,
+            'actual': peak_memory,
+            'pred': pred,
+            'error': f&quot;{abs(peak_memory - pred)/pred*100:.1f}%&quot;
+        })
+
+        del model
+        torch.cuda.empty_cache()
+
+    except Exception as e:
+        print(f&quot;  Error: {e}&quot;)
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;Validation Results (FP32)&quot;)
+print(&quot;=&quot; * 60)
+print(f&quot;{'Model':&lt;8} {'Params':&lt;8} {'Actual(GB)':&lt;10} {'Pred(GB)':&lt;10} {'Error':&lt;6}&quot;)
+print(&quot;-&quot; * 60)
+
+for r in results:
+    print(f&quot;{r['model']:&lt;8} {r['params']:&lt;8} {r['actual']:&lt;10.2f} {r['pred']:&lt;10.2f} {r['error']:&lt;6}&quot;)
+
+print(&quot;=&quot; * 60)
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%8E%9F%E5%A7%8B%E9%97%AE%E9%A2%98%E6%95%B4%E7%90%86">原始问题整理</a></li>
+<li><a href="#a-%E8%BF%90%E8%A1%8Cadamw%E7%9A%84peak-memory%E6%98%AF%E5%A4%9A%E5%B0%91">(a) 运行AdamW的peak memory是多少？</a>
+<ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E9%87%8F">参数量</a></li>
+<li><a href="#%E6%BF%80%E6%B4%BB%E5%80%BC">激活值</a></li>
+<li><a href="#peak-memory">peak memory</a></li>
+<li><a href="#%E5%A6%82%E6%9E%9C%E4%BC%9A%E6%8F%90%E5%89%8D%E9%87%8A%E6%94%BE%E4%B8%8D%E5%90%8C%E6%97%B6%E4%BF%9D%E5%AD%98%E6%89%80%E6%9C%89%E6%BF%80%E6%B4%BB%E5%80%BC">如果会提前释放，不同时保存所有激活值？</a></li>
+</ul>
+</li>
+<li><a href="#b-%E5%AF%B9%E4%BA%8Egpt-2-xl-shaped-model%E5%9B%9E%E7%AD%94a-%E5%9C%A880gb%E5%86%85%E5%AD%98%E7%9A%84%E5%89%8D%E6%8F%90%E4%B8%8B%E6%9C%80%E5%A4%A7%E5%8F%AF%E7%94%A8%E7%9A%84batch-size%E6%98%AF%E5%A4%9A%E5%B0%91">(b) 对于GPT-2 XL-shaped model，回答(a)。在80GB内存的前提下，最大可用的batch size是多少？</a>
+<ul>
+<li><a href="#gpt2-xl%E4%BB%A3%E5%85%A5%E8%AE%A1%E7%AE%97">GPT2-XL代入计算</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8gpt2-small%E5%AE%9E%E9%99%85%E7%8E%AF%E5%A2%83%E9%AA%8C%E8%AF%81%E4%B8%8A%E8%BF%B0%E5%85%AC%E5%BC%8F">使用GPT2-small实际环境验证上述公式</a></li>
+</ul>
+</li>
+<li><a href="#c-%E8%BF%90%E8%A1%8Cadamw%E7%9A%84%E4%B8%80%E4%B8%AAstep%E9%9C%80%E8%A6%81%E5%A4%9A%E5%B0%91%E7%9A%84flops">(c) 运行AdamW的一个step需要多少的FLOPs？</a></li>
+<li><a href="#d-%E5%9C%A8%E5%8D%95%E5%8F%B0nvidia-a100-gpu%E4%B8%8A%E8%AE%AD%E7%BB%83gpt-2-xl%E9%9C%80%E8%A6%81%E5%A4%9A%E5%B0%91%E5%A4%A9">(d) 在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天？</a></li>
+<li><a href="#%E9%99%84%E5%BD%95a-adamw%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0">附录A: AdamW代码实现</a></li>
+<li><a href="#%E9%99%84%E5%BD%95b-peak-memory%E9%AA%8C%E8%AF%81%E7%A8%8B%E5%BA%8F%E4%B8%8E%E7%BB%93%E6%9E%9C">附录B: peak memory验证程序与结果</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/optimizer/">
+              <h3 class="post-title">
+                从SGD到AdamW，优化器怎么发展过来的？
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('https://discus.skk.moe/discus/') {
+  options.api = 'https://discus.skk.moe/discus/'
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,407 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>值得顺便掌握一下的那些linux指令 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1773480611148">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="值得顺便掌握一下的那些linux指令 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。
+为了直接进入正题，省略诸如 cd 这样的广为人知的基础指令，直接看那些显著提升体验的东西。
+
+
+edit time: 2026-03-10 11:31:56
+
+df
+用于查看..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1773480611148" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              值得顺便掌握一下的那些linux指令
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-10
+              </span>
+              <span>
+                13 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。<br>
+为了直接进入正题，省略诸如 <code>cd</code> 这样的广为人知的基础指令，直接看那些显著提升体验的东西。</p>
+<!-- more -->
+<blockquote>
+<p>edit time: 2026-03-10 11:31:56</p>
+</blockquote>
+<h2 id="df">df</h2>
+<p>用于查看磁盘空间。使用场景比如训模型会保存很多中间文件，可以这样看看需要清理哪些。</p>
+<p>使用效果：<br>
+比如 <code>fuse-overlayfs</code> 是这个实例本身的存储， <code>shared-nvme</code> 是它的外接可持久化存储，使用率分别为 <code>50%</code> 和 <code>40%</code> 。</p>
+<pre><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# df
+Filesystem              1K-blocks        Used  Available Use% Mounted on
+fuse-overlayfs           31457280    15468244   15989036  50% /
+/dev/sda3               931347132    85832692  845514440  10% /base
+tmpfs                       65536           0      65536   0% /dev
+tmpfs                   528231156          12  528231144   1% /proc/driver/nvidia
+tmpfs                   528231156           0  528231156   0% /proc/asound
+tmpfs                   528231156           0  528231156   0% /proc/acpi
+tmpfs                       65536           0      65536   0% /dev/tty
+tmpfs                   528231156           0  528231156   0% /proc/scsi
+JuiceFS:public-juice3 21474836480 16810363272 4664473208  79% /shared-public
+tmpfs                   528231156           0  528231156   0% /sys/firmware
+tmpfs                   528231156           0  528231156   0% /sys/devices/virtual/powercap
+/dev/xvdb               308521792    15468280  277308488   6% /etc/hosts
+tmpfs                    62914560         112   62914448   1% /dev/shm
+JuiceFS:shared-juice3   104857600    41665660   63191940  40% /root/shared-nvme
+overlay                 931347132    85832692  845514440  10% /run/init
+tmpfs                   105646232       57136  105589096   1% /run/nvidia-persistenced/socket
+</code></pre>
+<p>至于要看哪几个文件最大，可以和 <code>ncdu</code> 这样的工具搭配使用。</p>
+<h2 id="grep">grep</h2>
+<p>查找关键词，关键词可以写正则。<br>
+通常和其他指令通过管道搭配使用，简单的用法、强大的功能。</p>
+<p>使用效果：</p>
+<pre><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# df | grep /dev
+/dev/sda3               931347132    85849780  845497352  10% /base
+tmpfs                       65536           0      65536   0% /dev
+tmpfs                       65536           0      65536   0% /dev/tty
+tmpfs                   528231156           0  528231156   0% /sys/devices/virtual/powercap
+/dev/xvdb               308521792    15468280  277308488   6% /etc/hosts
+tmpfs                    62914560         112   62914448   1% /dev/shm
+</code></pre>
+<p>也可以加 <code>-i</code> 参数用于忽略大小写。</p>
+<h2 id="ps">ps</h2>
+<p><code>ps aux</code> 用于查看当前用户的进程。<br>
+但是输出往往很冗长。我只关心我运行的实验，怎么做？<br>
+答案很方便：管道加grep！</p>
+<pre><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# ps aux | grep uv
+root        7482  0.0  0.0 232328 36616 pts/0    Sl+  11:02   0:00 uv run scripts/batch_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.b
+root        7512  0.0  0.0 232332 36100 pts/0    Sl+  11:02   0:00 uv run python -m cs336_basics.train --train-data data/tinystories_train.bin --data-dtype uint16 --vocab-size 10000 
+root        8012  0.0  0.0   3960  1976 pts/1    S+   11:27   0:00 grep --color=auto uv
+</code></pre>
+<p>作为对比，以下是原始输出。信息量比较大，不便于我们立即锁定自己需要的东西。</p>
+<pre><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         189  0.0  0.0   1128     4 ?        S    08:24   0:00 catatonit -P
+root         468  0.0  0.0  11868 10472 ?        Ss   08:24   0:00 /usr/bin/fuse-overlayfs -o lowerdir=/pcs/image_storage/overlay/l/FYLFLVKOA36HFQA3YPVYA4TOPN:/pcs/image_storage/over
+root         730  0.0  0.0 11642352 42724 ?      Sl   08:24   0:10 podman start -a -l
+root         804  0.0  0.0 140084  2080 ?        Ssl  08:24   0:00 /usr/libexec/podman/conmon --api-version 1 -c 21cc623ce89ebf5b23d24fab89813f67368a3a7d85627ea813d278eceae6b5d2 -u 2
+root         809  0.0  0.0   4884  3516 ?        Ss   08:24   0:00 /bin/bash /run/init
+root        4497  0.0  0.0  37064 31664 ?        S    08:24   0:01 /base/mambaforge/bin/python /base/mambaforge/bin/supervisord -n
+root        4804  0.0  0.0   4752  3404 ?        S    08:24   0:00 bash -lc  while true; do /base/mambaforge/bin/jupyter lab --ip 0.0.0.0 --port 8888 --no-browser  --ServerApp.root_d
+root        4805  0.0  0.0   4752  3400 ?        S    08:24   0:00 bash -lc  while true; do /base/mambaforge/bin/sshd -D -e; sleep 3; done; 
+root        4833  0.0  0.0   9888  7600 ?        S    08:24   0:00 sshd: /base/mambaforge/bin/sshd -D -e [listener] 0 of 10-100 startups
+root        4839  0.2  0.0 17700160 209192 ?     Sl   08:24   0:23 /base/mambaforge/bin/python3.10 /base/mambaforge/bin/jupyter-lab --ip 0.0.0.0 --port 8888 --no-browser --ServerApp.
+root        5156  0.0  0.0   5124  4280 pts/0    Ss   08:26   0:00 /bin/bash -l
+root        5629  0.0  0.0   5124  4248 pts/1    Ss   08:36   0:00 /bin/bash -l
+root        7482  0.0  0.0 232328 36616 pts/0    Sl+  11:02   0:00 uv run scripts/batch_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.b
+root        7485  0.0  0.0   4892  3612 pts/0    S+   11:02   0:00 bash scripts/batch_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.bin
+root        7512  0.0  0.0 232332 36100 pts/0    Sl+  11:02   0:00 uv run python -m cs336_basics.train --train-data data/tinystories_train.bin --data-dtype uint16 --vocab-size 10000 
+root        7515 98.0  0.2 31912736 2677372 pts/0 Sl+ 11:02  23:36 /root/shared-nvme/cs336/.venv/bin/python3 -m cs336_basics.train --train-data data/tinystories_train.bin --data-dtyp
+root        7651  0.2  0.0 1270524 45484 ?       Ssl  11:03   0:03 /root/shared-nvme/cs336/.venv/lib/python3.12/site-packages/wandb/bin/wandb-core --port-filename /tmp/tmpucm1x3jq/po
+root        7671  0.0  0.0 1180028 24544 ?       Sl   11:03   0:00 /root/shared-nvme/cs336/.venv/lib/python3.12/site-packages/wandb/bin/gpu_stats --portfile /tmp/wandb-system-monitor
+root        7782  0.0  0.0  12164  9020 ?        Ss   11:09   0:00 sshd-session: root [priv]
+root        7784  0.0  0.0  12424  6496 ?        S    11:09   0:00 sshd-session: root@notty
+root        7785  0.2  0.0   2844  2048 ?        Ss   11:09   0:02 /base/mambaforge/libexec/sftp-server
+root        8008  0.0  0.0   8468  4276 pts/1    R+   11:27   0:00 ps aux
+</code></pre>
+<h2 id="nvidia-smi">nvidia-smi</h2>
+<p>仅适用于使用nvidia显卡的设备。<br>
+可以查看GPU情况，包括CUDA版本、有几个设备和设备的使用率等。</p>
+<p>使用效果：<br>
+这里是单卡5090，CUDA版本为12.8，因此需要安装2.7.1等PyTorch版本。</p>
+<pre><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# nvidia-smi
+Tue Mar 10 11:18:13 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.172.08             Driver Version: 570.172.08     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5090        On  |   00000000:D8:00.0 Off |                  N/A |
+|  0%   42C    P1            133W /  575W |    1114MiB /  32607MiB |     24%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            7515      C   ...-nvme/cs336/.venv/bin/python3       1104MiB |
++-----------------------------------------------------------------------------------------+
+</code></pre>
+<h2 id="-v-vv-vvv">-v -vv -vvv</h2>
+<p>严格来说这个不是指令，而是一个常见的命令参数。但好用。<br>
+有许多工具默认状态给你提供的信息是很有限的，比如 <code>pip</code> 。如果加了 <code>-v</code> ，它就会给你提供更多的信息；<code>-vv</code> 更多更多……<br>
+比如你怀疑某个指令是不是卡在网络连接问题上了、又没有信息，就可以加这个参数看看。</p>
+<p>使用效果（不加参数）：</p>
+<pre><code>(pymc) PS C:\Users\10pi&gt; pip install einops
+Collecting einops
+  Using cached einops-0.8.1-py3-none-any.whl.metadata (13 kB)
+Using cached einops-0.8.1-py3-none-any.whl (64 kB)
+Installing collected packages: einops
+Successfully installed einops-0.8.1
+</code></pre>
+<p>使用效果（<code>-v</code>）：</p>
+<pre><code>(pymc) PS C:\Users\10pi&gt; pip install -v einops
+Using pip 24.3.1 from C:\Software\Miniconda\envs\pymc\lib\site-packages\pip (python 3.8)
+  Link requires a different Python (3.8.0 not in: '&gt;=3.9'): https://files.pythonhosted.org/packages/2a/09/f8d8f8f31e4483c10a906437b4ce31bdf3d6d417b73fe33f1a8b59e34228/einops-0.8.2-py3-none-any.whl (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.9)
+  Link requires a different Python (3.8.0 not in: '&gt;=3.9'): https://files.pythonhosted.org/packages/2c/77/850bef8d72ffb9219f0b1aac23fbc1bf7d038ee6ea666f331fa273031aa2/einops-0.8.2.tar.gz (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.9)
+Collecting einops
+  Obtaining dependency information for einops from https://files.pythonhosted.org/packages/87/62/9773de14fe6c45c23649e98b83231fffd7b9892b6cf863251dc2afa73643/einops-0.8.1-py3-none-any.whl.metadata
+  Using cached einops-0.8.1-py3-none-any.whl.metadata (13 kB)
+Using cached einops-0.8.1-py3-none-any.whl (64 kB)
+Installing collected packages: einops
+Successfully installed einops-0.8.1
+</code></pre>
+<p>使用效果（<code>-vv</code>）：（我省略了一部分内容）</p>
+<pre><code>(pymc) PS C:\Users\10pi&gt; pip install einops -vv
+Using pip 24.3.1 from C:\Software\Miniconda\envs\pymc\lib\site-packages\pip (python 3.8)
+Non-user install because site-packages writeable
+Disabling truststore because Python version isn't 3.10+
+Created temporary directory: C:\Users\10pi\AppData\Local\Temp\pip-build-tracker-hni59twj
+Initialized build tracking at C:\Users\10pi\AppData\Local\Temp\pip-build-tracker-hni59twj
+Created build tracker: C:\Users\10pi\AppData\Local\Temp\pip-build-tracker-hni59twj
+Entered build tracker: C:\Users\10pi\AppData\Local\Temp\pip-build-tracker-hni59twj
+Created temporary directory: C:\Users\10pi\AppData\Local\Temp\pip-install-8kirg154
+Created temporary directory: C:\Users\10pi\AppData\Local\Temp\pip-ephem-wheel-cache-zt8dwlfm
+1 location(s) to search for versions of einops:
+* https://pypi.org/simple/einops/
+Fetching project page and analyzing links: https://pypi.org/simple/einops/
+Getting page https://pypi.org/simple/einops/
+Found index url https://pypi.org/simple/
+Looking up &quot;https://pypi.org/simple/einops/&quot; in the cache
+Request header has &quot;max_age&quot; as 0, cache bypassed
+Starting new HTTPS connection (1): pypi.org:443
+https://pypi.org:443 &quot;GET /simple/einops/ HTTP/1.1&quot; 304 0
+Fetched page https://pypi.org/simple/einops/ as application/vnd.pypi.simple.v1+json
+  Found link https://files.pythonhosted.org/packages/36/1f/a5e6496a167b6e892123b201ccce251184457ce7a1b6c8e06662c09bfbab/einops-0.1.0-py3-none-any.whl (from https://pypi.org/simple/einops/), version: 0.1.0
+  Found link ...
+https://files.pythonhosted.org/packages/2c/77/850bef8d72ffb9219f0b1aac23fbc1bf7d038ee6ea666f331fa273031aa2/einops-0.8.2.tar.gz (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.9)
+  Skipping link: 0.8.2 Requires-Python &gt;=3.9: https://files.pythonhosted.org/packages/2c/77/850bef8d72ffb9219f0b1aac23fbc1bf7d038ee6ea666f331fa273031aa2/einops-0.8.2.tar.gz (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.9)
+Skipping link: not a file: https://pypi.org/simple/einops/
+Given no hashes to check 26 links for project 'einops': discarding no candidates
+Collecting einops
+  Obtaining dependency information for einops from https://files.pythonhosted.org/packages/87/62/9773de14fe6c45c23649e98b83231fffd7b9892b6cf863251dc2afa73643/einops-0.8.1-py3-none-any.whl.metadata
+  Created temporary directory: C:\Users\10pi\AppData\Local\Temp\pip-unpack-g4cpg3nk
+  Looking up &quot;https://files.pythonhosted.org/packages/87/62/9773de14fe6c45c23649e98b83231fffd7b9892b6cf863251dc2afa73643/einops-0.8.1-py3-none-any.whl.metadata&quot; in the cache
+  Current age based on date: 19087633
+  Ignoring unknown cache-control directive: immutable
+  Freshness lifetime from max-age: 365000000
+  The response is &quot;fresh&quot;, returning cached response
+  365000000 &gt; 19087633
+  Using cached einops-0.8.1-py3-none-any.whl.metadata (13 kB)
+Created temporary directory: C:\Users\10pi\AppData\Local\Temp\pip-unpack-nq9eoxgz
+Looking up &quot;https://files.pythonhosted.org/packages/87/62/9773de14fe6c45c23649e98b83231fffd7b9892b6cf863251dc2afa73643/einops-0.8.1-py3-none-any.whl&quot; in the cache
+Current age based on date: 19087579
+Ignoring unknown cache-control directive: immutable
+Freshness lifetime from max-age: 365000000
+The response is &quot;fresh&quot;, returning cached response
+365000000 &gt; 19087579
+Using cached einops-0.8.1-py3-none-any.whl (64 kB)
+Downloading link https://files.pythonhosted.org/packages/87/62/9773de14fe6c45c23649e98b83231fffd7b9892b6cf863251dc2afa73643/einops-0.8.1-py3-none-any.whl (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.8) to C:\Users\10pi\AppData\Local\Temp\pip-unpack-nq9eoxgz\einops-0.8.1-py3-none-any.whl
+Installing collected packages: einops
+
+Successfully installed einops-0.8.1
+Disabling truststore because Python version isn't 3.10+
+Remote version of pip: 25.0.1
+Local version of pip:  24.3.1
+Was pip installed by pip? False
+Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker-hni59twj'
+</code></pre>
+<p><code>-vvv</code> 就不说了。肯定更多。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#df">df</a></li>
+<li><a href="#grep">grep</a></li>
+<li><a href="#ps">ps</a></li>
+<li><a href="#nvidia-smi">nvidia-smi</a></li>
+<li><a href="#-v-vv-vvv">-v -vv -vvv</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/wandb/">
+              <h3 class="post-title">
+                WanDB基础使用教程总结
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('https://discus.skk.moe/discus/') {
+  options.api = 'https://discus.skk.moe/discus/'
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

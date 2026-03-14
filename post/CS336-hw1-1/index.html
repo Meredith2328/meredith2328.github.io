@@ -1,0 +1,1840 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CS336 Assignment 1 前半段记录：架构 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1773480611148">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CS336 Assignment 1 前半段记录：架构 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="从分词开始，搭建起Transformer架构。
+
+
+edit time: 2026-02-03 17:35:29 开始配置环境√
+edit time: 2026-02-03 17:56:45 下数据集，读文档√
+edit time: 202..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1773480611148" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CS336 Assignment 1 前半段记录：架构
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-10
+              </span>
+              <span>
+                52 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>从分词开始，搭建起Transformer架构。</p>
+<!-- more -->
+<blockquote>
+<p>edit time: 2026-02-03 17:35:29 开始配置环境√<br>
+edit time: 2026-02-03 17:56:45 下数据集，读文档√<br>
+edit time: 2026-02-03 18:47:24 BPE先到2.4停一下<br>
+edit time: 2026-02-09 18:30:51 BPE过3/3的demo√ 没优化居然就能过<br>
+edit time: 2026-02-09 21:37:52 想把3 Transformer结构做掉<br>
+edit time: 2026-02-09 22:36:31 3.1-3.3介绍√ 后面3.4-3.6就是纯代码了，基本上是自己写一遍，再让ai写一遍，补一些细节<br>
+edit time: 2026-02-11 22:54:59 读test_model，照猫画虎Linear, Embedding, RMSNorm, SwiGLU√<br>
+edit time: 2026-02-12 23:26:05 完成整个3 Transformer结构部分√<br>
+edit time: 2026-02-13 21:36:29 完成4 Utils部分√<br>
+edit time: 2026-02-13 22:25:45 粗略地过了5 Training Loop部分，最后合在一起因为没有做tokenizer所以先搁置<br>
+edit time: 2026-03-10 09:03:18 补完训练部分√ 不管干什么，都先在PyTorch里面干一下，就知道了。</p>
+</blockquote>
+<p>作业目录：</p>
+<ol>
+<li>BPE tokenizer</li>
+<li>Transformer LM</li>
+<li>The cross-entropy loss function and the AdamW optimizer</li>
+<li>The training loop (support: serilizing, loading model, optimizer state)</li>
+</ol>
+<p>提到的工具：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cProfile</code></td>
+<td>CPU性能分析工具。</td>
+</tr>
+<tr>
+<td><code>torch.profiler</code></td>
+<td>GPU性能分析工具。</td>
+</tr>
+<tr>
+<td><code>einops</code></td>
+<td>好用的重排tensor、tensor乘法、tensor聚合的可读实现库。</td>
+</tr>
+<tr>
+<td><code>WanDB</code></td>
+<td>日志工具，用于记录loss、acc变化，以及记录实验信息。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-training-a-transformer-lm">4 Training a Transformer LM</h2>
+<blockquote>
+<p>我们要做什么？实现一些训练Transformer必要的工具。</p>
+</blockquote>
+<p>4.1 Cross-entropy loss</p>
+<p>实现交叉熵损失。</p>
+<p>4.2 The SGD Optimizer</p>
+<p>基础的随机梯度下降优化器的原理。</p>
+<p>4.3 AdamW</p>
+<p>更进一步，实现AdamW优化器。</p>
+<p>4.4 Learning rate scheduling</p>
+<p>cosine学习率调度。</p>
+<p>4.5 Gradient clipping</p>
+<p>梯度裁剪，防止梯度过大。</p>
+<h3 id="crossentropyloss">CrossEntropyLoss</h3>
+<p>跨各个token，跨batch的平均损失。<br>
+慢慢推一下维度：<br>
+<code>inputs: Float[Tensor, &quot; batch_size vocab_size&quot;]</code><br>
+<code>targets: Int[Tensor, &quot; batch_size&quot;]</code><br>
+所以为了数值稳定，我们将 <code>inputs: (batch, vocab_size)</code> 减去它跨 <code>vocab</code> 维度的 <code>max_vals: (batch, 1)</code> ，得到 <code>inputs_stable: (batch, vocab_size)</code> ，<br>
+然后对 <code>inputs_stable</code> 执行log_sum_exp。<br>
+具体而言，先整体exp，然后在<code>vocab_size</code>维上做sum，最后再log。</p>
+<p>再接下来，我们根据targets提供的标签知道了inputs中哪些是正确的，把正确的取出。</p>
+<p>总之，其实就是算了这两部分：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>C</mi><mi>r</mi><mi>o</mi><mi>s</mi><mi>s</mi><mi>E</mi><mi>n</mi><mi>t</mi><mi>r</mi><mi>o</mi><mi>p</mi><mi>y</mi><mo>(</mo><mi>x</mi><mo separator="true">,</mo><mi>y</mi><mo>)</mo><mo>=</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mo>(</mo><mfrac><msup><mi>e</mi><msub><mi>x</mi><mi>y</mi></msub></msup><mrow><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><msub><mi>x</mi><mi>j</mi></msub></msup></mrow></mfrac><mo>)</mo><mo>=</mo><mi>log</mi><mo>⁡</mo><mo>(</mo><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><msub><mi>x</mi><mi>j</mi></msub></msup><mo>)</mo><mo>−</mo><msub><mi>x</mi><mi>y</mi></msub></mrow><annotation encoding="application/x-tex">CrossEntropy(x,y)=-\log(\frac{e^{x_y}}{\sum_j e^{x_j}})=\log(\sum_j e^{x_j})-x_y
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">o</span><span class="mord mathdefault">s</span><span class="mord mathdefault">s</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">o</span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mopen">(</span><span class="mord mathdefault">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.46321em;vertical-align:-1.1218180000000002em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.341392em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16195399999999993em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.43581800000000004em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6064620000000001em;"><span style="top:-3.0050700000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.664392em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285716em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.1218180000000002em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.463782em;vertical-align:-1.413777em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen">(</span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.050005em;"><span style="top:-1.8723309999999997em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span><span style="top:-3.0500049999999996em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.413777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7143919999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3280857142857143em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.716668em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<pre><code class="language-python">class CrossEntropyLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, inputs, targets):
+        # 1) calc log-sum-exp
+        # batch &quot;1&quot; since 1 only automatically added in the front
+        max_vals = reduce(inputs, 'batch vocab -&gt; batch 1', reduction='max')
+        inputs_stable = inputs - max_vals # (batch, vocab)
+        # subtract, for numerical stability
+        
+        log_sum_exp = reduce(
+            inputs_stable.exp(),
+            'batch vocab -&gt; batch',
+            reduction='sum'
+        ).log() + max_vals
+        # add, for numerical stability
+        
+        # 2) get the predicted vals for correct labels
+        # eg. targets = torch.tensor([2, 0, 3])
+        # logits = torch.tensor([
+        #     [0.1, 0.2, '0.3', 0.4, 0.5],
+        #     ['1.0', 1.1, 1.2, 1.3, 1.4],
+        #     [2.0, 2.1, 2.2, '2.3', 2.4]
+        # ])
+        # we take torch.tensor([0.3, 1.0, 2.3])
+        target_logits = inputs.gather(
+            dim=-1,
+            index=targets.unsqueeze(-1)
+        ).squeeze(-1)
+
+        # 3) calc batch mean loss
+        losses = log_sum_exp - target_logits
+        return losses.mean()
+</code></pre>
+<h3 id="sgd">SGD</h3>
+<p>大名鼎鼎的随机梯度下降（Stochastic Gradient Descent）。<br>
+介绍了parameter group的概念，表示模型的不同部分的参数使用不同的超参数。<br>
+用了一个简单的例子来测试超参数的影响：</p>
+<pre><code class="language-python">from collections.abc import Callable, Iterable
+from typing import Optional
+import torch
+import math
+
+class SGD(torch.optim.Optimizer):
+    &quot;&quot;&quot;
+    Stochastic Gradient Descent (SGD).
+
+    eg.
+
+    weights = torch.nn.Parameter(5 * torch.randn((10, 10)))
+    opt = SGD([weights], lr=1)
+    for t in range(100):
+        opt.zero_grad() # Reset the gradients for all learnable parameters.
+        loss = (weights**2).mean() # Compute a scalar loss value.
+        print(loss.cpu().item())
+        loss.backward() # Run backward pass, which computes gradients.
+        opt.step() # Run optimizer step.
+
+    Forward, compute the loss.
+    Backward, compute the gradient.
+    Run optimizer step, update the params.
+    &quot;&quot;&quot;
+
+    def __init__(self, params, lr=1e-3):
+        if lr &lt; 0:
+            raise ValueError(f&quot;Invalid learning rate: {lr}&quot;)
+        defaults = {&quot;lr&quot;: lr}
+        super().__init__(params, defaults)
+    
+    def step(self, closure: Optional[Callable] = None):
+        loss = None if closure is None else closure()
+        for group in self.param_groups:
+            lr = group[&quot;lr&quot;]
+            for p in group[&quot;params&quot;]:
+                if p.grad is None:
+                    continue
+
+                state = self.state[p]
+                t = state.get(&quot;t&quot;, 0) # iteration number we maintain
+                grad = p.grad.data
+                # the learning rate decays over training
+                p.data -= lr / math.sqrt(t + 1) * grad
+                state[&quot;t&quot;] = t + 1
+
+        return loss
+        
+weights = torch.nn.Parameter(5 * torch.randn((10, 10)))
+opt = SGD([weights], lr=1)
+for t in range(100):
+  opt.zero_grad() # Reset the gradients for all learnable parameters.
+  loss = (weights**2).mean() # Compute a scalar loss value.
+  print(loss.cpu().item())
+  loss.backward() # Run backward pass, which computes gradients.
+  opt.step() # Run optimizer step.
+</code></pre>
+<p>结果大致如下：<br>
+可见，lr增大时，loss的值大致下降变快，直到无穷小。<br>
+但lr很大时（1e3），loss的值反倒发散到无穷大。</p>
+<pre><code># lr=1
+24.955036163330078 23.966821670532227 23.29372787475586 22.758888244628906 22.305986404418945 ...
+</code></pre>
+<pre><code># lr=1e1
+20.56572723388672 13.162065505981445 9.702513694763184 7.591179847717285 6.148856163024902 ...
+</code></pre>
+<pre><code># lr=1e2
+23.596664428710938 23.596660614013672 4.04854679107666 0.09689083695411682 1.5798126642781223e-16 ...
+</code></pre>
+<pre><code># lr=1e3
+27.495254516601562 9925.787109375 1714339.5 190701984.0 15446859776.0
+</code></pre>
+<p>我觉得ai给了一个特别直观的解释。<br>
+想象你在一个碗状的山谷（最小值在谷底）：</p>
+<ul>
+<li>lr太小：像老太太挪步，半天走不到谷底</li>
+<li>lr合适：正常步伐，稳步下降</li>
+<li>lr偏大：大步流星，很快接近谷底</li>
+<li>lr过大：一步跨到对面山坡，再一步跨回来，每一步都跳到更高的地方，最终飞出碗外</li>
+</ul>
+<h3 id="adamw">AdamW</h3>
+<figure data-type="image" tabindex="1"><img src="https://meredith2328.github.io/post-images/20260213211756.png" alt="" loading="lazy"></figure>
+<p>这个看起来像是在SGD的基础上加了一些数学原理的估计，使得它有很好的效果。<br>
+具体原理暂时不关心，我希望更侧重对大模型训练整体及其实现的把握。以后写到AdamW了再回过来补充原理。</p>
+<pre><code class="language-python">class AdamW(torch.optim.Optimizer):
+
+    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01):
+        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay)
+        super().__init__(params, defaults)
+    
+    def step(self, closure=None):
+        loss = None
+        if closure is not None:
+            loss = closure()
+        
+        for group in self.param_groups:
+            beta1, beta2 = group['betas']
+            lr = group['lr']
+            eps = group['eps']
+            weight_decay = group['weight_decay']
+            
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                
+                grad = p.grad.data
+                
+                # 初始化状态
+                state = self.state[p]
+                if len(state) == 0:
+                    state['step'] = 0
+                    state['m'] = torch.zeros_like(p.data)  # 一阶矩
+                    state['v'] = torch.zeros_like(p.data)  # 二阶矩
+                
+                # 更新步数
+                state['step'] += 1
+                t = state['step']
+                
+                # 更新矩估计
+                state['m'].mul_(beta1).add_(grad, alpha=1 - beta1)
+                state['v'].mul_(beta2).addcmul_(grad, grad, value=1 - beta2)
+                
+                # 偏差修正
+                bias_correction1 = 1 - beta1 ** t
+                bias_correction2 = 1 - beta2 ** t
+                
+                # Adam更新
+                denom = state['v'].sqrt().add_(eps)
+                step_size = lr * (bias_correction2 ** 0.5) / bias_correction1
+                p.data.addcdiv_(state['m'], denom, value=-step_size)
+                
+                # 权重衰减（解耦）
+                if weight_decay != 0:
+                    p.data.add_(p.data, alpha=-lr * weight_decay)
+        
+        return loss
+        
+        
+</code></pre>
+<pre><code class="language-python">def get_adamw_cls() -&gt; Any:
+    &quot;&quot;&quot;
+    Returns a torch.optim.Optimizer that implements AdamW.
+    &quot;&quot;&quot;
+    return model.AdamW
+</code></pre>
+<blockquote>
+<p>以下是GPT对问题的回答（未检验，很可能有问题）。<br>
+之后会专门写一篇blog替换掉这里对激活值等的计算。</p>
+</blockquote>
+<hr>
+<p>(a) AdamW 训练的内存占用分析</p>
+<p>假设使用 float32（4字节），d_ff = 4 × d_model，batch_size = B，context_length = L。</p>
+<ol>
+<li>参数量与内存</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>参数量公式</th>
+<th>内存 (字节)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Token Embedding</td>
+<td>V × d_model</td>
+<td>4Vd_model</td>
+</tr>
+<tr>
+<td>每层 Attention QKV</td>
+<td>3 × d_model²</td>
+<td>12d_model²</td>
+</tr>
+<tr>
+<td>每层 Attention O</td>
+<td>d_model²</td>
+<td>4d_model²</td>
+</tr>
+<tr>
+<td>每层 FFN w1/w3</td>
+<td>2 × d_model × 4d_model = 8d_model²</td>
+<td>32d_model²</td>
+</tr>
+<tr>
+<td>每层 FFN w2</td>
+<td>4d_model × d_model = 4d_model²</td>
+<td>16d_model²</td>
+</tr>
+<tr>
+<td>每层 RMSNorm</td>
+<td>2 × d_model</td>
+<td>8d_model</td>
+</tr>
+<tr>
+<td>每层小计</td>
+<td></td>
+<td>12+4+32+16 = 64d_model² + 8d_model</td>
+</tr>
+<tr>
+<td>num_layers层</td>
+<td></td>
+<td>N(64d_model² + 8d_model)</td>
+</tr>
+<tr>
+<td>Final RMSNorm</td>
+<td>d_model</td>
+<td>4d_model</td>
+</tr>
+<tr>
+<td>LM Head</td>
+<td>V × d_model</td>
+<td>4Vd_model</td>
+</tr>
+</tbody>
+</table>
+<p><strong>参数内存总量</strong>：</p>
+<pre><code>M_params = 8Vd_model + N(64d_model² + 8d_model) + 4d_model ≈ 8Vd_model + 64N d_model²
+</code></pre>
+<ol start="2">
+<li>梯度内存</li>
+</ol>
+<p>梯度与参数形状相同，因此：</p>
+<pre><code>M_grads = M_params
+</code></pre>
+<ol start="3">
+<li>优化器状态内存</li>
+</ol>
+<p>AdamW为每个参数存储：</p>
+<ul>
+<li>一阶矩 m（float32）</li>
+<li>二阶矩 v（float32）</li>
+</ul>
+<p>因此：</p>
+<pre><code>M_optim = 2 × M_params
+</code></pre>
+<ol start="4">
+<li>激活值内存（单层）</li>
+</ol>
+<p><strong>Attention子层</strong>：</p>
+<ul>
+<li>Q/K/V投影输出：3 × B × L × d_model → 12BLd_model</li>
+<li>QK^T 分数矩阵：B × num_heads × L × L → 4BHL²</li>
+<li>Softmax输出（与分数矩阵同形状）：4BHL²</li>
+<li>加权和输出：B × L × d_model → 4BLd_model</li>
+<li>O投影输出：B × L × d_model → 4BLd_model</li>
+</ul>
+<p><strong>FFN子层</strong>：</p>
+<ul>
+<li>w1/w3投影输出：2 × B × L × 4d_model → 32BLd_model</li>
+<li>SiLU输出（与w1同形状）：16BLd_model</li>
+<li>w2投影输出：B × L × d_model → 4BLd_model</li>
+</ul>
+<p><strong>RMSNorm</strong>（两个）：2 × B × L × d_model → 8BLd_model</p>
+<p><strong>单层激活值总量</strong>：</p>
+<pre><code>M_act_layer = (12+4+4+4+32+16+4+8)BLd_model + 8BHL²
+            = 84BLd_model + 8BHL²
+</code></pre>
+<p><strong>所有层</strong>（需要存储所有层的激活值用于反向传播）：</p>
+<pre><code>M_act = N × M_act_layer = 84N BLd_model + 8N BHL²
+</code></pre>
+<ol start="5">
+<li>输出层激活值</li>
+</ol>
+<ul>
+<li>Final Norm输出：B × L × d_model → 4BLd_model</li>
+<li>LM Head输出：B × L × V → 4BLV</li>
+<li>Cross-entropy中间值（log_softmax）：B × L × V → 4BLV</li>
+</ul>
+<p><strong>输出层激活值</strong>：</p>
+<pre><code>M_act_out = 4BLd_model + 8BLV
+</code></pre>
+<ol start="6">
+<li>总内存</li>
+</ol>
+<pre><code>M_total = M_params + M_grads + M_optim + M_act + M_act_out
+        = M_params + M_params + 2M_params + M_act + M_act_out
+        = 4M_params + M_act + M_act_out
+        = 4(8Vd_model + 64N d_model²) + (84N BLd_model + 8N BHL²) + (4BLd_model + 8BLV)
+        = 32Vd_model + 256N d_model² + 84N BLd_model + 8N BHL² + 4BLd_model + 8BLV
+</code></pre>
+<hr>
+<p>(b) GPT-2 XL 数值实例</p>
+<p>GPT-2 XL配置：</p>
+<ul>
+<li>V = 50,257</li>
+<li>L = 1,024</li>
+<li>N = 48</li>
+<li>d_model = 1,600</li>
+<li>num_heads = 25</li>
+<li>H = 25</li>
+<li>d_ff = 6,400 = 4 × 1,600</li>
+</ul>
+<p>代入公式（单位：字节）：</p>
+<pre><code>M_params = 8×50257×1600 + 48×64×1600²
+         = 643,289,600 + 48 × 163,840,000
+         = 643M + 7,864M
+         = 8.507GB
+
+M_optim = 2 × M_params = 17.014GB
+M_grads = M_params = 8.507GB
+
+M_act = 48×84×B×1024×1600 + 48×8×B×25×1024²
+      = 48×84×B×1,638,400 + 48×8×B×25×1,048,576
+      = 48×137,625,600×B + 48×209,715,200×B
+      = 6.606B×B + 10.066B×B
+      = 16.672B GB
+
+M_act_out = 4×B×1024×1600 + 8×B×1024×50257
+          = 6,553,600×B + 411,697,664×B
+          = 0.0061B + 0.383B
+          = 0.389B GB
+</code></pre>
+<p><strong>总内存</strong>：</p>
+<pre><code>M_total = 8.507 + 17.014 + 8.507 + 16.672B + 0.389B
+        = 34.028 + 17.061B GB
+</code></pre>
+<p><strong>最大batch size</strong>（80GB内存）：</p>
+<pre><code>80 = 34.028 + 17.061B
+17.061B = 45.972
+B = 2.69 ≈ 2
+</code></pre>
+<p><strong>答案</strong>：<code>M_total = 34.028 + 17.061B GB</code>，最大batch size为 <strong>2</strong>。</p>
+<hr>
+<p>(c) AdamW 一步的FLOPs</p>
+<p>AdamW的主要操作：</p>
+<ol>
+<li><strong>更新一阶矩</strong>：<code>m = β1·m + (1-β1)·g</code> → 2次乘加/参数</li>
+<li><strong>更新二阶矩</strong>：<code>v = β2·v + (1-β2)·g²</code> → 2次乘加 + 1次乘法/参数</li>
+<li><strong>计算修正因子</strong>：<code>1-β1ᵗ</code>、<code>1-β2ᵗ</code> → 忽略（每步一次）</li>
+<li><strong>参数更新</strong>：<code>θ -= α·m/(√v+ε)</code> → 1次除法 + 1次平方根 + 1次乘法/参数</li>
+<li><strong>权重衰减</strong>：<code>θ -= α·λ·θ</code> → 1次乘加/参数</li>
+</ol>
+<p>粗略估计，每个参数约 <strong>10-12 FLOPs</strong>。</p>
+<p><strong>总FLOPs</strong>：</p>
+<pre><code>F_adamw ≈ 12 × (参数量) = 12 × (8Vd_model + 64N d_model²)
+</code></pre>
+<p>对于GPT-2 XL：</p>
+<pre><code>参数量 ≈ 2.046B
+F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
+</code></pre>
+<hr>
+<p>(d) 训练时间估算</p>
+<p>GPT-2 XL参数量 ≈ 2.046B</p>
+<p><strong>前向FLOPs</strong>（从之前计算）：</p>
+<pre><code>F_forward ≈ 4.51T FLOPs
+</code></pre>
+<p><strong>反向FLOPs</strong>（假设是前向的2倍）：</p>
+<pre><code>F_backward = 2 × F_forward = 9.02T FLOPs
+</code></pre>
+<p><strong>一步总FLOPs</strong>：</p>
+<pre><code>F_step = F_forward + F_backward + F_adamw
+       = 4.51T + 9.02T + 0.0245T
+       = 13.5545T FLOPs
+</code></pre>
+<p><strong>A100峰值</strong>：19.5 TFLOPS<br>
+<strong>50% MFU</strong>：9.75 TFLOPS</p>
+<p><strong>每秒处理步数</strong>：</p>
+<pre><code>steps_per_sec = 9.75T / 13.5545T = 0.719 步/秒
+</code></pre>
+<p><strong>400K步所需秒数</strong>：</p>
+<pre><code>seconds = 400,000 / 0.719 = 556,328 秒
+</code></pre>
+<p><strong>转换为天</strong>：</p>
+<pre><code>days = 556,328 / (24×3600) = 556,328 / 86,400 ≈ 6.44 天
+</code></pre>
+<p><strong>答案</strong>：约 <strong>6.4天</strong></p>
+<hr>
+<h2 id="3-transformer-language-model-architecture">3 Transformer Language Model Architecture</h2>
+<blockquote>
+<p>我们要做什么？实现Transformer本身。</p>
+</blockquote>
+<p>3.1 Transformer LM</p>
+<p>对Transformer的整体直觉做了简介。</p>
+<p>3.2 Output Normalization and Embedding</p>
+<p>同上。提到相比于原论文，我们的实现修改为pre-norm。</p>
+<p>3.3 Remark: Batching, Einsum and Efficient Computation</p>
+<p><code>batch_size</code> 和 <code>sequence_length</code> 通常置于开头，以便直接传播。有时需要利用 <code>view,reshape,transpose</code> 这些方法，但pytorch原生的写法有时不那么清晰。为了简便或者阅读友好等目的，推荐使用einops库。</p>
+<p>3.4 Basic Building Blocks: Linear and Embedding Modules</p>
+<p>介绍基础的Module。</p>
+<p>3.5 Pre-Norm Transformer Block</p>
+<p>实现pre-norm的transformer块。</p>
+<p>3.6 The Full Transformer LM</p>
+<p>实现整个Transformer模型，并且对它的参数、FLOPs做估算。</p>
+<p>语言模型接收 <code>(batch_size, sequence_length)</code> （相当于接收一个序列），<br>
+生成对下一个token的归一化的概率分布 <code>(batch_size, sequence_length, vocab_size)</code> 。<br>
+训练语言模型时，优化预测得到的下一个token和实际下一个token的交叉熵损失。</p>
+<p><s>连接主义！</s></p>
+<h3 id="知识resource-accounting">知识：Resource accounting</h3>
+<blockquote>
+<p>这一部分本来在3 Training a Transformer LM最后，挪到了最前面方便查阅。<br>
+编写了一篇博客 <a href="https://meredith2328.github.io/post/LLMestimate/">怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</a> ，详细整理了相关的内容，并且利用实际的包做了验证。</p>
+</blockquote>
+<blockquote>
+<p>直觉：<br>
+<strong>随着模型变大，FFN和Attention占最主导（90%），其中FFN可能更多。</strong><br>
+<strong>但是随着长上下文变长，到一定阈值后，Attention反超FFN成为绝对主导（起码超过50%）。</strong></p>
+</blockquote>
+<p><img src="https://meredith2328.github.io/post-images/20260212231548.png" alt="" loading="lazy"><br>
+<img src="https://meredith2328.github.io/post-images/20260212231557.png" alt="" loading="lazy"></p>
+<h3 id="linear">Linear</h3>
+<figure data-type="image" tabindex="2"><img src="https://meredith2328.github.io/post-images/20260211223733.png" alt="" loading="lazy"></figure>
+<p>Linear是一个对输入向量 <code>x</code> 执行 <code>y = xW^T</code> 操作，得到输出向量 <code>y</code> 的层。</p>
+<p>ps.   <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><msup><mi>W</mi><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">xW^T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8413309999999999em;vertical-align:0em;"></span><span class="mord mathdefault">x</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413309999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span></span></span></span>  而不是  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">Wx</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault">x</span></span></span></span>  是因为尽管我们在数学上的向量往往是列向量（ <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">Wx</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="mord mathdefault">x</span></span></span></span> ），但NumPy和PyTorch的内部实现通常优先使用行向量。原因很好猜到：内存的局部性。</p>
+<p>注意首先使用 <code>super().__init__()</code> ，这是接下来使用 <code>load_state_dict</code> 手动加载权重的基础。</p>
+<p>首先利用 <code>torch.empty</code> 创建 <code>(out_features, in_features)</code> 的 <code>W</code> ，然后将它用 <code>nn.Parameter</code> 包装，再然后使用文档Parameter Initialization部分提到的 <code>trunc_normal_</code> 进行截断处理。<br>
+对于 <code>forward</code> 的实际实现，这里不使用einops时应该写作 <code>x @ W^T</code> ，因为考虑到空间局部性， <code>x</code> 这样的向量一般是行向量。当然，如果我们直接使用einops.einsum，就很方便了。把那些用于并行的<code>batch</code>之类的维度写成 <code>...</code> 即可。</p>
+<pre><code class="language-python">import torch
+import torch.nn as nn
+from torch.nn.init import trunc_normal_
+from math import sqrt
+from einops import einsum
+
+class Linear(nn.Module):
+    '''Construct a (out_features, in_features) linear layer.
+    forward: y = xW^T.
+    '''
+
+    def __init__(self, in_features, out_features, device=None, dtype=None):
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        
+        std = sqrt(2.0 / (in_features + out_features))
+        self.weights = trunc_normal_(
+            nn.Parameter(
+                torch.empty(out_features, in_features, device=device, dtype=dtype)
+            ),
+            mean = 0.0,
+            std = std,
+            a = -3.0 * std,
+            b = 3.0 * std
+        )
+
+    def forward(self, x):
+        if x.device != self.weights.device:
+            self.weights = self.weights.to(x.device)
+
+        # return x @ self.weights.T
+        return einsum(x, self.weights, '... in_features, out_features in_features -&gt; ... out_features')
+</code></pre>
+<p>接下来是修改adapter。<br>
+需要用到 <code>.load_state_dict('key': weights)</code> 来加载权重。</p>
+<pre><code class="language-python">from cs336_basics import bpe, model
+
+def run_linear(
+    d_in: int,
+    d_out: int,
+    weights: Float[Tensor, &quot; d_out d_in&quot;],
+    in_features: Float[Tensor, &quot; ... d_in&quot;],
+) -&gt; Float[Tensor, &quot; ... d_out&quot;]:
+    &quot;&quot;&quot;
+    Given the weights of a Linear layer, compute the transformation of a batched input.
+
+    Args:
+        in_dim (int): The size of the input dimension
+        out_dim (int): The size of the output dimension
+        weights (Float[Tensor, &quot;d_out d_in&quot;]): The linear weights to use
+        in_features (Float[Tensor, &quot;... d_in&quot;]): The output tensor to apply the function to
+
+    Returns:
+        Float[Tensor, &quot;... d_out&quot;]: The transformed output of your linear module.
+    &quot;&quot;&quot;
+
+    linear_layer = model.Linear(d_in, d_out)
+    state_dict = {'weights': weights}
+    linear_layer.load_state_dict(state_dict, strict=False)
+    return linear_layer(in_features)
+</code></pre>
+<h3 id="embedding">embedding</h3>
+<p>Embedding是一个对于输入 <code>token_id</code> 查表，得到它的Embedding向量的层。</p>
+<pre><code class="language-python">from cs336_basics import bpe, model
+
+def run_linear(
+    d_in: int,
+    d_out: int,
+    weights: Float[Tensor, &quot; d_out d_in&quot;],
+    in_features: Float[Tensor, &quot; ... d_in&quot;],
+) -&gt; Float[Tensor, &quot; ... d_out&quot;]:
+    &quot;&quot;&quot;
+    Given the weights of a Linear layer, compute the transformation of a batched input.
+
+    Args:
+        in_dim (int): The size of the input dimension
+        out_dim (int): The size of the output dimension
+        weights (Float[Tensor, &quot;d_out d_in&quot;]): The linear weights to use
+        in_features (Float[Tensor, &quot;... d_in&quot;]): The output tensor to apply the function to
+
+    Returns:
+        Float[Tensor, &quot;... d_out&quot;]: The transformed output of your linear module.
+    &quot;&quot;&quot;
+
+    linear_layer = model.Linear(d_in, d_out)
+    state_dict = {'weights': weights}
+    linear_layer.load_state_dict(state_dict, strict=False)
+    return linear_layer(in_features)
+
+
+def run_embedding(
+    vocab_size: int,
+    d_model: int,
+    weights: Float[Tensor, &quot; vocab_size d_model&quot;],
+    token_ids: Int[Tensor, &quot; ...&quot;],
+) -&gt; Float[Tensor, &quot; ... d_model&quot;]:
+    &quot;&quot;&quot;
+    Given the weights of an Embedding layer, get the embeddings for a batch of token ids.
+
+    Args:
+        vocab_size (int): The number of embeddings in the vocabulary
+        d_model (int): The size of the embedding dimension
+        weights (Float[Tensor, &quot;vocab_size d_model&quot;]): The embedding vectors to fetch from
+        token_ids (Int[Tensor, &quot;...&quot;]): The set of token ids to fetch from the Embedding layer
+
+    Returns:
+        Float[Tensor, &quot;... d_model&quot;]: Batch of embeddings returned by your Embedding layer.
+    &quot;&quot;&quot;
+    embedding_layer = model.Embedding(vocab_size, d_model)
+    embedding_layer.load_state_dict({'weight': weights})
+    return embedding_layer(token_ids)
+</code></pre>
+<pre><code class="language-python">def run_embedding(
+    vocab_size: int,
+    d_model: int,
+    weights: Float[Tensor, &quot; vocab_size d_model&quot;],
+    token_ids: Int[Tensor, &quot; ...&quot;],
+) -&gt; Float[Tensor, &quot; ... d_model&quot;]:
+    &quot;&quot;&quot;
+    Given the weights of an Embedding layer, get the embeddings for a batch of token ids.
+
+    Args:
+        vocab_size (int): The number of embeddings in the vocabulary
+        d_model (int): The size of the embedding dimension
+        weights (Float[Tensor, &quot;vocab_size d_model&quot;]): The embedding vectors to fetch from
+        token_ids (Int[Tensor, &quot;...&quot;]): The set of token ids to fetch from the Embedding layer
+
+    Returns:
+        Float[Tensor, &quot;... d_model&quot;]: Batch of embeddings returned by your Embedding layer.
+    &quot;&quot;&quot;
+    embedding_layer = model.Embedding(vocab_size, d_model)
+    embedding_layer.load_state_dict({'weight': weights})
+    return embedding_layer(token_ids)
+</code></pre>
+<h3 id="rmsnorm">RMSNorm</h3>
+<p>RMSNorm相比于普通的层归一化，少了一步减去均值的过程。<br>
+<code>RMS(a)</code> 即是求标准差的过程去掉了减去均值，并且再加上 <code>1e-5</code> 防止underflow。</p>
+<figure data-type="image" tabindex="3"><img src="https://meredith2328.github.io/post-images/20260211224857.png" alt="" loading="lazy"></figure>
+<p>有一个注意的点：在平方之前，需要upcast成float32，防止溢出。<br>
+这也启示了我们：在torch中如果有比较大的数，可能需要upcast成float32进行计算。</p>
+<pre><code class="language-python">class RMSNorm(nn.Module):
+    &quot;&quot;&quot;RMSNorm(a_i) = a_i * g_i / RMS(a)
+    RMS(a) = \sqrt(\sum_{i=1}^{d_model} a_i^2 + eps)
+    g_i: (d_model) is a learnable &quot;gain&quot; parameter.
+    eps: 1e-5. Hyperparameter.
+    &quot;&quot;&quot;
+
+    def __init__(self, d_model, eps = 1e-5, device=None, dtype=None):
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(d_model, device=device, dtype=dtype))
+        self.d_model = d_model
+        self.eps = 1e-5
+
+    def forward(self, x):
+        # upcast input to torch.float32
+        # to prevent overflow in x^2
+        in_dtype = x.dtype
+        x = x.to(torch.float32)
+        # mean in d_model
+        rms_a = torch.sqrt(x.pow(2).mean(dim=-1, keepdim=True) + self.eps)
+        result = x / rms_a * self.weight
+        return result.to(in_dtype)
+</code></pre>
+<pre><code class="language-python">def run_rmsnorm(
+    d_model: int,
+    eps: float,
+    weights: Float[Tensor, &quot; d_model&quot;],
+    in_features: Float[Tensor, &quot; ... d_model&quot;],
+) -&gt; Float[Tensor, &quot; ... d_model&quot;]:
+    &quot;&quot;&quot;Given the weights of a RMSNorm affine transform,
+    return the output of running RMSNorm on the input features.
+
+    Args:
+        d_model (int): The dimensionality of the RMSNorm input.
+        eps: (float): A value added to the denominator for numerical stability.
+        weights (Float[Tensor, &quot;d_model&quot;]): RMSNorm weights.
+        in_features (Float[Tensor, &quot;... d_model&quot;]): Input features to run RMSNorm on. Can have arbitrary leading
+            dimensions.
+
+    Returns:
+        Float[Tensor,&quot;... d_model&quot;]: Tensor of with the same shape as `in_features` with the output of running
+        RMSNorm of the `in_features`.
+    &quot;&quot;&quot;
+    rmsnorm = model.RMSNorm(d_model, eps=eps)
+    rmsnorm.load_state_dict({'weight': weights})
+    return rmsnorm(in_features)
+</code></pre>
+<h3 id="rope">RoPE</h3>
+<p>RoPE 将query向量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>q</mi><mo>=</mo><msub><mi>W</mi><mi>q</mi></msub><mi>x</mi></mrow><annotation encoding="application/x-tex">q=W_qx</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">q</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mord mathdefault">x</span></span></span></span> 利用矩阵 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span> 进行旋转，得到了新的向量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>q</mi><mo mathvariant="normal">′</mo></msup></mrow><annotation encoding="application/x-tex">q&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.946332em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.751892em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> 。<br>
+矩阵 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msubsup><mi>R</mi><mi>k</mi><mi>i</mi></msubsup></mrow><annotation encoding="application/x-tex">R_k^i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1077719999999998em;vertical-align:-0.2831079999999999em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-2.4168920000000003em;margin-left:-0.00773em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831079999999999em;"><span></span></span></span></span></span></span></span></span></span> 是由角度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>θ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\theta_{i,k}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 构造得到的旋转矩阵。角度满足以下性质：</p>
+<ul>
+<li>当dim_position <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span> 相同时，角度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>θ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi></mrow></msub><mo>=</mo><mfrac><mi>i</mi><msup><mi mathvariant="normal">Θ</mi><mrow><mo>(</mo><mn>2</mn><mi>k</mi><mo>−</mo><mn>2</mn><mo>)</mo><mi mathvariant="normal">/</mi><mi>d</mi></mrow></msup></mfrac></mrow><annotation encoding="application/x-tex">\theta_{i,k}=\frac{i}{\Theta^{(2k-2)/d}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.2410889999999999em;vertical-align:-0.38542499999999996em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.855664em;"><span style="top:-2.614575em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight">Θ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8220357142857143em;"><span style="top:-2.8220357142857138em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5357142857142856em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">2</span><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span><span class="mbin mtight">−</span><span class="mord mtight">2</span><span class="mclose mtight">)</span><span class="mord mtight">/</span><span class="mord mathdefault mtight">d</span></span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.38542499999999996em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 随着位置 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span> 线性变化。这保证了无论 token_position的绝对数值大还是小，得到的注意力分数都只依赖于相对位置的差值 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi><mo>−</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">i-j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.74285em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span></span></span></span> 。</li>
+<li>当token_position <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.65952em;vertical-align:0em;"></span><span class="mord mathdefault">i</span></span></span></span> 相同时，角度 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>θ</mi><mrow><mi>i</mi><mo separator="true">,</mo><mi>k</mi></mrow></msub><mo>=</mo><mfrac><mi>i</mi><msup><mi mathvariant="normal">Θ</mi><mrow><mo>(</mo><mn>2</mn><mi>k</mi><mo>−</mo><mn>2</mn><mo>)</mo><mi mathvariant="normal">/</mi><mi>d</mi></mrow></msup></mfrac></mrow><annotation encoding="application/x-tex">\theta_{i,k}=\frac{i}{\Theta^{(2k-2)/d}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.980548em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361079999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.2410889999999999em;vertical-align:-0.38542499999999996em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.855664em;"><span style="top:-2.614575em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight">Θ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8220357142857143em;"><span style="top:-2.8220357142857138em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5357142857142856em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">2</span><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span><span class="mbin mtight">−</span><span class="mord mtight">2</span><span class="mclose mtight">)</span><span class="mord mtight">/</span><span class="mord mathdefault mtight">d</span></span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.38542499999999996em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 变化量随着 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span> 的增加而减少，即 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span> 比较小时，角度变化很快，频率很高； <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span> 比较大时，角度变化很慢，频率很低。<br>
+（其中 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">Θ</mi></mrow><annotation encoding="application/x-tex">\Theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">Θ</span></span></span></span> 是常数超参数， <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> 是维度大小，即max_seq_len）</li>
+</ul>
+<p>我们可以预先计算矩阵 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msubsup><mi>R</mi><mi>k</mi><mi>i</mi></msubsup></mrow><annotation encoding="application/x-tex">R_k^i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1077719999999998em;vertical-align:-0.2831079999999999em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-2.4168920000000003em;margin-left:-0.00773em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831079999999999em;"><span></span></span></span></span></span></span></span></span></span> ，在使用时再传入query向量和token_positions。</p>
+<p>第28行的 <code>rearrange</code> 是这样的作用：<br>
+<img src="https://meredith2328.github.io/post-images/20260212175652.png" alt="" loading="lazy"></p>
+<pre><code class="language-python">class RoPE(nn.Module):
+    def __init__(self, theta: float, d_k: int, max_seq_len: int, device=None):
+        super().__init__()
+        assert d_k % 2 == 0
+        self.theta = theta
+        self.d_k = d_k
+        self.max_seq_len = max_seq_len
+
+        # precalc frequencies
+        # freqs[k] = Θ^(-2k/d_k) for 2k = 0, 2, ..., d_k - 2
+        freqs = 1.0 / (theta ** (torch.arange(0, d_k, 2, device=device).float() / d_k))
+        positions = torch.arange(max_seq_len, device=device).float()
+
+        # Cartesian product
+        angles = einsum(positions, freqs, 'seq, half -&gt; seq half')
+
+        self.register_buffer('cos', torch.cos(angles), persistent=False)
+        self.register_buffer('sin', torch.sin(angles), persistent=False)
+        
+    def forward(self, x, token_positions):
+        orig_dtype = x.dtype
+        device = x.device
+
+        if self.cos.device != device:
+            self.cos = self.cos.to(device)
+            self.sin = self.sin.to(device)
+
+        x_reshaped = rearrange(x, '... seq (half two) -&gt; ... seq half two', two=2)
+
+        positions = token_positions.long()
+        cos = self.cos[positions]
+        sin = self.sin[positions]
+
+        x1, x2 = x_reshaped[..., 0], x_reshaped[..., 1]
+        rotated_x1 = x1 * cos - x2 * sin
+        rotated_x2 = x1 * sin + x2 * cos
+
+        x_rotated = rearrange(
+            [rotated_x1, rotated_x2],
+            'two ... seq half -&gt; ... seq (half two)',
+            two=2
+        )
+        return x_rotated.to(orig_dtype)
+
+</code></pre>
+<p>adapter还是一个道理，而且这个都不用 <code>load_state_dict</code> 了。</p>
+<pre><code class="language-python">def run_rope(
+    d_k: int,
+    theta: float,
+    max_seq_len: int,
+    in_query_or_key: Float[Tensor, &quot; ... sequence_length d_k&quot;],
+    token_positions: Int[Tensor, &quot; ... sequence_length&quot;],
+) -&gt; Float[Tensor, &quot; ... sequence_length d_k&quot;]:
+    &quot;&quot;&quot;
+    Run RoPE for a given input tensor.
+
+    Args:
+        d_k (int): Embedding dimension size for the query or key tensor.
+        theta (float): RoPE parameter.
+        max_seq_len (int): Maximum sequence length to pre-cache if your implementation does that.
+        in_query_or_key (Float[Tensor, &quot;... sequence_length d_k&quot;]): Input tensor to run RoPE on.
+        token_positions (Int[Tensor, &quot;... sequence_length&quot;]): Tensor of shape (batch_size, sequence_length) with the token positions
+    Returns:
+        Float[Tensor, &quot; ... sequence_length d_k&quot;]: Tensor with RoPEd input.
+    &quot;&quot;&quot;
+    rope = model.RoPE(theta, d_k, max_seq_len)
+    with torch.no_grad():
+        output = rope(in_query_or_key, token_positions)
+    return output
+</code></pre>
+<h3 id="transformer-lm">Transformer LM</h3>
+<blockquote>
+<p>DEBUG: <code>load_state_dict</code></p>
+</blockquote>
+<p>在默认实现中，顺手加了一个权重绑定：结尾 <code>lm_head</code> 的权重和开头 <code>token_embedding</code> 的权重共享，仅仅转置。<br>
+结果这一个顺手，给我带来了比较大的麻烦：<br>
+在PyTorch中，Parameter如果同名，则它们指向同一个结构。导致我在加载时，前面加载了 <code>token_embedding</code> 的权重，后面加载的 <code>lm_head</code> 的权重覆盖了它。<br>
+这一结果是，在完成了 <code>load_state_dict</code> 之后，逐项比较 <code>transformer_model.named_parameters()</code> 和 <code>state_dict</code> ，发现有且仅有一项 <code>token_embedding</code> 不一致，最大的绝对数值大约差3.1左右。</p>
+<p>解决这一件事情之后，成功通过了这一部分的所有用例。<br>
+<img src="https://meredith2328.github.io/post-images/20260212230058.png" alt="" loading="lazy"></p>
+<pre><code class="language-python">class TransformerBlock(nn.Module):
+    def __init__(
+        self,
+        d_model: int,
+        num_heads: int,
+        d_ff: int,
+        theta: float = 10000.0,
+        max_seq_len: int = 2048,
+        device=None,
+        dtype=None
+    ):
+        super().__init__()
+        
+        self.norm1 = RMSNorm(d_model, device=device, dtype=dtype)
+        self.attention = MultiHeadSelfAttention(
+            d_model, num_heads, True, theta, max_seq_len, device, dtype
+        )
+        
+        self.norm2 = RMSNorm(d_model, device=device, dtype=dtype)
+        self.ffn = SwiGLU(d_model, d_ff, device=device, dtype=dtype)
+    
+    def forward(self, x, token_positions=None):
+        x = x + self.attention(self.norm1(x), token_positions)
+        x = x + self.ffn(self.norm2(x))
+        return x
+
+class TransformerLM(nn.Module):
+    &quot;&quot;&quot;
+    Transformer Language Model
+    &quot;&quot;&quot;
+    
+    def __init__(
+        self,
+        vocab_size: int,
+        context_length: int,
+        d_model: int,
+        num_heads: int,
+        d_ff: int,
+        num_layers: int,
+        theta: float = 10000.0,
+        device=None,
+        dtype=None
+    ):
+        super().__init__()
+        self.vocab_size = vocab_size
+        self.context_length = context_length
+        self.d_model = d_model
+        self.num_layers = num_layers
+        self.num_heads = num_heads
+        self.d_ff = d_ff
+        self.theta = theta
+        
+        # Token Embedding
+        self.token_embedding = Embedding(
+            vocab_size, 
+            d_model, 
+            device=device, 
+            dtype=dtype
+        )
+        
+        # Transformer Blocks - 注意变量名改为layers以匹配adapter
+        self.layers = nn.ModuleList([
+            TransformerBlock(
+                d_model=d_model,
+                num_heads=num_heads,
+                d_ff=d_ff,
+                theta=theta,
+                max_seq_len=context_length,
+                device=device,
+                dtype=dtype
+            )
+            for _ in range(num_layers)
+        ])
+        
+        # Final Layer Norm
+        self.final_norm = RMSNorm(
+            d_model, 
+            device=device, 
+            dtype=dtype
+        )
+        
+        # Output Projection (权重绑定)
+        self.lm_head = Linear(
+            d_model, 
+            vocab_size, 
+            device=device, 
+            dtype=dtype
+        )
+        
+        # 罪魁祸首, 不应该用权重绑定!
+        # self.lm_head.weight = self.token_embedding.weight
+    
+    def forward(
+        self,
+        token_ids: Int[Tensor, &quot;batch seq_len&quot;],
+        token_positions: Int[Tensor, &quot;batch seq_len&quot;] | None = None
+    ) -&gt; Float[Tensor, &quot;batch seq_len vocab_size&quot;]:
+        &quot;&quot;&quot;
+        前向传播
+        &quot;&quot;&quot;
+        x = self.token_embedding(token_ids)  # [batch, seq_len, d_model]
+        
+        for layer in self.layers:
+            x = layer(x, token_positions)
+        
+        x = self.final_norm(x)
+        logits = self.lm_head(x)  # [batch, seq_len, vocab_size]
+        
+        return logits
+        
+</code></pre>
+<pre><code class="language-python">def run_transformer_block(
+    d_model: int,
+    num_heads: int,
+    d_ff: int,
+    max_seq_len: int,
+    theta: float,
+    weights: dict[str, Tensor],
+    in_features: Float[Tensor, &quot; batch sequence_length d_model&quot;],
+) -&gt; Float[Tensor, &quot; batch sequence_length d_model&quot;]:
+    &quot;&quot;&quot;
+    Given the weights of a pre-norm Transformer block and input features,
+    return the output of running the Transformer block on the input features.
+
+    This function should use RoPE.
+    Depending on your implementation, you may simply need to pass the relevant args
+    to your TransformerBlock constructor, or you may need to initialize your own RoPE
+    class and pass that instead.
+
+    Args:
+        d_model (int): The dimensionality of the Transformer block input.
+        num_heads (int): Number of heads to use in multi-headed attention. `d_model` must be
+            evenly divisible by `num_heads`.
+        d_ff (int): Dimensionality of the feed-forward inner layer.
+        max_seq_len (int): Maximum sequence length to pre-cache if your implementation does that.
+        theta (float): RoPE parameter.
+        weights (dict[str, Tensor]):
+            State dict of our reference implementation.
+            The keys of this dictionary are:
+            - `attn.q_proj.weight`
+                The query projections for all `num_heads` attention heads.
+                Shape is (d_model, d_model).
+                The rows are ordered by matrices of shape (num_heads, d_k),
+                so `attn.q_proj.weight == torch.cat([q_heads.0.weight, ..., q_heads.N.weight], dim=0)`.
+            - `attn.k_proj.weight`
+                The key projections for all `num_heads` attention heads.
+                Shape is (d_model, d_model).
+                The rows are ordered by matrices of shape (num_heads, d_k),
+                so `attn.k_proj.weight == torch.cat([k_heads.0.weight, ..., k_heads.N.weight], dim=0)`.
+            - `attn.v_proj.weight`
+                The value projections for all `num_heads` attention heads.
+                Shape is (d_model, d_model).
+                The rows are ordered by matrices of shape (num_heads, d_v),
+                so `attn.v_proj.weight == torch.cat([v_heads.0.weight, ..., v_heads.N.weight], dim=0)`.
+            - `attn.output_proj.weight`
+                Weight of the multi-head self-attention output projection
+                Shape is (d_model, d_model).
+            - `ln1.weight`
+                Weights of affine transform for the first RMSNorm
+                applied in the transformer block.
+                Shape is (d_model,).
+            - `ffn.w1.weight`
+                Weight of the first linear transformation in the FFN.
+                Shape is (d_model, d_ff).
+            - `ffn.w2.weight`
+                Weight of the second linear transformation in the FFN.
+                Shape is (d_ff, d_model).
+            - `ffn.w3.weight`
+                Weight of the third linear transformation in the FFN.
+                Shape is (d_model, d_ff).
+            - `ln2.weight`
+                Weights of affine transform for the second RMSNorm
+                applied in the transformer block.
+                Shape is (d_model,).
+        in_features (Float[Tensor, &quot;batch sequence_length d_model&quot;]):
+            Tensor to run your implementation on.
+
+    Returns:
+        Float[Tensor, &quot;batch sequence_length d_model&quot;] Tensor with the output of
+        running the Transformer block on the input features while using RoPE.
+    &quot;&quot;&quot;
+
+    block = model.TransformerBlock(
+        d_model=d_model,
+        num_heads=num_heads,
+        d_ff=d_ff,
+        theta=theta,
+        max_seq_len=max_seq_len
+    )
+    
+    state_dict = {
+        'norm1.weight': weights['ln1.weight'],
+        'norm2.weight': weights['ln2.weight'],
+        'attention.W_q.weight': weights['attn.q_proj.weight'],
+        'attention.W_k.weight': weights['attn.k_proj.weight'],
+        'attention.W_v.weight': weights['attn.v_proj.weight'],
+        'attention.W_o.weight': weights['attn.output_proj.weight'],
+        'ffn.w1.weight': weights['ffn.w1.weight'],
+        'ffn.w2.weight': weights['ffn.w2.weight'],
+        'ffn.w3.weight': weights['ffn.w3.weight'],
+    }
+    
+    block.load_state_dict(state_dict)
+    
+    batch_size, seq_len = in_features.shape[0], in_features.shape[1]
+    token_positions = torch.arange(seq_len, device=in_features.device)
+    token_positions = token_positions.unsqueeze(0).expand(batch_size, -1)
+    
+    with torch.no_grad():
+        output = block(in_features, token_positions)
+    
+    return output
+
+
+def debug_transformer_weights(model, ref_weights, num_layers):
+    &quot;&quot;&quot;
+    独立调试函数：对比TransformerLM模型权重与参考权重
+    
+    Args:
+        model: 你的TransformerLM模型实例
+        ref_weights: 测试传进来的weights字典
+        num_layers: 层数
+    &quot;&quot;&quot;
+    print(&quot;\n&quot; + &quot;=&quot; * 80)
+    print(&quot;🔍 TRANSFORMER LM 权重调试&quot;)
+    print(&quot;=&quot; * 80)
+    
+    total_mismatches = 0
+    
+    # 1. Token Embedding
+    print(&quot;\n【1. Token Embedding】&quot;)
+    print(&quot;-&quot; * 50)
+    model_w = model.token_embedding.weight
+    ref_w = ref_weights['token_embeddings.weight']
+    print(f&quot;  模型: shape {tuple(model_w.shape)}&quot;)
+    print(f&quot;  参考: shape {tuple(ref_w.shape)}&quot;)
+    if model_w.shape == ref_w.shape:
+        diff = (model_w - ref_w).abs().max().item()
+        print(f&quot;  ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        if diff &lt; 1e-5:
+            print(f&quot;  ✅ 数值一致&quot;)
+        else:
+            print(f&quot;  ⚠️ 数值差异较大&quot;)
+            total_mismatches += 1
+    else:
+        print(f&quot;  ❌ 形状不匹配！&quot;)
+        total_mismatches += 1
+    
+    # 2. 遍历每一层
+    for layer_idx in range(num_layers):
+        print(f&quot;\n{'='*60}&quot;)
+        print(f&quot;【2.{layer_idx} Layer {layer_idx}】&quot;)
+        print(f&quot;{'='*60}&quot;)
+        
+        layer = model.layers[layer_idx]
+        prefix = f'layers.{layer_idx}'
+        
+        # ----- Attention 权重 -----
+        print(&quot;\n  📍 MultiHeadSelfAttention&quot;)
+        
+        # Q
+        model_q = layer.attention.W_q.weight
+        ref_q = ref_weights[f'{prefix}.attn.q_proj.weight']
+        print(f&quot;\n    [Q]&quot;)
+        print(f&quot;      模型: {tuple(model_q.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_q.shape)}&quot;)
+        if model_q.shape == ref_q.shape:
+            diff = (model_q - ref_q).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_q.shape == ref_q.T.shape:
+            diff = (model_q - ref_q.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配 (模型{model_q.shape} vs 参考{ref_q.shape})&quot;)
+            total_mismatches += 1
+        
+        # K
+        model_k = layer.attention.W_k.weight
+        ref_k = ref_weights[f'{prefix}.attn.k_proj.weight']
+        print(f&quot;\n    [K]&quot;)
+        print(f&quot;      模型: {tuple(model_k.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_k.shape)}&quot;)
+        if model_k.shape == ref_k.shape:
+            diff = (model_k - ref_k).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_k.shape == ref_k.T.shape:
+            diff = (model_k - ref_k.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+        
+        # V
+        model_v = layer.attention.W_v.weight
+        ref_v = ref_weights[f'{prefix}.attn.v_proj.weight']
+        print(f&quot;\n    [V]&quot;)
+        print(f&quot;      模型: {tuple(model_v.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_v.shape)}&quot;)
+        if model_v.shape == ref_v.shape:
+            diff = (model_v - ref_v).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_v.shape == ref_v.T.shape:
+            diff = (model_v - ref_v.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+        
+        # O
+        model_o = layer.attention.W_o.weight
+        ref_o = ref_weights[f'{prefix}.attn.output_proj.weight']
+        print(f&quot;\n    [O]&quot;)
+        print(f&quot;      模型: {tuple(model_o.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_o.shape)}&quot;)
+        if model_o.shape == ref_o.shape:
+            diff = (model_o - ref_o).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_o.shape == ref_o.T.shape:
+            diff = (model_o - ref_o.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+        
+        # ----- FFN 权重 -----
+        print(&quot;\n  📍 SwiGLU&quot;)
+        
+        # w1
+        model_w1 = layer.ffn.w1.weight
+        ref_w1 = ref_weights[f'{prefix}.ffn.w1.weight']
+        print(f&quot;\n    [w1]&quot;)
+        print(f&quot;      模型: {tuple(model_w1.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_w1.shape)}&quot;)
+        if model_w1.shape == ref_w1.shape:
+            diff = (model_w1 - ref_w1).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_w1.shape == ref_w1.T.shape:
+            diff = (model_w1 - ref_w1.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配 (期望 {ref_w1.shape} 或 {ref_w1.T.shape})&quot;)
+            total_mismatches += 1
+        
+        # w2
+        model_w2 = layer.ffn.w2.weight
+        ref_w2 = ref_weights[f'{prefix}.ffn.w2.weight']
+        print(f&quot;\n    [w2]&quot;)
+        print(f&quot;      模型: {tuple(model_w2.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_w2.shape)}&quot;)
+        if model_w2.shape == ref_w2.shape:
+            diff = (model_w2 - ref_w2).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_w2.shape == ref_w2.T.shape:
+            diff = (model_w2 - ref_w2.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+        
+        # w3
+        model_w3 = layer.ffn.w3.weight
+        ref_w3 = ref_weights[f'{prefix}.ffn.w3.weight']
+        print(f&quot;\n    [w3]&quot;)
+        print(f&quot;      模型: {tuple(model_w3.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_w3.shape)}&quot;)
+        if model_w3.shape == ref_w3.shape:
+            diff = (model_w3 - ref_w3).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        elif model_w3.shape == ref_w3.T.shape:
+            diff = (model_w3 - ref_w3.T).abs().max().item()
+            print(f&quot;      🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+            total_mismatches += 1
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+        
+        # ----- RMSNorm -----
+        print(&quot;\n  📍 RMSNorm&quot;)
+        
+        # norm1
+        model_norm1 = layer.norm1.weight
+        ref_norm1 = ref_weights[f'{prefix}.ln1.weight']
+        print(f&quot;\n    [norm1]&quot;)
+        print(f&quot;      模型: {tuple(model_norm1.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_norm1.shape)}&quot;)
+        if model_norm1.shape == ref_norm1.shape:
+            diff = (model_norm1 - ref_norm1).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+        
+        # norm2
+        model_norm2 = layer.norm2.weight
+        ref_norm2 = ref_weights[f'{prefix}.ln2.weight']
+        print(f&quot;\n    [norm2]&quot;)
+        print(f&quot;      模型: {tuple(model_norm2.shape)}&quot;)
+        print(f&quot;      参考: {tuple(ref_norm2.shape)}&quot;)
+        if model_norm2.shape == ref_norm2.shape:
+            diff = (model_norm2 - ref_norm2).abs().max().item()
+            print(f&quot;      ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+        else:
+            print(f&quot;      ❌ 形状不匹配&quot;)
+            total_mismatches += 1
+    
+    # 3. Final Layer Norm
+    print(f&quot;\n{'='*60}&quot;)
+    print(&quot;【3. Final Layer Norm】&quot;)
+    print(f&quot;{'='*60}&quot;)
+    model_final = model.final_norm.weight
+    ref_final = ref_weights['ln_final.weight']
+    print(f&quot;  模型: {tuple(model_final.shape)}&quot;)
+    print(f&quot;  参考: {tuple(ref_final.shape)}&quot;)
+    if model_final.shape == ref_final.shape:
+        diff = (model_final - ref_final).abs().max().item()
+        print(f&quot;  ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+    else:
+        print(f&quot;  ❌ 形状不匹配&quot;)
+        total_mismatches += 1
+    
+    # 4. LM Head
+    print(f&quot;\n{'='*60}&quot;)
+    print(&quot;【4. LM Head】&quot;)
+    print(f&quot;{'='*60}&quot;)
+    model_head = model.lm_head.weight
+    ref_head = ref_weights['lm_head.weight']
+    print(f&quot;  模型: {tuple(model_head.shape)}&quot;)
+    print(f&quot;  参考: {tuple(ref_head.shape)}&quot;)
+    if model_head.shape == ref_head.shape:
+        diff = (model_head - ref_head).abs().max().item()
+        print(f&quot;  ✅ 形状匹配 | 最大差异: {diff:.6f}&quot;)
+    elif model_head.shape == ref_head.T.shape:
+        diff = (model_head - ref_head.T).abs().max().item()
+        print(f&quot;  🔄 需要转置 | 转置后差异: {diff:.6f}&quot;)
+        total_mismatches += 1
+    else:
+        print(f&quot;  ❌ 形状不匹配&quot;)
+        total_mismatches += 1
+    
+    # 5. 总结
+    print(&quot;\n&quot; + &quot;=&quot; * 80)
+    print(&quot;📊 调试总结&quot;)
+    print(&quot;=&quot; * 80)
+    if total_mismatches == 0:
+        print(&quot;✅ 所有权重形状匹配！&quot;)
+        print(&quot;   如果输出仍然不对，检查:&quot;)
+        print(&quot;   - RoPE是否生效&quot;)
+        print(&quot;   - 因果掩码是否正确&quot;)
+        print(&quot;   - forward是否传递了token_positions&quot;)
+    else:
+        print(f&quot;❌ 发现 {total_mismatches} 处形状不匹配&quot;)
+        print(&quot;   需要根据上述 🔄 标记添加 .T 转置&quot;)
+    
+    print(&quot;\n&quot; + &quot;=&quot; * 80)
+
+def run_transformer_lm(
+    vocab_size: int,
+    context_length: int,
+    d_model: int,
+    num_layers: int,
+    num_heads: int,
+    d_ff: int,
+    rope_theta: float,
+    weights: dict[str, Tensor],
+    in_indices: Int[Tensor, &quot; batch_size sequence_length&quot;],
+) -&gt; Float[Tensor, &quot; batch_size sequence_length vocab_size&quot;]:
+    &quot;&quot;&quot;Given the weights of a Transformer language model and input indices,
+    return the output of running a forward pass on the input indices.
+
+    This function should use RoPE.
+
+    Args:
+        vocab_size (int): The number of unique items in the output vocabulary to be predicted.
+        context_length (int): The maximum number of tokens to process at once.
+        d_model (int): The dimensionality of the model embeddings and sublayer outputs.
+        num_layers (int): The number of Transformer layers to use.
+        num_heads (int): Number of heads to use in multi-headed attention. `d_model` must be
+            evenly divisible by `num_heads`.
+        d_ff (int): Dimensionality of the feed-forward inner layer (section 3.3).
+        rope_theta (float): The RoPE $\Theta$ parameter.
+        weights (dict[str, Tensor]):
+            State dict of our reference implementation. {num_layers} refers to an
+            integer between `0` and `num_layers - 1` (the layer index).
+            The keys of this dictionary are:
+            - `token_embeddings.weight`
+                Token embedding matrix. Shape is (vocab_size, d_model).
+            - `layers.{num_layers}.attn.q_proj.weight`
+                The query projections for all `num_heads` attention heads.
+                Shape is (num_heads * (d_model / num_heads), d_model).
+                The rows are ordered by matrices of shape (num_heads, d_k),
+                so `attn.q_proj.weight == torch.cat([q_heads.0.weight, ..., q_heads.N.weight], dim=0)`.
+            - `layers.{num_layers}.attn.k_proj.weight`
+                The key projections for all `num_heads` attention heads.
+                Shape is (num_heads * (d_model / num_heads), d_model).
+                The rows are ordered by matrices of shape (num_heads, d_k),
+                so `attn.k_proj.weight == torch.cat([k_heads.0.weight, ..., k_heads.N.weight], dim=0)`.
+            - `layers.{num_layers}.attn.v_proj.weight`
+                The value projections for all `num_heads` attention heads.
+                Shape is (num_heads * (d_model / num_heads), d_model).
+                The rows are ordered by matrices of shape (num_heads, d_v),
+                so `attn.v_proj.weight == torch.cat([v_heads.0.weight, ..., v_heads.N.weight], dim=0)`.
+            - `layers.{num_layers}.attn.output_proj.weight`
+                Weight of the multi-head self-attention output projection
+                Shape is ((d_model / num_heads) * num_heads, d_model).
+            - `layers.{num_layers}.ln1.weight`
+                Weights of affine transform for the first RMSNorm
+                applied in the transformer block.
+                Shape is (d_model,).
+            - `layers.{num_layers}.ffn.w1.weight`
+                Weight of the first linear transformation in the FFN.
+                Shape is (d_model, d_ff).
+            - `layers.{num_layers}.ffn.w2.weight`
+                Weight of the second linear transformation in the FFN.
+                Shape is (d_ff, d_model).
+            - `layers.{num_layers}.ffn.w3.weight`
+                Weight of the third linear transformation in the FFN.
+                Shape is (d_model, d_ff).
+            - `layers.{num_layers}.ln2.weight`
+                Weights of affine transform for the second RMSNorm
+                applied in the transformer block.
+                Shape is (d_model,).
+            - `ln_final.weight`
+                Weights of affine transform for RMSNorm applied to the output of the final transformer block.
+                Shape is (d_model, ).
+            - `lm_head.weight`
+                Weights of the language model output embedding.
+                Shape is (vocab_size, d_model).
+        in_indices (Int[Tensor, &quot;batch_size sequence_length&quot;]) Tensor with input indices to run the language model on. Shape is (batch_size, sequence_length), where
+            `sequence_length` is at most `context_length`.
+
+    Returns:
+        Float[Tensor, &quot;batch_size sequence_length vocab_size&quot;]: Tensor with the predicted unnormalized
+        next-word distribution for each token.
+    &quot;&quot;&quot;
+    transformer_model = model.TransformerLM(
+        vocab_size=vocab_size,
+        context_length=context_length,
+        d_model=d_model,
+        num_heads=num_heads,
+        d_ff=d_ff,
+        num_layers=num_layers,
+        theta=rope_theta
+    )
+    
+    state_dict = {}
+    
+    # Token Embedding
+    state_dict['token_embedding.weight'] = weights['token_embeddings.weight']
+    
+    # Transformer Block
+    for layer_idx in range(num_layers):
+        prefix = f'layers.{layer_idx}'
+        
+        # attention
+        state_dict[f'layers.{layer_idx}.attention.W_q.weight'] = weights[f'{prefix}.attn.q_proj.weight']
+        state_dict[f'layers.{layer_idx}.attention.W_k.weight'] = weights[f'{prefix}.attn.k_proj.weight']
+        state_dict[f'layers.{layer_idx}.attention.W_v.weight'] = weights[f'{prefix}.attn.v_proj.weight']
+        state_dict[f'layers.{layer_idx}.attention.W_o.weight'] = weights[f'{prefix}.attn.output_proj.weight']
+        
+        # FFN
+        w1_weight = weights[f'{prefix}.ffn.w1.weight']  # (d_ff, d_model)
+        state_dict[f'layers.{layer_idx}.ffn.w1.weight'] = w1_weight  # 转置成 (d_model, d_ff)
+        
+        w2_weight = weights[f'{prefix}.ffn.w2.weight']  # (d_model, d_ff)
+        state_dict[f'layers.{layer_idx}.ffn.w2.weight'] = w2_weight  # 转置成 (d_ff, d_model)
+        
+        w3_weight = weights[f'{prefix}.ffn.w3.weight']  # (d_ff, d_model)
+        state_dict[f'layers.{layer_idx}.ffn.w3.weight'] = w3_weight  # 转置成 (d_model, d_ff)
+        
+        # RMSNorm
+        state_dict[f'layers.{layer_idx}.norm1.weight'] = weights[f'{prefix}.ln1.weight']
+        state_dict[f'layers.{layer_idx}.norm2.weight'] = weights[f'{prefix}.ln2.weight']
+    
+    state_dict['final_norm.weight'] = weights['ln_final.weight']
+
+    lm_head_weight = weights['lm_head.weight']
+    state_dict['lm_head.weight'] = lm_head_weight
+    
+    # 加载权重
+    transformer_model.load_state_dict(state_dict, strict=False)
+    # debug_transformer_weights(transformer_model, weights, num_layers) # DEBUG2
+    
+    # DEBUG1: 对比state_dict和named_parameters
+    # for name, _ in transformer_model.named_parameters():
+    #     if name in state_dict:
+    #         print(f&quot;✅ {name}&quot;)
+    #     else:
+    #         print(f&quot;❌ {name} 不在state_dict中&quot;)
+
+    # 生成位置索引
+    batch_size, seq_len = in_indices.shape
+    device = in_indices.device
+    token_positions = torch.arange(seq_len, device=device)
+    token_positions = token_positions.unsqueeze(0).expand(batch_size, -1)
+    
+    # 前向传播
+    with torch.no_grad():
+        logits = transformer_model(in_indices, token_positions)
+    
+    return logits
+</code></pre>
+<h2 id="2-bpe">2 BPE</h2>
+<blockquote>
+<p>我们要做什么？实现基于BPE算法的分词器。</p>
+</blockquote>
+<p>2.1 The Unicode Standard<br>
+介绍每个字符的unicode数字转换方法。在python中是 <code>ord</code> 和 <code>chr</code> 。</p>
+<p>2.2 Unicode Encodings<br>
+介绍 <code>.encode</code> 和 <code>.decode</code> 方法，可以将字符串和unicode byte序列进行互相转换。</p>
+<p>2.3 Subword Tokenization<br>
+介绍子词分词。</p>
+<p>2.4 BPE Tokenizer Training<br>
+以简单的例子，介绍BPE Tokenizer的训练。（最终实现效果与 <code>tiktoken</code> 对齐）</p>
+<p>2.5 Experimenting with BPE Tokenizer Training<br>
+在TinyStories数据集上进行BPE Tokenizer训练。</p>
+<p>2.6 BPE Tokenizer: Encoding and Decoding<br>
+实现BPE Tokenizer的编码和解码。</p>
+<p>2.7 Experiments<br>
+一些用于提升理解的问题和实验。</p>
+<h3 id="阅读知识部分">阅读知识部分</h3>
+<p>通过 <code>ord</code> 将Unicode转为int ，<code>chr</code> 将int转为Unicode。<br>
+可见，<code>chr</code>的返回值得到一个包含了相关字符的Unicode字符串。<br>
+但是，它在print中会自动进行一层解析，例如空字符0。</p>
+<pre><code class="language-python">&gt;&gt;&gt; ord('牛')
+29275
+&gt;&gt;&gt; chr(29275)
+'牛'
+
+&gt;&gt;&gt; chr(0)
+'\x00'
+&gt;&gt;&gt; print(chr(0))
+
+&gt;&gt;&gt; &quot;this is a test&quot; + chr(0) + &quot;string&quot;
+'this is a test\x00string'
+&gt;&gt;&gt; print(&quot;this is a test&quot; + chr(0) + &quot;string&quot;)
+this is a teststring
+</code></pre>
+<p>不直接使用Unicode：词汇表太大，太稀疏，而且需要处理词汇表外的词。<br>
+(原始字符串) -<code>.encode(&quot;utf-8&quot;)</code> -&gt; (bytes) - <code>list()</code> -&gt; (list of bytes)</p>
+<p>连着几个byte表示一个Unicode字符，那逐byte转utf-8肯定有问题了。<br>
+<s>玩个meme</s></p>
+<pre><code>&gt;&gt;&gt; decode_utf8_bytes_to_str_wrong(&quot;锟斤拷&quot;.encode(&quot;utf-8&quot;))    
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 2, in decode_utf8_bytes_to_str_wrong     
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xe9 in position 0: unexpected end of data
+</code></pre>
+<p>参考 <a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8 - Wikipedia</a> ，每个byte的开始位是有要求的。<br>
+<img src="https://meredith2328.github.io/post-images/20260203183920.png" alt="" loading="lazy"><br>
+In UTF-8, two-byte sequences must match the pattern:</p>
+<pre><code>110xxxxx 10xxxxxx
+</code></pre>
+<p>所以可以构造例子 <code>[11111111, 11111111]</code> 不满足条件：</p>
+<pre><code>&gt;&gt;&gt; bytes([255,255]).decode(&quot;utf-8&quot;)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+</code></pre>
+<p>（放空）<br>
+我们刚刚做的事情是<strong>把原始的字符串转化成了连续的byte</strong>：<code>.encode(&quot;utf-8&quot;)</code>。<br>
+现在文章的表示变得相当长，训练模型需要太多的计算。因此需要压缩。<br>
+压缩的方法是，让词汇表的数量增加（256），添加子词，实现对整个序列的压缩。构造词汇表的过程称作“训练BPE tokenizer”。</p>
+<p>pre-tokenize：例如使用正则表达式，把空格和后面的词汇连在一起。<br>
+使用 <code>re.finditer</code> 。<br>
+For example, the word 'text' might be a pre-token that appears 10 times. In this case, when we count how often the characters ‘t’ and ‘e’ appear next to each other, we will see that the word ‘text’ has ‘t’ and ‘e’ adjacent and we can increment their count by 10 instead of looking through the corpus. Since we’re training a byte-level BPE model, each pre-token is represented as a sequence of UTF-8 bytes.</p>
+<pre><code>&gt;&gt;&gt; PAT = r&quot;&quot;&quot;'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+&quot;&quot;&quot;
+&gt;&gt;&gt; # requires `regex` package
+&gt;&gt;&gt; import regex as re
+&gt;&gt;&gt; re.findall(PAT, &quot;some text that i'll pre-tokenize&quot;)
+['some', ' text', ' that', ' i', &quot;'ll&quot;, ' pre', '-', 'tokenize']
+</code></pre>
+<p>BPE包括三个步骤：</p>
+<ul>
+<li>Vocabulary Initialization</li>
+<li>Pre-tokenization</li>
+<li>Compute BPE merges（使用频率最高且字典序最大的）<br>
+频率：`dict[tuple[bytes], int]</li>
+</ul>
+<p>eg. pre-token的依次合并：<br>
+<code>{low: 5, lower: 2, widest: 3, newest: 6}</code><br>
+<code>{(l,o,w): 5, (l,o,w,e,r): 2, (w,i,d,e,st): 3, (n,e,w,e,st): 6}</code><br>
+<code>{(l,o,w): 5, (l,o,w,e,r): 2, (w,i,d,est): 3, (n,e,w,est): 6}</code><br>
+Continuing this, the sequence of merges we get in the end will be <code>['s t', 'e st', 'o w', 'l ow', 'w est', 'n e','ne west', 'w i', 'wi d', 'wid est', 'low e', 'lowe r']</code> 。</p>
+<p>此时词汇表从一开始的 <code>[&lt;|endoftext|&gt;, [...256 BYTE CHARS]</code> 变成：<br>
+<code>[&lt;|endoftext|&gt;, [...256 BYTE CHARS], st, est, ow, low, west, ne]</code></p>
+<h3 id="24-bpe-tokenizer-training的naive实现">2.4 BPE Tokenizer Training的naive实现</h3>
+<p>规划模块+逐个模块实现并检查.</p>
+<p><img src="https://meredith2328.github.io/post-images/20260206150752.png" alt="" loading="lazy"><br>
+对于这样一个问题，将文本文件读入、得到一个BPE tokenizer，<br>
+需要以下几部分：<br>
+(1) 读入文本，得到文本段（chunk）。<br>
+(2) GPT-2的pre-token，<code>re.finditer</code> ，得到一小片被pre-token过的文本。<br>
+(3) 两个数据结构：词汇表和频率表。对这样一小片文本，遍历每个字符，添加更新频率表 <code>dict[tuple[bytes], int]</code> 。<br>
+(4) 在频率表中取出频率最高的（通过 <code>max</code> ），合并 <code>tuple[bytes]</code> 为新的 <code>typle[bytes]</code> 。更新词汇表和频率表。</p>
+<p><img src="https://meredith2328.github.io/post-images/20260206235808.png" alt="" loading="lazy"><br>
+那么初始实现又慢又错，包括：</p>
+<ol>
+<li><strong>字节级别 vs 字符串级别</strong>：你目前用字符串处理，但要求是字节级别的BPE</li>
+<li><strong>GPT-2正则表达式</strong>：需要特殊处理文本分割</li>
+<li><strong>数据结构</strong>：vocab应该是 <code>dict[int, bytes]</code> 而不是 <code>dict[int, str]</code><br>
+错在没有搞懂bytes和字符的区别，慢在没有做优化（1.5s）。</li>
+</ol>
+<p>首先搞懂一下字节级别BPE。<a href="https://fancyerii.github.io/2025/09/07/bpe-trainer-1/">动手实现和优化BPE Tokenizer的训练——第1部分：最简单实现 - 李理的博客</a></p>
+<blockquote>
+<p>沉下心来，别着急，慢慢来。<br>
+仔细读test，把自己的函数行为和test搞成完全一致。</p>
+</blockquote>
+<p>之后仔细读了一下，发现一是byte没有存对，二是split应该先按照特殊token，再使用GPT-2的分词。两个问题都解决掉就ok了。</p>
+<h3 id="27-experiments的回答">2.7 Experiments的回答</h3>
+<blockquote>
+<p>(a) 压缩比的含义</p>
+</blockquote>
+<p><strong>压缩比 = 原始文本字节数 / 产生的token数量</strong><br>
+不同tokenizer的压缩比差异：</p>
+<ul>
+<li><strong>TinyStories tokenizer (10K vocab)</strong>：针对儿童故事训练，对简单词汇压缩比较好</li>
+<li><strong>OpenWebText tokenizer (32K vocab)</strong>：更大词表，能识别更多复杂词汇和短语<br>
+通常词表越大，压缩比越高（每个token代表更多字节），因为能匹配更长的常见词/子词单元。</li>
+</ul>
+<blockquote>
+<p>(b) 用TinyStories tokenizer处理OpenWebText</p>
+</blockquote>
+<p><strong>会发生什么？</strong></p>
+<ul>
+<li><strong>压缩比下降</strong>：很多OpenWebText中的词汇（技术术语、复杂词汇、特殊符号）在TinyStories词表中不存在，会被切成更小的子词单元</li>
+<li><strong>定性描述</strong>：文本会被&quot;过度切分&quot;，例如&quot;neural network&quot;可能变成 <code>[&quot;neural&quot;, &quot;▁network&quot;]</code> 或者更碎，导致token序列变长</li>
+<li><strong>本质</strong>：这是<strong>领域不匹配</strong>问题——tokenizer没见过足够多的该领域词汇</li>
+</ul>
+<p>下面的内容来自我实际的训练日志：</p>
+<pre><code>Step 1/3: train BPE tokenizer
+BPE training configuration:
+  input_path: data/TinyStoriesV2-GPT4-train.txt
+  vocab_size: 10000
+  special_tokens: ['&lt;|endoftext|&gt;']
+  progress_every: 100
+  heartbeat_seconds: 15
+  vocab_out: tokenizer/tinystories_bpe_vocab.pkl
+  merges_out: tokenizer/tinystories_bpe_merges.pkl
+[progress] read_corpus done in 12.2s, chars=2226845268
+Saved tokenizer artifacts:
+  vocab_path: tokenizer/tinystories_bpe_vocab.pkl
+  merges_path: tokenizer/tinystories_bpe_merges.pkl
+  longest_token: b' accomplishment'
+  longest_token_len: 15
+  total_elapsed: 11m42.2s
+</code></pre>
+<p>估算一下，总计 <code>2226845268 bytes</code> ，训练BPE tokenizer总计11m42.2s， 大约就是 <code>2226845268/702.2=3171240.76901 bytes/sec</code> ，即大约3MB/s。<br>
+这个表现我觉得挺好了。根据 <a href="https://github.com/openai/tiktoken">openai/tiktoken: tiktoken is a fast BPE tokeniser for use with OpenAI's models.</a> 的说明，他们的tiktoken在同样单线程的情况下目测大约是6MB/s，在只使用了有限数量的工程优化的前提下达成这样的效果挺振奋人心的。<br>
+尽管许多工程优化的实现细节并不是完全我自己一行一行敲的 <s>甚至low level的大部分实现几乎都不是自己一行一行敲的</s> ，仍然收获良多。</p>
+<figure data-type="image" tabindex="4"><img src="https://meredith2328.github.io/post-images/20260310093341.png" alt="" loading="lazy"></figure>
+<blockquote>
+<p>(c) tokenizer吞吐量估算</p>
+</blockquote>
+<p><strong>估算逻辑</strong>：</p>
+<ol>
+<li>先测量tokenizer处理一定量文本的速度（bytes/sec）</li>
+<li>用这个速率计算处理825GB所需时间<br>
+例如：如果tokenizer速度是50 MB/sec，则825GB需要：<br>
+<code>825 × 1024 MB ÷ 50 MB/sec ≈ 16,896秒 ≈ 4.7小时</code><br>
+实际速度取决于：</li>
+</ol>
+<ul>
+<li>tokenizer实现（BPE算法效率）</li>
+<li>并行化程度</li>
+<li>硬件（CPU/GPU）</li>
+</ul>
+<p>其实这个题是要我估算，我一开始没反应过来。 <s>感谢GPT，差点真去训了。</s><br>
+825GB按我的3MB/s大约就是281600s，约为78小时。 <s>差点浪费78小时的算力。</s></p>
+<blockquote>
+<p>(d) 为什么用uint16？</p>
+</blockquote>
+<p>uint16 (无符号16位整数) 是合适选择因为：</p>
+<ul>
+<li>取值范围够用：<strong>uint16范围 0-65535</strong>，覆盖vocab_size (10K和32K都在这个范围内)</li>
+<li>存储效率高：每个token只占2字节，比int64 (8字节) 节省75%空间</li>
+<li>内存友好：处理大规模数据集时，内存占用更小，加载更快<br>
+对比：</li>
+<li>uint8 (0-255) 不够用（最大256 &lt; 32K）</li>
+<li>uint32 浪费空间（能存40亿，但只需要3.2万）</li>
+<li>uint16 刚刚好</li>
+</ul>
+<h2 id="1-环境配置">1 环境配置</h2>
+<p><a href="https://docs.astral.sh/uv/guides/projects/#viewing-your-version">Working on projects | uv</a></p>
+<blockquote>
+<p>整个作业做完后感慨一下，uv真的是非常好用的工具。<br>
+我前后需要切换环境版本，uv帮我省去了相当多的环境配置的麻烦。</p>
+</blockquote>
+<p>环境为 <code>cs336</code> ，Python=3.12，在WSL中。</p>
+<pre><code>uv run -- flask run -p 3000
+- `uv run`：uv 的命令
+- `--`：分隔符，表示 &quot;uv 的参数到此结束&quot;
+- `flask run -p 3000`：这些参数全部传递给 `flask` 命令
+</code></pre>
+<p><a href="https://docs.pytorch.org/docs/stable/nn.html#containers">torch.nn — PyTorch 2.10 documentation</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#4-training-a-transformer-lm">4 Training a Transformer LM</a>
+<ul>
+<li><a href="#crossentropyloss">CrossEntropyLoss</a></li>
+<li><a href="#sgd">SGD</a></li>
+<li><a href="#adamw">AdamW</a></li>
+</ul>
+</li>
+<li><a href="#3-transformer-language-model-architecture">3 Transformer Language Model Architecture</a>
+<ul>
+<li><a href="#%E7%9F%A5%E8%AF%86resource-accounting">知识：Resource accounting</a></li>
+<li><a href="#linear">Linear</a></li>
+<li><a href="#embedding">embedding</a></li>
+<li><a href="#rmsnorm">RMSNorm</a></li>
+<li><a href="#rope">RoPE</a></li>
+<li><a href="#transformer-lm">Transformer LM</a></li>
+</ul>
+</li>
+<li><a href="#2-bpe">2 BPE</a>
+<ul>
+<li><a href="#%E9%98%85%E8%AF%BB%E7%9F%A5%E8%AF%86%E9%83%A8%E5%88%86">阅读知识部分</a></li>
+<li><a href="#24-bpe-tokenizer-training%E7%9A%84naive%E5%AE%9E%E7%8E%B0">2.4 BPE Tokenizer Training的naive实现</a></li>
+<li><a href="#27-experiments%E7%9A%84%E5%9B%9E%E7%AD%94">2.7 Experiments的回答</a></li>
+</ul>
+</li>
+<li><a href="#1-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE">1 环境配置</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/linux-command/">
+              <h3 class="post-title">
+                值得顺便掌握一下的那些linux指令
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('https://discus.skk.moe/discus/') {
+  options.api = 'https://discus.skk.moe/discus/'
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

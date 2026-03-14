@@ -1,0 +1,277 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>用einops包替换掉PyTorch的大部分矩阵变换函数 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1773480611148">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="用einops包替换掉PyTorch的大部分矩阵变换函数 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="只是 rearrange ，reduce ， repeat 和 einsum 这四个函数而已。
+但真的很好用。
+
+爱因斯坦求和标记：Einops tutorial, part 1: basics - Einops
+
+edit time: 2..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1773480611148" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              用einops包替换掉PyTorch的大部分矩阵变换函数
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-02-09
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>只是 <code>rearrange</code> ，<code>reduce</code> ， <code>repeat</code> 和 <code>einsum</code> 这四个函数而已。<br>
+但真的很好用。</p>
+<!-- more -->
+<p>爱因斯坦求和标记：<a href="https://einops.rocks/1-einops-basics/">Einops tutorial, part 1: basics - Einops</a></p>
+<blockquote>
+<p>edit time: 2026-02-09 22:36:31</p>
+</blockquote>
+<h2 id="rearrange-reduce-repeat">rearrange, reduce, repeat</h2>
+<p><code>rearrange</code> 函数：以更可读的方式重排、合并或拆分维度。<br>
+在这种计算机视觉的上下文里还挺合适的，分别是batch channel height width这样的实际语义，做调整时保持语义会很有利于阅读。</p>
+<pre><code class="language-python"># y = x.transpose(0, 2, 3, 1)
+y = rearrange(x, 'b c h w -&gt; b h w c')
+</code></pre>
+<p><code>reduce</code> 函数：这个真的很好读，一看就是对channel维度做了mean操作。</p>
+<pre><code class="language-python"># x.mean(-1)
+reduce(x, 'b h w c -&gt; b h w', 'mean')
+</code></pre>
+<p><code>repeat</code> 函数：同理，一看就是在中间这个地方重复了5次。</p>
+<pre><code class="language-python">repeat(ims[0], &quot;h w c -&gt; h 5 w c&quot;).shape
+</code></pre>
+<h2 id="einsum">einsum</h2>
+<p>(1)那么接下来可以把 <code>einsum</code> 用于矩阵乘法。</p>
+<pre><code>Y = D @ A.T # basic implementation
+Y = einsum(D, A, &quot;... d_in, d_out d_in -&gt; ... d_out&quot;)
+# better in reading
+</code></pre>
+<p>(2)当然也可以用于广播操作。<br>
+We have a batch of images, and for each image we want to generate 10 dimmed versions based on some scaling factor:</p>
+<pre><code class="language-python">images = torch.randn(64, 128, 128, 3) # (batch, height, width, channel)
+dim_by = torch.linspace(start=0.0, end=1.0, steps=10)
+## Reshape and multiply
+dim_value = rearrange(dim_by, &quot;dim_value -&gt; 1 dim_value 1 1 1&quot;)
+images_rearr = rearrange(images, &quot;b height width channel -&gt; b 1 height width channel&quot;)
+dimmed_images = images_rearr * dim_value
+
+## Or:
+dimmed_images = einsum(
+	images, dim_by,
+	&quot;b h w c, dim_value -&gt; b dim_value h w c&quot;
+)
+</code></pre>
+<p>(3) 假如需要对一批图片的中间两个维度施加一个线性变换（channel独立）。<br>
+注意：<strong>需要独立的维度一般放在前面。</strong></p>
+<pre><code class="language-python">channels_last = torch.randn(64, 32, 32, 3) # (batch, height, width, channel)
+B = torch.randn(32*32, 32*32)
+
+channels_first = rearrange(
+	channels_last,
+	&quot;b h w c -&gt; b c (h w)&quot;
+)
+channels_first_transformed = einsum(
+	channels_first, B,
+	&quot;b c pixel_in, pixel_out pixel_in -&gt; b c pixel_out&quot;
+)
+channels_last_transformed = rearrange(
+	channels_first_transformed,
+	&quot;b c (h w) -&gt; b h w c&quot;
+)
+</code></pre>
+<p>没有了。以上就是基础用法。去实践吧。这个包真的意料之外地好用。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#rearrange-reduce-repeat">rearrange, reduce, repeat</a></li>
+<li><a href="#einsum">einsum</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://meredith2328.github.io/post/algorithm-3/">
+              <h3 class="post-title">
+                【数据结构与算法3】基础数据结构与算法模板整理
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+
+          
+            <link rel="stylesheet" href="https://unpkg.com/disqusjs@1.1/dist/disqusjs.css">
+<script src="https://unpkg.com/disqusjs@1.1/dist/disqus.js"></script>
+
+<div id="disqus_thread"></div>
+
+<script>
+
+var options = {
+  shortname: '',
+  apikey: '11aMFw7o4nfZV4ivvVBRfOl1G5HWJFhJgYjARVM958zMmZPbEmX8eyhhjf0tvZ18',
+}
+if ('https://discus.skk.moe/discus/') {
+  options.api = 'https://discus.skk.moe/discus/'
+}
+var dsqjs = new DisqusJS(options)
+
+</script>
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
