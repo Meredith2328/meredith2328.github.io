@@ -1,0 +1,374 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pull Request 6949 | 十派的玩具箱</title>
+<link rel="shortcut icon" href="https://meredith2328.github.io/favicon.ico?v=1778929955422">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://meredith2328.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Pull Request 6949 | 十派的玩具箱 - Atom Feed" href="https://meredith2328.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Allow env::... for object_storage.endpoint by Meredith2328 · Pull Request #6949 · tensorzero/tensorzero
+
+本次pr包括代码逻辑、测试逻辑..." />
+    <meta name="keywords" content="CS相关" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://meredith2328.github.io">
+  <img class="avatar" src="https://meredith2328.github.io/images/avatar.png?v=1778929955422" alt="">
+  </a>
+  <h1 class="site-title">
+    十派的玩具箱
+  </h1>
+  <p class="site-description">
+    “能做成的事情是不少的”
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/10pi" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://meredith2328.github.io/post/friends" class="menu">
+          友链
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Meredith2328" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Pull Request 6949
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-03-14
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://meredith2328.github.io/tag/FOnN2uDcuG/" class="post-tag">
+                  # CS相关
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><a href="https://github.com/tensorzero/tensorzero/pull/6949">Allow <code>env::...</code> for <code>object_storage.endpoint</code> by Meredith2328 · Pull Request #6949 · tensorzero/tensorzero</a></p>
+<blockquote>
+<p>本次pr包括<strong>代码逻辑、测试逻辑和文档撰写</strong>三部分。<br>
+打掉第一只野怪！金币+1，经验+3。<br>
+edit time: 2026-03-14 20:19:59</p>
+</blockquote>
+<p>感悟：对ai工作流的优化</p>
+<ul>
+<li>codex用于处理<strong>环境配置</strong>等耗时的问题，并且负责整理整体代码结构（慢），</li>
+<li>deepseek用于快速问答、给我讲解我要做什么（快）。</li>
+</ul>
+<h2 id="代码逻辑">代码逻辑</h2>
+<p><code>crates/tensorzero-core/src/config/mod.rs</code></p>
+<p>这里从原来的 <code>config</code> 必须字面写出 <code>endpoint</code> 来源，修改为了可以支持传入 <code>env::SOME_ENV</code> ，在这里parse出 <code>endpoint</code> 来源。<br>
+具体而言，有三处：</p>
+<ol>
+<li>把config的本地引用改为 <code>mut</code> ，这样的话我们可以直接parse改成新值。</li>
+<li>在进入后续逻辑之前，首先调用 <code>resolve_object_storage_endpoint</code> ，执行我们添加的parse helper函数。</li>
+<li>编写 <code>resolve_object_storage_endpoint</code> 函数逻辑。</li>
+</ol>
+<pre><code class="language-rust">impl ObjectStoreInfo {
+    pub fn new(config: Option&lt;StorageKind&gt;) -&gt; Result&lt;Option&lt;Self&gt;, Error&gt; {
+        let Some(mut config) = config else {
+            return Ok(None);
+        };
+
+        if let StorageKind::S3Compatible { endpoint, .. } = &amp;mut config
+            &amp;&amp; let Some(endpoint_value) = endpoint.take()
+        {
+            *endpoint = Some(resolve_object_storage_endpoint(&amp;endpoint_value)?);
+        }
+
+        let object_store: Option&lt;Arc&lt;dyn ObjectStore&gt;&gt; = match &amp;config {
+            StorageKind::Filesystem { path } =&gt; {
+                Some(Arc::new(match LocalFileSystem::new_with_prefix(path) {
+    format!(&quot;{e:?}&quot;).contains(&quot;BadScheme&quot;)
+}
+
+fn resolve_object_storage_endpoint(endpoint: &amp;str) -&gt; Result&lt;String, Error&gt; {
+    if let Some(env_var) = endpoint.strip_prefix(&quot;env::&quot;) {
+        return std::env::var(env_var).map_err(|_| {
+            Error::new(ErrorDetails::Config {
+                message: format!(
+                    &quot;Environment variable `{env_var}` not found. Your configuration for `[object_storage]` requires this variable for `endpoint`.&quot;
+                ),
+            })
+        });
+    }
+
+    if endpoint.starts_with(&quot;dynamic::&quot;)
+        || endpoint.starts_with(&quot;path::&quot;)
+        || endpoint.starts_with(&quot;path_from_env::&quot;)
+        || matches!(endpoint, &quot;sdk&quot; | &quot;none&quot;)
+    {
+        return Err(Error::new(ErrorDetails::Config {
+            message: format!(
+                &quot;Invalid `[object_storage].endpoint`: `{endpoint}`. Use `env::ENVIRONMENT_VARIABLE` or a literal endpoint value.&quot;
+            ),
+        }));
+    }
+
+    Ok(endpoint.to_string())
+}
+</code></pre>
+<h2 id="测试逻辑">测试逻辑</h2>
+<p><code>crates/tensorzero-core/src/config/tests.rs</code></p>
+<p>添加了三个单元测试。</p>
+<pre><code class="language-rust">use tempfile::NamedTempFile;
+use toml::de::DeTable;
+
+use crate::{
+    embeddings::EmbeddingProviderConfig,
+    inference::types::{Role, storage::StorageKind},
+    variant::JsonMode,
+};
+
+/// Ensure that the sample valid config can be parsed without panicking
+#[tokio::test]
+        &quot;Unexpected error message: {err}&quot;
+    );
+}
+
+#[tokio::test]
+async fn test_config_object_storage_endpoint_env_var_resolves() {
+    tensorzero_unsafe_helpers::set_env_var_tests_only(
+        &quot;TENSORZERO_TEST_S3_ENDPOINT&quot;,
+        &quot;https://storage.example.com&quot;,
+    );
+
+    let config_str = r#&quot;
+            [object_storage]
+            type = &quot;s3_compatible&quot;
+            bucket_name = &quot;tensorzero-fake-bucket&quot;
+            region = &quot;us-east-1&quot;
+            endpoint = &quot;env::TENSORZERO_TEST_S3_ENDPOINT&quot;
+
+            [functions]&quot;#;
+    let config = toml::from_str(config_str).expect(&quot;Failed to parse sample config&quot;);
+
+    let config = Box::pin(Config::load_from_toml(ConfigInput::Fresh(config)))
+        .await
+        .expect(&quot;Env-backed object storage endpoint should be valid config&quot;);
+    let object_store_info = config
+        .object_store_info
+        .as_ref()
+        .expect(&quot;Object store info should be initialized&quot;);
+
+    let StorageKind::S3Compatible { endpoint, .. } = &amp;object_store_info.kind else {
+        panic!(&quot;Expected an S3-compatible object store&quot;);
+    };
+
+    assert_eq!(
+        endpoint.as_deref(),
+        Some(&quot;https://storage.example.com&quot;),
+        &quot;The resolved endpoint should be stored in the object store kind&quot;
+    );
+}
+
+#[tokio::test]
+async fn test_config_object_storage_endpoint_env_var_missing_errors() {
+    let config_str = r#&quot;
+            [object_storage]
+            type = &quot;s3_compatible&quot;
+            bucket_name = &quot;tensorzero-fake-bucket&quot;
+            region = &quot;us-east-1&quot;
+            endpoint = &quot;env::TENSORZERO_TEST_NONEXISTENT_S3_ENDPOINT_VAR&quot;
+
+            [functions]&quot;#;
+    let config = toml::from_str(config_str).expect(&quot;Failed to parse sample config&quot;);
+
+    let err = Box::pin(Config::load_from_toml(ConfigInput::Fresh(config)))
+        .await
+        .expect_err(&quot;Should error when the object storage endpoint env var is missing&quot;);
+    let err_msg = err.to_string();
+
+    assert!(
+        err_msg.contains(&quot;TENSORZERO_TEST_NONEXISTENT_S3_ENDPOINT_VAR&quot;),
+        &quot;Error should mention the missing env var: {err_msg}&quot;
+    );
+}
+
+#[tokio::test]
+async fn test_config_object_storage_endpoint_dynamic_rejected() {
+    let config_str = r#&quot;
+            [object_storage]
+            type = &quot;s3_compatible&quot;
+            bucket_name = &quot;tensorzero-fake-bucket&quot;
+            region = &quot;us-east-1&quot;
+            endpoint = &quot;dynamic::s3_endpoint&quot;
+
+            [functions]&quot;#;
+    let config = toml::from_str(config_str).expect(&quot;Failed to parse sample config&quot;);
+
+    let err = Box::pin(Config::load_from_toml(ConfigInput::Fresh(config)))
+        .await
+        .expect_err(&quot;Dynamic object storage endpoints should be rejected&quot;);
+    let err_msg = err.to_string();
+
+    assert!(
+        err_msg.contains(&quot;Invalid `[object_storage].endpoint`&quot;),
+        &quot;Error should point to the invalid object storage endpoint: {err_msg}&quot;
+    );
+    assert!(
+        err_msg.contains(&quot;Use `env::ENVIRONMENT_VARIABLE` or a literal endpoint value&quot;),
+        &quot;Error should explain the supported endpoint forms: {err_msg}&quot;
+    );
+}
+
+#[tokio::test]
+async fn test_config_blocked_s3_http_endpoint_default() {
+    let logs_contain = crate::utils::testing::capture_logs();
+</code></pre>
+<h2 id="文档撰写">文档撰写</h2>
+<p><code>docs/gateway/configuration-reference.mdx</code></p>
+<p>添加了一行文档。</p>
+<pre><code>You can also set it to `env::YOUR_ENVIRONMENT_VARIABLE` to read from the environment variable `YOUR_ENVIRONMENT_VARIABLE` on startup.
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%A3%E7%A0%81%E9%80%BB%E8%BE%91">代码逻辑</a></li>
+<li><a href="#%E6%B5%8B%E8%AF%95%E9%80%BB%E8%BE%91">测试逻辑</a></li>
+<li><a href="#%E6%96%87%E6%A1%A3%E6%92%B0%E5%86%99">文档撰写</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+
+        
+
+        <div class="site-footer">
+  <script src="https://giscus.app/client.js"
+        data-repo="Meredith2328/meredith2328.github.io"
+        data-repo-id="R_kgDOHzrhbQ"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOHzrhbc4C42EF"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MVYHGJ8X03');
+</script>
+  <a class="rss" href="https://meredith2328.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
