@@ -10,21 +10,21 @@
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦">
   <meta property="og:description" content="这篇文章是我最近一个月做的一组实验的记录。起因很简单：想看看 0.6B 这种“小参数”模型， 在两张 RTX 5090 上，到底能不能用强化学习训出像样的数学推理和 Agent 能力。 起点是 Datawhale 第 11 章的 hello-agents 案例，之后延伸出了一堆东西。 从 GSM8K 数学推理，到多轮工">
-  <link rel="canonical" href="https://meredith2328.github.io/posts/notes/mathqwen-0.6b-agentic-rl.html">
+  <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html">
   
   
   <meta property="article:published_time" content="2026-08-07T00:00:00">
 
-  <link rel="icon" href="../../favicon.png">
-  <link rel="apple-touch-icon" href="../../favicon.png">
-  <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../rss.xml">
+  <link rel="icon" href="../../../favicon.png">
+  <link rel="apple-touch-icon" href="../../../favicon.png">
+  <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../../css/style.css">
   
 </head>
 <body>
@@ -32,10 +32,10 @@
   <div class="deco deco-right" aria-hidden="true"></div>
   <header class="site-header">
     <div class="header-banner is-default"
-         style="background-image:url('../../img/banner-default.svg')"></div>
+         style="background-image:url('../../../img/banner-default.svg')"></div>
     <div class="header-row">
-      <a class="brand" href="../../index.html">
-        <img class="brand-icon" src="../../img/dino-icon.png" alt="dino" width="28" height="30">
+      <a class="brand" href="../../../index.html">
+        <img class="brand-icon" src="../../../img/dino-icon.png" alt="dino" width="28" height="30">
         <span class="brand-name">10PI&#39;S BLOG丨十派的玩具箱</span>
         
       </a>
@@ -69,19 +69,19 @@
           
         
         
-          <a class="social-icon" href="../../rss.xml" title="RSS"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+          <a class="social-icon" href="../../../rss.xml" title="RSS"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></a>
         
       </div>
     </div>
     
     <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
 <ul>
-<li><a href="../../index.html">首页</a></li>
-<li><a href="../toy/10pi.html">关于</a></li>
-<li><a data-kind="folder" href="../../index.html#folder=posts/courses">CS相关</a></li>
-<li><a data-kind="folder" href="../../index.html#folder=posts/toy">玩具</a></li>
-<li><a href="../toy/friends.html">友链</a></li>
-<li><a href="../../dino/index.html">恐龙游戏</a></li>
+<li><a href="../../../index.html">首页</a></li>
+<li><a href="../../toy/10pi.html">关于</a></li>
+<li><a data-kind="folder" href="../../../index.html#folder=posts/courses">CS相关</a></li>
+<li><a data-kind="folder" href="../../../index.html#folder=posts/toy">玩具</a></li>
+<li><a href="../../toy/friends.html">友链</a></li>
+<li><a href="../../../dino/index.html">恐龙游戏</a></li>
 </ul></nav>
     
   </header>
@@ -89,16 +89,16 @@
   <main class="site-main">
 <article class="post">
   <header class="post-header">
-    <a class="back-link" href="../../index.html">← 返回首页</a>
+    <a class="back-link" href="../../../index.html">← 返回首页</a>
     <h1 class="post-title">用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦</h1>
     <div class="post-meta">
       <time datetime="2026-08-07T00:00:00">2026-08-07</time>
       
-      <a class="tag-chip" href="../../index.html#tag=Agent">#Agent</a>
+      <a class="tag-chip" href="../../../index.html#tag=Agent">#Agent</a>
       
-      <a class="tag-chip" href="../../index.html#tag=LLM">#LLM</a>
+      <a class="tag-chip" href="../../../index.html#tag=LLM">#LLM</a>
       
-      <span class="post-folder">▣ posts/notes</span>
+      <span class="post-folder">▣ posts/notes/ml</span>
     </div>
   </header>
 
@@ -200,7 +200,7 @@
 <p>之后我担心把格式也作为奖励信号、会冲淡我更关注的数学推理能力信号，所以在答案抽取上做了放松。</p>
 <p>只要大致符合格式、抽取出的结果正确，我就给它奖励。</p>
 <p>做了这样的处理之后，Megatron 才真正训起来，而不是一直停在基座附近。</p>
-<h2 id="agentic-0-98">实验二：Agentic 工具链，从 0% 摸到 98%</h2>
+<h2 id="agentic-rl">实验二：Agentic RL 工具链调用能力训练</h2>
 <p>光做数学推理不过瘾，我们把重点转向“会调用工具”的智能体。设计了两档到六档递进任务：
 Easy（1 次计算器调用）、Multi-step（2–3 步链）、Hard（4–5 步链）、Long-chain（6–8 步）、
 Multi-tool（汇率/单位换算跨工具）、Planning（场景目标自主规划）。数字全是 9–13 位，
@@ -249,7 +249,124 @@ TRL 会在模型里复制一份初始权重当 KL 参照，训练日志一切正
 策略退化成“调用一次工具 + 长篇叙述”。而在后面实验三里，SFT 只有 2.5%（远未饱和），
 修复后的 GRPO 反而能把它提到 12.5%。RL 的增益依赖“SFT 未饱和”的分布，
 这一点比“GRPO 与 SFT 持平”更接近真相。</p>
-<h2 id="_2">实验三：自己搭一个跨应用工具基准</h2>
+<h2 id="_2">顺手摸了一下链长的天花板</h2>
+<p>实验二做到这里，我其实一直在琢磨一个问题：0.6B 到底能稳定走多长的链？
+之前的 Long-chain 也就 6–8 步，那 10 步、16 步、28 步呢？是没见过的长度
+直接崩，还是能像写好的循环程序一样一直延伸下去？</p>
+<p>于是我做了一组扫长实验。测试集把链长拉到 6/8/10/12/16/20/22/24/26/28，
+每档 15 条，再加 6/8/10/12 项的连乘每档 15 条；训练侧准备了四组分布——
+6–8 步、4–14 步、8–20 步、16–28 步——每组 500 条，各自训完再放到
+同一套长测试集上比。数字还是 9–13 位的大数，心算不了，必须真调计算器。</p>
+<table>
+<thead>
+<tr>
+<th>训练分布</th>
+<th>8 步</th>
+<th>12 步</th>
+<th>16 步</th>
+<th>20 步</th>
+<th>24 步</th>
+<th>28 步</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6–8 步</td>
+<td>100%</td>
+<td>26.7%</td>
+<td>20.0%</td>
+<td>0%</td>
+<td>0%</td>
+<td>–</td>
+</tr>
+<tr>
+<td>4–14 步</td>
+<td>100%</td>
+<td>100%</td>
+<td>26.7%</td>
+<td>6.7%</td>
+<td>0%</td>
+<td>–</td>
+</tr>
+<tr>
+<td>8–20 步</td>
+<td>100%</td>
+<td>100%</td>
+<td>93.3%</td>
+<td>93.3%</td>
+<td>0%</td>
+<td>–</td>
+</tr>
+<tr>
+<td>16–28 步</td>
+<td>66.7%</td>
+<td>86.7%</td>
+<td>100%</td>
+<td>100%</td>
+<td>86.7%</td>
+<td>80.0%</td>
+</tr>
+</tbody>
+</table>
+<p>这张表读起来特别有意思。稳定链长的上限，基本就等于训练分布的最长区间：
+练 6–8 步，上限就停在 8 步；练 8–20 步，能扛到 20 步；练 16–28 步，
+26 步还有 86.7%。但所有模型都在“训练最长步数 + 2~4”的地方断崖式往下掉。
+0.6B 学到的是“有限长度的串接模式”，不是一条长度无关的循环程序——
+它更像在背“先算这个、再算那个”的具体剧本，而不是抽象出
+“重复上一步直到结束”这个动作本身。</p>
+<p>这里得做一次诚实的修正：早期这张曲线图我们标注的是“SFT/GRPO”，
+后来审计（就是实验二里那个 md5 哈希比对）发现 GRPO 压根没更新权重，
+曲线其实完全就是 SFT 自己跑出来的。“训练分布决定上限”这个结论不受影响，
+但“GRPO 在这里起到了作用”这句话得收回去——链长天花板这件事，
+是数据分布说了算，不是 RL 算法说了算。</p>
+<h2 id="_3">怎么兼顾长链和短链</h2>
+<p>但这么一搞，一个矛盾马上冒出来了：训练分布右移，长链是稳了，短链却遭殃。
+看表里 16–28 步那一行，8 步只有 66.7%——明明更短的链应该更简单，
+怎么反而做不对？</p>
+<p>想了一下也合理：长链数据里每道题都是十六七步起步，模型从没见过
+“三四步就收工”的题，自然不知道什么时候该停。它习惯性地继续调工具、
+继续算，把简单的题活活做复杂了。而且 0.900 和 0.890 这种“综合分”
+其实挺有迷惑性——长链模型在偏长的测试集上综合分反而更高，
+但它在 8 步上有个肉眼可见的大洞，真实用起来谁敢放心。</p>
+<p>两条互补的手段，我都试了：</p>
+<p><strong>覆盖式平衡训练</strong>：别只押一个区间，按长度分层采样——4–28 步每档 20 条，
+连乘按 4–16 项每档 20 条，一共 640 条。分布铺开之后，短链完全恢复
+（8/12 步回到 100%），长链保持高位（20 步 93.3%、26–28 步 73–80%）。</p>
+<p><strong>长度提示</strong>：更省事的办法，评测时在问题里写明“本题恰好 N 个计算步骤”，
+零训练成本。只练长链的模型，薄弱长度从 0.800 提到 0.960
+（8 步从 60% 回到 100%）；平衡模型加上提示，全长度直接到 96.7%
+（6–22 步 100%，24/28 步 86.7%）。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>综合正确率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>只练长链（16–28 步）</td>
+<td>90.0%（8 步只剩 66.7%）</td>
+</tr>
+<tr>
+<td>覆盖式平衡训练</td>
+<td>89.0%（8/12 步回到 100%）</td>
+</tr>
+<tr>
+<td>只练长链 + 长度提示</td>
+<td>96.0%*（薄弱长度 0.800 → 0.960）</td>
+</tr>
+<tr>
+<td>平衡训练 + 长度提示</td>
+<td>96.7%（6–22 步 100%）</td>
+</tr>
+</tbody>
+</table>
+<p>要我说，长度提示是性价比最高的“摸高”手段：一分钱训练成本没有，
+就是把意图写清楚，模型立刻知道该在什么时候收手。0.6B 不是没有循环能力，
+而是要“训练分布覆盖 + 显式长度锚定”两个条件凑齐，
+才能把这种能力稳定逼出来。</p>
+<h2 id="_4">实验三：自己搭一个跨应用工具基准</h2>
 <p>真实世界的 Agent 基准（比如 Toolathlon，604 个工具、32 个真实应用）需要
 Docker、MCP、真实账号，双卡 5090 环境根本跑不起来。所以我们按同样的方法论
 自己搭了一个可控沙箱：9 个模拟应用（文件、数据表、笔记、日历、邮件、数学、文本、
@@ -271,7 +388,21 @@ GRPO 版本（修复了保存 bug 之后跑的，adapter 哈希已校验）也�
 内容。这个对照实验把结论钉死了一点：web 0% 不是任务太难，也不是零样本迁移的锅，
 而是 0.6B 在这个流水线里学不会“把工具返回内容串接成下一步参数”，
 也就是工具结果接地（tool-output grounding）这个能力本身缺位。</p>
-<h2 id="_3">一些踩坑清单</h2>
+<p>很可惜，受限于训练资源、以及个人的学习目的，我这里的探索就走到这里。</p>
+<h2 id="72bqlora">实验四：顺手挑战一下 72B（QLoRA 参数量摸高）</h2>
+<p>0.6B 摸完了，顺手往参数量的方向摸一摸高。双卡 5090 一共 64 GB 显存，
+全参数训 72B 想都别想，但 QLoRA 可以：把基座权重量化到 4-bit 塞进显存，
+只训练插进去的一小撮 LoRA 参数。</p>
+<p>具体方案是 Qwen2.5-72B-Instruct，bitsandbytes NF4 4-bit 量化
+（基座权重大约压到 36 GB），LoRA r16，DeepSpeed ZeRO-3 加 CPU offload。
+ZeRO-3 把优化器状态、梯度和参数全部切到两张卡上分片，
+CPU offload 再兜底，显存这才压得住。</p>
+<p>实际跑通了 40 步 SFT，<code>qlora/models/qlora_70b_sft/</code> 里的 train_info
+记录了峰值显存 17.44 GB/卡——注意是每张卡，离 32 GB 的天花板还有一大截，
+说明 batch 或者上下文长度还有往上加的空间。loss 正常收敛，这条路是通的。</p>
+<p>我只是探索了一下“72B 能在一台双卡 5090 上训起来”这件事本身，</p>
+<p>而没有做 GSM8K 的评估训练。</p>
+<h2 id="_5">一些踩坑清单</h2>
 <ul>
 <li>
 <p><strong>sm_120 软件栈</strong>：PyPI 默认 cu126 的 torch 不支持 Blackwell，必须 cu128/cu130；
@@ -290,7 +421,33 @@ GRPO 版本（修复了保存 bug 之后跑的，adapter 哈希已校验）也�
 <li><strong>SFT 后熵太低</strong>：token 熵约 0.002，温度 0.9 下采样几乎相同、奖励零方差；
   要提到温度 1.2、top-p 0.95 才有学习信号。</li>
 </ul>
-<h2 id="_4">结语</h2>
+<h2 id="_6">可观测性落地：怎么把“看起来对”变成“真的对”</h2>
+<p>前面踩了这么多坑，回过头看，大部分坑的共性只有一个：
+<strong>日志一切正常，实际什么都没发生</strong>。loss 在降、梯度范数非零、
+wandb 曲线漂漂亮亮——但保存下来的权重和初始权重逐字节相同。
+这让我彻底意识到，这个项目里最值钱的不是哪个框架分数高，
+而是一套“怎么确认它真的在动”的办法。</p>
+<p>我把这套办法整理成五条，也全部固化进了脚本：</p>
+<p><strong>权重级核验</strong>。训练脚本结束打印 <code>ADAPTER_HASH_INIT / ADAPTER_HASH_OUT</code>，
+两个哈希相同就直接报警。TRL 的 ref-adapter 陷阱就是这么抓出来的——
+如果不是闲着没事跑去比对 md5，我们可能到现在还抱着一个假的 98.3%
+在写总结。</p>
+<p><strong>数据级核验</strong>。数据生成脚本内置 self-check，每一条专家轨迹都要重放一遍、
+让执行式验证器真正跑过，才有资格进训练集。标准答案自己都不自洽，
+后面的奖励全是空中楼阁。</p>
+<p><strong>口径级核验</strong>。报数字时必须写清楚评测器是单调用还是多调用、
+greedy 还是 sampling、max-new 和 max-rounds 是多少。不同口径的数字
+不能混着比，我们最早在 3.3% 和 20% 之间反复横跳，
+就是评测器口径没对齐。</p>
+<p><strong>结果级核验</strong>。论文和 README 里每个数字都能在 <code>results/</code> 找到对应的 JSON，
+wandb 有对应的 run id；数字一旦修改，所有文档同步更新。
+写报告最怕的就是“我记得好像是 68%”。</p>
+<p><strong>负结果照实写</strong>。web 保留应用 0%、修复后 GRPO 崩塌到 3.3%，
+这种不漂亮的数字全部保留并解释清楚，不因为难看就删。
+负结果往往才是真正值钱的信息，它把能力的边界画得明明白白。</p>
+<p>这五条做完，至少能保证：当你写下“模型从 42.2% 提到 68.8%”的时候，
+这句话经得起别人拿 wandb 和 results 里的 JSON 逐条对账。</p>
+<h2 id="_7">结语</h2>
 <p>我想实验本身是有学习价值的，实验过程中的“可观测性”则更是重中之重。</p>
 <p>例如数据生成时写了一些自检、帮助我发现许多问题；</p>
 <p>训练结束通过哈希值校验发现了压根没训到的TRL保存陷阱；</p>
@@ -303,7 +460,7 @@ GRPO 版本（修复了保存 bug 之后跑的，adapter 哈希已校验）也�
 <p>随本实验附以下资料供参考：</p>
 <ul>
 <li>实验报告：<a href="https://github.com/Meredith2328/MathQwen/blob/main/REPORT.md">REPORT.md</a></li>
-<li>29 页论文：<a href="https://github.com/Meredith2328/MathQwen/blob/main/paper/paper.pdf">paper.pdf</a></li>
+<li>30 页论文：<a href="https://github.com/Meredith2328/MathQwen/blob/main/paper/paper.pdf">paper.pdf</a></li>
 <li>全部训练曲线：<a href="https://wandb.ai/10pi-fudan-university-school-of-management/agenticrl">wandb agenticrl</a></li>
 </ul>
   </div>
@@ -334,7 +491,7 @@ GRPO 版本（修复了保存 bug 之后跑的，adapter 哈希已校验）也�
     <div class="footer-inner">
       <span>© 2026 10pi (Meredith2328) — built with pilog</span>
       <span class="footer-sep">::</span>
-      <a href="../../rss.xml">RSS</a>
+      <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
@@ -349,26 +506,26 @@ GRPO 版本（修复了保存 bug 之后跑的，adapter 哈希已校验）也�
         <button class="dino-close" type="button" aria-label="关闭">×</button>
       </div>
       <div class="dino-stage">
-        <iframe class="dino-frame" src="../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
+        <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
-      <img src="../../img/dino-icon.png" alt="小恐龙" width="26" height="28">
+      <img src="../../../img/dino-icon.png" alt="小恐龙" width="26" height="28">
       <span>PLAY</span>
     </button>
   </div>
   
 
-  <script src="../../js/main.js" defer></script>
+  <script src="../../../js/main.js" defer></script>
   <script>
-    window.PILOG_ROOT = "../../";
+    window.PILOG_ROOT = "../../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
-  <script src="../../js/search.js" defer></script>
+  <script src="../../../js/search.js" defer></script>
   
 </body>
 </html>

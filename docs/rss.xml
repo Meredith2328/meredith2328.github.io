@@ -9,8 +9,8 @@
     <generator>pilog</generator>
       <item>
         <title>用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦</title>
-        <link>https://meredith2328.github.io/posts/notes/mathqwen-0.6b-agentic-rl.html</link>
-        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/mathqwen-0.6b-agentic-rl.html</guid>
+        <link>https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html</guid>
         <pubDate>Fri, 07 Aug 2026 00:00:00 -0000</pubDate>
         <description>这篇文章是我最近一个月做的一组实验的记录。起因很简单：想看看 0.6B 这种“小参数”模型， 在两张 RTX 5090 上，到底能不能用强化学习训出像样的数学推理和 Agent 能力。 起点是 Datawhale 第 11 章的 hello-agents 案例，之后延伸出了一堆东西。 从 GSM8K 数学推理，到多轮工具调用，再到自己搭一个跨应用的工具基准， 最后还顺手用 QLoRA 挑战了一下 72B 的微调。 想试着讲讲看整个过程踩到的无数的坑。 &lt;strong&gt;完整的论文、报告和代码&lt;/strong&gt;：…</description>
       </item>
@@ -22,7 +22,7 @@
         <description>一套个人自制的轻量静态博客框架：读取 &lt;code&gt;blogs/&lt;/code&gt; 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，主题复刻 Chrome 断网页的像素美学。</description>
       </item>
       <item>
-        <title>夏夜将终：一个乐队官网是怎么搭的</title>
+        <title>夏夜将终：一个乐队官网的诞生</title>
         <link>https://meredith2328.github.io/posts/toy/xyjz.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/xyjz.html</guid>
         <pubDate>Thu, 16 Jul 2026 00:00:00 -0000</pubDate>
