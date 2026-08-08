@@ -1,7 +1,8 @@
 ---
 title: 用einops包替换掉PyTorch的大部分矩阵变换函数
 date: 2026-02-09 10:11:31
-tags: []
+tags:
+- 工具
 published: true
 hideInList: false
 feature: null

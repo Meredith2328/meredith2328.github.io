@@ -1,7 +1,8 @@
 ---
 title: 怎么估算LLM的参数量和训练FLOPs？推一推、测一测
 date: 2026-03-03 10:21:39
-tags: []
+tags:
+- 大模型
 published: true
 hideInList: false
 feature: null

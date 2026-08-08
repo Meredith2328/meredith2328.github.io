@@ -1,7 +1,8 @@
 ---
 title: 从原始Softmax到在线Softmax
 date: 2026-04-09 15:57:34
-tags: []
+tags:
+- 机器学习
 published: true
 hideInList: false
 feature: null

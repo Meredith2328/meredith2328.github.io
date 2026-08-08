@@ -103,23 +103,23 @@
     <input id="filter-more-search" type="search" placeholder="搜索标签…">
     <div class="filter-more-list" id="filter-more-list">
       
-      <button class="tag-chip" type="button" data-tag="Agent">#Agent</button>
+      <button class="tag-chip" type="button" data-tag="CS336">#CS336</button>
       
       <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
       
       <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
       
-      <button class="tag-chip" type="button" data-tag="LLM">#LLM</button>
-      
-      <button class="tag-chip" type="button" data-tag="meta">#meta</button>
-      
-      <button class="tag-chip" type="button" data-tag="pilog">#pilog</button>
-      
-      <button class="tag-chip" type="button" data-tag="乐队">#乐队</button>
+      <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
       
       <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
       
+      <button class="tag-chip" type="button" data-tag="工具">#工具</button>
+      
       <button class="tag-chip" type="button" data-tag="数据结构与算法">#数据结构与算法</button>
+      
+      <button class="tag-chip" type="button" data-tag="机器学习">#机器学习</button>
+      
+      <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
       
     </div>
   </div>
@@ -132,7 +132,7 @@
 
   <div class="card-grid" id="card-grid">
     
-    <article class="card" data-tags="Agent LLM " data-folder="posts/notes/ml" data-date="2026-08-07">
+    <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-08-07">
       
       <a class="card-link" href="posts/notes/ml/mathqwen-0.6b-agentic-rl.html">
         <div class="card-body">
@@ -152,9 +152,7 @@
           
           <div class="card-tags">
             
-            <button class="tag-chip" type="button" data-tag="Agent">#Agent</button>
-            
-            <button class="tag-chip" type="button" data-tag="LLM">#LLM</button>
+            <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
             
           </div>
         </div>
@@ -162,7 +160,7 @@
       </a>
     </article>
     
-    <article class="card is-highlight" data-tags="pilog meta " data-folder="posts/toy" data-date="2026-07-30">
+    <article class="card is-highlight" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2026-07-30">
       
       <a class="card-link" href="posts/toy/pilog-blog.html">
         <div class="card-body">
@@ -182,9 +180,7 @@
           
           <div class="card-tags">
             
-            <button class="tag-chip" type="button" data-tag="pilog">#pilog</button>
-            
-            <button class="tag-chip" type="button" data-tag="meta">#meta</button>
+            <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
             
           </div>
         </div>
@@ -196,7 +192,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="乐队 奇怪的东西 " data-folder="posts/toy" data-date="2026-07-16">
+    <article class="card" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2026-07-16">
       
       <a class="card-link" href="posts/toy/xyjz.html">
         <div class="card-body">
@@ -216,8 +212,6 @@
           
           <div class="card-tags">
             
-            <button class="tag-chip" type="button" data-tag="乐队">#乐队</button>
-            
             <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
             
           </div>
@@ -226,7 +220,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/notes/ml" data-date="2026-05-16">
+    <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-05-16">
       
       <a class="card-link" href="posts/notes/ml/nanovllm.html">
         <div class="card-body">
@@ -245,6 +239,8 @@
           <div class="card-preview">总结：FlashAttention用于降低Attention计算阶段预存的显存消耗（内部计算范畴）， PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。 <strong>FlashAttention</strong>：   问题：标准 Attention 需要存储 N×N 的中间矩阵，显存 O(N²) ；  解决：分块 + 在线 softmax，显存降到 O(N) ；  关键：外循环 Q 块，内循环 K、V 块，在线更新 m、l、O ；  <strong>PagedAttention</strong>： -…</div>
           
           <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
             
           </div>
         </div>
@@ -286,7 +282,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/notes/ml" data-date="2026-04-09">
+    <article class="card" data-tags="机器学习 " data-folder="posts/notes/ml" data-date="2026-04-09">
       
       <a class="card-link" href="posts/notes/ml/softmax.html">
         <div class="card-body">
@@ -306,13 +302,15 @@
           
           <div class="card-tags">
             
+            <button class="tag-chip" type="button" data-tag="机器学习">#机器学习</button>
+            
           </div>
         </div>
         
       </a>
     </article>
     
-    <article class="card" data-tags="奇怪的东西 " data-folder="posts/reference" data-date="2026-03-25">
+    <article class="card" data-tags="翻译 " data-folder="posts/reference" data-date="2026-03-25">
       
       <a class="card-link" href="posts/reference/fudan-mlsys-cn.html">
         <div class="card-body">
@@ -332,7 +330,7 @@
           
           <div class="card-tags">
             
-            <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
+            <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
             
           </div>
         </div>
@@ -340,7 +338,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/notes/ml" data-date="2026-03-12">
+    <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-03-12">
       
       <a class="card-link" href="posts/notes/ml/LLMestimate2.html">
         <div class="card-body">
@@ -360,6 +358,8 @@
           
           <div class="card-tags">
             
+            <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
+            
           </div>
         </div>
         
@@ -370,7 +370,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/notes/ml" data-date="2026-03-11">
+    <article class="card" data-tags="机器学习 " data-folder="posts/notes/ml" data-date="2026-03-11">
       
       <a class="card-link" href="posts/notes/ml/optimizer.html">
         <div class="card-body">
@@ -390,6 +390,8 @@
           
           <div class="card-tags">
             
+            <button class="tag-chip" type="button" data-tag="机器学习">#机器学习</button>
+            
           </div>
         </div>
         
@@ -400,7 +402,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/courses/cs336" data-date="2026-03-10">
+    <article class="card" data-tags="CS336 " data-folder="posts/courses/cs336" data-date="2026-03-10">
       
       <a class="card-link" href="posts/courses/cs336/CS336-hw1-1.html">
         <div class="card-body">
@@ -420,6 +422,8 @@
           
           <div class="card-tags">
             
+            <button class="tag-chip" type="button" data-tag="CS336">#CS336</button>
+            
           </div>
         </div>
         
@@ -430,7 +434,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/courses/cs336" data-date="2026-03-10">
+    <article class="card" data-tags="CS336 " data-folder="posts/courses/cs336" data-date="2026-03-10">
       
       <a class="card-link" href="posts/courses/cs336/CS336-hw1-2.html">
         <div class="card-body">
@@ -450,13 +454,15 @@
           
           <div class="card-tags">
             
+            <button class="tag-chip" type="button" data-tag="CS336">#CS336</button>
+            
           </div>
         </div>
         
       </a>
     </article>
     
-    <article class="card" data-tags="" data-folder="posts/notes/tools" data-date="2026-03-10">
+    <article class="card" data-tags="工具 " data-folder="posts/notes/tools" data-date="2026-03-10">
       
       <a class="card-link" href="posts/notes/tools/linux-command.html">
         <div class="card-body">
@@ -475,6 +481,8 @@
           <div class="card-preview">命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。 为了直接进入正题，省略诸如 <code>cd</code> 这样的广为人知的基础指令，直接看那些显著提升体验的东西。  用于查看磁盘空间。使用场景比如训模型会保存很多中间文件，可以这样看看需要清理哪些。 使用效果： 比如 <code>fuse-overlayfs</code> 是这个实例本身的存储， <code>shared-nvme</code> 是它的外接可持久化存储，使用率分别为 <code>50%</code> 和 <code>40%</code> 。 至于要看哪几个文件最大，可以和 <code>ncdu</code>…</div>
           
           <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="工具">#工具</button>
             
           </div>
         </div>

@@ -1,7 +1,8 @@
 ---
 title: WanDB基础使用教程总结
 date: 2026-03-08 21:25:58
-tags: []
+tags:
+- 工具
 published: true
 hideInList: false
 feature: null

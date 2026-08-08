@@ -1,7 +1,8 @@
 ---
 title: 怎么估算LLM训练的内存和计算需求？推一推、测一测
 date: 2026-03-12 19:01:53
-tags: []
+tags:
+- 大模型
 published: true
 hideInList: false
 feature: null

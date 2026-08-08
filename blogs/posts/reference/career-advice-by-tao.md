@@ -2,7 +2,7 @@
 title: Career advice 丨 职业建议（翻译自 Terence Tao 的博客）
 date: 2025-08-01 16:15:08
 tags:
-- 奇怪的东西
+- 翻译
 published: true
 hideInList: false
 feature: null

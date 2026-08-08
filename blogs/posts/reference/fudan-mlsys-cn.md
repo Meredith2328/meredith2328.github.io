@@ -2,7 +2,7 @@
 title: 给机器学习系统课程做了一下中文翻译
 date: 2026-03-25 15:13:09
 tags:
-- 奇怪的东西
+- 翻译
 published: true
 hideInList: false
 feature: null

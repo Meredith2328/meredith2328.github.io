@@ -1,7 +1,8 @@
 ---
 title: 值得顺便掌握一下的那些linux指令
 date: 2026-03-10 11:14:01
-tags: []
+tags:
+- 工具
 published: true
 hideInList: false
 feature: null

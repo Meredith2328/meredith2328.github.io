@@ -1,7 +1,8 @@
 ---
 title: 用 pilog 搭建像素风博客
 date: 2026-07-30
-tags: [pilog, meta]
+tags:
+- 奇怪的东西
 highlight: true
 preview: 一套个人自制的轻量静态博客框架：读取 `blogs/` 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，主题复刻 Chrome 断网页的像素美学。
 preview_image: assets/cover-pixel.png
