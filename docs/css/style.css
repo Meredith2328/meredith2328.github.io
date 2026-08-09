@@ -1356,8 +1356,9 @@ a:hover {
 
 .graph-pad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, auto);
   gap: 4px;
+  justify-content: center;
 }
 
 .graph-pad-up {
