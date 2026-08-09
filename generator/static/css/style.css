@@ -1294,6 +1294,128 @@ a:hover {
   border: 1px solid var(--hairline);
 }
 
+.graph-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--paper);
+  border: var(--border);
+  box-shadow: var(--shadow-px);
+  padding: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.graph-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-zoom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 96px;
+  height: 8px;
+  margin: 0;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.graph-zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 0 var(--shadow);
+}
+
+.graph-zoom-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 0;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 0 var(--shadow);
+}
+
+.graph-zoom-slider:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.graph-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.graph-pad-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.graph-pan-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.graph-pad-home {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.graph-pan-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.graph-pad-down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.graph-ctrl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--ink);
+  background: var(--paper);
+  border: var(--border);
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.graph-ctrl-btn:hover,
+.graph-ctrl-btn:active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.graph-ctrl-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 var(--shadow);
+}
+
+.graph-ctrl-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 /* ---------- post page ---------- */
 
 .post {
@@ -1783,6 +1905,22 @@ a:hover {
 
   .graph-wrap {
     height: 600px;
+  }
+
+  .graph-controls {
+    top: 8px;
+    right: 8px;
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .graph-zoom-slider {
+    width: 72px;
+  }
+
+  .graph-ctrl-btn {
+    width: 30px;
+    height: 30px;
   }
 
   .brand-sub {

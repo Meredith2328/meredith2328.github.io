@@ -16,6 +16,14 @@
   var statsEl = document.getElementById("graph-stats");
   var fitBtn = document.getElementById("graph-fit");
   var snakeBtn = document.getElementById("graph-snake");
+  var zoomSlider = document.getElementById("graph-zoom");
+  var zoomInBtn = document.getElementById("graph-zoom-in");
+  var zoomOutBtn = document.getElementById("graph-zoom-out");
+  var panUpBtn = document.getElementById("graph-pan-up");
+  var panDownBtn = document.getElementById("graph-pan-down");
+  var panLeftBtn = document.getElementById("graph-pan-left");
+  var panRightBtn = document.getElementById("graph-pan-right");
+  var recenterBtn = document.getElementById("graph-recenter");
   if (!svg || !wrap) return;
 
   var W = 1200, H = 700;
@@ -439,6 +447,7 @@
 
   function applyTransform() {
     viewport.setAttribute("transform", "translate(" + ox + "," + oy + ") scale(" + zoom + ")");
+    if (zoomSlider) zoomSlider.value = String(Math.round(zoom * 100));
   }
 
   function onNodeDown(e, n) {
@@ -561,6 +570,135 @@
     applyTransform();
     snakeDirty = true;
   }, { passive: false });
+
+  /* ---------- floating controls (zoom / pan / recenter) ---------- */
+
+  function zoomBy(factor) {
+    cancelFlashAnim();
+    var rect = svg.getBoundingClientRect();
+    var cx = rect.width / 2, cy = rect.height / 2;
+    var z = Math.min(3, Math.max(0.25, zoom * factor));
+    var f = z / zoom;
+    ox = cx - (cx - ox) * f;
+    oy = cy - (cy - oy) * f;
+    zoom = z;
+    applyTransform();
+    snakeDirty = true;
+  }
+
+  function setZoomFromSlider(pct) {
+    cancelFlashAnim();
+    var z = Math.min(3, Math.max(0.25, pct / 100));
+    var rect = svg.getBoundingClientRect();
+    var cx = rect.width / 2, cy = rect.height / 2;
+    var f = z / zoom;
+    ox = cx - (cx - ox) * f;
+    oy = cy - (cy - oy) * f;
+    zoom = z;
+    applyTransform();
+    snakeDirty = true;
+  }
+
+  function panBy(dx, dy) {
+    ox += dx;
+    oy += dy;
+    applyTransform();
+  }
+
+  function recenterView() {
+    if (!data) return;
+    var rootId = null;
+    Object.keys(nodes).forEach(function (id) {
+      if (nodes[id].type === "root") rootId = id;
+    });
+    if (rootId == null) return;
+    var n = nodes[rootId];
+    var rect = svg.getBoundingClientRect();
+    var tx = rect.width / 2 - n.x * zoom;
+    var ty = rect.height / 2 - n.y * zoom;
+    animateTransform([zoom, ox, oy], [zoom, tx, ty], 280);
+    snakeDirty = true;
+  }
+
+  var hold = { raf: null, fn: null, last: 0 };
+
+  function stopHold() {
+    if (hold.raf != null) cancelAnimationFrame(hold.raf);
+    hold.raf = null;
+    hold.fn = null;
+  }
+
+  function holdTick(ts) {
+    if (!hold.fn) return;
+    var dt = Math.min(120, ts - hold.last) / 1000;
+    hold.last = ts;
+    hold.fn(dt);
+    hold.raf = requestAnimationFrame(holdTick);
+  }
+
+  function startHold(fn) {
+    stopHold();
+    hold.fn = fn;
+    hold.last = performance.now();
+    fn(0); // a quick tap performs one step
+    hold.raf = requestAnimationFrame(holdTick);
+  }
+
+  function bindHoldBtn(el, fn) {
+    if (!el) return;
+    el.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      startHold(fn);
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+      el.addEventListener(ev, function () {
+        if (hold.fn === fn) stopHold();
+      });
+    });
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fn(0);
+      }
+    });
+  }
+
+  function panHandler(dx, dy) {
+    return function (dt) {
+      var rect = svg.getBoundingClientRect();
+      var speed = Math.max(120, rect.width * 0.35); // px per second
+      var step = dt > 0 ? speed * dt : rect.width * 0.06;
+      panBy(-dx * step, -dy * step);
+    };
+  }
+
+  function zoomHandler(factor) {
+    return function (dt) {
+      zoomBy(dt > 0 ? Math.pow(1.5, dt) : factor);
+    };
+  }
+
+  bindHoldBtn(zoomInBtn, zoomHandler(1.25));
+  bindHoldBtn(zoomOutBtn, zoomHandler(1 / 1.25));
+  bindHoldBtn(panUpBtn, panHandler(0, -1));
+  bindHoldBtn(panDownBtn, panHandler(0, 1));
+  bindHoldBtn(panLeftBtn, panHandler(-1, 0));
+  bindHoldBtn(panRightBtn, panHandler(1, 0));
+
+  if (zoomSlider) {
+    zoomSlider.addEventListener("input", function () {
+      setZoomFromSlider(parseFloat(zoomSlider.value) || 100);
+    });
+  }
+  if (recenterBtn) {
+    recenterBtn.addEventListener("click", recenterView);
+    recenterBtn.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        recenterView();
+      }
+    });
+  }
 
   var expandBtn = document.getElementById("graph-expand-all");
   var collapseBtn = document.getElementById("graph-collapse-all");

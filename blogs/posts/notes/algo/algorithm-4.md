@@ -1814,33 +1814,199 @@ class Solution:
         return self.res
 ```
 
-### 专题九 图
+### 专题九 图：DFS和BFS遍历
 
-200 岛屿数量
+图这个专题是十分有趣的。最主要是DFS和BFS两种遍历方式。
 
-递归清空岛屿。
+为了两种写法都练得很熟练，我们往往可以把两种函数的接口设成高度相似的，这样可以无缝切换。
 
+> 我们怎么样把图的DFS/BFS跟之前很好想的“树的DFS”给联系起来呢？
+>
+> 根本在于“**管好自己的，引出别人的。**”
+>
+> 不管是任何DFS/BFS，自己的部分都只处理自己这个节点。与此同时，它们又要在末尾引出“还有哪些节点要处理”。这是核心逻辑。
+>
+> 除此之外，就是利用 `visited` 来防止重复判断/重复入队了。
+
+注意仔细观察以下三个模板，逐行仔细看。这里模板多花点时间，早点想清楚，就是为了以后刷题少花点时间。
+
+**模板一：函数调用DFS**
+
+“判断，标记，处理，邻居”
+
+```python
+def dfs(node, visited, graph):
+    if node in visited:
+        return
+    # 1. 标记访问（关键！）
+    visited.add(node)
+    # 2. 处理当前节点（打印、统计等）
+    print(node)
+    # 3. 递归访问邻居
+    for neighbor in graph[node]:
+        if neighbor not in visited:
+            dfs(neighbor, visited, graph)
 ```
+
+**模板二：显式栈DFS** （和队列BFS特别像！）
+
+```python
+def dfs_stack(start, graph):
+    visited = set()
+    stack = [start]
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        print(node)
+        # 把未访问的邻居压入栈
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                stack.append(neighbor)
+```
+
+**模板三：队列BFS**
+
+BFS 只要无脑在入队时标记时就可以了，防止重复入队。
+
+```python
+from collections import deque
+
+def bfs(start, graph):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)  # 注意这里！！！BFS 只要无脑在入队时标记时就可以了，防止重复入队
+
+    while queue:
+        node = queue.popleft()
+        print(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor) # 注意这里！！！同上
+                queue.append(neighbor)
+```
+
+把上述的邻接表换成网格，就变成了常考的网格模板。
+
+```python
+# 方向数组（常用技巧）
+DIRS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+def dfs_grid(grid, r, c):
+    # 边界检查 + 访问检查（非0即1的网格通常直接将值改掉）
+    if not (0 <= r < len(grid) and 0 <= c < len(grid[0])):
+        return
+    if grid[r][c] != '1':  # 假设'1'是未访问的陆地
+        return
+
+    grid[r][c] = '0'  # 标记已访问
+    for dr, dc in DIRS:
+        dfs_grid(grid, r + dr, c + dc)
+
+def bfs_grid(grid, r, c):
+    from collections import deque
+    q = deque([(r, c)])
+    grid[r][c] = '0'
+    while q:
+        r, c = q.popleft()
+        for dr, dc in DIRS:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]) and grid[nr][nc] == '1':
+                grid[nr][nc] = '0'
+                q.append((nr, nc))
+```
+
+仔细做好上面的模板，下面两道题目完全是手到擒来。
+
+经典题目： [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)
+
+```python
 class Solution:
     def numIslands(self, grid: List[List[str]]) -> int:
-        m, n = len(grid), len(grid[0])
-        def clear(x, y):
-            if x < 0 or x >= m or y < 0 or y >= n or grid[x][y] == '0':
-                return
-            grid[x][y] = '0'
-            clear(x-1, y)
-            clear(x+1, y)
-            clear(x, y-1)
-            clear(x, y+1)
+        DIR = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
-        cnt = 0
-        for i in range(m):
-            for j in range(n):
+        def dfs(r, c): # 用于消灭掉一大片的海洋
+            if not (0 <= r < len(grid) and 0 <= c < len(grid[0])):
+                return
+            if grid[r][c] != '1':
+                return
+            grid[r][c] = '0'
+            for dr, dc in DIR:
+                dfs(r + dr, c + dc)
+
+        def bfs(r, c):
+            q = deque([(r, c)])
+            grid[r][c] = '0'
+            while q:
+                row, col = q.popleft()
+                for dr, dc in DIR:
+                    nr, nc = row + dr, col + dc
+                    if not (0 <= nr < len(grid) and 0 <= nc < len(grid[0])):
+                        continue
+                    if grid[nr][nc] == '0':
+                        continue
+                    q.append((nr, nc))
+                    grid[nr][nc] = '0'
+
+        count = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
                 if grid[i][j] == '1':
-                    cnt += 1
-                    clear(i, j)
-        return cnt
+                    count += 1
+                    bfs(i, j)
+
+        return count
 ```
+
+再练一道：[695. 岛屿的最大面积](https://leetcode.cn/problems/max-area-of-island/) 。上面的模板以及上一道如果练熟了，这一道应该能很快地码出来（5分钟之类的）。
+
+```python
+class Solution:
+    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+        DIR = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        maxCount = 0
+        curCount = 0
+        def dfs(r, c):
+            if not (0 <= r < len(grid) and 0 <= c < len(grid[0])):
+                return
+            if not grid[r][c] == 1:
+                return
+            grid[r][c] = 0
+            nonlocal curCount
+            curCount += 1
+            for dr, dc in DIR:
+                dfs(r + dr, c + dc)
+        
+        def bfs(r, c):
+            q = deque([(r, c)])
+            grid[r][c] = 0
+            nonlocal curCount
+            curCount += 1
+            while q:
+                row, col = q.popleft()
+                for dr, dc in DIR:
+                    nr, nc = row + dr, col + dc
+                    if not (0 <= nr < len(grid) and 0 <= nc < len(grid[0])):
+                        continue
+                    if not grid[nr][nc] == 1:
+                        continue
+                    q.append((nr, nc))
+                    grid[nr][nc] = 0
+                    curCount += 1
+
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    curCount = 0
+                    bfs(i, j)
+                    maxCount = max(maxCount, curCount)
+        return maxCount
+```
+
+
+
+
 
 994 腐烂的橘子
 
