@@ -1885,24 +1885,16 @@ a:hover {
   box-shadow: 2px 2px 0 0 var(--shadow);
 }
 
-.random-flash {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  pointer-events: none;
-  background: #e8f0fe;
-  animation: random-flash 0.32s ease;
+.random-dice.is-rolling svg {
+  animation: dice-roll 0.3s steps(3) 1;
 }
 
-@keyframes random-flash {
+@keyframes dice-roll {
   0% {
-    opacity: 0;
-  }
-  30% {
-    opacity: 1;
+    transform: rotate(0deg);
   }
   100% {
-    opacity: 0;
+    transform: rotate(360deg);
   }
 }
 
