@@ -12,14 +12,14 @@
         <link>https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html</guid>
         <pubDate>Mon, 10 Aug 2026 00:00:00 -0000</pubDate>
-        <description>先说结论：&lt;strong&gt;TRL 1.9.2 的 &lt;code&gt;GRPOTrainer&lt;/code&gt; 在“从已有的 LoRA adapter 继续训练”这条路上，藏着一个会静默空转的 bug&lt;/strong&gt;。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter…</description>
+        <description>&lt;strong&gt;TRL 1.9.2 的 &lt;code&gt;GRPOTrainer&lt;/code&gt; 有一个“静默”的bug，使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。&lt;/strong&gt; 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter…</description>
       </item>
       <item>
         <title>用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦</title>
         <link>https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html</guid>
         <pubDate>Fri, 07 Aug 2026 00:00:00 -0000</pubDate>
-        <description>这篇文章是我最近一个月做的一组实验的记录。起因很简单：想看看 0.6B 这种“小参数”模型， 在两张 RTX 5090 上，到底能不能用强化学习训出像样的数学推理和 Agent 能力。 起点是 Datawhale 第 11 章的 hello-agents 案例，之后延伸出了一堆东西。 从 GSM8K 数学推理，到多轮工具调用，再到自己搭一个跨应用的工具基准， 最后还顺手用 QLoRA 挑战了一下 72B 的微调。 想试着讲讲看整个过程踩到的无数的坑。 &lt;strong&gt;完整的论文、报告和代码&lt;/strong&gt;：…</description>
+        <description>这篇文章是我最近一个月做的一组实验的记录。起因很简单：想看看 0.6B 这种“小参数”模型， 在两张 RTX 5090 上，到底能不能用强化学习训出像样的数学推理和 Agent 能力。 起点是 Datawhale HelloAgents 第十一章 Agentic-RL ，之后延伸出了一堆东西。 从 GSM8K…</description>
       </item>
       <item>
         <title>用 pilog 搭建像素风博客</title>

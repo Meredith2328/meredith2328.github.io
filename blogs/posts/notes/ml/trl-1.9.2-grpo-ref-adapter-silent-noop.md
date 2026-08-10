@@ -9,7 +9,7 @@ feature: null
 isTop: false
 ---
 
-先说结论：**TRL 1.9.2 的 `GRPOTrainer` 在“从已有的 LoRA adapter 继续训练”这条路上，藏着一个会静默空转的 bug**。
+**TRL 1.9.2 的 `GRPOTrainer` 有一个“静默”的bug，使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。**
 
 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter 逐字节相同——模型压根没被训过。
 
@@ -23,11 +23,11 @@ isTop: false
 2. 把它直接交给 `GRPOTrainer`，并且 **`beta != 0`**（也就是开了 KL 约束，要和参考策略做对比）；
 3. 没有额外传 `peft_config`（因为模型本身已经是 PeftModel 了）。
 
-这算不上什么冷门场景。SFT 预热完再上 GRPO，是 Agentic RL 里最常见的流程之一。我们用 Qwen3-0.6B 在双卡 5090 上完整跑了一轮：100 步、带过程奖励、跑满、wandb 曲线齐全，看起来什么都是对的。直到某天备份时顺手对比了一下权重哈希，才发现训练产物和 SFT 初始化一模一样——那一整轮实验等于白跑。
+这算不上什么冷门场景。SFT 预热完再上 GRPO，是 Agentic RL 里最常见的流程之一。[我们用 Qwen3-0.6B 在双卡 5090 上完整跑了一轮](https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html) ：100 步、带过程奖励、跑满、wandb 曲线齐全，看起来什么都是对的。直到某天备份时顺手对比了一下权重哈希，才发现训练产物和 SFT 初始化一模一样——那一整轮实验等于白跑。
 
 ## 最小复现
 
-我在 Kaggle 放了一个公开的复现 notebook，CPU 就能跑，两三分钟出结果：
+我在 Kaggle 放了一个公开的复现 notebook，用来最小复现这个问题。CPU 就能跑，两三分钟出结果：
 
 [TRL 1.9.2 ref adapter silent no-op repro](https://www.kaggle.com/code/meredith10pi/trl-1-9-2-ref-adapter-silent-no-op-repro)
 
@@ -76,7 +76,7 @@ saved == initial: False
 
 两个办法都能让训练真正发生，选一个就行：
 
-**最快的办法**：加载时传 `is_trainable=True`，一行搞定。
+**最快的办法**：如果省事想直接用，加载时传 `is_trainable=True`，一行搞定。类似 [#3031](https://github.com/huggingface/trl/issues/3031) 。
 
 ```python
 model = PeftModel.from_pretrained(base, sft_adapter, is_trainable=True)
@@ -108,25 +108,25 @@ trainer = GRPOTrainer(model=model, peft_config=LoraConfig(...), ...)
 - **它没有消除 ref adapter 这个脆弱点。** `is_trainable=True` 时 TRL 依然会创建一个 `ref` 副本（我们实测它是冻结的，语义上没有坏），但“ref 应该冻结”这件事目前靠的是 PEFT 的行为，而不是 TRL 自己给的保证。框架修好之前，这个机制随时可能再出问题。
 - **默认用法仍然是个坑。** 框架的默认行为（`is_trainable=False` + `beta != 0` → 空优化器）不改，文档里也不会写，迟早还会有人踩上去。
 
-所以我的结论是：`is_trainable=True` 是最快的逃生舱，`merge_and_unload` 是官方推荐、也更可控的一条路，但两者本质上都是在绕路——真正该修的是框架本身。
+所以我的结论是：`is_trainable=True` 是为了图省事，而 `merge_and_unload` 是官方推荐、也更可控的一条路，但两者本质上都是在绕路——真正该修的是框架本身。
 
-## 对 TRL 的建议
+## 对 TRL 的建议：可观测性
 
 这个 bug 最危险的地方不是“没训”，而是**全程没有任何报错**。框架侧至少应该做两件事：
 
 1. `GRPOTrainer` 初始化时检查策略 adapter 有没有可训练参数，没有就直接抛错，把原因讲清楚（提示 `is_trainable=True` 或者传 `peft_config`）；
 2. 创建 `ref` adapter 的时候显式把它冻结，别让它把 default 一起拖下水。
 
-完整的证据链、根因分析、以及按 TRL 仓库模板写好的 issue / PR 草稿，我都整理在了实验仓库里，等人工确认后再提交。顺带一提，[#3031](https://github.com/huggingface/trl/issues/3031) 看起来和我们很像，但症状不一样：那边是“奖励完全不涨、梯度为 0”，一眼就能看出有问题；我们这边是**所有指标都在动**，只有对比权重哈希才能发现——比那个隐蔽得多。
+完整的证据链、根因分析，我都整理在了实验仓库里，之后会提交一下看看。顺带一提，[#3031](https://github.com/huggingface/trl/issues/3031) 看起来和我们很像，但症状不一样：那边是“奖励完全不涨、梯度为 0”，一眼就能看出有问题；我们这边是**所有指标都在动**，只有对比权重哈希才能发现——比那个隐蔽得多。
 
 ## 怎么检查自己有没有中招
 
 如果你做过“SFT 预热 → GRPO 续训”，而且当时用的是 `PeftModel.from_pretrained` 直接加载，花十秒钟自查一下：
 
 - 训练日志里加一行，打印 `optimizer.param_groups` 里的参数个数，是 0 就说明中招了；
-- 或者更直接：把训练后的 adapter 和初始 adapter 各算一个 md5，一样就是没训；
-- 再懒一点：对比训练前后在验证集上的表现，完全没变化也要起疑心。
+- 或者另一种方式：把训练后的 adapter 和初始 adapter 各算一个 md5，一样就是没训；
+- 再懒一点：对比训练前后在验证集上的表现，”百分比完全没变化“也要起疑心。
 
-这个 bug 教会我的还是那件事：**RL 是“稀疏”的，日志会骗人，只有可观测性不会。** 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。
+这个 bug 教会我的还是那件事：**RL 是“稀疏”的，日志会骗人，只有可观测性不会。** 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。~~毕竟真金白银拿去租卡训的模型，结果训了半天实验是废的，这谁绷得住啊~~
 
 完整的技术档案（源码级根因、替代解释排除、Kaggle 复现结果）会随 issue / PR 一起公开；在那之前，想动手复现的话，用上面那个公开的 Kaggle notebook 就够了。
