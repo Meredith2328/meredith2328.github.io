@@ -4,7 +4,8 @@
 {% block og_type %}article{% endblock %}
 {% block og_title %}{{ post.title }}{% endblock %}
 {% block og_extra %}
-  {% if post.thumb_url %}<meta property="og:image" content="{{ site.site_url }}/{{ post.thumb_url }}">{% endif %}
+  {% set og_img = post.feature_url or post.thumb_url or 'assets/og-default.png' %}
+  <meta property="og:image" content="{{ site.site_url }}/{{ og_img }}">
   <meta property="article:published_time" content="{{ post.date.isoformat() }}">
 {% endblock %}
 
@@ -28,6 +29,8 @@
   </div>
   {% endif %}
 
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
+
   <div class="post-body markdown-body" data-chapters="{{ post.chapter_count }}" data-per-page="{{ post.chapters_per_page }}">
     {{ post.html|safe }}
   </div>
@@ -38,6 +41,17 @@
     <select id="pager-select" aria-label="跳转到章节"></select>
     <span class="pager-info" id="pager-info"></span>
     <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  {% endif %}
+
+  {% if post.prev_post or post.next_post %}
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    {% if post.prev_post %}
+    <a class="post-nav-link is-prev" href="{{ root }}{{ post.prev_post.url }}">← 上一篇<br><span class="post-nav-title">{{ post.prev_post.title }}</span></a>
+    {% endif %}
+    {% if post.next_post %}
+    <a class="post-nav-link is-next" href="{{ root }}{{ post.next_post.url }}">下一篇 →<br><span class="post-nav-title">{{ post.next_post.title }}</span></a>
+    {% endif %}
   </nav>
   {% endif %}
 
@@ -57,7 +71,12 @@
       data-theme="light"
       data-lang="{{ giscus.lang }}"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   {% endif %}
 </article>
@@ -66,5 +85,9 @@
 {% block scripts %}
 {% if post.chapter_count and post.chapter_count > 1 %}
 <script src="{{ root }}js/pager.js" defer></script>
+{% endif %}
+<script src="{{ root }}js/toc.js" defer></script>
+{% if giscus and giscus.enabled and giscus.repo %}
+<script src="{{ root }}js/giscus.js" defer></script>
 {% endif %}
 {% endblock %}

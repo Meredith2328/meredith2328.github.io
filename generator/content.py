@@ -30,6 +30,8 @@ class Post:
     order: float | None = None
     chapters_per_page: int = 0
     chapter_count: int = 0
+    prev_post: object | None = None
+    next_post: object | None = None
     folder: str = ""
     url: str = ""
     html: str = ""

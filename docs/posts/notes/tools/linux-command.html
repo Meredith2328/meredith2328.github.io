@@ -5,25 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>值得顺便掌握一下的那些linux指令 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。 为了直接进入正题，省略诸如 cd 这样的广为人知的基础指令，直接看那些显著提升体验的东西。 用于查看磁盘空间。使用场景比如训模型会保存很多中间文件，可以这样看看需要清理哪些。 比如 fuse-overlayfs 是这个实例本身的存储， shared-nv">
+  <meta name="description" content="命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。 为了直接进入正题，省略诸如 cd 这样的广为人知的基础指令，直接看那些显著提升体验的东西。 用于查看磁盘空间。使用场景比如训模型会保存">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="值得顺便掌握一下的那些linux指令">
-  <meta property="og:description" content="命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。 为了直接进入正题，省略诸如 cd 这样的广为人知的基础指令，直接看那些显著提升体验的东西。 用于查看磁盘空间。使用场景比如训模型会保存很多中间文件，可以这样看看需要清理哪些。 比如 fuse-overlayfs 是这个实例本身的存储， shared-nv">
+  <meta property="og:description" content="命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。 为了直接进入正题，省略诸如 cd 这样的广为人知的基础指令，直接看那些显著提升体验的东西。 用于查看磁盘空间。使用场景比如训模型会保存">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/tools/linux-command.html">
   
   
+  <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2026-03-10T00:00:00">
 
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../css/fonts.css">
   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../../vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../../../css/style.css">
   
 </head>
@@ -103,6 +102,8 @@
   </header>
 
   
+
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。
@@ -296,6 +297,17 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
   
 
   
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    
+    <a class="post-nav-link is-prev" href="../../../posts/courses/cs336/CS336-hw1-2.html">← 上一篇<br><span class="post-nav-title">CS336 · Assignment 1 · 后半段：实验</span></a>
+    
+    
+    <a class="post-nav-link is-next" href="../../../posts/notes/tools/wandb.html">下一篇 →<br><span class="post-nav-title">WanDB基础使用教程总结</span></a>
+    
+  </nav>
+  
+
+  
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
     <script src="https://giscus.app/client.js"
@@ -311,7 +323,12 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
       data-theme="light"
       data-lang="zh-CN"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   
 </article>
@@ -352,11 +369,15 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
     window.PILOG_ROOT = "../../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="../../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../../vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/toc.js" defer></script>
+
+<script src="../../../js/giscus.js" defer></script>
 
 
 </body>

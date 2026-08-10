@@ -194,6 +194,39 @@ def make_dino_icons(root: Path, out: Path) -> None:
     log(f"warning: cannot make dino icons: {last_exc}")
 
 
+def make_og_default(root: Path, out: Path) -> None:
+    """Generate the default social-share card (1200x630) used by og:image for
+    pages without their own cover. Pixel style: dino sprite + title text."""
+    try:
+        from PIL import ImageDraw, ImageFont
+
+        img = Image.new("RGB", (1200, 630), "#f7f7f7")
+        draw = ImageDraw.Draw(img)
+        for x in range(4):
+            draw.rectangle([x, x, 1199 - x, 629 - x], outline="#3c4043")
+        sprite = root / "dino" / "reference" / "sprite_2x.png"
+        if sprite.exists():
+            trex = Image.open(sprite).convert("RGBA").crop(TREX_BOX)
+            trex = trex.resize((trex.width * 3, trex.height * 3), Image.NEAREST)
+            img.paste(trex, (150, 190), trex)
+        font = None
+        for cand in (r"C:\Windows\Fonts\arialbd.ttf", r"C:\Windows\Fonts\msyhbd.ttc"):
+            try:
+                font = ImageFont.truetype(cand, 86)
+                break
+            except OSError:
+                continue
+        if font is None:
+            font = ImageFont.load_default()
+        draw.text((486, 236), "10PI'S BLOG", fill="#e8eaed", font=font)
+        draw.text((480, 230), "10PI'S BLOG", fill="#3c4043", font=font)
+        (out / "assets").mkdir(parents=True, exist_ok=True)
+        img.save(out / "assets" / "og-default.png")
+        log("og default card generated")
+    except OSError as exc:
+        log(f"warning: cannot make og default card: {exc}")
+
+
 def render_nav(page_url: str, ctx: MarkdownContext) -> str:
     nav_file = ctx.blog_root / "nav.md"
     if not nav_file.exists():
@@ -399,6 +432,14 @@ def build_site(
     ctx.posts_by_rel = {p.rel: p for p in posts}
     for post in posts:
         post.url = post.rel + ".html"
+
+    # global prev/next navigation follows the card order (pinned first, then
+    # newest first); the ends wrap around to each other
+    ordered_posts = sorted_for_cards(posts)
+    total_posts = len(ordered_posts)
+    for i, post in enumerate(ordered_posts):
+        post.prev_post = ordered_posts[(i - 1) % total_posts]
+        post.next_post = ordered_posts[(i + 1) % total_posts]
 
     # 1. render each post's body + preview
     for post in posts:
@@ -617,7 +658,7 @@ def build_site(
             **base_vars,
             "root": root_prefix(post.url),
             "page_title": post.title,
-            "description": post.preview_plain[:160],
+            "description": post.preview_plain[:100],
             "canonical": (
                 cfg.site_url + "/" + post.url if cfg.site_url else ""
             ),
@@ -711,6 +752,7 @@ def build_site(
         log(f"pruned {pruned} stale pages")
 
     make_dino_icons(cfg.root, out_root)
+    make_og_default(cfg.root, out_root)
 
     # 6. rss
     rss_xml = build_rss(posts, cfg, cfg.base_path, cfg.site_url)

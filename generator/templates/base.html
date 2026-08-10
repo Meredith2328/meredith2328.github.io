@@ -5,22 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>{% block title %}{{ page_title }}{% endblock %}{% if page_title and page_title != site.title %} · {{ site.title }}{% endif %}</title>
-  <meta name="description" content="{{ description or site.subtitle }}">
+  <meta name="description" content="{{ description or site.subtitle or site.title }}">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:site_name" content="{{ site.title }}">
   <meta property="og:title" content="{% block og_title %}{% if page_title and page_title != site.title %}{{ page_title }} · {% endif %}{{ site.title }}{% endblock %}">
-  <meta property="og:description" content="{{ description or site.subtitle }}">
+  <meta property="og:description" content="{{ description or site.subtitle or site.title }}">
   {% if canonical %}<link rel="canonical" href="{{ canonical }}">{% endif %}
   {% block og_extra %}{% endblock %}
   <link rel="icon" href="{{ root }}favicon.png">
   <link rel="apple-touch-icon" href="{{ root }}favicon.png">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }} · RSS" href="{{ root }}rss.xml">
   {% if site.use_google_fonts %}
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ root }}css/fonts.css">
   {% endif %}
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="{{ root }}vendor/katex/katex.min.css">
   <link rel="stylesheet" href="{{ root }}css/style.css">
   {% block head %}{% endblock %}
 </head>
@@ -104,8 +102,8 @@
     window.PILOG_ROOT = {{ root|tojson }};
     window.PILOG_DEFAULT_VIEW = {{ site.default_view|tojson }};
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="{{ root }}vendor/katex/katex.min.js"></script>
+  <script defer src="{{ root }}vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="{{ root }}js/search.js" defer></script>
   {% block scripts %}{% endblock %}

@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50） · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题11 二分查找 专题15 动态规划 专题16 多维动态规划 回溯模板：结束条件，遍历选择，做出选择。 回溯需要考虑当前start时可以做哪些">
+  <meta name="description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题11 二分查找 专题">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）">
-  <meta property="og:description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题11 二分查找 专题15 动态规划 专题16 多维动态规划 回溯模板：结束条件，遍历选择，做出选择。 回溯需要考虑当前start时可以做哪些">
+  <meta property="og:description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题11 二分查找 专题">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/algo/algorithm-5.html">
+  
   
   <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/131482ac47af.jpg">
   <meta property="article:published_time" content="2026-03-02T00:00:00">
@@ -19,11 +20,9 @@
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../css/fonts.css">
   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../../vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../../../css/style.css">
   
 </head>
@@ -103,6 +102,8 @@
   </header>
 
   
+
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
   <div class="post-body markdown-body" data-chapters="9" data-per-page="1">
     <div class="post-chapter" data-ch="1"><p>回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。</p>
@@ -1279,6 +1280,17 @@
   
 
   
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    
+    <a class="post-nav-link is-prev" href="../../../posts/notes/algo/algorithm-4.html">← 上一篇<br><span class="post-nav-title">数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</span></a>
+    
+    
+    <a class="post-nav-link is-next" href="../../../posts/toy/reverseChess.html">下一篇 →<br><span class="post-nav-title">贴贴棋（reverseChess）介绍</span></a>
+    
+  </nav>
+  
+
+  
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
     <script src="https://giscus.app/client.js"
@@ -1294,7 +1306,12 @@
       data-theme="light"
       data-lang="zh-CN"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   
 </article>
@@ -1335,13 +1352,17 @@
     window.PILOG_ROOT = "../../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="../../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../../vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
 
 <script src="../../../js/pager.js" defer></script>
+
+<script src="../../../js/toc.js" defer></script>
+
+<script src="../../../js/giscus.js" defer></script>
 
 
 </body>

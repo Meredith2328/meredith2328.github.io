@@ -35,7 +35,12 @@
       : "第 " + start + "–" + end + " 章 / 共 " + total + " 章";
   }
 
-  function show() {
+  function scrollToEl(el) {
+    var top = el.getBoundingClientRect().top + window.pageYOffset - 24;
+    window.scrollTo({ top: top, behavior: "smooth" });
+  }
+
+  function show(scrollTarget) {
     var start = page * per;
     chapters.forEach(function (ch, i) {
       ch.hidden = i < start || i >= start + per;
@@ -47,7 +52,11 @@
     if (history.replaceState) {
       history.replaceState(null, "", "#ch-" + (page + 1));
     }
-    body.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (scrollTarget && scrollTarget !== body) {
+      scrollToEl(scrollTarget);
+    } else {
+      body.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   prevBtn.addEventListener("click", function () {
@@ -70,11 +79,41 @@
     }
   });
 
+  var initialHash = location.hash;
+
   // deep link: #ch-N opens that page directly (all chapters share one URL)
-  var m = location.hash.match(/^#ch-(\d+)$/);
+  var m = initialHash.match(/^#ch-(\d+)$/);
   if (m) {
     var wanted = parseInt(m[1], 10) - 1;
     if (!isNaN(wanted) && wanted >= 0 && wanted < pages) page = wanted;
   }
+
+  window.pilogPager = {
+    jumpToHeading: function (h) {
+      if (!h) return false;
+      var ch = h.closest(".post-chapter");
+      if (!ch) return false;
+      var idx = Array.prototype.indexOf.call(chapters, ch);
+      if (idx < 0) return false;
+      var targetPage = Math.floor(idx / per);
+      if (targetPage !== page) {
+        page = targetPage;
+        show(h);
+      } else {
+        scrollToEl(h);
+      }
+      return true;
+    }
+  };
   show();
+
+  // heading hash (#section-id) inside a hidden chapter -> jump to that page
+  if (initialHash.length > 1 && !/^#ch-/.test(initialHash)) {
+    var target = document.getElementById(
+      decodeURIComponent(initialHash.slice(1))
+    );
+    if (target && body.contains(target)) {
+      window.pilogPager.jumpToHeading(target);
+    }
+  }
 })();

@@ -229,7 +229,7 @@ giscus 是**客户端**评论系统（GitHub Discussions 驱动），博客侧�
 
 **想换字体或配色？** 主题样式集中在 `generator/static/css/style.css` 顶部的 CSS 变量里（`--paper`、`--ink`、`--accent` 等）。
 
-**想关掉 Google Fonts？** `config.json` 里 `use_google_fonts: false`，回退到系统字体（Windows 上为 Segoe UI + 微软雅黑，代码为 Cascadia Code/Consolas）。
+**字体从哪来？** 字体已自托管在仓库里（`generator/static/fonts/`，Inter + JetBrains Mono 的 woff2），`config.json` 里 `use_google_fonts: false` 可关闭、回退到系统字体（Windows 上为 Segoe UI + 微软雅黑，代码为 Cascadia Code/Consolas）。KaTeX 也已自托管（`generator/static/vendor/katex/`），全站不依赖 Google Fonts 与 jsDelivr CDN。
 
 ## 许可
 

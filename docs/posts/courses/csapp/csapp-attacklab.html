@@ -5,25 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>CSAPP · Attacklab · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="这个lab不用打断点方便很多。 末尾加 -q 是不发送到评测服务器。 我们要做的事情类似于phase3，如下： 此时我们要解决以下问题： 0x556400b8 本来是我们用于存放字符串的位置（执行的命令之后），但是我们现在此位置未知。 首先类似于phase4，将我们所需注入的代码： mov 字符串地址,%rdi 和执行">
+  <meta name="description" content="这个lab不用打断点方便很多。 末尾加 -q 是不发送到评测服务器。 我们要做的事情类似于phase3，如下： 此时我们要解决以下问题： 0x556400b8 本来是我们用于存放字符串的位置（执行的命">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="CSAPP · Attacklab">
-  <meta property="og:description" content="这个lab不用打断点方便很多。 末尾加 -q 是不发送到评测服务器。 我们要做的事情类似于phase3，如下： 此时我们要解决以下问题： 0x556400b8 本来是我们用于存放字符串的位置（执行的命令之后），但是我们现在此位置未知。 首先类似于phase4，将我们所需注入的代码： mov 字符串地址,%rdi 和执行">
+  <meta property="og:description" content="这个lab不用打断点方便很多。 末尾加 -q 是不发送到评测服务器。 我们要做的事情类似于phase3，如下： 此时我们要解决以下问题： 0x556400b8 本来是我们用于存放字符串的位置（执行的命">
   <link rel="canonical" href="https://meredith2328.github.io/posts/courses/csapp/csapp-attacklab.html">
   
-  <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/4a368d1637ce.jpg">
+  
+  <meta property="og:image" content="https://meredith2328.github.io/posts/migrated/post-images/csapp-attacklab.png">
   <meta property="article:published_time" content="2024-05-15T00:00:00">
 
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../css/fonts.css">
   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../../vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../../../css/style.css">
   
 </head>
@@ -107,6 +106,8 @@
     <img class="post-hero-img" src="../../../posts/migrated/post-images/csapp-attacklab.png" alt="">
   </div>
   
+
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
@@ -473,6 +474,17 @@ ret
   
 
   
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    
+    <a class="post-nav-link is-prev" href="../../../posts/courses/csapp/csapp-cachelab.html">← 上一篇<br><span class="post-nav-title">CSAPP · Cachelab</span></a>
+    
+    
+    <a class="post-nav-link is-next" href="../../../posts/courses/csapp/csapp-bomblab.html">下一篇 →<br><span class="post-nav-title">CSAPP · Bomblab</span></a>
+    
+  </nav>
+  
+
+  
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
     <script src="https://giscus.app/client.js"
@@ -488,7 +500,12 @@ ret
       data-theme="light"
       data-lang="zh-CN"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   
 </article>
@@ -529,11 +546,15 @@ ret
     window.PILOG_ROOT = "../../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="../../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../../vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/toc.js" defer></script>
+
+<script src="../../../js/giscus.js" defer></script>
 
 
 </body>

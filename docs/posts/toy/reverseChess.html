@@ -5,25 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>贴贴棋（reverseChess）介绍 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="在线游玩：贴贴棋 贴贴棋是一个10x10的黑白棋变体小游戏，纯HTML（JavaScript）。最主要的规则如下： （复制）如果走到的地方周围三面为空（不考虑移动前的位置，因为总是为空，下同），则任取一面置黑色。 （同化）如果一面有白棋、两面为空，则将白棋和任意一面空的同时置为黑色。 （保留）如果两面有白棋、一面为空，">
+  <meta name="description" content="在线游玩：贴贴棋 贴贴棋是一个10x10的黑白棋变体小游戏，纯HTML（JavaScript）。最主要的规则如下： （复制）如果走到的地方周围三面为空（不考虑移动前的位置，因为总是为空，下同），则任取">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="贴贴棋（reverseChess）介绍">
-  <meta property="og:description" content="在线游玩：贴贴棋 贴贴棋是一个10x10的黑白棋变体小游戏，纯HTML（JavaScript）。最主要的规则如下： （复制）如果走到的地方周围三面为空（不考虑移动前的位置，因为总是为空，下同），则任取一面置黑色。 （同化）如果一面有白棋、两面为空，则将白棋和任意一面空的同时置为黑色。 （保留）如果两面有白棋、一面为空，">
+  <meta property="og:description" content="在线游玩：贴贴棋 贴贴棋是一个10x10的黑白棋变体小游戏，纯HTML（JavaScript）。最主要的规则如下： （复制）如果走到的地方周围三面为空（不考虑移动前的位置，因为总是为空，下同），则任取">
   <link rel="canonical" href="https://meredith2328.github.io/posts/toy/reverseChess.html">
   
-  <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/ac00dd2b7d4e.jpg">
+  
+  <meta property="og:image" content="https://meredith2328.github.io/posts/migrated/post-images/reverseChess.png">
   <meta property="article:published_time" content="2026-02-26T00:00:00">
 
   <link rel="icon" href="../../favicon.png">
   <link rel="apple-touch-icon" href="../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../rss.xml">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/fonts.css">
   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../../css/style.css">
   
 </head>
@@ -108,6 +107,8 @@
   </div>
   
 
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
+
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>在线游玩：<a href="https://meredith2328.github.io/reverseChess/">贴贴棋</a></p>
 <!-- more -->
@@ -127,6 +128,17 @@
   
 
   
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    
+    <a class="post-nav-link is-prev" href="../../posts/notes/algo/algorithm-5.html">← 上一篇<br><span class="post-nav-title">数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）</span></a>
+    
+    
+    <a class="post-nav-link is-next" href="../../posts/notes/tools/einops.html">下一篇 →<br><span class="post-nav-title">用einops包替换掉PyTorch的大部分矩阵变换函数</span></a>
+    
+  </nav>
+  
+
+  
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
     <script src="https://giscus.app/client.js"
@@ -142,7 +154,12 @@
       data-theme="light"
       data-lang="zh-CN"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   
 </article>
@@ -183,11 +200,15 @@
     window.PILOG_ROOT = "../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+<script src="../../js/toc.js" defer></script>
+
+<script src="../../js/giscus.js" defer></script>
 
 
 </body>

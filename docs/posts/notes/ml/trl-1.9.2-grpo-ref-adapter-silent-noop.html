@@ -5,25 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wand">
+  <meta name="description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的">
-  <meta property="og:description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wand">
+  <meta property="og:description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
   
   
+  <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2026-08-10T00:00:00">
 
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../css/fonts.css">
   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../../vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../../../css/style.css">
   
 </head>
@@ -103,6 +102,8 @@
   </header>
 
   
+
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p><strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。</strong></p>
@@ -198,6 +199,17 @@ saved == initial: False
   
 
   
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    
+    <a class="post-nav-link is-prev" href="../../../posts/toy/10pi.html">← 上一篇<br><span class="post-nav-title">十派的玩具箱有哪些内容？</span></a>
+    
+    
+    <a class="post-nav-link is-next" href="../../../posts/notes/ml/mathqwen-0.6b-agentic-rl.html">下一篇 →<br><span class="post-nav-title">用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦</span></a>
+    
+  </nav>
+  
+
+  
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
     <script src="https://giscus.app/client.js"
@@ -213,7 +225,12 @@ saved == initial: False
       data-theme="light"
       data-lang="zh-CN"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   
 </article>
@@ -254,11 +271,15 @@ saved == initial: False
     window.PILOG_ROOT = "../../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="../../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../../vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/toc.js" defer></script>
+
+<script src="../../../js/giscus.js" defer></script>
 
 
 </body>

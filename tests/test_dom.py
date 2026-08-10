@@ -68,6 +68,8 @@ def main() -> None:
         ok &= check("highlight card shown", page.locator(".card.is-highlight").count() >= 1)
         body_font = page.evaluate("getComputedStyle(document.body).fontFamily")
         ok &= check("sans font stack", "Inter" in body_font or "Segoe" in body_font, body_font[:60])
+        ok &= check("fonts self-hosted", page.locator('link[href$="css/fonts.css"]').count() == 1)
+        ok &= check("katex self-hosted", page.locator('link[href$="vendor/katex/katex.min.css"]').count() == 1)
         card_h = page.locator(".card").first.bounding_box()["height"]
         ok &= check("card height reasonable", 150 < card_h < 320, str(card_h))
         thumb_w = page.locator(".card-thumb img").first.bounding_box()["width"]
@@ -278,14 +280,53 @@ def main() -> None:
         ok &= check("long post paged into chapters", chapters >= 5, str(chapters))
         ok &= check("pager nav visible", page.locator("#post-pager").is_visible())
         ok &= check("series nav box styled", page.locator(".post-rel.is-series").count() == 1)
+        ok &= check("post TOC built", page.locator("#post-toc").is_visible() and
+                    page.locator("#post-toc a").count() >= 5,
+                    str(page.locator("#post-toc a").count()))
         info1 = page.locator("#pager-info").inner_text()
         ok &= check("pager starts at chapter 1", "第 1 章" in info1, info1)
         page.click("#pager-next")
         page.wait_for_timeout(400)
         info2 = page.locator("#pager-info").inner_text()
         ok &= check("pager next switches chapter", "第 2 章" in info2, info2)
+        # clicking a TOC entry for a hidden chapter switches to its page
+        page.locator("#post-toc a", has_text="专题四").click()
+        page.wait_for_timeout(600)
+        info3 = page.locator("#pager-info").inner_text()
+        ok &= check("TOC jumps to hidden chapter page", "第 5 章" in info3, info3)
         page.goto(base + "/posts/notes/ml/mathqwen-0.6b-agentic-rl.html", wait_until="networkidle")
         ok &= check("related box styled", page.locator(".post-rel.is-related").count() == 1)
+        # scroll-spy highlights the section in view
+        page.evaluate("window.scrollTo(0, document.querySelector('.post-body').offsetHeight)")
+        page.wait_for_timeout(500)
+        ok &= check("TOC scroll-spy active", page.locator("#post-toc a.is-active").count() == 1)
+
+        # prev/next post navigation (card order, wraps at the ends)
+        page.goto(base + "/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html",
+                  wait_until="networkidle")
+        prev_href = page.locator(".post-nav-link.is-prev").get_attribute("href")
+        next_href = page.locator(".post-nav-link.is-next").get_attribute("href")
+        ok &= check("prev points to previous post", prev_href and "10pi" in prev_href, str(prev_href))
+        ok &= check("next points to next post", next_href and "mathqwen" in next_href, str(next_href))
+        page.goto(base + "/posts/toy/zi-she.html", wait_until="networkidle")
+        wrap_href = page.locator(".post-nav-link.is-next").get_attribute("href")
+        ok &= check("oldest post next wraps to first", wrap_href and "10pi" in wrap_href, str(wrap_href))
+
+        # og:image uses the cover (not favicon) and description is filled
+        page.goto(base + "/posts/toy/10pi.html", wait_until="networkidle")
+        og_img = page.evaluate("document.querySelector('meta[property=\"og:image\"]').content")
+        ok &= check("og:image uses cover", "10pi" in og_img and "favicon" not in og_img, og_img)
+        og_desc = page.evaluate("document.querySelector('meta[property=\"og:description\"]').content")
+        ok &= check("og:description non-empty", len(og_desc) > 20, og_desc[:40])
+        page.goto(base + "/", wait_until="networkidle")
+        home_desc = page.evaluate("document.querySelector('meta[name=description]').content")
+        ok &= check("home description fallback", len(home_desc) > 0, home_desc[:40])
+
+        # giscus failure fallback: a retry button appears when the widget fails
+        page.goto(base + "/posts/toy/pilog-blog.html", wait_until="networkidle")
+        page.wait_for_selector("#giscus-fallback:not([hidden])", timeout=10000)
+        ok &= check("giscus fallback shows on failure",
+                    page.locator("#giscus-retry").is_visible())
 
         # screenshots sanity
         for name in ["01-cards.png", "02-tree.png", "03-graph.png", "05-post.png", "06-mobile.png"]:

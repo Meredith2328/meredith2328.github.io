@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>结合nanovllm的FlashAttention和PagedAttention主要原理概述 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="总结：FlashAttention用于降低Attention计算阶段预存的显存消耗（内部计算范畴）， PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。 FlashAttention： 问题：标准 Attention 需要存储 N×N 的中间矩阵，显存 O(N²) 解决：分块 + 在线 s">
+  <meta name="description" content="总结：FlashAttention用于降低Attention计算阶段预存的显存消耗（内部计算范畴）， PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。 FlashAtt">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="结合nanovllm的FlashAttention和PagedAttention主要原理概述">
-  <meta property="og:description" content="总结：FlashAttention用于降低Attention计算阶段预存的显存消耗（内部计算范畴）， PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。 FlashAttention： 问题：标准 Attention 需要存储 N×N 的中间矩阵，显存 O(N²) 解决：分块 + 在线 s">
+  <meta property="og:description" content="总结：FlashAttention用于降低Attention计算阶段预存的显存消耗（内部计算范畴）， PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。 FlashAtt">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/nanovllm.html">
+  
   
   <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/6a6b24883449.jpg">
   <meta property="article:published_time" content="2026-05-16T00:00:00">
@@ -19,11 +20,9 @@
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../css/fonts.css">
   
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../../vendor/katex/katex.min.css">
   <link rel="stylesheet" href="../../../css/style.css">
   
 </head>
@@ -103,6 +102,8 @@
   </header>
 
   
+
+  <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
@@ -474,6 +475,17 @@ PagedAttention：block size = 4 tokens，按需动态分配
   
 
   
+  <nav class="post-nav" aria-label="上一篇 / 下一篇">
+    
+    <a class="post-nav-link is-prev" href="../../../posts/toy/xyjz.html">← 上一篇<br><span class="post-nav-title">夏夜将终：一个乐队官网的诞生</span></a>
+    
+    
+    <a class="post-nav-link is-next" href="../../../posts/toy/notegotya.html">下一篇 →<br><span class="post-nav-title">做了一个叫notegotya的五线谱识谱练习玩具</span></a>
+    
+  </nav>
+  
+
+  
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
     <script src="https://giscus.app/client.js"
@@ -489,7 +501,12 @@ PagedAttention：block size = 4 tokens，按需动态分配
       data-theme="light"
       data-lang="zh-CN"
       crossorigin="anonymous"
+      onerror="window.__giscusFail&&window.__giscusFail()"
       async></script>
+    <div class="giscus-fallback" id="giscus-fallback" hidden>
+      <span>评论加载失败，可能网络不太稳定。</span>
+      <button class="pixel-btn" type="button" id="giscus-retry">重新加载</button>
+    </div>
   </section>
   
 </article>
@@ -530,11 +547,15 @@ PagedAttention：block size = 4 tokens，按需动态分配
     window.PILOG_ROOT = "../../../";
     window.PILOG_DEFAULT_VIEW = "cards";
   </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  <script defer src="../../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../../vendor/katex/contrib/auto-render.min.js"
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/toc.js" defer></script>
+
+<script src="../../../js/giscus.js" defer></script>
 
 
 </body>

@@ -93,7 +93,7 @@ feature: true
 | `default_view` | 首页默认视图：卡片 / 清单 / 图谱 |
 | `cards_per_page` | 卡片视图每页数量 |
 | `collapse_threshold` | 文章多时目录 / 图谱的默认折叠阈值 |
-| `use_google_fonts` | 是否加载 Google 字体 |
+| `use_google_fonts` | 是否加载自托管字体（Inter + JetBrains Mono，woff2 已随仓库分发） |
 | `show_dino` | 右下角小恐龙游戏开关 |
 | `socials` | 社交账号图标：GitHub / X / Bilibili / 微博 / 邮箱 / RSS |
 | `giscus` | 评论（GitHub Discussions 驱动） |
