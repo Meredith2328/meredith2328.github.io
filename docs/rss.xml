@@ -8,6 +8,13 @@
     <language>zh-CN</language>
     <generator>pilog</generator>
       <item>
+        <title>抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的</title>
+        <link>https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html</guid>
+        <pubDate>Mon, 10 Aug 2026 00:00:00 -0000</pubDate>
+        <description>先说结论：&lt;strong&gt;TRL 1.9.2 的 &lt;code&gt;GRPOTrainer&lt;/code&gt; 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug&lt;/strong&gt;。训练跑完、日志好看、loss 在降、reward 在涨、grad_norm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。 这不是我们写错了什么玄学配置，而是框架在某种官方支持的使用方式下，自己把优化器建成了空的。下面把它讲清楚：什么情况会踩、怎么最小复现、根因在哪、怎么修、怎么自检。 同时满足下面三个条件就会踩：  你先用…； </description>
+      </item>
+      <item>
         <title>用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦</title>
         <link>https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html</guid>
@@ -19,7 +26,7 @@
         <link>https://meredith2328.github.io/posts/toy/pilog-blog.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/pilog-blog.html</guid>
         <pubDate>Thu, 30 Jul 2026 00:00:00 -0000</pubDate>
-        <description>一套个人自制的轻量静态博客框架：读取 &lt;code&gt;blogs/&lt;/code&gt; 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，主题复刻 Chrome 断网页的像素美学。</description>
+        <description>一套个人自制的轻量静态博客框架：所有东西都可以用Markdown修改。 读取 &lt;code&gt;blogs/&lt;/code&gt; 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，Chrome小恐龙风格。</description>
       </item>
       <item>
         <title>夏夜将终：一个乐队官网的诞生</title>
@@ -110,7 +117,7 @@
         <link>https://meredith2328.github.io/posts/notes/algo/algorithm-4.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/algo/algorithm-4.html</guid>
         <pubDate>Mon, 02 Mar 2026 00:00:00 -0000</pubDate>
-        <description>哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。  专题1 哈希 需要什么就哈希记录什么。 专题2 双指针 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 对滑动窗口的理解是：处理移动窗口前后的差分。 专题4 子串 专题5 数组 专题6 矩阵 专题7 链表 链表的一个重要工具是prev指针，用于指示前一个节点。 专题8 二叉树 专题9 图 1…</description>
+        <description>哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。  专题1 哈希 需要什么就哈希记录什么。 专题2 双指针 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。 专题4 子串 专题5 数组 专题6 矩阵 专题7 链表 链表的一个重要工具是prev指针，用于指示前一个节点。 专题8 二叉树 专题9…</description>
       </item>
       <item>
         <title>【数据结构与算法5】LeetCode HOT 100 in Python（后50）</title>

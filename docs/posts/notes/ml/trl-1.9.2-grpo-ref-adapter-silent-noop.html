@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="pilog">
+  <title>抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的 · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <meta name="description" content="先说结论：TRL 1.9.2 的 GRPOTrainer 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug。训练跑完、日志好看、loss 在降、reward 在涨、gradnorm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。 这不是我们写错了什么玄学配置，而">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
+  <meta property="og:title" content="抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的">
+  <meta property="og:description" content="先说结论：TRL 1.9.2 的 GRPOTrainer 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug。训练跑完、日志好看、loss 在降、reward 在涨、gradnorm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。 这不是我们写错了什么玄学配置，而">
+  <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
+  
+  
+  <meta property="article:published_time" content="2026-08-10T00:00:00">
+
+  <link rel="icon" href="../../../favicon.png">
+  <link rel="apple-touch-icon" href="../../../favicon.png">
+  <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../../css/style.css">
+  
+</head>
+<body>
+  <div class="deco deco-left" aria-hidden="true"></div>
+  <div class="deco deco-right" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-banner is-default"
+         style="background-image:url('../../../img/banner-default.svg')"></div>
+    <div class="header-row">
+      <a class="brand" href="../../../index.html">
+        <img class="brand-icon" src="../../../img/dino-icon.png" alt="dino" width="28" height="30">
+        <span class="brand-name">10PI&#39;S BLOG丨十派的玩具箱</span>
+        
+      </a>
+
+      <div class="view-switch" role="tablist" aria-label="视图切换">
+        <button class="view-tab is-active" role="tab" data-view="cards" aria-selected="true">卡片视图</button>
+        <button class="view-tab" role="tab" data-view="tree" aria-selected="false">清单视图</button>
+        <button class="view-tab" role="tab" data-view="graph" aria-selected="false">图谱视图</button>
+      </div>
+
+      <div class="search-wrap" id="search-wrap">
+        <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
+               autocomplete="off" aria-label="搜索">
+        <div class="search-results" id="search-results" hidden></div>
+      </div>
+
+      <div class="socials">
+        
+          
+            <a class="social-icon" href="https://github.com/meredith2328" title="github" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+          <a class="social-icon" href="../../../rss.xml" title="RSS"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+        
+      </div>
+    </div>
+    
+    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+<ul>
+<li><a href="../../../index.html">首页</a></li>
+<li><a href="../../toy/10pi.html">关于</a></li>
+<li><a data-kind="folder" href="../../../index.html#folder=posts/courses">CS相关</a></li>
+<li><a data-kind="folder" href="../../../index.html#folder=posts/toy">玩具</a></li>
+<li><a href="../../toy/friends.html">友链</a></li>
+<li><a href="../../../dino/index.html">恐龙游戏</a></li>
+</ul></nav>
+    
+  </header>
+
+  <main class="site-main">
+<article class="post">
+  <header class="post-header">
+    <a class="back-link" href="../../../index.html">← 返回首页</a>
+    <h1 class="post-title">抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的</h1>
+    <div class="post-meta">
+      <time datetime="2026-08-10T00:00:00">2026-08-10</time>
+      
+      <a class="tag-chip" href="../../../index.html#tag=%E5%A4%A7%E6%A8%A1%E5%9E%8B">#大模型</a>
+      
+      <span class="post-folder">▣ posts/notes/ml</span>
+    </div>
+  </header>
+
+  
+
+  <div class="post-body markdown-body">
+    <p>先说结论：<strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug</strong>。训练跑完、日志好看、loss 在降、reward 在涨、grad_norm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。</p>
+<p>这不是我们写错了什么玄学配置，而是框架在某种官方支持的使用方式下，自己把优化器建成了空的。下面把它讲清楚：什么情况会踩、怎么最小复现、根因在哪、怎么修、怎么自检。</p>
+<h2 id="_1">什么情况下会踩</h2>
+<p>同时满足下面三个条件就会踩：</p>
+<ol>
+<li>你先用 <code>PeftModel.from_pretrained(base, adapter)</code> 加载了一个已有的 LoRA adapter（注意这里<strong>默认</strong> <code>is_trainable=False</code>）；</li>
+<li>把它直接交给 <code>GRPOTrainer</code>，且 <strong><code>beta != 0</code></strong>（也就是要用 KL 约束参考策略）；</li>
+<li>没有额外传 <code>peft_config</code>（因为模型已经是 PeftModel 了）。</li>
+</ol>
+<p>这不算是冷门用法：SFT 预热完再上 GRPO，是 Agentic RL 最常见的流程之一。我们用 Qwen3-0.6B 在双卡 5090 上跑了一整轮实验（100 步、带过程奖励、跑满、wandb 曲线齐全），结果权重哈希一对比，和 SFT 初始化一模一样——白跑。</p>
+<h2 id="_2">最小复现</h2>
+<p>我在 Kaggle 上放了一个公开的复现 notebook（CPU 就能跑，两三分钟）：</p>
+<p><a href="https://www.kaggle.com/code/meredith10pi/trl-1-9-2-ref-adapter-silent-no-op-repro">TRL 1.9.2 ref adapter silent no-op repro</a></p>
+<p>核心代码就这几行：</p>
+<div class="highlight"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>   <span class="c1"># is_trainable=False</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">GRPOConfig</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">...</span><span class="p">),</span>   <span class="c1"># beta != 0 触发 bug 路径</span>
+    <span class="n">reward_funcs</span><span class="o">=</span><span class="p">[</span><span class="n">reward_fn</span><span class="p">],</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">train</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</code></pre></div>
+<p>跑完看三件事：</p>
+<div class="highlight"><pre><span></span><code>trainable params right after trainer init: 0        # ← 已经不对劲
+optimizer param count (captured at creation): 0     # ← 实锤：优化器是空的
+last log line: {'loss': -0.26, 'grad_norm': 0.001, 'reward': 0.625}   # ← 但指标活着
+saved == initial: True                              # ← 什么都没训
+</code></pre></div>
+<p>对照组就改一个参数——加载时传 <code>is_trainable=True</code>：</p>
+<div class="highlight"><pre><span></span><code>optimizer param count (captured at creation): 12
+saved == initial: False
+</code></pre></div>
+<p>同样的脚本、同样的数据、同样的奖励，只有 <code>inference_mode</code> 不同，结果从“白跑”变成“真训”。这基本锁死了根因。</p>
+<h2 id="_3">根因（三步）</h2>
+<ol>
+<li><code>PeftModel.from_pretrained(..., is_trainable=False)</code> 会在 adapter 配置里写 <code>inference_mode=True</code>。</li>
+<li><code>beta != 0</code> 时，TRL 为了算 KL 项，会自动创建一个叫 <code>ref</code> 的 adapter 作为参考策略，并且<strong>直接把 default adapter 的配置原样传过去</strong>（<code>model.add_adapter("ref", default_config)</code>）。PEFT 的 <code>inject_adapter</code> 收尾时，只要配置是 inference 模式，就会把<strong>当前激活的 adapter（default）一起冻结</strong>。</li>
+<li>于是 <code>GRPOTrainer</code> 初始化完，模型里一个可训练参数都没有，优化器创建出来是空的。</li>
+</ol>
+<p>那为什么日志还那么热闹？因为训练循环里算参考 logps 时会临时切换 adapter（<code>use_adapter</code> 里调用 <code>set_adapter</code>），把 <code>requires_grad</code> 翻来翻去：梯度照常累积、<code>grad_norm</code> 照常打印、loss 随每步采样的不同题目自然波动。<strong>只有 <code>optimizer.step()</code> 无事可做。</strong> 看起来在训练，其实只是在看风景。</p>
+<h2 id="_4">怎么修</h2>
+<p>两个办法，都能让训练真正发生：</p>
+<p><strong>最快的修法</strong>：加载时传 <code>is_trainable=True</code>。</p>
+<div class="highlight"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">,</span> <span class="n">is_trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>更稳的修法</strong>：把预热权重合进基座，再新建一个干净的 LoRA（参考策略语义上也更正确——它就是一个真正的 SFT 模型）。</p>
+<div class="highlight"><pre><span></span><code><span class="n">warm</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">warm</span><span class="o">.</span><span class="n">merge_and_unload</span><span class="p">()</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">peft_config</span><span class="o">=</span><span class="n">LoraConfig</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+<p>我们在自己的项目里用的是第二种，并把它固化成了训练脚本里的哈希校验（每次训练结束打印保存权重和初始权重的 md5，一致就报警）。</p>
+<h2 id="is_trainabletrue"><code>is_trainable=True</code> 能解决什么、不能解决什么</h2>
+<p>上面两个修法都验证有效，但它们的“能”和“不能”不一样，值得单独说清楚——免得有人以为传个参数就万事大吉。</p>
+<p><strong><code>is_trainable=True</code> 能直接解决的：</strong></p>
+<ul>
+<li>让加载的 adapter 变成可训练，优化器非空，GRPO 真正更新权重——也就是“续训白跑”这个核心症状，一行解决；</li>
+<li>原理上它把 PEFT 的 <code>inference_mode</code> 变成 <code>False</code>，正好绕开 <code>add_adapter</code> 把 default 冻结的那一步。</li>
+</ul>
+<p><strong><code>is_trainable=True</code> 解决不了的：</strong></p>
+<ul>
+<li><strong>它不会给你任何警告。</strong> 它只是让“你这一次”没踩坑；框架不会告诉你“你差点踩坑”。同一个仓库里其他人（或者未来的你）用默认的 <code>is_trainable=False</code>，还是会静默白跑。这正是要提 issue 的原因：治本要靠框架 fail fast，不能指望每个用户恰好知道这个参数。</li>
+<li><strong>它不能换 LoRA 结构。</strong> RL 阶段想改 <code>r</code>、<code>target_modules</code> 或换新的 <code>peft_config</code>？TRL 1.9.2 对“PeftModel + peft_config”的组合直接报错，<code>is_trainable=True</code> 改不了 adapter 结构——这种场景只能 <code>merge_and_unload()</code> 之后重新建 LoRA。</li>
+<li><strong>它没消除 ref adapter 这个脆弱点。</strong> <code>is_trainable=True</code> 时 TRL 仍然会创建一个 <code>ref</code> 副本（实测它是冻结的、语义没问题），但“ref 应该冻结”这件事靠的是当前 PEFT 行为，而不是 TRL 自己的保证；框架修好之前，这个机制随时可能再咬人。</li>
+<li><strong>它对默认用法仍然是陷阱。</strong> 框架的默认行为（<code>is_trainable=False</code> + <code>beta != 0</code> → 空优化器）不改，文档里也不会写，被咬只是时间问题。</li>
+</ul>
+<p>所以结论是：<code>is_trainable=True</code> 是<strong>最快的逃生舱</strong>，<code>merge_and_unload</code> 是<strong>官方推荐且更可控的路径</strong>，但两者都只是绕路——真正该修的是框架本身。</p>
+<h2 id="trl">对 TRL 的建议</h2>
+<p>这个 bug 最危险的地方不是“没训”，而是<strong>没有任何报错</strong>。所以框架侧至少应该做两件事：</p>
+<ol>
+<li><code>GRPOTrainer</code> 初始化时检查策略 adapter 有没有可训练参数，没有就直接抛错（提示 <code>is_trainable=True</code> 或传 <code>peft_config</code>）；</li>
+<li>创建 <code>ref</code> adapter 时显式冻结它，不要让它把 default 一起拖下水。</li>
+</ol>
+<p>我已经把完整的证据链、根因分析、以及按 TRL 仓库模板写好的 issue / PR 草稿整理在了我们的实验仓库里，等人工确认后再提交。相关 issue 里有一个很像的 <a href="https://github.com/huggingface/trl/issues/3031">#3031</a>，但症状不一样：那边是“奖励完全不涨、梯度为 0”，一眼就能看出有问题；这边是<strong>所有指标都在动</strong>，只有对比权重哈希才能发现——比那个隐蔽得多。</p>
+<h2 id="_5">怎么自检自己有没有踩过</h2>
+<p>如果你做过“SFT 预热 → GRPO 续训”，而且当时用的是 <code>PeftModel.from_pretrained</code> 直接加载，花十秒钟自查一下：</p>
+<ul>
+<li>训练日志里打印一下 <code>optimizer.param_groups</code> 里的参数个数，是 0 就中招了；</li>
+<li>或者更直接：把训练后的 adapter 和初始 adapter 各算一个 md5，一样就是没训；</li>
+<li>再不济，对比一下训练前后在验证集上的表现，完全没变化也要怀疑。</li>
+</ul>
+<p>这个 bug 教会我的还是那件事：<strong>RL 是“稀疏”的，日志会骗人，只有可观测性不会。</strong> 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。</p>
+<p>完整的技术档案（源码级根因、替代解释排除、Kaggle 复现结果）：<a href="https://github.com/Meredith2328/MathQwen/blob/main/docs/TRL_REF_ADAPTER_BUG.md">TRL_REF_ADAPTER_BUG.md</a></p>
+  </div>
+
+  
+  <section class="post-comments">
+    <h2 class="comments-title">评论</h2>
+    <script src="https://giscus.app/client.js"
+      data-repo="Meredith2328/pilog"
+      data-repo-id="R_kgDOTpY2UA"
+      data-category="Announcements"
+      data-category-id="DIC_kwDOTpY2UM4DCZMy"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="light"
+      data-lang="zh-CN"
+      crossorigin="anonymous"
+      async></script>
+  </section>
+  
+</article>
+</main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>© 2026 10pi (Meredith2328) — built with pilog</span>
+      <span class="footer-sep">::</span>
+      <a href="../../../rss.xml">RSS</a>
+      <span class="footer-sep">::</span>
+      <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
+    </div>
+  </footer>
+
+  
+  <div class="dino-widget" data-widget="dino">
+    <div class="dino-panel" hidden>
+      <div class="dino-bar">
+        <span class="dino-title">T-REX RUNNER</span>
+        <span class="dino-hint">点击游戏区域后按 空格</span>
+        <button class="dino-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="dino-stage">
+        <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
+        <div class="dino-loading" id="dino-loading">加载中…</div>
+      </div>
+    </div>
+    <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
+      <img src="../../../img/dino-icon.png" alt="小恐龙" width="26" height="28">
+      <span>PLAY</span>
+    </button>
+  </div>
+  
+
+  <script src="../../../js/main.js" defer></script>
+  <script>
+    window.PILOG_ROOT = "../../../";
+    window.PILOG_DEFAULT_VIEW = "cards";
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
+  <script src="../../../js/search.js" defer></script>
+  
+</body>
+</html>

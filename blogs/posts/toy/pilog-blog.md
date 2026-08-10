@@ -4,16 +4,20 @@ date: 2026-07-30
 tags:
 - 奇怪的东西
 highlight: true
-preview: 一套个人自制的轻量静态博客框架：读取 `blogs/` 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，主题复刻 Chrome 断网页的像素美学。
+preview: 一套个人自制的轻量静态博客框架：所有东西都可以用Markdown修改。 读取 `blogs/` 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，Chrome小恐龙风格。
 preview_image: assets/cover-pixel.png
 ---
 
 # 用 pilog 搭建像素风博客
 
-**pilog** 是个人自制的**所见即所得**的超轻量静态博客生成器：
-只需要在 Obsidian 里打开  `blogs/` 目录写 Markdown，
- `python pilog.py build` ：构建成带三种视图的静态站点。
- `python pilog.py serve --watch` ：本地预览并打开**控制台**（想改哪里点哪里）。
+**pilog** 是个人自制的**所见即所得**的超轻量静态博客生成器。
+
+只需要在 Obsidian 里打开  `blogs/` 目录写 Markdown，然后可以这么用：
+
+- `python pilog.py build` ：构建成带三种视图的静态站点。
+
+- `python pilog.py serve --watch` ：本地预览并打开**控制台**（想改哪里点哪里）。
+
 pilog没有数据库、没有后端，只有一个个 Markdown 文件和一个负责构建的脚本。
 
 ## 三种视图

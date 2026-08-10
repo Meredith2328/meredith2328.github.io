@@ -132,6 +132,38 @@
 
   <div class="card-grid" id="card-grid">
     
+    <article class="card" data-tags="CSAPP " data-folder="posts/courses/csapp" data-date="2025-06-17">
+      
+      <a class="card-link" href="../posts/courses/csapp/ieee754.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <time datetime="2025-06-17">2025-06-17</time>
+            
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses">courses</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses/csapp">csapp</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">IEEE754 浮点数与十进制数互相转换流程及例子</h3>
+          
+          <div class="card-preview">原来只是精度、数量级，再加上偏移量这个从无符号数到有符号数的工程实现。 <del>浮点数从未如此简单。</del> （不是）  <strong>十进制数转浮点数步骤：</strong>   十进制转二进制，如<span class="arithmatex">\(10.001_{2}\)</span>。 ；  二进制转二进制的科学计数法表示（<span class="arithmatex">\(1.xxx_2 \times 2^{yyy}\)</span>），如<span class="arithmatex">\(1.001_{2} \times 2^1\)</span>，根据指数<span class="arithmatex">\(yyy\)</span>参考下述“规格化和非规格化判断”。 ；  根据二进制的科学计数法表示，参考下述“M和E是多少”，写出s, exp,… ； </div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
+            
+          </div>
+        </div>
+        
+        <div class="card-thumb">
+          <img src="../assets/.thumbs/0a2dcca88f6f.jpg" alt="" loading="lazy">
+        </div>
+        
+      </a>
+    </article>
+    
     <article class="card is-cover" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2024-08-30">
       
       <span class="card-cover" style="background-image:url('../posts/migrated/post-images/10pi.jpg')"></span>
@@ -451,34 +483,6 @@
           <h3 class="card-title">CS61A disc04 树的递归</h3>
           
           <div class="card-preview">For the following questions, don't start trying to write code right away. Instead, start by <strong>describing the recursive case in words</strong>. Some examples:  In <code>fib</code> from lecture, the recursive case is to add together the previous two Fibonacci numbers.；  -…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
-            
-          </div>
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card" data-tags="CS61A " data-folder="posts/courses/cs61a" data-date="2023-08-30">
-      
-      <a class="card-link" href="../posts/courses/cs61a/cs61a-disc05.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <time datetime="2023-08-30">2023-08-30</time>
-            
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses">courses</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses/cs61a">cs61a</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">CS61A disc05 迭代、时空复杂度</h3>
-          
-          <div class="card-preview">使用<code>try-except</code>块是为了在循环内调用<code>next(t)</code>足够多次、通过<code>StopIteration</code>退出循环时将其处理掉。 用<code>for</code>还是很直接的，重点提一下用<code>yield from</code>构造生成函数的递归。 首先理解<code>yield from</code>，它是使用另外一个迭代器，效果类似于 `for item in iterable: yield…</div>
           
           <div class="card-tags">
             
@@ -912,6 +916,17 @@
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
               <span class="tree-name">从原始Softmax到在线Softmax</span>
               <span class="tree-date">2026-04-09</span>
+            </a>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop">
+            <a class="tree-row" href="../posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的</span>
+              <span class="tree-date">2026-08-10</span>
             </a>
           </li>
           

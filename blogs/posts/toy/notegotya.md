@@ -10,6 +10,7 @@ feature: posts/migrated/post-images/notegotya.gif
 isTop: false
 ---
 因为想学一下低音谱号，顺便再多熟练熟练不熟悉的高音谱号的读谱，所以做了个小玩具出来。
+
 把谱面难度调低还挺好玩的 → [notegotya](https://meredith2328.github.io/notegotya/)
 
 <!-- more -->

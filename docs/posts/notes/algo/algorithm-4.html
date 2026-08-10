@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>【数据结构与算法4】LeetCode HOT 100 in Python（前50） · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。 需要什么就哈希记录什么。 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 对滑动窗口的理解是：处理移动窗口前后的差分。 链表的一个重要工具是prev指针，用于指示前一个节点。">
+  <meta name="description" content="哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。 需要什么就哈希记录什么。 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。 链表的一个重要工具是prev指">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="【数据结构与算法4】LeetCode HOT 100 in Python（前50）">
-  <meta property="og:description" content="哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。 需要什么就哈希记录什么。 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 对滑动窗口的理解是：处理移动窗口前后的差分。 链表的一个重要工具是prev指针，用于指示前一个节点。">
+  <meta property="og:description" content="哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。 需要什么就哈希记录什么。 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。 链表的一个重要工具是prev指">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/algo/algorithm-4.html">
   
   <meta property="og:image" content="https://meredith2328.github.io/posts/migrated/post-images/20260302113711.png">
@@ -111,7 +111,7 @@
 专题2 双指针
 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。
 专题3 滑动窗口
-对滑动窗口的理解是：处理移动窗口前后的差分。
+滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。
 专题4 子串
 专题5 数组
 专题6 矩阵
@@ -1601,7 +1601,7 @@ class Solution:
 <blockquote>
 <p>我们怎么样把图的DFS/BFS跟之前很好想的“树的DFS”给联系起来呢？</p>
 <p>根本在于“<strong>管好自己的，引出别人的。</strong>”</p>
-<p>不管是任何DFS/BFS，自己的部分都只处理自己这个节点。与此同时，它们又要在末尾引出“还有哪些节点要处理”。这是核心逻辑。</p>
+<p>不管是任何DFS/BFS，自己的部分都只<strong>处理自己</strong>这个节点。与此同时，它们又要在末尾“<strong>引出邻居</strong>”节点供处理。这是核心逻辑。</p>
 <p>除此之外，就是利用 <code>visited</code> 来防止重复判断/重复入队了。</p>
 </blockquote>
 <p>注意仔细观察以下三个模板，逐行仔细看。这里模板多花点时间，早点想清楚，就是为了以后刷题少花点时间。</p>
@@ -1758,72 +1758,58 @@ class Solution:
                     <span class="n">maxCount</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxCount</span><span class="p">,</span> <span class="n">curCount</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">maxCount</span>
 </code></pre></div>
-<p>994 腐烂的橘子</p>
-<p>多源bfs，方法是把所有初值都初始化加入队列中。</p>
-<p>队列中存放当前未处理过的腐烂的橘子，</p>
-<p>每个橘子取出后，确定它的四个方向。</p>
-<div class="highlight"><pre><span></span><code>class Solution:
-    def orangesRotting(self, grid: List[List[int]]) -&gt; int:
-        m, n = len(grid), len(grid[0])
-        q = deque()
-        fresh_count = 0
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        max_t = 0
-
-        for i in range(m):
-            for j in range(n):
-                if grid[i][j] == 2:
-                    # 腐烂的橘子的初始时间为0
-                    q.append((i, j, 0))
-                elif grid[i][j] == 1:
-                    fresh_count += 1
-
-        if fresh_count == 0:
-            return 0
-
-        while q:
-            x, y, t = q.popleft()
-            # 所有的腐烂橘子的时间最大值
-            max_t = max(t, max_t)
-
-            for dx, dy in directions:
-                nx, ny = x + dx, y + dy
-                if 0 &lt;= nx &lt; m and 0 &lt;= ny &lt;  n and grid[nx][ny] == 1:
-                    fresh_count -= 1
-                    grid[nx][ny] = 2
-                    q.append((nx, ny, t + 1))
-
-        if fresh_count == 0:
-            return max_t
-        else:
-            return -1
+<p>再来一道： <a href="https://leetcode.cn/problems/rotting-oranges/">994. 腐烂的橘子</a></p>
+<p>“打窝”然后让它扩散开来。这个就十分bfs了。</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">orangesRotting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">DIR</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="n">grid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">queue</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">dc</span> <span class="ow">in</span> <span class="n">DIR</span><span class="p">:</span>
+                <span class="n">nr</span><span class="p">,</span> <span class="n">nc</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">dr</span><span class="p">,</span> <span class="n">c</span> <span class="o">+</span> <span class="n">dc</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">nr</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">nc</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">grid</span><span class="p">[</span><span class="n">nr</span><span class="p">][</span><span class="n">nc</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">grid</span><span class="p">[</span><span class="n">nr</span><span class="p">][</span><span class="n">nc</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">grid</span><span class="p">[</span><span class="n">nr</span><span class="p">][</span><span class="n">nc</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">nr</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="n">grid</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">res</span>
 </code></pre></div>
-<p>207 课程表</p>
-<p>拓扑排序的写法是，队列中装入所有入度为0的点，每次从队列中取出一个点、更新邻接点的入度。</p>
-<div class="highlight"><pre><span></span><code>class Solution:
-    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -&gt; bool:
-        graph = defaultdict(list)
-        indegree = [0] * numCourses
-
-        for course, pre in prerequisites:
-            # pre到course
-            graph[pre].append(course)
-            indegree[course] += 1
-
-        q = deque([node for node in range(numCourses) if indegree[node] == 0])
-
-        count = 0
-
-        while q:
-            # 把每个入度为0的点都学掉, 从而去掉从它出发的边
-            node = q.popleft()
-            count += 1
-            for neighbour in graph[node]:
-                indegree[neighbour] -= 1
-                if indegree[neighbour] == 0:
-                    q.append(neighbour)
-
-        return count == numCourses
+<p><a href="https://leetcode.cn/problems/course-schedule/">207. 课程表</a> / <a href="https://leetcode.cn/problems/course-schedule-ii/">210. 课程表 II</a></p>
+<p><strong>模版四：拓扑排序</strong></p>
+<p>拓扑排序其实也是基于BFS的。这里需要额外增加两个知识点：</p>
+<ul>
+<li>需要知道怎么构建邻接表（pre-&gt;cur的有向边）。</li>
+<li>需要记录并更新入度。<strong>入队的永远是入度为0的点，出队永远用于更新邻接点的入度。</strong></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">canFinish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numCourses</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prerequisites</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numCourses</span><span class="p">)]</span>
+        <span class="n">indegree</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">numCourses</span>
+        <span class="k">for</span> <span class="n">cur</span><span class="p">,</span> <span class="n">pre</span> <span class="ow">in</span> <span class="n">prerequisites</span><span class="p">:</span>
+            <span class="n">graph</span><span class="p">[</span><span class="n">pre</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+            <span class="n">indegree</span><span class="p">[</span><span class="n">cur</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numCourses</span><span class="p">)</span> <span class="k">if</span> <span class="n">indegree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">queue</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">graph</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+                <span class="n">indegree</span><span class="p">[</span><span class="n">neighbour</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">indegree</span><span class="p">[</span><span class="n">neighbour</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbour</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">count</span> <span class="o">==</span> <span class="n">numCourses</span>
 </code></pre></div>
 <p>208 实现Trie (前缀树)</p>
 <div class="highlight"><pre><span></span><code>class Trie:

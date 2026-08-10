@@ -132,6 +132,34 @@
 
   <div class="card-grid" id="card-grid">
     
+    <article class="card" data-tags="工具 " data-folder="posts/notes/tools" data-date="2026-03-10">
+      
+      <a class="card-link" href="../posts/notes/tools/linux-command.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <time datetime="2026-03-10">2026-03-10</time>
+            
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/tools">tools</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">值得顺便掌握一下的那些linux指令</h3>
+          
+          <div class="card-preview">命令行能够即时地做很多事情，甚至代表一种简洁而切题的计算机哲学。 为了直接进入正题，省略诸如 <code>cd</code> 这样的广为人知的基础指令，直接看那些显著提升体验的东西。  用于查看磁盘空间。使用场景比如训模型会保存很多中间文件，可以这样看看需要清理哪些。 使用效果： 比如 <code>fuse-overlayfs</code> 是这个实例本身的存储， <code>shared-nvme</code> 是它的外接可持久化存储，使用率分别为 <code>50%</code> 和 <code>40%</code> 。 至于要看哪几个文件最大，可以和 <code>ncdu</code>…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="工具">#工具</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
+    
     <article class="card" data-tags="工具 " data-folder="posts/notes/tools" data-date="2026-03-08">
       
       <a class="card-link" href="../posts/notes/tools/wandb.html">
@@ -212,7 +240,7 @@
           </div>
           <h3 class="card-title">【数据结构与算法4】LeetCode HOT 100 in Python（前50）</h3>
           
-          <div class="card-preview">哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。  专题1 哈希 需要什么就哈希记录什么。 专题2 双指针 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 对滑动窗口的理解是：处理移动窗口前后的差分。 专题4 子串 专题5 数组 专题6 矩阵 专题7 链表 链表的一个重要工具是prev指针，用于指示前一个节点。 专题8 二叉树 专题9 图 1…</div>
+          <div class="card-preview">哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。  专题1 哈希 需要什么就哈希记录什么。 专题2 双指针 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。 专题4 子串 专题5 数组 专题6 矩阵 专题7 链表 链表的一个重要工具是prev指针，用于指示前一个节点。 专题8 二叉树 专题9…</div>
           
           <div class="card-tags">
             
@@ -469,38 +497,6 @@
             <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
             
           </div>
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card" data-tags="CSAPP " data-folder="posts/courses/csapp" data-date="2025-06-17">
-      
-      <a class="card-link" href="../posts/courses/csapp/ieee754.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <time datetime="2025-06-17">2025-06-17</time>
-            
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses">courses</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses/csapp">csapp</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">IEEE754 浮点数与十进制数互相转换流程及例子</h3>
-          
-          <div class="card-preview">原来只是精度、数量级，再加上偏移量这个从无符号数到有符号数的工程实现。 <del>浮点数从未如此简单。</del> （不是）  <strong>十进制数转浮点数步骤：</strong>   十进制转二进制，如<span class="arithmatex">\(10.001_{2}\)</span>。 ；  二进制转二进制的科学计数法表示（<span class="arithmatex">\(1.xxx_2 \times 2^{yyy}\)</span>），如<span class="arithmatex">\(1.001_{2} \times 2^1\)</span>，根据指数<span class="arithmatex">\(yyy\)</span>参考下述“规格化和非规格化判断”。 ；  根据二进制的科学计数法表示，参考下述“M和E是多少”，写出s, exp,… ； </div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
-            
-          </div>
-        </div>
-        
-        <div class="card-thumb">
-          <img src="../assets/.thumbs/0a2dcca88f6f.jpg" alt="" loading="lazy">
         </div>
         
       </a>
@@ -928,6 +924,17 @@
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
               <span class="tree-name">从原始Softmax到在线Softmax</span>
               <span class="tree-date">2026-04-09</span>
+            </a>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop">
+            <a class="tree-row" href="../posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的</span>
+              <span class="tree-date">2026-08-10</span>
             </a>
           </li>
           

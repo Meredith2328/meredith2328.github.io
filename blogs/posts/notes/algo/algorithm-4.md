@@ -19,7 +19,7 @@ isTop: false
 专题2 双指针
 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。
 专题3 滑动窗口
-对滑动窗口的理解是：处理移动窗口前后的差分。
+滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。
 专题4 子串
 专题5 数组
 专题6 矩阵
@@ -1824,7 +1824,7 @@ class Solution:
 >
 > 根本在于“**管好自己的，引出别人的。**”
 >
-> 不管是任何DFS/BFS，自己的部分都只处理自己这个节点。与此同时，它们又要在末尾引出“还有哪些节点要处理”。这是核心逻辑。
+> 不管是任何DFS/BFS，自己的部分都只**处理自己**这个节点。与此同时，它们又要在末尾“**引出邻居**”节点供处理。这是核心逻辑。
 >
 > 除此之外，就是利用 `visited` 来防止重复判断/重复入队了。
 
@@ -2006,82 +2006,66 @@ class Solution:
 
 
 
+再来一道： [994. 腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)
 
+“打窝”然后让它扩散开来。这个就十分bfs了。
 
-994 腐烂的橘子
-
-多源bfs，方法是把所有初值都初始化加入队列中。
-
-队列中存放当前未处理过的腐烂的橘子，
-
-每个橘子取出后，确定它的四个方向。
-
-```
+```python
 class Solution:
     def orangesRotting(self, grid: List[List[int]]) -> int:
-        m, n = len(grid), len(grid[0])
-        q = deque()
-        fresh_count = 0
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        max_t = 0
-
-        for i in range(m):
-            for j in range(n):
+        DIR = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        queue = deque([])
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
                 if grid[i][j] == 2:
-                    # 腐烂的橘子的初始时间为0
-                    q.append((i, j, 0))
-                elif grid[i][j] == 1:
-                    fresh_count += 1
-
-        if fresh_count == 0:
-            return 0
-
-        while q:
-            x, y, t = q.popleft()
-            # 所有的腐烂橘子的时间最大值
-            max_t = max(t, max_t)
-
-            for dx, dy in directions:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < m and 0 <= ny <  n and grid[nx][ny] == 1:
-                    fresh_count -= 1
-                    grid[nx][ny] = 2
-                    q.append((nx, ny, t + 1))
-
-        if fresh_count == 0:
-            return max_t
-        else:
-            return -1
+                    queue.append((i, j, 0))
+        res = 0
+        while queue:
+            r, c, t = queue.popleft()
+            for dr, dc in DIR:
+                nr, nc = r + dr, c + dc
+                if not (0 <= nr < len(grid) and 0 <= nc < len(grid[0])):
+                    continue
+                if grid[nr][nc] == 0 or grid[nr][nc] == 2:
+                    continue
+                grid[nr][nc] = 2
+                queue.append((nr, nc, t + 1))
+                res = max(res, t + 1)
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    return -1
+        return res
 ```
 
-207 课程表
 
-拓扑排序的写法是，队列中装入所有入度为0的点，每次从队列中取出一个点、更新邻接点的入度。
 
-```
+[207. 课程表](https://leetcode.cn/problems/course-schedule/) / [210. 课程表 II](https://leetcode.cn/problems/course-schedule-ii/)
+
+**模版四：拓扑排序**
+
+拓扑排序其实也是基于BFS的。这里需要额外增加两个知识点：
+
+- 需要知道怎么构建邻接表（pre->cur的有向边）。
+- 需要记录并更新入度。**入队的永远是入度为0的点，出队永远用于更新邻接点的入度。**
+
+```python
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
-        graph = defaultdict(list)
+        graph = [[] for _ in range(numCourses)]
         indegree = [0] * numCourses
-
-        for course, pre in prerequisites:
-            # pre到course
-            graph[pre].append(course)
-            indegree[course] += 1
-
-        q = deque([node for node in range(numCourses) if indegree[node] == 0])
-
+        for cur, pre in prerequisites:
+            graph[pre].append(cur)
+            indegree[cur] += 1
+        queue = deque([i for i in range(numCourses) if indegree[i] == 0])
         count = 0
-
-        while q:
-            # 把每个入度为0的点都学掉, 从而去掉从它出发的边
-            node = q.popleft()
+        while queue:
+            node = queue.popleft()
             count += 1
             for neighbour in graph[node]:
                 indegree[neighbour] -= 1
                 if indegree[neighbour] == 0:
-                    q.append(neighbour)
-
+                    queue.append(neighbour)
         return count == numCourses
 ```
 

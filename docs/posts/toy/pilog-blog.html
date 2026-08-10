@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>用 pilog 搭建像素风博客 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="一套个人自制的轻量静态博客框架：读取 blogs/ 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，主题复刻 Chrome 断网页的像素美学。">
+  <meta name="description" content="一套个人自制的轻量静态博客框架：所有东西都可以用Markdown修改。 读取 blogs/ 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，Chrome小恐龙风格。">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="用 pilog 搭建像素风博客">
-  <meta property="og:description" content="一套个人自制的轻量静态博客框架：读取 blogs/ 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，主题复刻 Chrome 断网页的像素美学。">
+  <meta property="og:description" content="一套个人自制的轻量静态博客框架：所有东西都可以用Markdown修改。 读取 blogs/ 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，Chrome小恐龙风格。">
   <link rel="canonical" href="https://meredith2328.github.io/posts/toy/pilog-blog.html">
   
   <meta property="og:image" content="https://meredith2328.github.io/assets/cover-pixel.png">
@@ -104,11 +104,17 @@
 
   <div class="post-body markdown-body">
     <h1 id="pilog">用 pilog 搭建像素风博客</h1>
-<p><strong>pilog</strong> 是个人自制的<strong>所见即所得</strong>的超轻量静态博客生成器：
-只需要在 Obsidian 里打开  <code>blogs/</code> 目录写 Markdown，
- <code>python pilog.py build</code> ：构建成带三种视图的静态站点。
- <code>python pilog.py serve --watch</code> ：本地预览并打开<strong>控制台</strong>（想改哪里点哪里）。
-pilog没有数据库、没有后端，只有一个个 Markdown 文件和一个负责构建的脚本。</p>
+<p><strong>pilog</strong> 是个人自制的<strong>所见即所得</strong>的超轻量静态博客生成器。</p>
+<p>只需要在 Obsidian 里打开  <code>blogs/</code> 目录写 Markdown，然后可以这么用：</p>
+<ul>
+<li>
+<p><code>python pilog.py build</code> ：构建成带三种视图的静态站点。</p>
+</li>
+<li>
+<p><code>python pilog.py serve --watch</code> ：本地预览并打开<strong>控制台</strong>（想改哪里点哪里）。</p>
+</li>
+</ul>
+<p>pilog没有数据库、没有后端，只有一个个 Markdown 文件和一个负责构建的脚本。</p>
 <h2 id="_1">三种视图</h2>
 <p><strong>pilog</strong> 生成的页面顶端可以切换三种视图，它们描述的是同一棵内容树：</p>
 <ol>
