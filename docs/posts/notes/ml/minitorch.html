@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
-  <title>minitorch · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <title>MiniTorch尝试复现了PyTorch的许多API · 10PI&#39;S BLOG丨十派的玩具箱</title>
   <meta name="description" content="项目文档链接：MiniTorch 项目仓库：minitorch/minitorch: The full minitorch student suite. 我的实现：Meredith2328/minit">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
-  <meta property="og:title" content="minitorch">
+  <meta property="og:title" content="MiniTorch尝试复现了PyTorch的许多API">
   <meta property="og:description" content="项目文档链接：MiniTorch 项目仓库：minitorch/minitorch: The full minitorch student suite. 我的实现：Meredith2328/minit">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/minitorch.html">
   
@@ -91,7 +91,7 @@
 <article class="post">
   <header class="post-header">
     <a class="back-link" href="../../../index.html">← 返回首页</a>
-    <h1 class="post-title">minitorch</h1>
+    <h1 class="post-title">MiniTorch尝试复现了PyTorch的许多API</h1>
     <div class="post-meta">
       <time datetime="2026-01-05T00:00:00">2026-01-05</time>
       
@@ -106,11 +106,9 @@
   <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
   <div class="post-body markdown-body" data-chapters="10" data-per-page="1">
-    <div class="post-chapter" data-ch="1"><p>项目文档链接：<a href="https://minitorch.github.io/">MiniTorch</a>
-项目仓库：<a href="https://github.com/minitorch/minitorch">minitorch/minitorch: The full minitorch student suite.</a></p>
-<p>我的实现：<a href="https://github.com/Meredith2328/minitorch">Meredith2328/minitorch: The full minitorch student suite.</a>
-（完成√并整理√了Fundamentals, ML Primer, AutoDiff, Tensors, 
-完成了Efficiency部分，未涉及Networks部分。）</p>
+    <div class="post-chapter" data-ch="1"><p>项目文档链接：<a href="https://minitorch.github.io/">MiniTorch</a></p>
+<p>项目仓库：<a href="https://github.com/minitorch/minitorch">minitorch/minitorch: The full minitorch student suite.</a></p>
+<p>我的实现：<a href="https://github.com/Meredith2328/minitorch">Meredith2328/minitorch: The full minitorch student suite.</a></p>
 <p>另外推荐参考这个，写得比我多得多：<a href="https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf">MiniTorch-学习全攻略.pdf</a></p>
 </div><div class="post-chapter" data-ch="2" data-title="项目整体介绍"><h2 id="_1">项目整体介绍</h2>
 <p>MiniTorch是一个基于Python基础语法或Numpy，并进一步使用Numba和CUDA对矩阵运算进行优化，以实现符合PyTorch接口的一个简易版PyTorch的项目。
@@ -1375,11 +1373,9 @@ Task3.3: <a href="https://github.com/atgctg/minitorch">atgctg/minitorch: Solutio
 Task3.4: <a href="https://github.com/feimos32/Minitorch-Learning-Introduction">feimos32/Minitorch-Learning-Introduction</a></p>
 <p>感谢先行者！</p>
 </div><div class="post-chapter" data-ch="9" data-title="Network"><h2 id="network">Network</h2>
-<p>Networks：已经开发出一个很简单的pytorch了，来拿它搞个卷积神经网络进行图像分类这种上游任务吧！
-不是个人学习的重点，直接合并了 Task4: <a href="https://github.com/Dearkano/MiniTorch/">Dearkano/MiniTorch: Cornell CS5781 Machine Learning Engineering</a> 以保证完整性。
-感谢先行者！</p>
-<p>nn.py里面的class Max有问题
-TODO</p>
+<p>Networks：已经开发出一个很简单的pytorch了，来拿它搞个卷积神经网络进行图像分类这种上游任务吧！</p>
+<p>不是个人学习的重点，直接合并了 Task4: <a href="https://github.com/Dearkano/MiniTorch/">Dearkano/MiniTorch: Cornell CS5781 Machine Learning Engineering</a> 以保证完整性。</p>
+<p>感谢先行者！</p>
 </div><div class="post-chapter" data-ch="10" data-title="附: 基于Pytorch代码，讲讲反向传播和计算图"><h2 id="pytorch">附: 基于Pytorch代码，讲讲反向传播和计算图</h2>
 <p>以下代码选取自PyTorch官方的 <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">Quickstart — PyTorch Tutorials</a>
 省略了<code>import</code>，数据集加载，设置<code>DataLoader</code>，建立模型，设置损失函数和优化器。</p>
@@ -1637,6 +1633,7 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
 <script src="../../../js/pager.js" defer></script>
 
 <script src="../../../js/toc.js" defer></script>
+<script src="../../../js/code-copy.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

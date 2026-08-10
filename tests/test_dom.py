@@ -273,6 +273,11 @@ def main() -> None:
         page.goto(base + "/posts/toy/pilog-blog.html", wait_until="networkidle")
         ok &= check("strikethrough renders", page.locator("del").count() >= 1)
         ok &= check("latex math markup present", page.locator(".arithmatex").count() >= 2)
+        ok &= check("code copy buttons present", page.locator(".post-body .code-copy").count() >= 1)
+        page.locator(".post-body .code-copy").first.click()
+        page.wait_for_timeout(300)
+        ok &= check("code copy feedback shown",
+                    "已复制" in page.locator(".post-body .code-copy").first.inner_text())
 
         # long post section paging + styled related/series footer boxes
         page.goto(base + "/posts/notes/algo/algorithm-4.html", wait_until="networkidle")

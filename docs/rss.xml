@@ -162,7 +162,7 @@
         <description>总而言之是叽里呱啦一些《算法导论》笔记 基础算法案例，分治，比较算法与随机化，动态规划，贪心，最短路径， 网络流，回溯，在线算法，P/NP，近似算法  直觉+过程+伪代码： 上下文、复杂度， 边界、核心设置， 不变量、自然语言解释。 Lec1 数学基础√ Lec2 分治√ Lec3 比较算法与随机化√ Lec4 哈希 不太能用这个结构讲√ &lt;del&gt;Lec5 布隆过滤器 不太能用这个结构讲&lt;/del&gt; Lec6 动态规划必须可以√ Lec7 贪心可以√ Lec8…</description>
       </item>
       <item>
-        <title>minitorch</title>
+        <title>MiniTorch尝试复现了PyTorch的许多API</title>
         <link>https://meredith2328.github.io/posts/notes/ml/minitorch.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/minitorch.html</guid>
         <pubDate>Mon, 05 Jan 2026 00:00:00 -0000</pubDate>

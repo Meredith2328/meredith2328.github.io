@@ -1,5 +1,5 @@
 ---
-title: minitorch
+title: MiniTorch尝试复现了PyTorch的许多API
 date: 2026-01-05 20:26:02
 tags:
 - 机器学习
@@ -11,11 +11,10 @@ chapters_per_page: 1
 ---
 
 项目文档链接：[MiniTorch](https://minitorch.github.io/)
+
 项目仓库：[minitorch/minitorch: The full minitorch student suite.](https://github.com/minitorch/minitorch)
 
 我的实现：[Meredith2328/minitorch: The full minitorch student suite.](https://github.com/Meredith2328/minitorch)
-（完成√并整理√了Fundamentals, ML Primer, AutoDiff, Tensors, 
-完成了Efficiency部分，未涉及Networks部分。）
 
 另外推荐参考这个，写得比我多得多：[MiniTorch-学习全攻略.pdf](https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf)
 ## 项目整体介绍
@@ -1485,11 +1484,11 @@ Task3.4: [feimos32/Minitorch-Learning-Introduction](https://github.com/feimos32/
 ## Network
 
 Networks：已经开发出一个很简单的pytorch了，来拿它搞个卷积神经网络进行图像分类这种上游任务吧！
+
 不是个人学习的重点，直接合并了 Task4: [Dearkano/MiniTorch: Cornell CS5781 Machine Learning Engineering](https://github.com/Dearkano/MiniTorch/) 以保证完整性。
+
 感谢先行者！
 
-nn.py里面的class Max有问题
-TODO
 ## 附: 基于Pytorch代码，讲讲反向传播和计算图
 
 以下代码选取自PyTorch官方的 [Quickstart — PyTorch Tutorials](https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html)
