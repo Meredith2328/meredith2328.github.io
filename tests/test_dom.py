@@ -386,6 +386,31 @@ def main() -> None:
         page.wait_for_load_state("networkidle")
         ok &= check("arrow-right goes to next post", "mathqwen" in page.url, page.url)
 
+        # back link returns to the paginated home page the reader left
+        page.goto(base + "/page/2.html", wait_until="networkidle")
+        page.evaluate("window.scrollTo(0, 500)")
+        page.wait_for_timeout(500)  # let the scroll-state saver run
+        page.locator(".card-link").first.click()
+        page.wait_for_load_state("networkidle")
+        back_href = page.locator(".back-link").get_attribute("href")
+        ok &= check("back link points to page 2", "page/2.html" in back_href, back_href)
+        page.click(".back-link")
+        page.wait_for_load_state("networkidle")
+        ok &= check("back returns to page 2", "page/2.html" in page.url, page.url)
+        page.wait_for_timeout(800)
+        y = page.evaluate("window.pageYOffset")
+        ok &= check("home scroll position restored", y >= 300, str(y))
+        # fresh direct post load without a stored home -> default index.html
+        page.goto(base + "/posts/toy/notegotya.html", wait_until="networkidle")
+        page.evaluate(
+            "sessionStorage.removeItem('pilog.home');"
+            "sessionStorage.removeItem('pilog.home.scroll')"
+        )
+        page.reload(wait_until="networkidle")
+        back_href = page.locator(".back-link").get_attribute("href")
+        ok &= check("back link defaults to index",
+                    back_href.rstrip("/").endswith("index.html"), back_href)
+
         # chinese heading anchors + post stats + dino touch buttons
         page.goto(base + "/posts/notes/ml/minitorch.html", wait_until="networkidle")
         h2id = page.locator(".post-body h2").first.get_attribute("id")

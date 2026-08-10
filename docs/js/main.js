@@ -791,4 +791,63 @@
       }
     });
   }
+
+  /* ---------- remember which home page the reader came from ----------
+     "返回首页" should go back to the paginated page they left (e.g. page 2),
+     and restore its scroll position, instead of always dumping them on page 1. */
+  var HOME_STATE_KEY = "pilog.home";
+  var HOME_SCROLL_KEY = "pilog.home.scroll";
+
+  function isHomePath(p) {
+    if (p === "/") return true;
+    return /\/?(index|page\/\d+)\.html?$/.test(p.replace(/\/+$/, ""));
+  }
+
+  if (home) {
+    var homeSaveTimer = null;
+    function saveHomeState() {
+      try {
+        sessionStorage.setItem(HOME_STATE_KEY, location.pathname + location.search);
+        sessionStorage.setItem(HOME_SCROLL_KEY, String(window.pageYOffset));
+      } catch (e) {
+        /* storage unavailable: fall back to the default back link */
+      }
+    }
+    window.addEventListener("scroll", function () {
+      if (homeSaveTimer) clearTimeout(homeSaveTimer);
+      homeSaveTimer = setTimeout(saveHomeState, 250);
+    }, { passive: true });
+    window.addEventListener("beforeunload", saveHomeState);
+
+    // restore the scroll position when returning to the same home page
+    (function () {
+      try {
+        var saved = sessionStorage.getItem(HOME_STATE_KEY);
+        if (!saved || saved !== location.pathname + location.search) return;
+        var y = parseInt(sessionStorage.getItem(HOME_SCROLL_KEY) || "0", 10);
+        if (!y || y <= 0) return;
+        var restore = function () {
+          window.scrollTo(0, y);
+        };
+        var run = function () { setTimeout(restore, 80); };
+        if (document.readyState === "complete") run();
+        else window.addEventListener("load", run);
+      } catch (e) {
+        /* ignore */
+      }
+    })();
+  } else {
+    // post pages: point the back link at the remembered home page
+    var backLink = document.querySelector(".back-link");
+    if (backLink) {
+      try {
+        var savedPath = sessionStorage.getItem(HOME_STATE_KEY);
+        if (savedPath && isHomePath(savedPath)) {
+          backLink.href = savedPath;
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    }
+  }
 })();
