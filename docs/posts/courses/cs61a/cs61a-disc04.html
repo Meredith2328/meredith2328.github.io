@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS61A · Disc 04 · 树的递归</h1>
     <div class="post-meta">
       <time datetime="2023-08-30T00:00:00">2023-08-30</time>
+      <span class="post-stats">1451 字 · 约 4 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS61A">#CS61A</a>
       
@@ -119,7 +124,7 @@
 <h2 id="q1-insect-combinatorics">Q1: Insect Combinatorics</h2>
 <p>基础情况略。
 递归情况：从左下出发的路径的可能数，是第一步往上走、之后的路径的可能数 加 第一步往右走，之后的路径的可能数。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">paths</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">paths</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return the number of paths from one corner of an</span>
 <span class="sd">    M by N grid to the opposite corner.</span>
 
@@ -140,7 +145,7 @@
 <h2 id="q2-even-weighted">Q2: Even weighted</h2>
 <p>先理解题目含义：
 <code>x = [1, 2, 3, 4, 5, 6]</code>，下标从0开始，只留下标为<code>0, 2, 4</code>的三个元素即 <code>[1, 3, 5]</code> ，之后将每个元素与之前提到的偶数下标相乘，即 <code>[1 * 0, 3 * 2, 5 * 4] = [0, 6, 20]</code>。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">even_weighted_loop</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">even_weighted_loop</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]</span>
 <span class="sd">    &gt;&gt;&gt; even_weighted_loop(x)</span>
@@ -154,7 +159,7 @@
             <span class="n">result</span> <span class="o">+=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">even_weighted_comprehension</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">even_weighted_comprehension</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]</span>
 <span class="sd">    &gt;&gt;&gt; even_weighted_comprehension(x)</span>
@@ -165,7 +170,7 @@
 <h2 id="q3-has-path">Q3: Has Path</h2>
 <p>递归情况：如果本节点值等于路径第一位，子分支中存在一个分支满足路径的剩余部分，则返回真。
 硬控我好几分钟的地方是python的列表切片后如果长度为1，仍然是一个列表。令人忍俊不禁。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">has_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">has_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return whether tree t has a path from the root with labels p.</span>
 
 <span class="sd">    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])</span>
@@ -197,7 +202,7 @@
 <h2 id="q4-find-path">Q4: Find Path</h2>
 <p>不妨先抛弃题目模板，自行思考。
 仍然满足上一题“子情况中存在一个满足则返回该子情况，子情况全部不满足才返回不满足”。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])</span>
 <span class="sd">    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])</span>
@@ -221,7 +226,7 @@
         <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div>
 <p>之后尝试与题目模板格式匹配：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])</span>
 <span class="sd">    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])</span>
@@ -250,7 +255,7 @@
 思路很简单：
 如果是叶，则构造一个标签相同、带了新叶的树返回；
 如果不是叶，则构造一个标签相同、每个分支完成了<code>sprout leaves</code>（即题设要求的函数）的树返回。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sprout_leaves</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">leaves</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sprout_leaves</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">leaves</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Sprout new leaves containing the labels in leaves at each leaf of</span>
 <span class="sd">    the original tree t and return the resulting tree.</span>
 
@@ -293,7 +298,7 @@
 “大”与“小”通过比较<code>label(t)</code>判断。
 （<code>max(s, key=f)</code> returns the item <code>x</code> in <code>s</code> for which <code>f(x)</code> is largest.
 <code>max([t1, t2], key=label)</code> returns the tree with the largest label, in this case <code>t2</code>.）</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tree</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">branches</span><span class="o">=</span><span class="p">[]):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tree</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">branches</span><span class="o">=</span><span class="p">[]):</span>
     <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">is_tree</span><span class="p">(</span><span class="n">branch</span><span class="p">),</span> <span class="s1">'branches must be trees'</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">branches</span><span class="p">)</span>
@@ -369,6 +374,8 @@
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -384,6 +391,8 @@
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -406,6 +415,7 @@
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

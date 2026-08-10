@@ -234,6 +234,10 @@ def render_nav(page_url: str, ctx: MarkdownContext) -> str:
     text = nav_file.read_text(encoding="utf-8", errors="replace")
     html = render_markdown(text, nav_file, page_url, ctx).html
     soup = BeautifulSoup(html, "html.parser")
+    # nav.md's `# 导航` heading would add a hidden <h1> to every page; the
+    # <nav> already carries aria-label, so drop the heading entirely
+    for h in soup.find_all("h1"):
+        h.decompose()
     for a in soup.find_all("a", href=True):
         if "#folder=" in a["href"]:
             a["data-kind"] = "folder"
@@ -757,6 +761,22 @@ def build_site(
     # 6. rss
     rss_xml = build_rss(posts, cfg, cfg.base_path, cfg.site_url)
     (out_root / "rss.xml").write_text(rss_xml, encoding="utf-8")
+
+    # 7. sitemap.xml (all generated html pages except 404)
+    if cfg.site_url:
+        urls = []
+        for page in sorted(generated_pages):
+            if page.suffix != ".html" or page.name == "404.html":
+                continue
+            rel = page.relative_to(out_root).as_posix()
+            urls.append(f"  <url><loc>{cfg.site_url}/{rel}</loc></url>")
+        sitemap = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + "\n".join(urls)
+            + "\n</urlset>\n"
+        )
+        (out_root / "sitemap.xml").write_text(sitemap, encoding="utf-8")
 
     if ctx.warnings:
         log("warnings:")

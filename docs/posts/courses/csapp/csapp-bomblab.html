@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CSAPP · Bomblab</h1>
     <div class="post-meta">
       <time datetime="2024-04-30T00:00:00">2024-04-30</time>
+      <span class="post-stats">3676 字 · 约 9 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -113,7 +118,7 @@
     <blockquote>
 <p>最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。<br/>因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。</p>
 </blockquote>
-<h2 id="_1">效果截图</h2>
+<h2 id="效果截图">效果截图</h2>
 <p><img alt="" src="../../migrated/post-images/1714446702306.png"/></p>
 <p>各phase答案:</p>
 <div class="highlight"><pre><span></span><code>sudo hostnamectl set-hostname ubuntu
@@ -126,7 +131,7 @@ Brownie, you are doing a heck of a job.
 5 1 2 3 6 4
 50
 </code></pre></div>
-<h2 id="secret_phase">secret_phase: 二叉树搜索</h2>
+<h2 id="secret_phase-二叉树搜索">secret_phase: 二叉树搜索</h2>
 <p>读入整数，整数，字符串
 <code>b secret_phase</code>
 edx: a
@@ -161,7 +166,7 @@ esi: input_int
 所以大于就往右走，小于就往左走
 既然返回值为1，而返回值初始为0，往右走一步就跳出就可以，意味着被调用函数返回值为0，之后向右执行一步得到1，返回即可。
 注意读到的0x32等于<code>50</code>。</p>
-<h2 id="phase_6">phase_6: 链表排序</h2>
+<h2 id="phase_6-链表排序">phase_6: 链表排序</h2>
 <p>读入六个整数
 rsi: %rsp，其实是&amp;num1</p>
 <p>循环1开头:
@@ -221,7 +226,7 @@ rbx变node2，ebp--，循环五次意味着节点值从node1到node6递减
 因此只要找合适的num值使前述节点排列成递减即可，即值顺序为 <code>5 1 2 3 6 4</code>。</p>
 <p>综上，这次phase没有a[i] = 7 - a[i]，应该相对还行。</p>
 <h2 id="phase_5">phase_5</h2>
-<h3 id="1">版本1: 数组对应</h3>
+<h3 id="版本1-数组对应">版本1: 数组对应</h3>
 <p>输入字符串长度为6
 %rax: &amp;字符串，之后右移，属于循环变量
 %rbx: &amp;字符串
@@ -233,7 +238,7 @@ rbx变node2，ebp--，循环五次意味着节点值从node1到node6递减
 <p>在跳回之前我们观察结束条件，%ecx=0x3f=63，也就是六个字符的下标对应出的数字之和为63.
 可取16+15+14+13+3+2，即下标为5, 14, 10, 15, 7, 0, 比如可以取48+这些数：<code>5&gt;:?70</code>
 注意不能用32+这些数，因为空格会在类scanf的函数中读值时自动被忽略掉。</p>
-<h3 id="2">版本2: 数组跳转</h3>
+<h3 id="版本2-数组跳转">版本2: 数组跳转</h3>
 <table>
 <thead>
 <tr>
@@ -309,7 +314,7 @@ rbx变node2，ebp--，循环五次意味着节点值从node1到node6递减
 <p>读出该程序干的事情是加15次数组元素，其中最后一次一定加的是f，我们需要输入的是第一个下标以及加和。
 不妨倒推，f+6+e+2+1 +a+0+8+4+9 +d+b+7+3+c = 115
 那么我们第一个下标对应值c，即入口是5，加和是115。</p>
-<h2 id="phase_4">phase_4: 二分查找</h2>
+<h2 id="phase_4-二分查找">phase_4: 二分查找</h2>
 <p>读入整数：
 rcx(arg4) = rsp + 4 = &amp;num2
 rdx(arg3) = rsp = &amp;num1
@@ -340,7 +345,7 @@ ebx&gt;=num1时直接返回
 左右端点为0和6时返回值+3；
 左右端点为4和6时返回值+5。
 返回值初始为0，完成上述查找得到返回15。</p>
-<h2 id="phase_3">phase_3: 跳转表</h2>
+<h2 id="phase_3-跳转表">phase_3: 跳转表</h2>
 <p>注意输入是 <code>%d %c %d</code>
 分别传到 %rsp+10, %rsp+f, %rsp+14，换回了数字 数字 字符的顺序
 num1 unsigned &gt; 7时，炸
@@ -352,7 +357,7 @@ num1 unsigned &gt; 7时，炸
 我们用 <code>x/a 0x402740</code>发现为+77，意味着%rax=num1=0时，执行+77，此时：
 %eax=0x75，num2 = 0x51=81。所以c = 0x75=<code>u</code>即可，这个字符可通过 <code>Alt + 小键盘117</code> 得到。
 答案为 <code>0 u 81</code></p>
-<h2 id="phase_2">phase_2: 斐波那契数列</h2>
+<h2 id="phase_2-斐波那契数列">phase_2: 斐波那契数列</h2>
 <p>%rsi参数2的值是%rsp，给read_six_numbers
 利用read_six_numbers将参数3-8读入%rsi, %rsi+4, ..., %rsi+14共六处，对应于%rsp, %rsp+4, ..., %rsp+14共六处
 num1=0
@@ -367,7 +372,7 @@ num3 = %eax = 1
 %eax += num2 = 1+1=2
 num4 = %eax = 2</p>
 <p>0 1 1 2 3 5</p>
-<h2 id="phase_1">phase_1: 比较字符串</h2>
+<h2 id="phase_1-比较字符串">phase_1: 比较字符串</h2>
 <p>strings_not_equal的返回值(%eax)为0就跳出去，意味着要求All strings are created equal. 识得唔识得啊。</p>
 <p>从相应位置读入所需字符串即可。</p>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="csapp-datalab.html" title="上一篇">← Datalab</a><a class="post-rel-link" href="csapp-attacklab.html" title="下一篇">Attacklab →</a></div></aside>
@@ -419,6 +424,8 @@ num4 = %eax = 2</p>
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -434,6 +441,8 @@ num4 = %eax = 2</p>
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -456,6 +465,7 @@ num4 = %eax = 2</p>
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

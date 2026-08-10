@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CSAPP · Datalab</h1>
     <div class="post-meta">
       <time datetime="2024-04-30T00:00:00">2024-04-30</time>
+      <span class="post-stats">4621 字 · 约 11 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -113,7 +118,7 @@
     <blockquote>
 <p>最近没写什么其他好玩的东西，拿课堂作业报告水一水blog。</p>
 </blockquote>
-<h2 id="_1">系列总览</h2>
+<h2 id="系列总览">系列总览</h2>
 <p>CSAPP（ICS 课程）lab 笔记：</p>
 <ol>
 <li><a href="csapp-datalab.html">Datalab</a>（本篇）：位运算与浮点数</li>
@@ -123,7 +128,7 @@
 <li><a href="csapp-shelllab.html">Shelllab</a>：Shell 实现</li>
 </ol>
 <p>浮点数部分单独写了笔记，欢迎参阅 <a href="ieee754.html">IEEE754 浮点数与十进制数互相转换流程及例子</a>。</p>
-<h2 id="_2">运行结果</h2>
+<h2 id="运行结果">运行结果</h2>
 <h3 id="dlc">dlc</h3>
 <div class="highlight"><pre><span></span><code>make
 ./dlc -e bits.c
@@ -133,7 +138,7 @@
 <div class="highlight"><pre><span></span><code>./btest
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/1714446471662.png"/></p>
-<h2 id="_3">思路</h2>
+<h2 id="思路">思路</h2>
 <h3 id="bitxor">bitXor</h3>
 <ul>
 <li>解法一</li>
@@ -339,6 +344,8 @@ return sameSign ^ 0x1;
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -354,6 +361,8 @@ return sameSign ^ 0x1;
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -376,6 +385,7 @@ return sameSign ^ 0x1;
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

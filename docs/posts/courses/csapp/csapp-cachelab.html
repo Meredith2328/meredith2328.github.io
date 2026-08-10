@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CSAPP · Cachelab</h1>
     <div class="post-meta">
       <time datetime="2024-06-05T00:00:00">2024-06-05</time>
+      <span class="post-stats">5187 字 · 约 12 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -117,7 +122,7 @@
 <div class="highlight"><pre><span></span><code>python2.7 driver.py
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/1717570680646.png"/></p>
-<h2 id="python2valgrind">安装python2和valgrind</h2>
+<h2 id="安装python2和valgrind">安装python2和valgrind</h2>
 <p>由于测试程序driver.py是python2程序，首先需要安装python2。流程如下：</p>
 <ol>
 <li>
@@ -157,14 +162,14 @@ Validation error at function 126! Run ./tracegen -M 32 -N 32 -F 0 for details.
 Skipping performance evaluation for this function.
 </code></pre></div>
 <p>这样的问题，排查确认是未安装<code>valgrind</code>，利用<code>sudo apt install valgrind</code> 就解决了。</p>
-<h3 id="32-32">32 * 32: 关于分块利用局部性的分析</h3>
-<h4 id="_1"><strong>缓存大小</strong></h4>
+<h3 id="32-32-关于分块利用局部性的分析">32 * 32: 关于分块利用局部性的分析</h3>
+<h4 id="缓存大小"><strong>缓存大小</strong></h4>
 <p>由于程序中<code>static A, B</code> 部分的相关定义~~（静态链接）~~，<strong>可以认为</strong><code>A</code>、<code>B</code>地址连续（中间无填充），它们对应的<code>Cache</code>的组和行的分布恰好是完全相同的（见下图）（这会造成对角线一定的Conflict Miss，见下）。</p>
 <p>缓存的利用机制如下：</p>
 <p>给出的<code>s = 5, E = 1, b = 5</code> 计算可知对应的Cache大小为<code>2^5 * 1 * 2^5 = 1024</code> Bytes。考虑到<code>int</code>类型为4 Bytes，</p>
 <p>我们对<code>A</code>和<code>B</code>使用的<code>Cache</code>有<code>S = 2^s = 2^5 = 32</code>组，每组有<code>E = 1</code>行，每行存储了<code>8 int</code>的块。</p>
 <p>不妨把这些组的唯一行编号为<code>Line 00</code> 到<code>Line 31</code>，见下图。</p>
-<h4 id="_2"><strong>缓存过程分析：为什么要分块？</strong></h4>
+<h4 id="缓存过程分析-为什么要分块"><strong>缓存过程分析：为什么要分块？</strong></h4>
 <p><img alt="" src="../../migrated/post-images/1717570661757.png"/></p>
 <p>这个图是我自己画的。形式参考自：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，非常感谢原作者的优秀思考。</p>
 <p>从开头举例，<strong>原始转置操作<code>B[j][i] = A[i][j]</code>指令经历了如下的过程：</strong></p>
@@ -192,10 +197,10 @@ Skipping performance evaluation for this function.
 </ol>
 <p>求和即miss总次数为32 + 128 + 1024 - 4（上述1. 与 2.在图中标红处共计4次重复计数） = 1180。</p>
 <p>查询源码可以发现valgrind本身使用了3次miss，即得下述Function 1的misses:1183。</p>
-<h4 id="8-8"><strong>第一次改进：使用8 * 8分块</strong></h4>
+<h4 id="第一次改进-使用8-8分块"><strong>第一次改进：使用8 * 8分块</strong></h4>
 <p>我们在理解了为什么会发生冲突之后，分块的作用就显而易见了。</p>
 <p>首先利用分块解决影响最大的问题：B按列读取，每读入8块时即驱逐之前的缓存。为了解决这个问题，我们可以考虑 <span class="arithmatex">\(8 \times 8\)</span>​的分块，在下一次驱逐缓存行之前先完成所有缓存行的传入。</p>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">transpose_submit</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">M</span><span class="p">],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">M</span><span class="p">][</span><span class="n">N</span><span class="p">])</span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">transpose_submit</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">M</span><span class="p">],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">M</span><span class="p">][</span><span class="n">N</span><span class="p">])</span>
 <span class="p">{</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">;</span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">+=</span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -213,7 +218,7 @@ Skipping performance evaluation for this function.
 <p>得到的结果如下Function 0：</p>
 <p><img alt="" src="../../migrated/post-images/1717570650830.png"/></p>
 <p>相比于原始代码Function 1，已经有了极大改善。</p>
-<h4 id="_3"><strong>第二次改进：使用局部变量</strong></h4>
+<h4 id="第二次改进-使用局部变量"><strong>第二次改进：使用局部变量</strong></h4>
 <p>之后继续修改，处理对角的conflict miss。</p>
 <p>我们在之前“可以认为”那里发现，如果我们要从<code>A[i][j]</code>转置到<code>B[i][j]</code>即转置相同坐标的元素，会必定驱逐相同的Cache Line，造成冲突不命中。那么什么时候会转置到相同坐标位置呢？显而易见，方阵对角线处，即<code>i == j</code>。</p>
 <p>但是我们按照前述计算的理论值应当为 32 + 128 + 128 = 288次，与340次（显示值misses = 343）仍然相差一定数值，说明我们的分析仍然有问题。这是为什么？</p>
@@ -244,7 +249,7 @@ Skipping performance evaluation for this function.
 <p>图片来源：<a href="https://d-sketon.top/20211015/csapp-cachelab/">CSAPP - CacheLab (d-sketon.top)</a></p>
 <p>为了规避上述由对角块造成的1、2问题，我们考虑利用题目所给的共计12个局部变量。对于每一个 8 * 8 分块，可以将<code>A[i][i..(i + 7)]</code>存入8个临时变量中，利用临时变量而非Cache进行转置。</p>
 <p>这样虽然似乎与Cache本身的意义有少许矛盾（甚至有种开挂感），但就优化而言是可行的。优化理论结果 misses = 128 + 128 + 32 = 288。同上-4即得284，与下图（显示值<code>misses = 287</code>）符合。</p>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">transpose_submit</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">M</span><span class="p">],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">M</span><span class="p">][</span><span class="n">N</span><span class="p">])</span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">transpose_submit</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">M</span><span class="p">],</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">M</span><span class="p">][</span><span class="n">N</span><span class="p">])</span>
 <span class="p">{</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">+=</span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -277,7 +282,7 @@ Skipping performance evaluation for this function.
 <p>有了上述分析，本次只需多尝试不同的分块方法、再思考做优化即迎刃而解了。</p>
 <p>图片来源：<a href="https://zhuanlan.zhihu.com/p/387662272">CSAPP - Cache Lab的更(最)优秀的解法 - 知乎 (zhihu.com)</a>，虽然之前感谢过一次了，但再次感谢原作者的优秀思考。</p>
 <p>看图发现 8 * 8 的分块内部上下两部分存在冲突，所以考虑继续缩小分块，先用 4 * 4分块尝试：</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">M</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="c1">// copy the A(i, j) block, row by row. Then paste it to B(j, i).</span>
@@ -300,7 +305,7 @@ Skipping performance evaluation for this function.
 <p>结果未达到1300以下，考虑继续优化。</p>
 <p>是否可以利用 4 * 8 的分块呢？4 * 8的分块内部的确不存在冲突，可以充分利用A的局部性，但置于B之后就不可以了。由此我们思考：是否可以先将A的 4 * 8 块置于B的相同位置、再将其中不在对角线上、需要转置的4 * 4块转置过来，如是操作，以相比于上述 4 * 4 分块的方式更好利用A的局部性？</p>
 <p>代码如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">M</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 
@@ -369,7 +374,7 @@ Skipping performance evaluation for this function.
 <p><img alt="" src="../../migrated/post-images/1717570604287.png"/></p>
 <h3 id="61-67">61 * 67</h3>
 <p>尝试对大部分块使用 8 * 8 分块，对边界处的直接转置，</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">61</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">61</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">M</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="c1">// Solve the boundary. Use 8 * 8 block for most places.</span>
@@ -413,7 +418,7 @@ Skipping performance evaluation for this function.
 <p><img alt="" src="../../migrated/post-images/1717570592488.png"/></p>
 <p>正好不在2000以下。</p>
 <p>思考我们的分块之后，决定把长边设置为循环变量，重新测试：</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">61</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">M</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">61</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">M</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="c1">// Solve the boundary. Use 8 * 8 block for most places.</span>
@@ -505,6 +510,8 @@ Skipping performance evaluation for this function.
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -520,6 +527,8 @@ Skipping performance evaluation for this function.
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -542,6 +551,7 @@ Skipping performance evaluation for this function.
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

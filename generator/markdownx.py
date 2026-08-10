@@ -201,6 +201,42 @@ def _normalize_lists(text: str) -> str:
     return "".join(out)
 
 
+def _heading_slugify(value: str, separator: str = "-") -> str:
+    """Slugify a heading for its anchor id, keeping CJK characters.
+    HTML5 ids allow Unicode, so `## 根因三步` -> `#根因三步` instead of `#_1`."""
+    slug = re.sub(r"\W+", separator, value)
+    slug = re.sub(re.escape(separator) + "+", separator, slug).strip(separator)
+    return slug.lower()
+
+
+def _collect_code_langs(text: str) -> list[str]:
+    """Walk fenced code blocks in source order and return the language/file
+    label of each one ("" when the fence has no info string)."""
+    langs: list[str] = []
+    in_fence = False
+    fence = ""
+    for line in text.splitlines(keepends=True):
+        stripped = line.strip()
+        if not in_fence and stripped.startswith(("```", "~~~")):
+            in_fence = True
+            fence = stripped[:3]
+            info = stripped[3:].strip()
+            label = ""
+            for token in info.split():
+                if token.lower().startswith("hl:"):
+                    continue
+                if "=" in token and token.split("=", 1)[0].lower() in ("title", "file"):
+                    label = token.split("=", 1)[1]
+                    break
+                if not label:
+                    label = token
+            langs.append(label)
+            continue
+        if in_fence and stripped.startswith(fence):
+            in_fence = False
+    return langs
+
+
 def _md_instance() -> md_lib.Markdown:
     return md_lib.Markdown(
         extensions=[
@@ -219,7 +255,11 @@ def _md_instance() -> md_lib.Markdown:
                 "css_class": "highlight",
                 "linenums": False,
             },
-            "toc": {"permalink": False, "toc_depth": "1-6"},
+            "toc": {
+                "permalink": False,
+                "toc_depth": "1-6",
+                "slugify": _heading_slugify,
+            },
             "pymdownx.tilde": {"subscript": False},
             "pymdownx.arithmatex": {"generic": True},
         },
@@ -432,7 +472,7 @@ def render_markdown(text: str, src_file: Path, page_url: str,
             anchor = ""
             if "#" in target:
                 target, anchor = target.split("#", 1)
-                anchor = "#" + re.sub(r"\s+", "-", anchor.strip())
+                anchor = "#" + _heading_slugify(anchor)
             post = resolve_wiki_post(target, src_file, ctx)
             if post is None:
                 ctx.warn(f"wiki link not found: [[{target}]] in {src_file.name}")
@@ -489,6 +529,12 @@ def render_markdown(text: str, src_file: Path, page_url: str,
             div.insert_before(head)
         if tail:
             div.insert_after(tail)
+
+    # keep each fence's language / file label on the <pre> so the front end
+    # can show a small tag in the code block header
+    for pre, lang in zip(soup.find_all("pre"), _collect_code_langs(text)):
+        if lang:
+            pre["data-lang"] = lang
 
     return Rendered(html=str(soup), refs=refs, image_sources=image_sources)
 

@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">结合nanovllm的FlashAttention和PagedAttention主要原理概述</h1>
     <div class="post-meta">
       <time datetime="2026-05-16T00:00:00">2026-05-16</time>
+      <span class="post-stats">9548 字 · 约 22 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%A4%A7%E6%A8%A1%E5%9E%8B">#大模型</a>
       
@@ -123,7 +128,7 @@ PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。</p>
 <li>解决：分块 + 页表映射 + 动态分配</li>
 <li>扩展：Prefix Cache + 引用计数，共享公共前缀</li>
 </ul>
-<h2 id="1">题目1：中间矩阵的显存问题</h2>
+<h2 id="题目1-中间矩阵的显存问题">题目1：中间矩阵的显存问题</h2>
 <p>在单头情况下（分头时把 <span class="arithmatex">\(d\_model\)</span> 换成 <span class="arithmatex">\(d\_model / num\_heads\)</span> ）有</p>
 <div class="arithmatex">\[Q,K,V \in \mathbb{R}^{seq\_len \times d\_model}\]</div>
 <div class="arithmatex">\[S=\text{softmax}(Q \times K^T / \sqrt{d}) \times V \in \mathbb{R}^{seq\_len \times seq\_len}\]</div>
@@ -133,7 +138,7 @@ PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。</p>
 <li>只有 <span class="arithmatex">\(24GB\)</span> 时放不下。
 总之，<strong>标准Attention的显存复杂度是序列长度的平方</strong>，序列长度变大时显存会爆炸。FlashAttention的目标就是不存储完整的 <span class="arithmatex">\(S\)</span> 矩阵。</li>
 </ol>
-<h2 id="2softmax">题目2：Softmax的在线计算</h2>
+<h2 id="题目2-softmax的在线计算">题目2：Softmax的在线计算</h2>
 <p>softmax是对行做的一个操作，把整行从分数转换成概率分布。</p>
 <div class="arithmatex">\[\text{softmax}(z_i)=\frac{e^{z_i - m}}{\sum_{j \in 1,2,\dots, n} e^{z_j - m}}\]</div>
 <p>其中 <span class="arithmatex">\(m=\max\{z_1,z_2, \dots, z_n\}\)</span> 。</p>
@@ -171,7 +176,7 @@ PagedAttention用于高效管理推理的KV Cache（外部推理范畴）。</p>
 <div class="arithmatex">\[l_{new} \leftarrow . \times e^{4-4} + e^{3-4} \approx 1.5529\]</div>
 <p>看到全部四个元素时的 <span class="arithmatex">\([m,l]\)</span> 更新为 <span class="arithmatex">\([4,1.5529]\)</span> 。</p>
 <p>忽略掉一些数值上的舍入误差（当然，也可以通过解析解完全相同来验证），会发现 <span class="arithmatex">\(l\)</span> 的结果恰好等于我们对 <span class="arithmatex">\(x=[2,1,3,4]\)</span> 希望求的分母求和项 <span class="arithmatex">\(l=e^{2-4}+e^{1-4}+e^{3-4}+e^{4-4}\)</span> 。</p>
-<h2 id="3flashattention">题目3：FlashAttention的核心思想</h2>
+<h2 id="题目3-flashattention的核心思想">题目3：FlashAttention的核心思想</h2>
 <p>现在我们有了标准Attention需要乘 <span class="arithmatex">\(N \times N\)</span> 的 <span class="arithmatex">\(S\)</span> 矩阵（显存爆炸），
 Softmax可以在不存全部值的情况下在线计算这两个知识。
 那么，FlashAttention的解决方案就是，把 <span class="arithmatex">\(Q,K,V\)</span> 都分块，每次只加载一小块到高速SRAM中计算，然后在线更新结果。</p>
@@ -342,7 +347,7 @@ O_1 = \frac{O}{l} = \begin{bmatrix}2/2.986 &amp; 1.493/2.986 \\ 1.493/2.986 &amp
 <p>原版算法有堪称实现灵魂的块大小计算公式 <span class="arithmatex">\(B_c=\lceil \frac{M}{4d} \rceil\)</span> 和 <span class="arithmatex">\(B_r = \min(\lceil \frac{M}{4d} \rceil,d)\)</span> ，保证 <span class="arithmatex">\(Q_i,K_j,V_j,O_i\)</span> 能同时放进SRAM，我们未对这一部分做阐述。</p>
 <p>原版用 diag⁡(ℓ)diag(ℓ) 来表达「逐行缩放」，数学上更严谨，也对应代码实现（广播乘法）。
 简化用 <code>O * e^(m - m_new)</code> 隐式假设逐行乘，没有强调向量和矩阵的广播语义。</p>
-<h2 id="4pagedattention">题目4：PagedAttention的显存管理优势</h2>
+<h2 id="题目4-pagedattention的显存管理优势">题目4：PagedAttention的显存管理优势</h2>
 <p>在生成文本时，每次只生成一个新的token，但做这个token的预测时，需要它之前所有token的 <span class="arithmatex">\(K\)</span> 和 <span class="arithmatex">\(V\)</span> 。标准做法是把之前算过的 <span class="arithmatex">\(K\)</span> 和 <span class="arithmatex">\(V\)</span> 存起来，避免重复计算，这就是<strong>KV Cache</strong>。</p>
 <p>但是，由于每个请求所需要的tokens数未知、有的多有的少，
 传统方法是直接给它们分配一块连续的显存，长度设为最大可能值。这需要连续空间、会造成显存浪费、甚至在释放时出现外部碎片，管理不够灵活。
@@ -370,7 +375,7 @@ PagedAttention：block size = 4 tokens，按需动态分配
 而对于增长到9 tokens，传统方法需要重新分配更大（16 tokens）的连续空间，并且将原来的5 tokens也拷贝到新空间、再写入新增加的4 tokens；
 而PagedAttention只需要动态增加1个block。
 这显现了PagedAttention不需要连续内存，动态分配、更加灵活。</p>
-<h2 id="5block-table">题目5：Block Table的工作原理</h2>
+<h2 id="题目5-block-table的工作原理">题目5：Block Table的工作原理</h2>
 <p>Block Table 实现了逻辑连续、物理不连续的映射，就像操作系统的虚拟内存。</p>
 <p>直接看题目。
 设定Block Size = 4，请求的 <span class="arithmatex">\(\text{Block Table} = [3,1,5]\)</span> 。
@@ -390,7 +395,7 @@ PagedAttention：block size = 4 tokens，按需动态分配
 物理块5（token 8,9,10,11）
 2.访问token索引9时应该去逻辑块 <span class="arithmatex">\(9 // 4=2\)</span> ，查表对应物理块5，块内偏移为 <span class="arithmatex">\(9 \% 4=1\)</span> 。
 3.同2可知，最后一个token在物理块5，这个块只存了token 8,9，没有存满。</p>
-<h2 id="6prefix-cache">题目6：Prefix Cache（前缀共享）的引用计数实现</h2>
+<h2 id="题目6-prefix-cache-前缀共享-的引用计数实现">题目6：Prefix Cache（前缀共享）的引用计数实现</h2>
 <p>我们发现很多请求共享相同的前缀。例如：</p>
 <ul>
 <li>系统 prompt："你是一个 AI 助手"（5 tokens）</li>
@@ -402,7 +407,7 @@ PagedAttention：block size = 4 tokens，按需动态分配
 </ul>
 <p>根据上述思想，参考自 <code>nanovllm/engine/block_manager.py</code> 的简化代码如下：
 （思想很简单，就是引用计数，共享的只存一份，每次要分配时先看看是不是已经存过了）</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Block</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Block</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_id</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">block_id</span> <span class="o">=</span> <span class="n">block_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ref_count</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># 引用计数</span>
@@ -518,6 +523,8 @@ PagedAttention：block size = 4 tokens，按需动态分配
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -533,6 +540,8 @@ PagedAttention：block size = 4 tokens，按需动态分配
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -555,6 +564,7 @@ PagedAttention：block size = 4 tokens，按需动态分配
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

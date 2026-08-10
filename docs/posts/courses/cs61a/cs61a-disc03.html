@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS61A · Disc 03 · 递归</h1>
     <div class="post-meta">
       <time datetime="2023-08-30T00:00:00">2023-08-30</time>
+      <span class="post-stats">2805 字 · 约 7 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS61A">#CS61A</a>
       
@@ -115,7 +120,7 @@
 还请读者自行对比思考，尽量完整理解，注意掌握分析思想。如果对理解上述思路有疑惑，可以看看本blog中讲解比较详细的题目，或者之前讲解的<code>disc01</code>等。</p>
 <h2 id="q1-warm-up-recursive-multiplication">Q1: Warm Up: Recursive Multiplication</h2>
 <p>思考过程省略。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Takes two positive integers and returns their product using recursion.</span>
 <span class="sd">    &gt;&gt;&gt; multiply(5, 3)</span>
 <span class="sd">    15</span>
@@ -133,14 +138,14 @@
 <p>base: n &lt; 10
 取案例。考虑两位数的情况：eg. <code>swipe(28)</code>
 将其转化为：一些操作，以及对降一阶（在这里就是位数少一位）的值执行<code>swipe</code>，一种可行操作如下：</p>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="nb">print</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">swipe</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 </code></pre></div>
 <p>注意中间一定要化用位数少一位的<code>swipe(2)</code>函数，而不是直接<code>print(2)</code>，这是为了构造递归，即从描述过程中取出某种抽象的、一般的物体；
 在递归时，我们只考虑本情况和“<strong>相对低阶一点</strong>”的情况，而不考虑无关的情况。如题目给出的调用<strong>四</strong>位数，我们只考虑怎样将其转化为一些操作和调用<strong>三</strong>位数；或者从调用<strong>三</strong>位数考虑转化为一些操作和调用<strong>两</strong>位数。
 将上述的<code>2</code>和<code>8</code>抽象为<code>n // 10</code>和<code>n % 10</code>，考虑一种实现如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">swipe</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">swipe</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Print the digits of n, one per line, first backward then forward.</span>
 
 <span class="sd">    &gt;&gt;&gt; swipe(2837)</span>
@@ -162,7 +167,7 @@
 </code></pre></div>
 <h2 id="q3-skip-factorial">Q3: Skip Factorial</h2>
 <p>思考省略。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">skip_factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">skip_factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return the product of positive integers n * (n - 2) * (n - 4) * ...</span>
 
 <span class="sd">    &gt;&gt;&gt; skip_factorial(5) # 5 * 3 * 1</span>
@@ -186,7 +191,7 @@
 在<code>2</code>完成之后，要对<code>1</code>执行完全相同的操作，所以应当调用<code>hailstone(1)</code> (2)。
 再考虑计数，我们利用递归的返回值而非全局变量进行计数，每执行一步返回值加一，意味着<code>even(2)</code>的返回值要在<code>hailstone(1)</code>的值基础上加一。(3)</p>
 <p>基于以上命题(1)(2)(3)，我们考虑在递归的返回值处调用相对低阶的函数。下述还把计算写到了参数中，读者当然可以在思考时拆分开，先用临时变量做计算，再将临时变量作为参数。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hailstone</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hailstone</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Print out the hailstone sequence starting at n, </span>
 <span class="sd">    and return the number of elements in the sequence.</span>
 <span class="sd">    &gt;&gt;&gt; a = hailstone(10)</span>
@@ -221,7 +226,7 @@
 </code></pre></div>
 <h2 id="q5-count-stair-ways">Q5: Count Stair Ways</h2>
 <p>题目引导超级详细，没有其他补充。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">count_stair_ways</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">count_stair_ways</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Returns the number of ways to climb up a flight of</span>
 <span class="sd">    n stairs, moving either one step or two steps at a time.</span>
 <span class="sd">    &gt;&gt;&gt; count_stair_ways(1)</span>
@@ -243,7 +248,7 @@
 <p>有一个坑点：题目给的<code>has_seven</code>函数只实现了函数中是否含<code>7</code>的判断，而题目要求还要判断是否为<code>7</code>的倍数。</p>
 <p>相比于从头到尾模拟，更适合这道题的可能是“取一个切面来模拟”。
 首先假定读者已经搞清楚了<code>helper function</code>封装起来的想法：如果<code>f(i, who, direction)</code>的<code>i</code>恰好等于<code>n</code>，则此时的<code>who</code>就是我们要找的<code>who</code>。用下面的案例说明，我们不妨找找内层函数<code>f</code>返回时，各参数值为多少？</p>
-<div class="highlight"><pre><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="n">sevens</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="o">&gt;&gt;&gt;</span> <span class="n">sevens</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
     <span class="mi">1</span>
     <span class="o">&gt;&gt;&gt;</span> <span class="n">sevens</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
     <span class="mi">2</span>
@@ -254,7 +259,7 @@
 <p>以<code>sevens(7, 5)</code>从<code>f(6, 1, 1)</code>开始的思考过程为例：</p>
 <p>此时<code>f(6, 1, 1)</code>这几个参数不满足<code>i == n</code>，所以经过“一些过程”，下次测试（即返回）<code>f(7, 2, -1)</code>。<code>f(7, 2, -1)</code>这几个参数满足<code>i == n</code>，返回<code>who</code>。
 考虑上述的“一些过程”。<code>i</code>从<code>6</code>到<code>7</code>，<code>who</code>从<code>1</code>到<code>2</code>，<code>direction</code>从<code>1</code>到<code>-1</code>。那么我们在执行<code>f(6, 1, 1)</code>的过程中，<code>who</code>是根据当前的<code>direction == 1</code>来修改的，而<code>direction</code>却是根据新的<code>(i + 1) == 7</code>来修改的，务必注意。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sevens</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sevens</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return the (clockwise) position of who says n among k players.</span>
 
 <span class="sd">    &gt;&gt;&gt; sevens(2, 5)</span>
@@ -324,7 +329,7 @@
 </ol>
 <p>从而可能的方法如下：
 （以下Solution1 和 Solution 1 another implement都能跑，至于Solution 2, 3, 4, ..., 114514就交给你啦（））</p>
-<div class="highlight"><pre><span></span><code>    <span class="c1"># Solution 1</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="c1"># Solution 1</span>
 
     <span class="c1"># def helper(remain, coin):</span>
     <span class="c1">#     if coin == None:</span>
@@ -401,6 +406,8 @@
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -416,6 +423,8 @@
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -438,6 +447,7 @@
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

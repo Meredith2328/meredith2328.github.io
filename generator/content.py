@@ -48,6 +48,11 @@ class Post:
     def date_str(self) -> str:
         return self.date.strftime("%Y-%m-%d")
 
+    @property
+    def reading_minutes(self) -> int:
+        """Rough reading time in minutes (~450 chars per minute)."""
+        return max(1, (self.word_count + 449) // 450)
+
 
 def split_front_matter(text: str) -> tuple[dict, str]:
     """Return (front matter dict, body text)."""
@@ -204,7 +209,7 @@ def scan_posts(blog_root: Path, ctx: MarkdownContext) -> list[Post]:
             ),
             chapters_per_page=_parse_chapters(fm.get("chapters_per_page")),
             folder=folder,
-            word_count=len(re.sub(r"\s+", "", body)),
+            word_count=len(re.sub(r"\s+", "", _prose_text(body))),
         )
         posts.append(post)
     return posts
@@ -219,6 +224,21 @@ def _parse_chapters(value) -> int:
     except (TypeError, ValueError):
         return 0
     return n if n > 0 else 0
+
+
+def _prose_text(body: str) -> str:
+    """Body text with fenced code removed, so word count / reading time
+    reflects prose instead of code characters."""
+    out = []
+    in_fence = False
+    for line in body.splitlines():
+        s = line.strip()
+        if s.startswith(("```", "~~~")):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            out.append(line)
+    return "\n".join(out)
 
 
 def _parse_feature(value) -> str:

@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">用双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL 的完整踩坑大集锦</h1>
     <div class="post-meta">
       <time datetime="2026-08-07T00:00:00">2026-08-07</time>
+      <span class="post-stats">9502 字 · 约 22 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%A4%A7%E6%A8%A1%E5%9E%8B">#大模型</a>
       
@@ -115,7 +120,7 @@
 <p><strong>完整的论文、报告和代码</strong>： <a href="https://github.com/Meredith2328/MathQwen">Meredith2328/MathQwen</a>，
 <strong>训练曲线</strong>： <a href="https://wandb.ai/10pi-fudan-university-school-of-management/agenticrl">wandb</a></p>
 <p>欢迎在评论区参考交流 <del>或者拷打</del> 。</p>
-<h2 id="_1">用到哪些知识</h2>
+<h2 id="用到哪些知识">用到哪些知识</h2>
 <p><strong>SFT（监督微调）</strong> 就是拿一批“问题-标准答案”的数据让模型“<strong>照着背</strong>”。
 它稳定，但只会模仿数据里出现过的行为。</p>
 <p><strong>RL（强化学习）</strong> 是另一条路：让模型自己生成答案，用奖励函数打分，
@@ -132,7 +137,7 @@
 <p><strong>Agentic RL</strong> 更进一步：模型不是输出一段文字就结束，而是进入
 “思考 → 调工具 → 看工具返回 → 再思考”的循环，奖励来自工具执行的真实结果。</p>
 <p><strong>wandb</strong> 参考我之前写过的 <a href="https://meredith2328.github.io/posts/notes/tools/wandb.html">WanDB基础使用教程总结 · 10PI'S BLOG丨十派的玩具箱</a> 。</p>
-<h2 id="gsm8k-qwen3-06b">实验一：通过四种训练栈在 GSM8K 上训练Qwen3 0.6B的数学推理能力</h2>
+<h2 id="实验一-通过四种训练栈在-gsm8k-上训练qwen3-0-6b的数学推理能力">实验一：通过四种训练栈在 GSM8K 上训练Qwen3 0.6B的数学推理能力</h2>
 <blockquote>
 <p>问答 -&gt; CoT -&gt; Agentic</p>
 <p>一切的开端是推理能力。</p>
@@ -201,7 +206,7 @@
 <p>之后我担心把格式也作为奖励信号、会冲淡我更关注的数学推理能力信号，所以在答案抽取上做了放松。</p>
 <p>只要大致符合格式、抽取出的结果正确，我就给它奖励。</p>
 <p>做了这样的处理之后，Megatron 才真正训起来，而不是一直停在基座附近。</p>
-<h2 id="agentic-rl">实验二：Agentic RL 工具链调用能力训练</h2>
+<h2 id="实验二-agentic-rl-工具链调用能力训练">实验二：Agentic RL 工具链调用能力训练</h2>
 <p>光做数学推理不过瘾，我们把重点转向“会调用工具”的智能体。设计了两档到六档递进任务：
 Easy（1 次计算器调用）、Multi-step（2–3 步链）、Hard（4–5 步链）、Long-chain（6–8 步）、
 Multi-tool（汇率/单位换算跨工具）、Planning（场景目标自主规划）。数字全是 9–13 位，
@@ -250,7 +255,7 @@ TRL 会在模型里复制一份初始权重当 KL 参照，训练日志一切正
 策略退化成“调用一次工具 + 长篇叙述”。而在后面实验三里，SFT 只有 2.5%（远未饱和），
 修复后的 GRPO 反而能把它提到 12.5%。RL 的增益依赖“SFT 未饱和”的分布，
 这一点比“GRPO 与 SFT 持平”更接近真相。</p>
-<h2 id="_2">顺手摸了一下链长的天花板</h2>
+<h2 id="顺手摸了一下链长的天花板">顺手摸了一下链长的天花板</h2>
 <p>实验二做到这里，我其实一直在琢磨一个问题：0.6B 到底能稳定走多长的链？
 之前的 Long-chain 也就 6–8 步，那 10 步、16 步、28 步呢？是没见过的长度
 直接崩，还是能像写好的循环程序一样一直延伸下去？</p>
@@ -320,7 +325,7 @@ TRL 会在模型里复制一份初始权重当 KL 参照，训练日志一切正
 曲线其实完全就是 SFT 自己跑出来的。“训练分布决定上限”这个结论不受影响，
 但“GRPO 在这里起到了作用”这句话得收回去——链长天花板这件事，
 是数据分布说了算，不是 RL 算法说了算。</p>
-<h2 id="_3">怎么兼顾长链和短链</h2>
+<h2 id="怎么兼顾长链和短链">怎么兼顾长链和短链</h2>
 <p>但这么一搞，一个矛盾马上冒出来了：训练分布右移，长链是稳了，短链却遭殃。
 看表里 16–28 步那一行，8 步只有 66.7%——明明更短的链应该更简单，
 怎么反而做不对？</p>
@@ -367,7 +372,7 @@ TRL 会在模型里复制一份初始权重当 KL 参照，训练日志一切正
 就是把意图写清楚，模型立刻知道该在什么时候收手。0.6B 不是没有循环能力，
 而是要“训练分布覆盖 + 显式长度锚定”两个条件凑齐，
 才能把这种能力稳定逼出来。</p>
-<h2 id="_4">实验三：自己搭一个跨应用工具基准</h2>
+<h2 id="实验三-自己搭一个跨应用工具基准">实验三：自己搭一个跨应用工具基准</h2>
 <p>真实世界的 Agent 基准（比如 Toolathlon，604 个工具、32 个真实应用）需要
 Docker、MCP、真实账号，双卡 5090 环境根本跑不起来。所以我们按同样的方法论
 自己搭了一个可控沙箱：9 个模拟应用（文件、数据表、笔记、日历、邮件、数学、文本、
@@ -390,7 +395,7 @@ GRPO 版本（修复了保存 bug 之后跑的，adapter 哈希已校验）也�
 而是 0.6B 在这个流水线里学不会“把工具返回内容串接成下一步参数”，
 也就是工具结果接地（tool-output grounding）这个能力本身缺位。</p>
 <p>很可惜，受限于训练资源、以及个人的学习目的，我这里的探索就走到这里。</p>
-<h2 id="72bqlora">实验四：顺手挑战一下 72B（QLoRA 参数量摸高）</h2>
+<h2 id="实验四-顺手挑战一下-72b-qlora-参数量摸高">实验四：顺手挑战一下 72B（QLoRA 参数量摸高）</h2>
 <p>0.6B 摸完了，顺手往参数量的方向摸一摸高。双卡 5090 一共 64 GB 显存，
 全参数训 72B 想都别想，但 QLoRA 可以：把基座权重量化到 4-bit 塞进显存，
 只训练插进去的一小撮 LoRA 参数。</p>
@@ -411,7 +416,7 @@ batch 和上下文想再往上顶，并没有想象中那么宽裕。训练本�
 所以“72B 能在一台双卡 5090 上训起来”这件事本身是通的，
 但这次 SFT 在数学能力上是净退步——负结果也照实记下来，
 等以后换成带 CoT 的 SFT 数据再补一轮。</p>
-<h2 id="_5">一些踩坑清单</h2>
+<h2 id="一些踩坑清单">一些踩坑清单</h2>
 <ul>
 <li>
 <p><strong>sm_120 软件栈</strong>：PyPI 默认 cu126 的 torch 不支持 Blackwell，必须 cu128/cu130；
@@ -430,7 +435,7 @@ batch 和上下文想再往上顶，并没有想象中那么宽裕。训练本�
 <li><strong>SFT 后熵太低</strong>：token 熵约 0.002，温度 0.9 下采样几乎相同、奖励零方差；
   要提到温度 1.2、top-p 0.95 才有学习信号。</li>
 </ul>
-<h2 id="_6">可观测性落地：怎么把“看起来对”变成“真的对”</h2>
+<h2 id="可观测性落地-怎么把-看起来对-变成-真的对">可观测性落地：怎么把“看起来对”变成“真的对”</h2>
 <p>前面踩了这么多坑，回过头看，大部分坑的共性只有一个：
 <strong>日志一切正常，实际什么都没发生</strong>。loss 在降、梯度范数非零、
 wandb 曲线漂漂亮亮——但保存下来的权重和初始权重逐字节相同。
@@ -456,7 +461,7 @@ wandb 有对应的 run id；数字一旦修改，所有文档同步更新。
 负结果往往才是真正值钱的信息，它把能力的边界画得明明白白。</p>
 <p>这五条做完，至少能保证：当你写下“模型从 42.2% 提到 68.8%”的时候，
 这句话经得起别人拿 wandb 和 results 里的 JSON 逐条对账。</p>
-<h2 id="_7">结语</h2>
+<h2 id="结语">结语</h2>
 <p>我想实验本身是有学习价值的，实验过程中的“可观测性”则更是重中之重。</p>
 <p>例如数据生成时写了一些自检、帮助我发现许多问题；</p>
 <p>训练结束通过哈希值校验发现了压根没训到的TRL框架保存陷阱；</p>
@@ -521,6 +526,8 @@ wandb 有对应的 run id；数字一旦修改，所有文档同步更新。
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -536,6 +543,8 @@ wandb 有对应的 run id；数字一旦修改，所有文档同步更新。
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -558,6 +567,7 @@ wandb 有对应的 run id；数字一旦修改，所有文档同步更新。
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

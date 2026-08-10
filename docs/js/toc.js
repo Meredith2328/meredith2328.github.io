@@ -45,6 +45,31 @@
 
   var links = toc.querySelectorAll("a");
 
+  // hover "#" anchor links on every heading (deep-linkable section anchors)
+  body.querySelectorAll("h1, h2, h3, h4").forEach(function (h) {
+    if (!h.id) return;
+    var a = document.createElement("a");
+    a.className = "heading-anchor";
+    a.href = "#" + h.id;
+    a.setAttribute("aria-label", "链接到本节");
+    a.textContent = "#";
+    h.insertBefore(a, h.firstChild);
+  });
+
+  body.addEventListener("click", function (e) {
+    var a = e.target.closest(".heading-anchor");
+    if (!a) return;
+    e.preventDefault();
+    var h = document.getElementById(a.getAttribute("href").slice(1));
+    if (!h) return;
+    if (window.pilogPager && window.pilogPager.jumpToHeading) {
+      window.pilogPager.jumpToHeading(h);
+    } else {
+      scrollToHeading(h);
+    }
+    if (history.replaceState) history.replaceState(null, "", a.getAttribute("href"));
+  });
+
   function scrollToHeading(h) {
     var top = h.getBoundingClientRect().top + window.pageYOffset - 24;
     if (window.pilogSmoothScroll) {

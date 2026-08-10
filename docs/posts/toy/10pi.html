@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../index.html">首页</a></li>
 <li><a href="10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">十派的玩具箱有哪些内容？</h1>
     <div class="post-meta">
       <time datetime="2024-08-30T00:00:00">2024-08-30</time>
+      <span class="post-stats">2253 字 · 约 6 分钟</span>
       
       <a class="tag-chip" href="../../index.html#tag=%E5%A5%87%E6%80%AA%E7%9A%84%E4%B8%9C%E8%A5%BF">#奇怪的东西</a>
       
@@ -114,7 +119,7 @@
 <p>知识笔记、工具笔记、写出的小玩意儿，都是玩具。</p>
 <p>有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。</p>
 <p>任何批评和建议均会受到最热烈的欢迎： <a href="https://github.com/Meredith2328/meredith2328.github.io/issues">Issues</a> / pipipi2328@gmail.com</p>
-<h2 id="_1">各种工具介绍</h2>
+<h2 id="各种工具介绍">各种工具介绍</h2>
 <p>主要集中于深度学习常用的工具。</p>
 <p><a href="../notes/tools/linux-command.html">Linux 好用的指令</a> </p>
 <p>是一些个人觉得UNIX特别干净漂亮的指令。</p>
@@ -122,7 +127,7 @@
 <p>是一个用于监测训练实验的包和网站。</p>
 <p><a href="../notes/tools/einops.html">einops</a> </p>
 <p>是把Tensor的各种变形操作变得直观的包。</p>
-<h2 id="_2">好玩的玩具们</h2>
+<h2 id="好玩的玩具们">好玩的玩具们</h2>
 <p>写的奇怪的小玩意儿。</p>
 <p><a href="https://meredith2328.github.io/notegotya/">notegotya</a> </p>
 <p>是一个用来练习五线谱识谱的小玩具。</p>
@@ -130,7 +135,7 @@
 <p>是一个带翻转规则的类黑白棋小游戏。</p>
 <p><a href="https://meredith2328.github.io/freshdan/#/">freshdan</a> </p>
 <p>是复旦大学新生指南，讲解许多对新生可能有用的内容。</p>
-<h2 id="_3">翻译和转载的文章</h2>
+<h2 id="翻译和转载的文章">翻译和转载的文章</h2>
 <p>有时还会翻译或转载一些我觉得很有趣的内容。</p>
 <p><a href="../reference/career-advice-by-tao.html">陶哲轩的职业建议</a></p>
 <p><a href="../reference/fudan-mlsys-cn.html">机器学习系统课程中文翻译</a></p>
@@ -145,12 +150,12 @@
 <p><a href="../notes/ml/optimizer.html">从SGD到AdamW，优化器怎么发展过来的？</a></p>
 <p><a href="../notes/ml/softmax.html">原始softmax、数值稳定的softmax和在线softmax</a></p>
 <p><a href="../notes/ml/nanovllm.html">结合nanovllm的FlashAttention和PagedAttention主要原理概述</a></p>
-<h2 id="rl">大模型训练与 RL</h2>
+<h2 id="大模型训练与-rl">大模型训练与 RL</h2>
 <p>一些训练和开源相关的记录。</p>
 <p><a href="../notes/ml/mathqwen-0.6b-agentic-rl.html">双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL</a></p>
 <p><a href="../notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">TRL 1.9.2 会“假装训练”的 bug</a></p>
 <p><a href="../notes/ml/TensorZero-6949.html">给 tensorzero 提的第一个 PR</a></p>
-<h2 id="_4">数据结构与算法</h2>
+<h2 id="数据结构与算法">数据结构与算法</h2>
 <p>总计三套笔记：算法设计与分析（算法导论），洛谷基础篇，LeetCode HOT 100。</p>
 <p><a href="../notes/algo/algorithm-1.html">算法课-数学部分</a></p>
 <p><a href="../notes/algo/algorithm-2.html">算法课-算法部分</a></p>
@@ -231,6 +236,8 @@
       <span class="footer-sep">::</span>
       <a href="../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -246,6 +253,8 @@
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -268,6 +277,7 @@
 
 <script src="../../js/toc.js" defer></script>
 <script src="../../js/code-copy.js" defer></script>
+<script src="../../js/lightbox.js" defer></script>
 
 <script src="../../js/giscus.js" defer></script>
 

@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS61A · Disc 07 · 树、链表</h1>
     <div class="post-meta">
       <time datetime="2023-08-30T00:00:00">2023-08-30</time>
+      <span class="post-stats">743 字 · 约 2 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS61A">#CS61A</a>
       
@@ -109,7 +114,7 @@
     <h2 id="q1-is-bst">Q1: Is BST</h2>
 <p>左子树的所有节点的值都小于等于父节点的值，
 右子树的所有节点的值都大于父节点的值。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_bst</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_bst</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Returns True if the Tree t has the structure of a valid BST.</span>
 
 <span class="sd">    &gt;&gt;&gt; t1 = Tree(6, [Tree(2, [Tree(1), Tree(4)]), Tree(7, [Tree(7), Tree(8)])])</span>
@@ -164,7 +169,7 @@
 </code></pre></div>
 <h2 id="q2-prune-small">Q2: Prune Small</h2>
 <p>Solution 1</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prune_small</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prune_small</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Prune the tree mutatively, keeping only the n branches</span>
 <span class="sd">    of each node with the smallest labels.</span>
 
@@ -189,14 +194,14 @@
         <span class="n">prune_small</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </code></pre></div>
 <p>Solution 2</p>
-<div class="highlight"><pre><span></span><code>    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
         <span class="n">largest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
         <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">largest</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">:</span>
         <span class="n">prune_small</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="q3-sum-two-ways">Q3: Sum Two Ways</h2>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sum_rec</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sum_rec</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns the sum of the elements in s.</span>
 
@@ -232,7 +237,7 @@
     <span class="k">return</span> <span class="nb">sum</span>
 </code></pre></div>
 <h2 id="q4-overlap">Q4: Overlap</h2>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">overlap</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">overlap</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""For increasing s and t, count the numbers that appear in both.</span>
 
 <span class="sd">    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))</span>
@@ -279,7 +284,7 @@
     <span class="k">return</span> <span class="n">count</span>
 </code></pre></div>
 <h2 id="q5-duplicate-link">Q5: Duplicate Link</h2>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">duplicate_link</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">duplicate_link</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Mutates s so that each element equal to val is followed by another val.</span>
 
 <span class="sd">    &gt;&gt;&gt; x = Link(5, Link(4, Link(5)))</span>
@@ -314,7 +319,7 @@ Place the division pattern from the example above in a <code>while</code> stat
 &gt;&gt;&gt; n = r
 </code></pre></div>
 <p>While constructing the decimal expansion, store the <code>tail</code> for each <code>n</code> in a dictionary keyed by <code>n</code>. When some <code>n</code> appears a second time, instead of constructing a new <code>Link</code>, set its original link as the rest of the previous link. That will form a cycle of the appropriate length.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return a linked list with a cycle containing the digits of n/d.</span>
 
 <span class="sd">    &gt;&gt;&gt; display(divide(5, 6))</span>
@@ -351,7 +356,7 @@ Place the division pattern from the example above in a <code>while</code> stat
 以<code>2345</code>举例，构造<code>2345</code>时是在已知<code>234</code>而非<code>345</code>的构造的情况下。
 因此我们要做的就是在<code>234</code>构造的末尾加上一个<code>5</code>（先遍历到末尾节点、再添加），
 而非在<code>345</code>的开头加上一个<code>2</code>（直接构造 <code>Link(2, 345的Link)</code>。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">store_digits</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">store_digits</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Stores the digits of a positive number n in a linked list.</span>
 
 <span class="sd">    &gt;&gt;&gt; s = store_digits(1)</span>
@@ -427,6 +432,8 @@ Place the division pattern from the example above in a <code>while</code> stat
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -442,6 +449,8 @@ Place the division pattern from the example above in a <code>while</code> stat
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -464,6 +473,7 @@ Place the division pattern from the example above in a <code>while</code> stat
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

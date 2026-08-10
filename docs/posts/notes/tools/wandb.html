@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">WanDB基础使用教程总结</h1>
     <div class="post-meta">
       <time datetime="2026-03-08T00:00:00">2026-03-08</time>
+      <span class="post-stats">2324 字 · 约 6 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%B7%A5%E5%85%B7">#工具</a>
       
@@ -113,7 +118,7 @@
 <p>感谢DeepSeek v3.2提供了所有的代码使用例。<br/>edit time: 2026-03-09 13:48:37</p>
 </blockquote>
 <p>整合入训练循环的最小模板：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
 
 <span class="c1"># 初始化</span>
 <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"my-project"</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span>
@@ -133,7 +138,7 @@
 
 <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="_1">总结</h2>
+<h2 id="总结">总结</h2>
 <p>在W&amp;B quickstart中提到了两款产品，我们主要使用的是前者，用于记录acc、loss、运行环境和模型权重等日志信息，并且便于做简单的绘图。</p>
 <table>
 <thead>
@@ -171,21 +176,21 @@
 </tr>
 </tbody>
 </table>
-<h2 id="accloss">基础使用：记录acc和loss的变化</h2>
+<h2 id="基础使用-记录acc和loss的变化">基础使用：记录acc和loss的变化</h2>
 <p>wanDB最本源的使用方式是通过 <code>wandb.log</code> 函数，记录 <code>epoch</code>， <code>accuracy</code> 和 <code>loss</code> ，只要在相关的地方把变量传给它就行。
 生成一些数字看看它的效果：</p>
 <p>```python hl:6,15-19,24
 import wandb
 import random
 import time</p>
-<h1 id="1-run">1. 初始化一个新的run</h1>
+<h1 id="1-初始化一个新的run">1. 初始化一个新的run</h1>
 <p>wandb.init(project="colab-demo", name="basic-example")</p>
-<h1 id="2">2. 模拟训练过程</h1>
+<h1 id="2-模拟训练过程">2. 模拟训练过程</h1>
 <p>for epoch in range(10):
     # 模拟一些指标
     loss = 1 / (epoch + 1) + random.random() * 0.1
     accuracy = epoch / 10 + random.random() * 0.05</p>
-<div class="highlight"><pre><span></span><code># 3. 记录指标
+<div class="highlight"><pre data-lang="python"><span></span><code># 3. 记录指标
 wandb.log({
     "epoch": epoch,
     "loss": loss,
@@ -194,10 +199,10 @@ wandb.log({
 
 time.sleep(1)  # 模拟训练时间
 </code></pre></div>
-<h1 id="4-run">4. 结束run</h1>
+<h1 id="4-结束run">4. 结束run</h1>
 <p>wandb.finish()
 print("实验完成！请查看wandb仪表板")</p>
-<div class="highlight"><pre><span></span><code>发现它帮我在终端生成了直观的变化图和总结。
+<div class="highlight"><pre data-lang="python"><span></span><code>发现它帮我在终端生成了直观的变化图和总结。
 
 ![](posts/migrated/post-images/20260308214955.png)
 
@@ -282,12 +287,12 @@ wandb.finish()
 <p><img alt="" src="../../migrated/post-images/20260308215748.png"/></p>
 <p>注意以下这个图表完全是借助 <code>wandb</code> 提供的接口绘制的。</p>
 <p><img alt="" src="../../migrated/post-images/20260308215916.png"/></p>
-<h2 id="pytorchhuggingface-transformers">基础使用：PyTorch和Huggingface Transformers的集成</h2>
+<h2 id="基础使用-pytorch和huggingface-transformers的集成">基础使用：PyTorch和Huggingface Transformers的集成</h2>
 <p>都一样，把变量传进去就行。某个指标、某个结果，甚至是模型权重文件 <code>model.pth</code> 。
 但wandb的免费似乎只支持200GB的存储，需要注意。</p>
 <p>Huggingface Transformers甚至还要更加省事：
 连那些参数都不需要自己传了， <code>Trainer</code> 已经封装好了，只要 <code>report_to="wandb"</code> 就可以了。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
@@ -371,7 +376,7 @@ wandb.finish()
 
 <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span> 
     <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
@@ -428,7 +433,7 @@ wandb.finish()
 <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260308220445.png"/></p>
-<h2 id="_2">进阶使用：超参数搜索</h2>
+<h2 id="进阶使用-超参数搜索">进阶使用：超参数搜索</h2>
 <p>定义搜索空间后，wandb可用于超参数搜索。
 例如下述定义了 <code>learning_rate</code> 在 <code>[1e-5, 1e-4]</code> 之间，服从对数均匀分布。</p>
 <blockquote>
@@ -436,7 +441,7 @@ wandb.finish()
 </blockquote>
 <p>之后我利用for循环串行运行了三次，wandb帮我测试的 <code>lr</code> 分别为 <code>2.213804440450783e-05</code> ，<code>1.6808858635707506e-05</code> ，<code>1.1746289104917436e-05</code> 。
 还定义了 <code>per_device_train_batch_size</code> 为 <code>8</code> 或 <code>16</code> ，实际跑了一次 <code>8</code> 、两次 <code>16</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span> 
     <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
@@ -585,6 +590,8 @@ wandb.finish()
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -600,6 +607,8 @@ wandb.finish()
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -622,6 +631,7 @@ wandb.finish()
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

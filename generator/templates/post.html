@@ -16,6 +16,7 @@
     <h1 class="post-title">{{ post.title }}</h1>
     <div class="post-meta">
       <time datetime="{{ post.date.isoformat() }}">{{ post.date_str }}</time>
+      <span class="post-stats">{{ post.word_count }} 字 · 约 {{ post.reading_minutes }} 分钟</span>
       {% for tag in post.tags %}
       <a class="tag-chip" href="{{ root }}index.html#tag={{ tag|urlencode }}">{{ '#' ~ tag }}</a>
       {% endfor %}
@@ -88,6 +89,7 @@
 {% endif %}
 <script src="{{ root }}js/toc.js" defer></script>
 <script src="{{ root }}js/code-copy.js" defer></script>
+<script src="{{ root }}js/lightbox.js" defer></script>
 {% if giscus and giscus.enabled and giscus.repo %}
 <script src="{{ root }}js/giscus.js" defer></script>
 {% endif %}

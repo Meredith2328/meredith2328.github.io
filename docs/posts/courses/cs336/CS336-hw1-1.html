@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS336 · Assignment 1 · 前半段：架构</h1>
     <div class="post-meta">
       <time datetime="2026-03-10T00:00:00">2026-03-10</time>
+      <span class="post-stats">11269 字 · 约 26 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS336">#CS336</a>
       
@@ -111,7 +116,7 @@
 <blockquote>
 <p>edit time: 2026-02-03 17:35:29 开始配置环境√<br/>edit time: 2026-02-03 17:56:45 下数据集，读文档√<br/>edit time: 2026-02-03 18:47:24 BPE先到2.4停一下<br/>edit time: 2026-02-09 18:30:51 BPE过3/3的demo√ 没优化居然就能过<br/>edit time: 2026-02-09 21:37:52 想把3 Transformer结构做掉<br/>edit time: 2026-02-09 22:36:31 3.1-3.3介绍√ 后面3.4-3.6就是纯代码了，基本上是自己写一遍，再让ai写一遍，补一些细节<br/>edit time: 2026-02-11 22:54:59 读test_model，照猫画虎Linear, Embedding, RMSNorm, SwiGLU√<br/>edit time: 2026-02-12 23:26:05 完成整个3 Transformer结构部分√<br/>edit time: 2026-02-13 21:36:29 完成4 Utils部分√<br/>edit time: 2026-02-13 22:25:45 粗略地过了5 Training Loop部分，最后合在一起因为没有做tokenizer所以先搁置<br/>edit time: 2026-03-10 09:03:18 补完训练部分√ 不管干什么，都先在PyTorch里面干一下，就知道了。</p>
 </blockquote>
-</div><div class="post-chapter" data-ch="2" data-title="系列总览"><h2 id="_1">系列总览</h2>
+</div><div class="post-chapter" data-ch="2" data-title="系列总览"><h2 id="系列总览">系列总览</h2>
 <p>CS336 Assignment 1 分两篇记录：</p>
 <ol>
 <li><a href="CS336-hw1-1.html">前半段：架构</a>（本篇）：BPE、Transformer LM、损失函数与优化器、训练循环</li>
@@ -179,7 +184,7 @@
 <p>再接下来，我们根据targets提供的标签知道了inputs中哪些是正确的，把正确的取出。</p>
 <p>总之，其实就是算了这两部分：</p>
 <div class="arithmatex">\[CrossEntropy(x,y)=-\log(\frac{e^{x_y}}{\sum_j e^{x_j}})=\log(\sum_j e^{x_j})-x_y\]</div>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CrossEntropyLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CrossEntropyLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -218,7 +223,7 @@
 <p>大名鼎鼎的随机梯度下降（Stochastic Gradient Descent）。
 介绍了parameter group的概念，表示模型的不同部分的参数使用不同的超参数。
 用了一个简单的例子来测试超参数的影响：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
@@ -302,7 +307,7 @@
 <p><img alt="" src="../../migrated/post-images/20260213211756.png"/></p>
 <p>这个看起来像是在SGD的基础上加了一些数学原理的估计，使得它有很好的效果。
 具体原理暂时不关心，我希望更侧重对大模型训练整体及其实现的把握。以后写到AdamW了再回过来补充原理。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">weight_decay</span><span class="p">)</span>
@@ -355,7 +360,7 @@
 
         <span class="k">return</span> <span class="n">loss</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_adamw_cls</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_adamw_cls</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns a torch.optim.Optimizer that implements AdamW.</span>
 <span class="sd">    """</span>
@@ -603,7 +608,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 生成对下一个token的归一化的概率分布 <code>(batch_size, sequence_length, vocab_size)</code> 。
 训练语言模型时，优化预测得到的下一个token和实际下一个token的交叉熵损失。</p>
 <p><del>连接主义！</del></p>
-<h3 id="resource-accounting">知识：Resource accounting</h3>
+<h3 id="知识-resource-accounting">知识：Resource accounting</h3>
 <blockquote>
 <p>这一部分本来在3 Training a Transformer LM最后，挪到了最前面方便查阅。<br/>编写了一篇博客 <a href="https://meredith2328.github.io/post/LLMestimate/">怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</a> ，详细整理了相关的内容，并且利用实际的包做了验证。</p>
 <p>直觉：<br/><strong>随着模型变大，FFN和Attention占最主导（90%），其中FFN可能更多。</strong><br/><strong>但是随着长上下文变长，到一定阈值后，Attention反超FFN成为绝对主导（起码超过50%）。</strong></p>
@@ -617,7 +622,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 <p>注意首先使用 <code>super().__init__()</code> ，这是接下来使用 <code>load_state_dict</code> 手动加载权重的基础。</p>
 <p>首先利用 <code>torch.empty</code> 创建 <code>(out_features, in_features)</code> 的 <code>W</code> ，然后将它用 <code>nn.Parameter</code> 包装，再然后使用文档Parameter Initialization部分提到的 <code>trunc_normal_</code> 进行截断处理。 
 对于 <code>forward</code> 的实际实现，这里不使用einops时应该写作 <code>x @ W^T</code> ，因为考虑到空间局部性， <code>x</code> 这样的向量一般是行向量。当然，如果我们直接使用einops.einsum，就很方便了。把那些用于并行的<code>batch</code>之类的维度写成 <code>...</code> 即可。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.init</span><span class="w"> </span><span class="kn">import</span> <span class="n">trunc_normal_</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">sqrt</span>
@@ -653,7 +658,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 </code></pre></div>
 <p>接下来是修改adapter。
 需要用到 <code>.load_state_dict('key': weights)</code> 来加载权重。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cs336_basics</span><span class="w"> </span><span class="kn">import</span> <span class="n">bpe</span><span class="p">,</span> <span class="n">model</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cs336_basics</span><span class="w"> </span><span class="kn">import</span> <span class="n">bpe</span><span class="p">,</span> <span class="n">model</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_linear</span><span class="p">(</span>
     <span class="n">d_in</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -681,7 +686,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 </code></pre></div>
 <h3 id="embedding">embedding</h3>
 <p>Embedding是一个对于输入 <code>token_id</code> 查表，得到它的Embedding向量的层。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cs336_basics</span><span class="w"> </span><span class="kn">import</span> <span class="n">bpe</span><span class="p">,</span> <span class="n">model</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cs336_basics</span><span class="w"> </span><span class="kn">import</span> <span class="n">bpe</span><span class="p">,</span> <span class="n">model</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_linear</span><span class="p">(</span>
     <span class="n">d_in</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -730,7 +735,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
     <span class="n">embedding_layer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">({</span><span class="s1">'weight'</span><span class="p">:</span> <span class="n">weights</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">embedding_layer</span><span class="p">(</span><span class="n">token_ids</span><span class="p">)</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_embedding</span><span class="p">(</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_embedding</span><span class="p">(</span>
     <span class="n">vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">weights</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="s2">" vocab_size d_model"</span><span class="p">],</span>
@@ -758,7 +763,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 <p><img alt="" src="../../migrated/post-images/20260211224857.png"/></p>
 <p>有一个注意的点：在平方之前，需要upcast成float32，防止溢出。
 这也启示了我们：在torch中如果有比较大的数，可能需要upcast成float32进行计算。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RMSNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RMSNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""RMSNorm(a_i) = a_i * g_i / RMS(a)</span>
 <span class="sd">    RMS(a) = \sqrt(\sum_{i=1}^{d_model} a_i^2 + eps)</span>
 <span class="sd">    g_i: (d_model) is a learnable "gain" parameter.</span>
@@ -781,7 +786,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
         <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">rms_a</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span>
         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">in_dtype</span><span class="p">)</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_rmsnorm</span><span class="p">(</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_rmsnorm</span><span class="p">(</span>
     <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">weights</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="s2">" d_model"</span><span class="p">],</span>
@@ -816,7 +821,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 <p>我们可以预先计算矩阵 <span class="arithmatex">\(R_k^i\)</span> ，在使用时再传入query向量和token_positions。</p>
 <p>第28行的 <code>rearrange</code> 是这样的作用：
 <img alt="" src="../../migrated/post-images/20260212175652.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RoPE</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RoPE</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">d_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_seq_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="k">assert</span> <span class="n">d_k</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
@@ -861,7 +866,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
         <span class="k">return</span> <span class="n">x_rotated</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">orig_dtype</span><span class="p">)</span>
 </code></pre></div>
 <p>adapter还是一个道理，而且这个都不用 <code>load_state_dict</code> 了。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_rope</span><span class="p">(</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_rope</span><span class="p">(</span>
     <span class="n">d_k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">max_seq_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -895,7 +900,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 这一结果是，在完成了 <code>load_state_dict</code> 之后，逐项比较 <code>transformer_model.named_parameters()</code> 和 <code>state_dict</code> ，发现有且仅有一项 <code>token_embedding</code> 不一致，最大的绝对数值大约差3.1左右。</p>
 <p>解决这一件事情之后，成功通过了这一部分的所有用例。
 <img alt="" src="../../migrated/post-images/20260212230058.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TransformerBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TransformerBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1005,7 +1010,7 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 
         <span class="k">return</span> <span class="n">logits</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_transformer_block</span><span class="p">(</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_transformer_block</span><span class="p">(</span>
     <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">d_ff</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1519,11 +1524,11 @@ F_adamw ≈ 12 × 2.046B = 24.55B FLOPs
 实现BPE Tokenizer的编码和解码。</p>
 <p>2.7 Experiments
 一些用于提升理解的问题和实验。</p>
-<h3 id="_2">阅读知识部分</h3>
+<h3 id="阅读知识部分">阅读知识部分</h3>
 <p>通过 <code>ord</code> 将Unicode转为int ，<code>chr</code> 将int转为Unicode。
 可见，<code>chr</code>的返回值得到一个包含了相关字符的Unicode字符串。
 但是，它在print中会自动进行一层解析，例如空字符0。</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">'牛'</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">'牛'</span><span class="p">)</span>
 <span class="mi">29275</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">29275</span><span class="p">)</span>
 <span class="s1">'牛'</span>
@@ -1587,7 +1592,7 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid 
 <p>Continuing this, the sequence of merges we get in the end will be <code>['s t', 'e st', 'o w', 'l ow', 'w est', 'n e','ne west', 'w i', 'wi d', 'wid est', 'low e', 'lowe r']</code> 。</p>
 <p>此时词汇表从一开始的 <code>[&lt;|endoftext|&gt;, [...256 BYTE CHARS]</code> 变成：
 <code>[&lt;|endoftext|&gt;, [...256 BYTE CHARS], st, est, ow, low, west, ne]</code></p>
-<h3 id="24-bpe-tokenizer-trainingnaive">2.4 BPE Tokenizer Training的naive实现</h3>
+<h3 id="2-4-bpe-tokenizer-training的naive实现">2.4 BPE Tokenizer Training的naive实现</h3>
 <p>规划模块+逐个模块实现并检查.</p>
 <p><img alt="" src="../../migrated/post-images/20260206150752.png"/>
 对于这样一个问题，将文本文件读入、得到一个BPE tokenizer，
@@ -1609,7 +1614,7 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid 
 <p>沉下心来，别着急，慢慢来。<br/>仔细读test，把自己的函数行为和test搞成完全一致。</p>
 </blockquote>
 <p>之后仔细读了一下，发现一是byte没有存对，二是split应该先按照特殊token，再使用GPT-2的分词。两个问题都解决掉就ok了。</p>
-<h3 id="27-experiments">2.7 Experiments的回答</h3>
+<h3 id="2-7-experiments的回答">2.7 Experiments的回答</h3>
 <blockquote>
 <p>(a) 压缩比的含义</p>
 </blockquote>
@@ -1686,7 +1691,7 @@ Saved tokenizer artifacts:
 <li>uint32 浪费空间（能存40亿，但只需要3.2万）</li>
 <li>uint16 刚刚好</li>
 </ul>
-</div><div class="post-chapter" data-ch="5" data-title="1 环境配置"><h2 id="1">1 环境配置</h2>
+</div><div class="post-chapter" data-ch="5" data-title="1 环境配置"><h2 id="1-环境配置">1 环境配置</h2>
 <p><a href="https://docs.astral.sh/uv/guides/projects/#viewing-your-version">Working on projects | uv</a></p>
 <blockquote>
 <p>整个作业做完后感慨一下，uv真的是非常好用的工具。<br/>我前后需要切换环境版本，uv帮我省去了相当多的环境配置的麻烦。</p>
@@ -1754,6 +1759,8 @@ Saved tokenizer artifacts:
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -1769,6 +1776,8 @@ Saved tokenizer artifacts:
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -1793,6 +1802,7 @@ Saved tokenizer artifacts:
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

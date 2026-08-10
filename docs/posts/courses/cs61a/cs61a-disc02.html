@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS61A · Disc 02 · 高阶函数</h1>
     <div class="post-meta">
       <time datetime="2023-07-17T00:00:00">2023-07-17</time>
+      <span class="post-stats">1544 字 · 约 4 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS61A">#CS61A</a>
       
@@ -111,7 +116,7 @@
 <p>这里的等号是数学等号，不是赋值↓</p>
 <p><code>(lambda x:3)(4)</code> = 3
 <code>(lambda x:  2 * 3 * x)(5)</code> = 30</p>
-<h2 id="q2q3"><del>Q2/Q3</del></h2>
+<h2 id="q2-q3"><del>Q2/Q3</del></h2>
 <p>对Environment Diagram不太有兴趣，Q2和Q3就跳过了qwq</p>
 <h2 id="q4-make-keeper">Q4: Make Keeper</h2>
 <p>思路：还是符合上一次disc提到的解决问题的迭代与抽象方式。
@@ -119,7 +124,7 @@
 <code>make_keeper(5)</code>返回一个这样的函数，它的循环变量<code>i</code>从1到5递增，如果<code>cond(i)</code>，则打印<code>i</code>。
 根据这个抽象，我们发现我们并不需要知道<code>cond</code>函数的具体细节，只是“用”就好了。因此，我们先描述出符合上述要求的函数，再把该函数的函数名（函数指针）作为外层函数的返回值即可。
 完成函数编写之后，将已有例子代入考虑执行过程，发现是合理的。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_keeper</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_keeper</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Returns a function that takes one parameter cond and prints</span>
 <span class="sd">    out all integers 1..i..n where calling cond(i) returns True.</span>
 
@@ -148,7 +153,7 @@
 Higher Order Function/高阶函数看起来很有趣。我们返回的函数作用域以内实际上可以用到内外作用域的两个变量，但我们把这两个变量拆分给两个函数分别构造。</p>
 <h2 id="q5-digit-finder">Q5: Digit Finder</h2>
 <p>先简化问题：我们不考虑<code>lambda</code>表达式，怎样构造符合题目条件的函数，将其函数名返回？</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_digit</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_digit</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Returns a function that returns the kth digit of x.</span>
 
 <span class="sd">    &gt;&gt;&gt; find_digit(2)(3456)</span>
@@ -168,7 +173,7 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
     <span class="k">return</span> <span class="n">get_kth_digit</span>
 </code></pre></div>
 <p>之后再根据题目将其写为<code>lambda</code>表达式，是很自然的。</p>
-<div class="highlight"><pre><span></span><code><span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">%</span> <span class="mi">10</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">%</span> <span class="mi">10</span>
 </code></pre></div>
 <h2 id="q6-match-maker">Q6: Match Maker</h2>
 <p>依旧将循环拆分，通过迭代抽象来完成题目目标。
@@ -179,7 +184,7 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
 判断这两位是否相同，如不相同，返回<code>False</code>，否则令<code>x //= 10</code>，重新执行上一步，除非较高位即<code>x // (pow(10, 2)) % 10</code>为0，跳出循环，返回<code>True</code>。
 再把距离换为<code>k</code>即可。
 对照题目模板，恰好匹配，塔诺西。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">match_k</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">match_k</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Returns a function that checks if digits k apart match.</span>
 
 <span class="sd">    &gt;&gt;&gt; match_k(2)(1010)</span>
@@ -205,7 +210,7 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="n">check</span>
 </code></pre></div>
-<h2 id="_1">总结</h2>
+<h2 id="总结">总结</h2>
 <p>上一次disc用到的那些思想的含金量还在增加！</p>
 <p>Remember the problem-solving approach from last discussion; it works just as well for implementing higher-order functions.</p>
 <ol>
@@ -265,6 +270,8 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -280,6 +287,8 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -302,6 +311,7 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

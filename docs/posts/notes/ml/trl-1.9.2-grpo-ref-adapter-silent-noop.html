@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的</h1>
     <div class="post-meta">
       <time datetime="2026-08-10T00:00:00">2026-08-10</time>
+      <span class="post-stats">3818 字 · 约 9 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%A4%A7%E6%A8%A1%E5%9E%8B">#大模型</a>
       
@@ -110,7 +115,7 @@
 <p>怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter 逐字节相同——模型压根没被训过。</p>
 <p>这不是我们配置写错了什么冷门参数，也不是运气不好踩到了某个边角。它是框架在一个挺常规的使用方式下，自己把优化器建成了空的，而且全程不吭一声。下面我把这件事从头到尾讲清楚：什么情况会撞上、怎么用最小的例子复现、根因到底在哪、怎么绕开、以及怎么检查自己有没有中招。</p>
 <p>已提交 <a href="https://github.com/huggingface/trl/issues/6700">Issue #6700 · huggingface/trl</a> 和 <a href="https://github.com/huggingface/trl/pull/6701">Pull Request #6701 · huggingface/trl</a> ，坐等审核。</p>
-<h2 id="_1">什么情况下会撞上</h2>
+<h2 id="什么情况下会撞上">什么情况下会撞上</h2>
 <p>需要同时满足三个条件：</p>
 <ol>
 <li>你先用 <code>PeftModel.from_pretrained(base, adapter)</code> 加载了一个已经训练好的 LoRA adapter。注意这一步<strong>默认</strong>是 <code>is_trainable=False</code>，也就是按“只用来推理”的方式加载；</li>
@@ -118,11 +123,11 @@
 <li>没有额外传 <code>peft_config</code>（因为模型本身已经是 PeftModel 了）。</li>
 </ol>
 <p>这算不上什么冷门场景。SFT 预热完再上 GRPO，是 Agentic RL 里最常见的流程之一。<a href="https://meredith2328.github.io/posts/notes/ml/mathqwen-0.6b-agentic-rl.html">我们用 Qwen3-0.6B 在双卡 5090 上完整跑了一轮</a> ：100 步、带过程奖励、跑满、wandb 曲线齐全，看起来什么都是对的。直到某天备份时顺手对比了一下权重哈希，才发现训练产物和 SFT 初始化一模一样——那一整轮实验等于白跑。</p>
-<h2 id="_2">最小复现</h2>
+<h2 id="最小复现">最小复现</h2>
 <p>我在 Kaggle 放了一个公开的复现 notebook，用来最小复现这个问题。CPU 就能跑，两三分钟出结果：</p>
 <p><a href="https://www.kaggle.com/code/meredith10pi/trl-1-9-2-ref-adapter-silent-no-op-repro">TRL 1.9.2 ref adapter silent no-op repro</a></p>
 <p>核心代码其实就这几行：</p>
-<div class="highlight"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>   <span class="c1"># is_trainable=False</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>   <span class="c1"># is_trainable=False</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
     <span class="n">args</span><span class="o">=</span><span class="n">GRPOConfig</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">...</span><span class="p">),</span>   <span class="c1"># beta != 0 触发 bug 路径</span>
@@ -132,17 +137,17 @@
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </code></pre></div>
 <p>跑完之后，注意看这几个输出：</p>
-<div class="highlight"><pre><span></span><code>trainable params right after trainer init: 0        # ← 已经不对劲了
+<div class="highlight"><pre data-lang="text"><span></span><code>trainable params right after trainer init: 0        # ← 已经不对劲了
 optimizer param count (captured at creation): 0     # ← 实锤：优化器是空的
 last log line: {'loss': -0.26, 'grad_norm': 0.001, 'reward': 0.625}   # ← 但指标活得很好
 saved == initial: True                              # ← 什么都没训
 </code></pre></div>
 <p>对照实验只改一个参数——加载时传 <code>is_trainable=True</code>：</p>
-<div class="highlight"><pre><span></span><code>optimizer param count (captured at creation): 12
+<div class="highlight"><pre data-lang="text"><span></span><code>optimizer param count (captured at creation): 12
 saved == initial: False
 </code></pre></div>
 <p>同样的脚本、同样的数据、同样的奖励函数，只是 <code>inference_mode</code> 不一样，结果就从“白跑一趟”变成“真的在训”。这个对照基本把根因锁死了。</p>
-<h2 id="_3">根因（三步）</h2>
+<h2 id="根因-三步">根因（三步）</h2>
 <p>拆开看其实不复杂：</p>
 <ol>
 <li><code>PeftModel.from_pretrained(..., is_trainable=False)</code> 会在 adapter 的配置里写上 <code>inference_mode=True</code>——意思就是“这个 adapter 只用来推理，不训练”；</li>
@@ -150,18 +155,18 @@ saved == initial: False
 <li>于是 <code>GRPOTrainer</code> 初始化完，整个模型里找不到一个可训练的参数，优化器创建出来自然是空的。</li>
 </ol>
 <p>那为什么日志还那么热闹？因为训练循环里计算参考 logps 的时候会临时切换 adapter（<code>use_adapter</code> 里调用了 <code>set_adapter</code>），把 <code>requires_grad</code> 翻来翻去。于是梯度照常累积、<code>grad_norm</code> 照常打印，loss 也会随着每步采样的题目不同而自然波动。<strong>只有 <code>optimizer.step()</code> 无事可做。</strong> 看起来在训练，其实只是在看风景。</p>
-<h2 id="_4">怎么修</h2>
+<h2 id="怎么修">怎么修</h2>
 <p>两个办法都能让训练真正发生，选一个就行：</p>
 <p><strong>最快的办法</strong>：如果省事想直接用，加载时传 <code>is_trainable=True</code>，一行搞定。类似 <a href="https://github.com/huggingface/trl/issues/3031">#3031</a> 。</p>
-<div class="highlight"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">,</span> <span class="n">is_trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">,</span> <span class="n">is_trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>更稳的办法</strong>：把预热权重合进基座，再新建一个干净的 LoRA。这样做参考策略的语义也更干净——它就是那个真正的 SFT 模型。</p>
-<div class="highlight"><pre><span></span><code><span class="n">warm</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">warm</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">warm</span><span class="o">.</span><span class="n">merge_and_unload</span><span class="p">()</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">peft_config</span><span class="o">=</span><span class="n">LoraConfig</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
 </code></pre></div>
 <p>我们在自己的项目里用的是第二种，并且把检查固化进了训练脚本：每次训练结束都打印保存权重和初始权重的 md5，一致就直接报警。这个习惯后来救了我们好几次。</p>
-<h2 id="is_trainabletrue"><code>is_trainable=True</code> 能解决什么、不能解决什么</h2>
+<h2 id="is_trainable-true-能解决什么-不能解决什么"><code>is_trainable=True</code> 能解决什么、不能解决什么</h2>
 <p>两个修法都验证有效，但它们的边界不一样。把话说清楚，免得有人以为传个参数就一劳永逸。</p>
 <p><strong><code>is_trainable=True</code> 能直接解决的：</strong></p>
 <ul>
@@ -176,14 +181,14 @@ saved == initial: False
 <li><strong>默认用法仍然是个坑。</strong> 框架的默认行为（<code>is_trainable=False</code> + <code>beta != 0</code> → 空优化器）不改，文档里也不会写，迟早还会有人踩上去。</li>
 </ul>
 <p>所以我的结论是：<code>is_trainable=True</code> 是为了图省事，而 <code>merge_and_unload</code> 是官方推荐、也更可控的一条路，但两者本质上都是在绕路——真正该修的是框架本身。</p>
-<h2 id="trl">对 TRL 的建议：可观测性</h2>
+<h2 id="对-trl-的建议-可观测性">对 TRL 的建议：可观测性</h2>
 <p>这个 bug 最危险的地方不是“没训”，而是<strong>全程没有任何报错</strong>。框架侧至少应该做两件事：</p>
 <ol>
 <li><code>GRPOTrainer</code> 初始化时检查策略 adapter 有没有可训练参数，没有就直接抛错，把原因讲清楚（提示 <code>is_trainable=True</code> 或者传 <code>peft_config</code>）；</li>
 <li>创建 <code>ref</code> adapter 的时候显式把它冻结，别让它把 default 一起拖下水。</li>
 </ol>
 <p>完整的证据链、根因分析，我都整理在了实验仓库里，之后会提交一下看看。顺带一提，<a href="https://github.com/huggingface/trl/issues/3031">#3031</a> 看起来和我们很像，但症状不一样：那边是“奖励完全不涨、梯度为 0”，一眼就能看出有问题；我们这边是<strong>所有指标都在动</strong>，只有对比权重哈希才能发现——比那个隐蔽得多。</p>
-<h2 id="_5">怎么检查自己有没有中招</h2>
+<h2 id="怎么检查自己有没有中招">怎么检查自己有没有中招</h2>
 <p>如果你做过“SFT 预热 → GRPO 续训”，而且当时用的是 <code>PeftModel.from_pretrained</code> 直接加载，花十秒钟自查一下：</p>
 <ul>
 <li>训练日志里加一行，打印 <code>optimizer.param_groups</code> 里的参数个数，是 0 就说明中招了；</li>
@@ -242,6 +247,8 @@ saved == initial: False
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -257,6 +264,8 @@ saved == initial: False
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -279,6 +288,7 @@ saved == initial: False
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">从原始Softmax到在线Softmax</h1>
     <div class="post-meta">
       <time datetime="2026-04-09T00:00:00">2026-04-09</time>
+      <span class="post-stats">4572 字 · 约 11 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0">#机器学习</a>
       
@@ -111,7 +116,7 @@
 <blockquote>
 <p>edit time: 2026-04-09 16:37:03</p>
 </blockquote>
-<h2 id="softmax">softmax形式推导</h2>
+<h2 id="softmax形式推导">softmax形式推导</h2>
 <p>我们讨论的起点是<strong>原始的softmax形式</strong>：</p>
 <div class="arithmatex">\[p_j = \frac{e^{z_j}}{\sum_k e^{z_k}}.\]</div>
 <hr/>
@@ -224,11 +229,11 @@ e^{\,m_i^{(j)} - m_i^{(j+1)}} \ell_i^{(j)}
 m_i^{(j+1)}
 \]</div>
 <p>重新对旧块和新块做统一归一化，再更新 <span class="arithmatex">\(\ell_i\)</span> 与 <span class="arithmatex">\(\tilde{o}_i\)</span>，最后得到输出 <span class="arithmatex">\(o_i\)</span>。</p>
-<h2 id="flashattentiongpt">我怀疑FlashAttention网上/GPT的常见讲解有一处推错的地方</h2>
+<h2 id="我怀疑flashattention网上-gpt的常见讲解有一处推错的地方">我怀疑FlashAttention网上/GPT的常见讲解有一处推错的地方</h2>
 <blockquote>
 <p>省流：结论 <span class="arithmatex">\(B \approx M/4d\)</span> 没问题，<br/>但是我怀疑有些讲解为了推这个结论用到的 <span class="arithmatex">\(B_r=B_c=B\)</span> 这个假设出发点有问题。<br/>只是个人看法，我也不确定自己这么想对不对，<br/>欢迎大家在评论区或者Github的 <a href="https://github.com/Meredith2328/meredith2328.github.io/issues">Issues</a> 页讨论~</p>
 </blockquote>
-<h3 id="_1">原始推导的问题</h3>
+<h3 id="原始推导的问题">原始推导的问题</h3>
 <p>在网上，有些讲解对 <span class="arithmatex">\(B \approx M/4d\)</span> 这个近似结论的推导是出发自 <span class="arithmatex">\(B_r=B_c=B\)</span> 的：</p>
 <p>记SRAM占用量为：</p>
 <div class="arithmatex">\[2B_rd+2B_cd+B_rB_c\]</div>
@@ -248,7 +253,7 @@ m_i^{(j+1)}
 <div class="arithmatex">\[B \approx \frac{M}{4d}\]</div>
 <p><strong>这与 <span class="arithmatex">\(M \gg d^2\)</span> 或 <span class="arithmatex">\(M = \Theta(nd), n \gg d\)</span> 这一长上下文肯定满足的条件恰好是相反的。</strong></p>
 <p>总之，按照原文来说，上述 <span class="arithmatex">\(B_r=B_c=B\)</span> 假设是与原文条件矛盾的推导。</p>
-<h3 id="b_rb_cb-b_cthetamd">不使用 <span class="arithmatex">\(B_r=B_c=B\)</span> ，推导得到 <span class="arithmatex">\(B_c=\Theta(M/d)\)</span></h3>
+<h3 id="不使用-b_r-b_c-b-推导得到-b_c-theta-m-d">不使用 <span class="arithmatex">\(B_r=B_c=B\)</span> ，推导得到 <span class="arithmatex">\(B_c=\Theta(M/d)\)</span></h3>
 <p>应该保留原文的<strong>长方形</strong>分块 <span class="arithmatex">\(B_r\)</span> 和 <span class="arithmatex">\(B_c\)</span> ，即按照下述流程推导：</p>
 <p>根据每次迭代在SRAM中需要存储的内容，有</p>
 <div class="arithmatex">\[Q_i,O_i \in \mathbb{R}^{B_r \times d}, \qquad K_j,V_j \in \mathbb{R}^{B_c \times d}, \qquad S_{ij}\in \mathbb{R}^{B_r\times B_c}.\]</div>
@@ -285,11 +290,11 @@ m_i^{(j+1)}
 <p>即有</p>
 <div class="arithmatex">\[\text{IO}=O(nd)\]</div>
 <p>等等。</p>
-<h2 id="softmax_1">softmax实际代码实现</h2>
+<h2 id="softmax实际代码实现">softmax实际代码实现</h2>
 <p>接下来联系到实际的代码实现，特别是softmax和log-sum-exp的PyTorch实现及其与交叉熵损失和FlashAttention的关系。</p>
 <p>标准的数值稳定softmax应该为：
 总之就是<strong>首先需要计算一个最大值</strong>，然后计算减去最大值后的softmax。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">softmax_stable</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -306,7 +311,7 @@ m_i^{(j+1)}
 <span class="c1"># attn_weights = torch.softmax(scores, dim=-1)</span>
 </code></pre></div>
 <p>而交叉熵损失则为：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cross_entropy_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cross_entropy_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    logits: [batch_size, num_classes] 原始输出（未经过 softmax）</span>
 <span class="sd">    labels: [batch_size] 真实类别索引 (0 ~ num_classes-1)</span>
@@ -329,7 +334,7 @@ m_i^{(j+1)}
 <p>在线Softmax的核心实现则为：
 其中 <span class="arithmatex">\(B_r\)</span> 是行row的块大小（即 <span class="arithmatex">\(Q\)</span> 的块大小，因为是 <span class="arithmatex">\(QK^T\)</span> ），
 <span class="arithmatex">\(B_c\)</span> 是列column的块大小。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">flash_attention_online_softmax</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">B_r</span><span class="p">,</span> <span class="n">B_c</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">flash_attention_online_softmax</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">B_r</span><span class="p">,</span> <span class="n">B_c</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    B_r: Q 的块大小，B_c: K/V 的块大小</span>
 <span class="sd">    Q, K, V: [n, d] 假设 batch=1, heads=1 简化</span>
@@ -385,7 +390,7 @@ m_i^{(j+1)}
 
     <span class="k">return</span> <span class="n">O</span>
 </code></pre></div>
-<h2 id="_2">手推小例子</h2>
+<h2 id="手推小例子">手推小例子</h2>
 <hr/>
 <ol>
 <li>标准 Softmax 数值稳定计算</li>
@@ -544,6 +549,8 @@ o = (0.3679×[0.8112,0.1887]×1.6065 + 1×[0.0607,0.9393]×1.0821) / 1.6731
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -559,6 +566,8 @@ o = (0.3679×[0.8112,0.1887]×1.6065 + 1×[0.0607,0.9393]×1.0821) / 1.6731
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -581,6 +590,7 @@ o = (0.3679×[0.8112,0.1887]×1.6065 + 1×[0.0607,0.9393]×1.0821) / 1.6731
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

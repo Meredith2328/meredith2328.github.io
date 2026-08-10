@@ -57,5 +57,28 @@
       var code = pre.querySelector("code");
       copyText((code || pre).textContent.replace(/\n$/, ""), btn);
     });
+
+    // language / file tag from the fence info (```python, ```rust title=train.py)
+    var lang = pre.getAttribute("data-lang");
+    if (lang) {
+      var tag = document.createElement("span");
+      tag.className = "code-lang";
+      tag.textContent = lang;
+      wrap.insertBefore(tag, btn);
+    }
+
+    // very long blocks collapse behind an "展开" toggle
+    if (pre.scrollHeight > 520) {
+      wrap.classList.add("is-long");
+      var more = document.createElement("button");
+      more.type = "button";
+      more.className = "code-more";
+      more.textContent = "展开";
+      wrap.appendChild(more);
+      more.addEventListener("click", function () {
+        var open = wrap.classList.toggle("is-open");
+        more.textContent = open ? "收起" : "展开";
+      });
+    }
   });
 })();

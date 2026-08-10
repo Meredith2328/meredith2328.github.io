@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">LLM 估算 · 02 · 怎么估算训练的内存和计算需求</h1>
     <div class="post-meta">
       <time datetime="2026-03-12T00:00:00">2026-03-12</time>
+      <span class="post-stats">6581 字 · 约 15 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%A4%A7%E6%A8%A1%E5%9E%8B">#大模型</a>
       
@@ -114,7 +119,7 @@
 <blockquote>
 <p>上接前文： <a href="https://meredith2328.github.io/post/LLMestimate/">怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</a><br/>本部分推导与验证的公式基于<strong>激活值不会提前释放、而是全部保留</strong>的假设，得到了 <span class="arithmatex">\(A_{per\_layer} \approx 16BLd+2BhL^2\)</span> 的结论，后续实测也是基于这个结论。另外引言中的 <span class="arithmatex">\(C \approx 6 × P × D\)</span> 指计算量约等于六倍的参数量乘以训练token数。<br/>事实上，许多中间值通常在后续层进行计算时就已经释放了，相关讨论在 (a) 的“如果会提前释放，不同时保存所有激活值？”部分，结论应为 <span class="arithmatex">\(A_{per\_layer}=9BLd+2BhL^2\)</span> 。<br/>撰写过程中借助了DeepSeek v3.2生成相关代码、以及处理一部分计算工作。<br/>另外，本篇只是个人基于现在已知的知识做的具有阶段性、一定合理性的推测，不代表真正的事实：不代表PyTorch、CUDA的实际工程实现。后者还需要更多的调查研究才能得出更好的结论。<br/>edit time: 2026-03-13 11:12:50</p>
 </blockquote>
-<h2 id="_1">原始问题整理</h2>
+<h2 id="原始问题整理">原始问题整理</h2>
 <blockquote>
 <p>来自CS336。自己翻的，可能有错，欢迎在 <a href="https://github.com/Meredith2328/meredith2328.github.io/issues">Issues · Meredith2328/meredith2328.github.io</a> 指正。</p>
 </blockquote>
@@ -140,17 +145,17 @@
 <p><strong>(c) 运行AdamW的一个step需要多少的FLOPs？</strong></p>
 <p><strong>(d)</strong> Model FLOPs utilization (MFU)定义为 the ratio of observed throughput (tokens per second) / the hardware’s theoretical peak FLOP throughput [Chowdhery et al., 2022] 。单台NVIDIA A100 GPU对于float32操作的理论峰值是19.5T FLOPs。<strong>假设你能获得50%的MFU，在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天</strong>（400K steps，batch size 1024）？</p>
 <p>（基于 [Kaplan et al. ,2020] and [Hoffmann et al. ,2022] ，假设反向FLOPs是前向FLOPs的两倍）</p>
-<h2 id="a-adamwpeak-memory">(a) 运行AdamW的peak memory是多少？</h2>
+<h2 id="a-运行adamw的peak-memory是多少">(a) 运行AdamW的peak memory是多少？</h2>
 <p>记 <code>B = batch_size, V = vocab_size, T = context_length, L = num_layers, D = d_model, H = num_heads, D_ff = 4D</code> 。</p>
 <p>peak memory由参数+激活值+梯度+优化器状态四部分组成： <code>M_total = M_params + M_acts + M_grads + M_opt</code> 。</p>
 <p>所有tensor都是float32，所以每个元素应为4 bytes。</p>
-<h3 id="_2">参数量</h3>
+<h3 id="参数量">参数量</h3>
 <p><strong>参数量</strong>如果按 <a href="https://meredith2328.github.io/post/LLMestimate/">以前推导过的参数量估算公式</a> 来，则有：（假设embedding层和LM Head参数共享，<span class="arithmatex">\(d_{ff}=4d\)</span> ，RMS Norm的参数量忽略不计）</p>
 <div class="arithmatex">\[P=12Nd^2+Vd\]</div>
 <p>用上面的记号就是：</p>
 <div class="highlight"><pre><span></span><code>P=12LD^2+VD
 </code></pre></div>
-<h3 id="_3">激活值</h3>
+<h3 id="激活值">激活值</h3>
 <p>激活值指某层的输出值，激活量指某层的输出值的数量。
 （但其实实际语境中分得没有这么清，可以从上下文判断指的是数量还是值）</p>
 <ul>
@@ -218,7 +223,7 @@ M_opt    = 8P
 </code></pre></div>
 <p>注意， <code>M_total = 16P + 4A</code> 这个整体系数4是来自于FP32每个元素4 Bytes的前提假设的。
 因此我们可以很方便地去估算别的：比如FP16等等。</p>
-<h3 id="_4">如果会提前释放，不同时保存所有激活值？</h3>
+<h3 id="如果会提前释放-不同时保存所有激活值">如果会提前释放，不同时保存所有激活值？</h3>
 <p>在机器学习系统的课程上，有这样一个PPT引起了我的疑惑。
 <img alt="" src="../../migrated/post-images/20260312234704.png"/></p>
 <p>把它的内容转写下来：
@@ -243,8 +248,8 @@ Example (d=2048, N=24, L=1024, B=8, h=16, V=50k):</p>
 <p>注意到，这里与我们推得的公式唯一区别就在于这个 <strong>9</strong> 。
 恰好我对数字很敏感，意识到它是4+4+1——峰值激活值只计入了FFN里面的。
 我们知道，Transformer块里面一层一层是顺序执行的，按理说计算到后面的时候，前面的就可以释放了。所以就有了这样的公式。</p>
-<h2 id="b-gpt-2-xl-shaped-modela80gbbatch-size">(b) 对于GPT-2 XL-shaped model，回答(a)。在80GB内存的前提下，最大可用的batch size是多少？</h2>
-<h3 id="gpt2-xl">GPT2-XL代入计算</h3>
+<h2 id="b-对于gpt-2-xl-shaped-model-回答-a-在80gb内存的前提下-最大可用的batch-size是多少">(b) 对于GPT-2 XL-shaped model，回答(a)。在80GB内存的前提下，最大可用的batch size是多少？</h2>
+<h3 id="gpt2-xl代入计算">GPT2-XL代入计算</h3>
 <p><a href="https://huggingface.co/openai-community/gpt2-xl">GPT2-XL</a></p>
 <div class="highlight"><pre><span></span><code>GPT2-XL
 V = vocab_size: 50257
@@ -263,7 +268,7 @@ D_ff = 4D
 <p>即最终的结论：（单位为GB）</p>
 <div class="arithmatex">\[M_{total}(batch\_size)=24.88+15.51 \times batch\_size\]</div>
 <p>这么看来，在80GB内存的前提下，最大可用的batch_size不超过 (80-24.88)/15.51≈3.55 。在单卡条件下，最大的batch_size为3。</p>
-<h3 id="gpt2-small">使用GPT2-small实际环境验证上述公式</h3>
+<h3 id="使用gpt2-small实际环境验证上述公式">使用GPT2-small实际环境验证上述公式</h3>
 <blockquote>
 <p>TODO 本部分的验证似乎有一定问题，之后会重写本部分。</p>
 </blockquote>
@@ -293,27 +298,27 @@ MEDIUM   353.5M   6.17       10.90      43.4%
 LARGE    772.1M   12.56      21.83      42.5% 
 ============================================================
 </code></pre></div>
-<h2 id="c-adamwstepflops">(c) 运行AdamW的一个step需要多少的FLOPs？</h2>
+<h2 id="c-运行adamw的一个step需要多少的flops">(c) 运行AdamW的一个step需要多少的FLOPs？</h2>
 <p>先根据附录A中的AdamW代码实现，详细地数AdamW一次优化器更新需要的FLOPs，后面再加上前向和后向的FLOPs，得到一个step完整的FLOPs。</p>
 <p>一阶矩更新：3FLOPs/元素（ <code>m &lt;- beta1 * m + (1 - beta1) * g</code> ）</p>
-<div class="highlight"><pre><span></span><code><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta1</span><span class="p">)</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta1</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta1</span><span class="p">)</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta1</span><span class="p">)</span>
 </code></pre></div>
 <p>对每个元素， <code>beta1 * m</code> ， <code>(1 - beta1) * g</code> 和这两项相加共计三次运算。
 ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次计算，但并不是每次元素运算都需要重新计算。因此，这里不需要计入。后续偏差修正、step_size同理。</p>
 <p>二阶矩更新：4FLOPs/元素（ <code>v &lt;- beta2 * v + (1 - beta2) * g * g</code> ）</p>
-<div class="highlight"><pre><span></span><code><span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta2</span><span class="p">)</span><span class="o">.</span><span class="n">addcmul_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta2</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta2</span><span class="p">)</span><span class="o">.</span><span class="n">addcmul_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta2</span><span class="p">)</span>
 </code></pre></div>
 <p><code>beta2 * v</code> ， <code>g * g</code> ，再乘 <code>1 - beta2</code> ，再加起来。</p>
 <p>分母构造：2FLOPs/元素 （ <code>denom &lt;- sqrt(v) + eps</code> ）</p>
-<div class="highlight"><pre><span></span><code><span class="n">denom</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">denom</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
 </code></pre></div>
 <p><code>sqrt(v)</code> ，<code>+ eps</code> 。</p>
 <p>参数Adam更新：3FLOPs/元素 （ <code>p &lt;- p + (-step_size) * m / denom</code> ）</p>
-<div class="highlight"><pre><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">addcdiv_</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">denom</span><span class="p">,</span> <span class="n">value</span><span class="o">=-</span><span class="n">step_size</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">addcdiv_</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">denom</span><span class="p">,</span> <span class="n">value</span><span class="o">=-</span><span class="n">step_size</span><span class="p">)</span>
 </code></pre></div>
 <p><code>m / denom</code> ，加上 <code>-step_size</code> ，加上 <code>p</code> 。</p>
 <p>解耦权重衰减：2FLOPs/元素（ <code>p &lt;- p + (-lr * weight_decay) * p</code> ）</p>
-<div class="highlight"><pre><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="n">lr</span> <span class="o">*</span> <span class="n">weight_decay</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="n">lr</span> <span class="o">*</span> <span class="n">weight_decay</span><span class="p">)</span>
 </code></pre></div>
 <p><code>(-lr * weight_decay) * p</code> ， 加上 <code>p</code> 。注意 <code>-lr</code> 和 <code>weight_decay</code> 是标量。</p>
 <p>总之，有运行AdamW一次优化器更新需要14 FLOPs。</p>
@@ -328,7 +333,7 @@ ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次�
 <div class="highlight"><pre><span></span><code>F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
 </code></pre></div>
 <p>（当然 <code>3F_fwd</code> 也可以使用经验公式 <code>6 × 参数量 × 训练 token 数</code> 进行近似。）</p>
-<h2 id="d-nvidia-a100-gpugpt-2-xl">(d) 在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天？</h2>
+<h2 id="d-在单台nvidia-a100-gpu上训练gpt-2-xl需要多少天">(d) 在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天？</h2>
 <blockquote>
 <p>本部分数值是GPT算的，本人没有核对。</p>
 </blockquote>
@@ -366,9 +371,9 @@ ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次�
 &gt;&gt;&gt; 3 * a * 400000 / 9.75e12 / 3600 / 24
 5115.191524722507
 </code></pre></div>
-<h2 id="a-adamw">附录A: AdamW代码实现</h2>
+<h2 id="附录a-adamw代码实现">附录A: AdamW代码实现</h2>
 <p><img alt="" src="../../migrated/post-images/20260311191813.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">weight_decay</span><span class="p">)</span>
@@ -421,7 +426,7 @@ ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次�
 
         <span class="k">return</span> <span class="n">loss</span>
 </code></pre></div>
-<h2 id="b-peak-memory">附录B: peak memory验证程序与结果</h2>
+<h2 id="附录b-peak-memory验证程序与结果">附录B: peak memory验证程序与结果</h2>
 <p>通过以下实验验证，发现对于GPT-2 SMALL/MEDIUM/LARGE，实际的内存占用均为我们预估值的41-43%左右，这个比例非常稳定（无论设备、模型大小），可能来自于各种各样的工程优化，可以直接作为修正系数，初步显示我们的预估公式的可用性。
 按理说，实际值一定是比我们的预估值小的，因为降低内存占用是很关键的工程需求，一定会有各种各样的优化（PyTorch、CUDA、操作系统、硬盘等等），同时内存占用也可能受到各种难以仔细分析的因素的影响。我们能够获得一个大致稳定的估算公式，应该已经还可以了。</p>
 <hr/>
@@ -551,11 +556,11 @@ LARGE    772.1M   12.56      21.83      42.4%
 <hr/>
 <p>验证代码如下。
 最关键的是</p>
-<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="o">.</span><span class="n">gradient_checkpointing_disable</span><span class="p">()</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">model</span><span class="o">.</span><span class="n">gradient_checkpointing_disable</span><span class="p">()</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </code></pre></div>
 <p>这两行代码。后者移入GPU中分配内存并进行训练，前者GPT说是如果不关闭则可能在运行过程中不会完全保留激活值、而是实时清理。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
 <span class="c1"># ==================== 配置开关 ====================</span>
@@ -695,6 +700,8 @@ LARGE    772.1M   12.56      21.83      42.4%
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -710,6 +717,8 @@ LARGE    772.1M   12.56      21.83      42.4%
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -732,6 +741,7 @@ LARGE    772.1M   12.56      21.83      42.4%
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

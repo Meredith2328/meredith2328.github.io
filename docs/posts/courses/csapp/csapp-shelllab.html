@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CSAPP · Shelllab</h1>
     <div class="post-meta">
       <time datetime="2024-06-27T00:00:00">2024-06-27</time>
+      <span class="post-stats">3672 字 · 约 9 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -113,10 +118,10 @@
     <blockquote>
 <p>待修改：当前仅仅包含了作业报告的提交内容。</p>
 </blockquote>
-<h2 id="_1">效果</h2>
+<h2 id="效果">效果</h2>
 <p>以<code>test16</code>为例，其余效果相似。
 <img alt="" src="../../migrated/post-images/1719465528078.png"/></p>
-<h2 id="_2">知识整理</h2>
+<h2 id="知识整理">知识整理</h2>
 <p>根据课本，我们在编写信号处理程序时应当遵守以下规则~~类怪谈~~：</p>
 <blockquote>
 <ol start="0">
@@ -149,14 +154,14 @@ Sigprocmask(SIG_BLOCK, &amp;mask_chld, &amp;prev_mask);
 Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 </code></pre></div>
 <h2 id="eval">eval</h2>
-<h3 id="_3">思路</h3>
+<h3 id="思路">思路</h3>
 <p>课本（中文）8.4.6节（P525）提供了不回收后台子进程的eval缺陷版本，在此之上加入信号处理：</p>
 <ol>
 <li>改变全局变量前后需要阻塞和取消阻塞全部信号，保证原子性；</li>
 <li>在使用Fork之前阻塞<code>SIGCHLD</code>，防止子进程在<code>fork</code>之后、<code>addjob</code>之前终止并被<code>handler</code>回收。同时要在子进程中取消阻塞<code>SIGCHLD</code>。</li>
 </ol>
 <p>上述两条信号处理是基于下列文档提示的。</p>
-<h3 id="_4">关于信号处理的文档提示</h3>
+<h3 id="关于信号处理的文档提示">关于信号处理的文档提示</h3>
 <p><strong>eval block:</strong></p>
 <blockquote>
 <p>In eval, the parent must use sigprocmask to block SIGCHLD signals before it forks the child,<br/>and then unblock these signals, again using sigprocmask after it adds the child to the job list by calling addjob. Since children inherit the blocked vectors of their parents, the child must be sure to then unblock SIGCHLD signals before it execs the new program. The parent needs to block the SIGCHLD signals in this way in order to avoid the race condition where the child is reaped by sigchld handler (and thus removed from the job list) before the parent calls addjob.</p>
@@ -165,8 +170,8 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <blockquote>
 <p>When you run your shell from the standard Unix shell, your shell is running in the foreground process group. If your shell then creates a child process, by default that child will also be a member of the foreground process group.<br/> Since typing ctrl-c sends a SIGINT to every process in the foreground group, typing ctrl-c will send a SIGINT to your shell, as well as to every process that your shell created, which obviously isn’t correct.<br/> Here is the workaround: After the fork, but before the execve, the child process should call setpgid(0, 0), which puts the child in a new process group whose group ID is identical to the child’s PID.<br/> This ensures that there will be only one process, your shell, in the foreground process group.<br/> When you type ctrl-c, the shell should catch the resulting SIGINT and then forward it to the appropriate foreground job (or more precisely, the process group that contains the foreground job).</p>
 </blockquote>
-<h3 id="_5">具体实现</h3>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">eval</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">cmdline</span><span class="p">)</span><span class="w"> </span>
+<h3 id="具体实现">具体实现</h3>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">eval</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">cmdline</span><span class="p">)</span><span class="w"> </span>
 <span class="p">{</span>
 <span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[</span><span class="n">MAXARGS</span><span class="p">];</span>
 <span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="n">MAXLINE</span><span class="p">];</span>
@@ -218,16 +223,16 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="builtin_cmd">builtin_cmd</h2>
-<h3 id="_6">思路</h3>
+<h3 id="思路_1">思路</h3>
 <p>照猫画虎：课本（中文）8.4.6节。相应结构作用相当于Java语言（C语言的<code>switch</code>不能直接比较字符串）中的<code>switch</code>：</p>
-<div class="highlight"><pre><span></span><code><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">argv</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">){</span>
+<div class="highlight"><pre data-lang="java"><span></span><code><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">argv</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">){</span>
 <span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">"quit"</span><span class="p">:</span>
 <span class="w">    </span><span class="p">...</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>注意遵守“规则”，即在使用全局变量 <code>jobs</code> 时阻塞所有信号。</p>
-<h3 id="_7">具体实现</h3>
-<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">builtin_cmd</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"> </span>
+<h3 id="具体实现_1">具体实现</h3>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">builtin_cmd</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"> </span>
 <span class="p">{</span>
 <span class="w">    </span><span class="cm">/* If first arg is a builtin command (quit, jobs, bg or fg), </span>
 <span class="cm">     * run it and return true.</span>
@@ -255,11 +260,11 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="waitfg">waitfg</h2>
-<h3 id="_8">思路</h3>
+<h3 id="思路_2">思路</h3>
 <p>参考课本8.5.7节“显式地等待信号”(P543)的相关部分，利用<code>while</code>循环和<code>sigsuspend</code>维护，直到相应前台进程终止（循环是为了保证只能因为该条件停止、而非收到<code>Ctrl-C</code>等对应的信号）时再停止等待。</p>
 <p>由于我们此处等待的<code>job</code>运行在前台，在该进程终止时，首先发出<code>SIGCHLD</code>信号给父进程，父进程此时在<code>sigsuspend</code>（相当于原子的<code>pause</code>），收到信号后，控制从<code>waitfg</code>先转移到<code>handler</code>，<code>handler</code>确认收到该信号对应终止的所有子进程（收到信号意味着至少有一个进程终止）中包含前台进程（见下<code>sigchld_handler</code>中的<code>if (job-&gt;state == FG)</code>），则在“<code>handler</code>运行结束、控制返回<code>waitfg</code>、<code>waitfg</code>的<code>pause</code>因为信号处理程序执行完毕而返回”的之后需要让<code>waitfg</code>跳出循环。因此设置了一个<code>fg_child_flag</code>变量作为循环条件，用于达成上述效果。</p>
-<h3 id="_9">具体实现</h3>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">waitfg</span><span class="p">(</span><span class="kt">pid_t</span><span class="w"> </span><span class="n">pid</span><span class="p">)</span>
+<h3 id="具体实现_2">具体实现</h3>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">waitfg</span><span class="p">(</span><span class="kt">pid_t</span><span class="w"> </span><span class="n">pid</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="w">    </span><span class="kt">sigset_t</span><span class="w"> </span><span class="n">mask_empty</span><span class="p">;</span>
 <span class="w">    </span><span class="n">sigemptyset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mask_empty</span><span class="p">);</span>
@@ -271,15 +276,15 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="sigchld_handler">sigchld_handler</h2>
-<h3 id="_10">课本提示</h3>
+<h3 id="课本提示">课本提示</h3>
 <blockquote>
 <p>• The waitpid, kill, fork, execve, setpgid, and sigprocmask functions will come in very handy. The WUNTRACED and WNOHANG options to waitpid will also be useful.<br/>• When you implement your signal handlers, be sure to send SIGINT and SIGTSTP signals to the entire foreground process group, using ”-pid” instead of ”pid” in the argument to the kill function. The sdriver.pl program tests for this error.<br/>• One of the tricky parts of the assignment is deciding on the allocation of work between the waitfg and sigchld handler functions. We recommend the following approach:<br/>– In waitfg, use a busy loop around the sleep function.<br/>– In sigchld handler, use exactly one call to waitpid.<br/>While other solutions are possible, such as calling waitpid in both waitfg and sigchld handler, these can be very confusing. It is simpler to do all reaping in the handler.</p>
 </blockquote>
-<h3 id="_11">思路</h3>
+<h3 id="思路_3">思路</h3>
 <p>照猫画虎：课本（中文）8.5.6节。
 之后按照<code>job</code>结束状态打印相关信息。这些信息是根据<code>sdriver.pl</code>和各<code>trace</code>比对<code>tsh</code>和<code>tshref</code>的结果（记得先<code>make</code>）比较得到的。</p>
-<h3 id="_12">具体实现</h3>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sigchld_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sig</span><span class="p">)</span><span class="w"> </span>
+<h3 id="具体实现_3">具体实现</h3>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sigchld_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sig</span><span class="p">)</span><span class="w"> </span>
 <span class="p">{</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">olderrno</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">errno</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">;</span>
 <span class="w">    </span><span class="kt">sigset_t</span><span class="w"> </span><span class="n">mask_all</span><span class="p">,</span><span class="w"> </span><span class="n">prev_all</span><span class="p">;</span>
@@ -314,7 +319,7 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <h2 id="sigint_handler">sigint_handler</h2>
 <p>参考 <code>trace06</code> 微调输出。</p>
 <p>由于所有的终止情况都包含子进程的终止，子进程终止时会发送<code>SIGCHLD</code>给父进程，所以我们不需要额外写信息输出。</p>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sigint_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sig</span><span class="p">)</span><span class="w"> </span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sigint_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sig</span><span class="p">)</span><span class="w"> </span>
 <span class="p">{</span>
 <span class="w">    </span><span class="c1">// to "the foreground job"</span>
 <span class="w">    </span><span class="kt">sigset_t</span><span class="w"> </span><span class="n">mask_all</span><span class="p">,</span><span class="w"> </span><span class="n">prev_all</span><span class="p">;</span>
@@ -334,7 +339,7 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 </code></pre></div>
 <h2 id="sigtstp_handler">sigtstp_handler</h2>
 <p>与<code>sigint_handler</code>基本完全相同。</p>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sigtstp_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sig</span><span class="p">)</span><span class="w"> </span>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sigtstp_handler</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">sig</span><span class="p">)</span><span class="w"> </span>
 <span class="p">{</span>
 <span class="w">    </span><span class="c1">// almost the same as sigint_handler</span>
 <span class="w">    </span><span class="kt">sigset_t</span><span class="w"> </span><span class="n">mask_all</span><span class="p">,</span><span class="w"> </span><span class="n">prev_mask</span><span class="p">;</span>
@@ -350,12 +355,12 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="do_bgfg">do_bgfg</h2>
-<h3 id="_13">思路</h3>
+<h3 id="思路_4">思路</h3>
 <p>首先获取<code>pid</code>或<code>jid</code>。从<code>builtin_cmd</code>传入的参数是<code>argv*[]</code>，<code>pid</code>或<code>jid</code>保存在<code>argv[1]</code>处，其中<code>jid</code>以<code>'%'</code>打头，可以用<code>atoi(argv[1] + 1)</code>消去该字符。</p>
 <p>在获取到<code>pid</code>或<code>jid</code>后，我们要获取需要被修改状态的进程，即根据<code>pid</code>或<code>jid</code>以及提供的相应封装函数来获取到我们需要切换<code>BG</code>或<code>FG</code>状态的<code>job</code>。</p>
 <p>在获取到<code>job</code>后，<code>bg</code>指令对应切换到<code>BG</code>状态，<code>fg</code>指令对应切换到<code>FG</code>状态并开始<code>waitfg</code>。</p>
-<h3 id="_14">具体实现</h3>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">do_bgfg</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"> </span>
+<h3 id="具体实现_4">具体实现</h3>
+<div class="highlight"><pre data-lang="c"><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">do_bgfg</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span><span class="w"> </span>
 <span class="p">{</span>
 <span class="w">    </span><span class="cm">/* Block the signals */</span>
 <span class="w">    </span><span class="kt">sigset_t</span><span class="w"> </span><span class="n">mask_all</span><span class="p">,</span><span class="w"> </span><span class="n">prev_mask</span><span class="p">;</span>
@@ -458,6 +463,8 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -473,6 +480,8 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -495,6 +504,7 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

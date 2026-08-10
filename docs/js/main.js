@@ -55,8 +55,8 @@
       pane.hidden = pane.dataset.pane !== name;
       pane.classList.toggle("is-active", pane.dataset.pane === name);
     });
-    if (updateHash && history.replaceState) {
-      history.replaceState(null, "", "#view-" + name);
+    if (updateHash && history.pushState) {
+      history.pushState(null, "", "#view-" + name);
     }
     if (name === "graph" && window.pilogGraph && !window.pilogGraph.started) {
       window.pilogGraph.start();
@@ -65,7 +65,7 @@
 
   document.querySelectorAll(".view-tab").forEach(function (tab) {
     tab.addEventListener("click", function () {
-      activateView(tab.dataset.view, false);
+      activateView(tab.dataset.view, true);
     });
   });
 
@@ -656,9 +656,90 @@
         if (loading) loading.hidden = true;
       });
     }
+    var jumpBtn = widget.querySelector(".dino-btn-jump");
+    var duckBtn = widget.querySelector(".dino-btn-duck");
+    function sendDinoKey(code, key, down) {
+      if (!frame || !frame.contentWindow) return;
+      var ev = new KeyboardEvent(down ? "keydown" : "keyup", {
+        key: key,
+        keyCode: code,
+        which: code,
+        bubbles: true
+      });
+      try {
+        frame.contentWindow.dispatchEvent(ev);
+      } catch (err) {
+        /* ignore */
+      }
+    }
+    function bindDinoBtn(btn, code, key) {
+      if (!btn) return;
+      btn.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        sendDinoKey(code, key, true);
+      });
+      ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+        btn.addEventListener(ev, function () {
+          sendDinoKey(code, key, false);
+        });
+      });
+    }
+    bindDinoBtn(jumpBtn, 38, "ArrowUp");
+    bindDinoBtn(duckBtn, 40, "ArrowDown");
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") open(false);
     });
     open(false);
+  }
+
+  /* ---------- random post: the pixel dice ---------- */
+  var diceBtns = document.querySelectorAll(".random-dice");
+  if (diceBtns.length) {
+    var diceRoot = window.PILOG_ROOT || "";
+    var cardUrls = null;
+    function jumpRandom() {
+      var go = function () {
+        if (!cardUrls || !cardUrls.length) return;
+        // a quick tree-flash-style blink before grabbing a random toy
+        var overlay = document.createElement("div");
+        overlay.className = "random-flash";
+        document.body.appendChild(overlay);
+        setTimeout(function () {
+          window.location.href =
+            diceRoot + cardUrls[Math.floor(Math.random() * cardUrls.length)];
+        }, 320);
+      };
+      if (cardUrls) {
+        go();
+        return;
+      }
+      fetch(diceRoot + "data/cards.json")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          cardUrls = data.map(function (e) { return e.url; });
+          go();
+        })
+        .catch(function () {});
+    }
+    diceBtns.forEach(function (b) {
+      b.addEventListener("click", jumpRandom);
+    });
+  }
+
+  /* ---------- post pages: ← / → jump between prev / next ---------- */
+  if (document.querySelector(".post-nav")) {
+    document.addEventListener("keydown", function (e) {
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (/^(input|textarea|select)$/i.test(document.activeElement.tagName)) return;
+      var t = e.target;
+      if (t && t.closest && t.closest("pre")) return; // let code blocks scroll
+      var a = null;
+      if (e.key === "ArrowLeft") a = document.querySelector(".post-nav-link.is-prev");
+      else if (e.key === "ArrowRight") a = document.querySelector(".post-nav-link.is-next");
+      if (a) {
+        e.preventDefault();
+        window.location.href = a.href;
+      }
+    });
   }
 })();

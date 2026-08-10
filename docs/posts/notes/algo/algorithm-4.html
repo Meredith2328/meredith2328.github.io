@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</h1>
     <div class="post-meta">
       <time datetime="2026-03-02T00:00:00">2026-03-02</time>
+      <span class="post-stats">5129 字 · 约 12 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -122,7 +127,7 @@
 链表的一个重要工具是prev指针，用于指示前一个节点。
 专题8 二叉树
 专题9 图</p>
-</div><div class="post-chapter" data-ch="2" data-title="专题一 哈希"><h3 id="_1">专题一 哈希</h3>
+</div><div class="post-chapter" data-ch="2" data-title="专题一 哈希"><h3 id="专题一-哈希">专题一 哈希</h3>
 <p>1 两数之和</p>
 <p>需要返回索引，所以记录索引。</p>
 <p>在遍历的同时，将已遍历过的元素索引记录在哈希表中，即可确定与当前元素组成两数之和的数是否存在。</p>
@@ -168,7 +173,7 @@
             sz = max(sz, cur_sz)
         return sz
 </code></pre></div>
-</div><div class="post-chapter" data-ch="3" data-title="专题二 双指针"><h3 id="_2">专题二 双指针</h3>
+</div><div class="post-chapter" data-ch="3" data-title="专题二 双指针"><h3 id="专题二-双指针">专题二 双指针</h3>
 <p>283 移动零</p>
 <p>两侧两个指针，一个负责寻找非0元素，一个负责记录0元素的位置。</p>
 <p>实际上使用一个指针应该也可以，两个指针只是为了方便我们确定指针交换元素已经处理了前面所有的元素，后面的都是我们添加上去的0。</p>
@@ -303,7 +308,7 @@
 
         return ans
 </code></pre></div>
-</div><div class="post-chapter" data-ch="4" data-title="专题三 滑动窗口"><h3 id="_3">专题三 滑动窗口</h3>
+</div><div class="post-chapter" data-ch="4" data-title="专题三 滑动窗口"><h3 id="专题三-滑动窗口">专题三 滑动窗口</h3>
 <p>3 无重复字符的最长子串</p>
 <div class="highlight"><pre><span></span><code>class Solution:
     def lengthOfLongestSubstring(self, s: str) -&gt; int:
@@ -369,7 +374,7 @@
                 res.append(l)
         return res
 </code></pre></div>
-</div><div class="post-chapter" data-ch="5" data-title="专题四 子串"><h3 id="_4">专题四 子串</h3>
+</div><div class="post-chapter" data-ch="5" data-title="专题四 子串"><h3 id="专题四-子串">专题四 子串</h3>
 <p>560 和为 K 的子数组</p>
 <p>最容易想到的是遍历全部子数组。当然，过不了用例。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -435,7 +440,7 @@
                 left += 1
         return "" if ans_left &lt; 0 else s[ans_left: ans_right + 1]
 </code></pre></div>
-</div><div class="post-chapter" data-ch="6" data-title="专题五 数组"><h3 id="_5">专题五 数组</h3>
+</div><div class="post-chapter" data-ch="6" data-title="专题五 数组"><h3 id="专题五-数组">专题五 数组</h3>
 <p>53 最大子数组和</p>
 <p>（解法一 前缀和）</p>
 <p>要找到哪一段的和最大，首先转换成前缀和，</p>
@@ -574,7 +579,7 @@
         # 按顺序全部有, 那就肯定是更大的
         return n + 1
 </code></pre></div>
-</div><div class="post-chapter" data-ch="7" data-title="专题六 矩阵"><h3 id="_6">专题六 矩阵</h3>
+</div><div class="post-chapter" data-ch="7" data-title="专题六 矩阵"><h3 id="专题六-矩阵">专题六 矩阵</h3>
 <p>73 矩阵置零</p>
 <p>最基础的空间O(mn)的思路是把(row, col)保存下来，然后模拟。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -717,7 +722,7 @@
                 x += 1
         return False
 </code></pre></div>
-</div><div class="post-chapter" data-ch="8" data-title="专题七 链表"><h3 id="_7">专题七 链表</h3>
+</div><div class="post-chapter" data-ch="8" data-title="专题七 链表"><h3 id="专题七-链表">专题七 链表</h3>
 <p>160 相交链表</p>
 <p>双指针每次都同时往右移动一格，</p>
 <p>如果相交，要么是有交点，要么是都为None。</p>
@@ -1112,7 +1117,7 @@ class Solution:
             # param_1 = obj.get(key)
 # obj.put(key,value)
 </code></pre></div>
-</div><div class="post-chapter" data-ch="9" data-title="专题八 二叉树"><h3 id="_8">专题八 二叉树</h3>
+</div><div class="post-chapter" data-ch="9" data-title="专题八 二叉树"><h3 id="专题八-二叉树">专题八 二叉树</h3>
 <p>94 二叉树的中序遍历</p>
 <div class="highlight"><pre><span></span><code># Definition for a binary tree node.
 # class TreeNode:
@@ -1598,7 +1603,7 @@ class Solution:
         maxGain(root)
         return self.res
 </code></pre></div>
-</div><div class="post-chapter" data-ch="10" data-title="专题九 图：DFS和BFS遍历"><h3 id="dfsbfs">专题九 图：DFS和BFS遍历</h3>
+</div><div class="post-chapter" data-ch="10" data-title="专题九 图：DFS和BFS遍历"><h3 id="专题九-图-dfs和bfs遍历">专题九 图：DFS和BFS遍历</h3>
 <p>图这个专题是十分有趣的。最主要是DFS和BFS两种遍历方式。</p>
 <p>为了两种写法都练得很熟练，我们往往可以把两种函数的接口设成高度相似的，这样可以无缝切换。</p>
 <blockquote>
@@ -1610,7 +1615,7 @@ class Solution:
 <p>注意仔细观察以下三个模板，逐行仔细看。这里模板多花点时间，早点想清楚，就是为了以后刷题少花点时间。</p>
 <p><strong>模板一：函数调用DFS</strong></p>
 <p>“判断，标记，处理，邻居”</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dfs</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">visited</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dfs</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">visited</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="c1"># 1. 标记访问（关键！）</span>
@@ -1623,7 +1628,7 @@ class Solution:
             <span class="n">dfs</span><span class="p">(</span><span class="n">neighbor</span><span class="p">,</span> <span class="n">visited</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>模板二：显式栈DFS</strong> （和队列BFS特别像！）</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dfs_stack</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dfs_stack</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
     <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">]</span>
     <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
@@ -1639,7 +1644,7 @@ class Solution:
 </code></pre></div>
 <p><strong>模板三：队列BFS</strong></p>
 <p>BFS 只要无脑在入队时标记时就可以了，防止重复入队。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">bfs</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
     <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -1655,7 +1660,7 @@ class Solution:
                 <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbor</span><span class="p">)</span>
 </code></pre></div>
 <p>把上述的邻接表换成网格，就变成了常考的网格模板。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 方向数组（常用技巧）</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># 方向数组（常用技巧）</span>
 <span class="n">DIRS</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">dfs_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
@@ -1683,7 +1688,7 @@ class Solution:
 </code></pre></div>
 <p>仔细做好上面的模板，下面两道题目完全是手到擒来。</p>
 <p>经典题目： <a href="https://leetcode.cn/problems/number-of-islands/">200. 岛屿数量</a></p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">numIslands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">DIR</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
 
@@ -1720,7 +1725,7 @@ class Solution:
         <span class="k">return</span> <span class="n">count</span>
 </code></pre></div>
 <p>再练一道：<a href="https://leetcode.cn/problems/max-area-of-island/">695. 岛屿的最大面积</a> 。上面的模板以及上一道如果练熟了，这一道应该能很快地码出来（5分钟之类的）。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">maxAreaOfIsland</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">DIR</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
         <span class="n">maxCount</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1763,7 +1768,7 @@ class Solution:
 </code></pre></div>
 <p>再来一道： <a href="https://leetcode.cn/problems/rotting-oranges/">994. 腐烂的橘子</a></p>
 <p>“打窝”然后让它扩散开来。这个就十分bfs了。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">orangesRotting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">DIR</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
         <span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([])</span>
@@ -1796,7 +1801,7 @@ class Solution:
 <li>需要知道怎么构建邻接表（pre-&gt;cur的有向边）。</li>
 <li>需要记录并更新入度。<strong>入队的永远是入度为0的点，出队永远用于更新邻接点的入度。</strong></li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">canFinish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numCourses</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prerequisites</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">graph</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numCourses</span><span class="p">)]</span>
         <span class="n">indegree</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">numCourses</span>
@@ -1907,6 +1912,8 @@ class Solution:
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -1922,6 +1929,8 @@ class Solution:
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -1946,6 +1955,7 @@ class Solution:
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

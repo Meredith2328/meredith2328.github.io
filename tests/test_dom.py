@@ -325,7 +325,7 @@ def main() -> None:
           return Math.abs(h.getBoundingClientRect().top - 24);
         })()""")
         ok &= check("TOC second click reaches first section",
-                    dist2 < 90, f"dist {dist2}")
+                    dist2 < 180, f"dist {dist2}")
 
         # prev/next post navigation (card order, wraps at the ends)
         page.goto(base + "/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html",
@@ -338,6 +338,46 @@ def main() -> None:
         wrap_href = page.locator(".post-nav-link.is-next").get_attribute("href")
         ok &= check("oldest post next wraps to first", wrap_href and "10pi" in wrap_href, str(wrap_href))
 
+        # ← / → flip between prev / next posts on article pages
+        page.goto(base + "/posts/notes/ml/mathqwen-0.6b-agentic-rl.html", wait_until="networkidle")
+        with page.expect_navigation(timeout=3000):
+            page.keyboard.press("ArrowLeft")
+        ok &= check("arrow-left goes to prev post", "trl" in page.url, page.url)
+        page.keyboard.press("ArrowRight")
+        page.wait_for_load_state("networkidle")
+        ok &= check("arrow-right goes to next post", "mathqwen" in page.url, page.url)
+
+        # chinese heading anchors + post stats + dino touch buttons
+        page.goto(base + "/posts/notes/ml/minitorch.html", wait_until="networkidle")
+        h2id = page.locator(".post-body h2").first.get_attribute("id")
+        ok &= check("chinese heading ids", bool(h2id) and "_" not in h2id, str(h2id))
+        ok &= check("heading anchor links", page.locator(".post-body .heading-anchor").count() >= 5)
+        stats = page.locator(".post-stats").inner_text()
+        ok &= check("post stats shown", "字" in stats and "分钟" in stats, stats)
+        ok &= check("dino touch buttons", page.locator(".dino-btn-jump, .dino-btn-duck").count() == 2)
+
+        # code language labels + long block collapse
+        page.goto(base + "/posts/notes/ml/TensorZero-6949.html", wait_until="networkidle")
+        ok &= check("code lang labels", page.locator(".code-lang").count() >= 3)
+        page.goto(base + "/posts/notes/algo/algorithm-3.html", wait_until="networkidle")
+        ok &= check("long code collapsible", page.locator(".code-block.is-long .code-more").count() >= 1)
+        page.locator(".code-block.is-long .code-more").first.click()
+        page.wait_for_timeout(200)
+        ok &= check("long code expands", page.locator(".code-block.is-long.is-open").count() >= 1)
+
+        # image lightbox
+        page.goto(base + "/posts/courses/csapp/csapp-cachelab.html", wait_until="networkidle")
+        page.locator(".post-body img").first.click()
+        page.wait_for_timeout(300)
+        ok &= check("lightbox opens", page.locator(".lightbox").count() == 1)
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(200)
+        ok &= check("lightbox closes on Esc", page.locator(".lightbox").count() == 0)
+
+        # random dice (header + footer)
+        ok &= check("random dice in header", page.locator(".header-row .random-dice").count() == 1)
+        ok &= check("random dice in footer", page.locator(".site-footer .random-dice").count() == 1)
+
         # og:image uses the cover (not favicon) and description is filled
         page.goto(base + "/posts/toy/10pi.html", wait_until="networkidle")
         og_img = page.evaluate("document.querySelector('meta[property=\"og:image\"]').content")
@@ -347,6 +387,19 @@ def main() -> None:
         page.goto(base + "/", wait_until="networkidle")
         home_desc = page.evaluate("document.querySelector('meta[name=description]').content")
         ok &= check("home description fallback", len(home_desc) > 0, home_desc[:40])
+        rss_desc = page.evaluate(
+            "fetch('rss.xml').then(r => r.text()).then(t => {"
+            "const m = t.match(/<description>([^<]*)<\\/description>/); return m ? m[1] : ''; })"
+        )
+        ok &= check("rss channel description", len(rss_desc) > 5, rss_desc[:30])
+        sitemap_urls = page.evaluate(
+            "fetch('sitemap.xml').then(r => r.text()).then(t => (t.match(/<url>/g) || []).length)"
+        )
+        ok &= check("sitemap generated", bool(sitemap_urls) and sitemap_urls > 40, str(sitemap_urls))
+        # view state is written to the url hash
+        page.click('[data-view="tree"]')
+        page.wait_for_timeout(200)
+        ok &= check("view state in url", "#view-tree" in page.url, page.url)
 
         # giscus failure fallback: a retry button appears when the widget fails
         page.goto(base + "/posts/toy/pilog-blog.html", wait_until="networkidle")

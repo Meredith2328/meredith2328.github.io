@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">用einops包替换掉PyTorch的大部分矩阵变换函数</h1>
     <div class="post-meta">
       <time datetime="2026-02-09T00:00:00">2026-02-09</time>
+      <span class="post-stats">642 字 · 约 2 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%B7%A5%E5%85%B7">#工具</a>
       
@@ -116,15 +121,15 @@
 <h2 id="rearrange-reduce-repeat">rearrange, reduce, repeat</h2>
 <p><code>rearrange</code> 函数：以更可读的方式重排、合并或拆分维度。
 在这种计算机视觉的上下文里还挺合适的，分别是batch channel height width这样的实际语义，做调整时保持语义会很有利于阅读。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># y = x.transpose(0, 2, 3, 1)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># y = x.transpose(0, 2, 3, 1)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">'b c h w -&gt; b h w c'</span><span class="p">)</span>
 </code></pre></div>
 <p><code>reduce</code> 函数：这个真的很好读，一看就是对channel维度做了mean操作。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># x.mean(-1)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># x.mean(-1)</span>
 <span class="n">reduce</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">'b h w c -&gt; b h w'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">)</span>
 </code></pre></div>
 <p><code>repeat</code> 函数：同理，一看就是在中间这个地方重复了5次。</p>
-<div class="highlight"><pre><span></span><code><span class="n">repeat</span><span class="p">(</span><span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"h w c -&gt; h 5 w c"</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">repeat</span><span class="p">(</span><span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"h w c -&gt; h 5 w c"</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
 </code></pre></div>
 <h2 id="einsum">einsum</h2>
 <p>(1)那么接下来可以把 <code>einsum</code> 用于矩阵乘法。</p>
@@ -134,7 +139,7 @@ Y = einsum(D, A, "... d_in, d_out d_in -&gt; ... d_out")
 </code></pre></div>
 <p>(2)当然也可以用于广播操作。
 We have a batch of images, and for each image we want to generate 10 dimmed versions based on some scaling factor:</p>
-<div class="highlight"><pre><span></span><code><span class="n">images</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># (batch, height, width, channel)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">images</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># (batch, height, width, channel)</span>
 <span class="n">dim_by</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="c1">## Reshape and multiply</span>
 <span class="n">dim_value</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">dim_by</span><span class="p">,</span> <span class="s2">"dim_value -&gt; 1 dim_value 1 1 1"</span><span class="p">)</span>
@@ -149,7 +154,7 @@ We have a batch of images, and for each image we want to generate 10 dimmed vers
 </code></pre></div>
 <p>(3) 假如需要对一批图片的中间两个维度施加一个线性变换（channel独立）。
 注意：<strong>需要独立的维度一般放在前面。</strong></p>
-<div class="highlight"><pre><span></span><code><span class="n">channels_last</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># (batch, height, width, channel)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">channels_last</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># (batch, height, width, channel)</span>
 <span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">32</span><span class="o">*</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="o">*</span><span class="mi">32</span><span class="p">)</span>
 
 <span class="n">channels_first</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span>
@@ -215,6 +220,8 @@ We have a batch of images, and for each image we want to generate 10 dimmed vers
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -230,6 +237,8 @@ We have a batch of images, and for each image we want to generate 10 dimmed vers
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -252,6 +261,7 @@ We have a batch of images, and for each image we want to generate 10 dimmed vers
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

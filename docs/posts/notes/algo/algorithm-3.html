@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">数据结构与算法 · 03 · 基础数据结构与算法模板整理</h1>
     <div class="post-meta">
       <time datetime="2026-01-18T00:00:00">2026-01-18</time>
+      <span class="post-stats">18746 字 · 约 42 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -133,11 +138,11 @@
 <li>对于比较大量的输入（如5e6），请使用 <em>scanf</em> 而非 cin 。</li>
 <li><strong>估算输出大小</strong>：对于 <em>递推</em> 等结果数值较大的问题，请使用 <em>long long</em> 甚至高精度。可以借助 <code>int</code> 占4B、使用32位、最大值为2147483647来估算大小。</li>
 </ul>
-<h1 id="_1">基础算法</h1>
-</div><div class="post-chapter" data-ch="2" data-title="模拟专题"><h2 id="_2">模拟专题</h2>
+<h1 id="基础算法">基础算法</h1>
+</div><div class="post-chapter" data-ch="2" data-title="模拟专题"><h2 id="模拟专题">模拟专题</h2>
 <p>这一部分包括三道题目（<strong>计数和方向</strong>），第一道是简单的模拟计数，第二道是经典的棋盘问题、含方向和边界处理，第三道是经典的围成圈击鼓传花。</p>
 <p><img alt="" src="../../migrated/post-images/20260119095533.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
@@ -179,7 +184,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260119103419.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 坐标系, 以及对格子的遍历.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 坐标系, 以及对格子的遍历.</span>
 <span class="c1">// 因为要遍历8个位置, 所以可以建立元素数为8的两个偏移量数组,</span>
 <span class="c1">// 逐个位置遍历.</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
@@ -214,7 +219,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260119111922.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 1-n. 每次传递是 cur = (cur + dir * s) % n;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 1-n. 每次传递是 cur = (cur + dir * s) % n;</span>
 <span class="c1">// 规定逆时针遍历整个圈以排布序列, 则面向圈外时, 左手边为正方向1. </span>
 <span class="c1">// 即 圈外1 ^ 左手0 则为正方向 dir=1, 否则为-1.</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
@@ -245,7 +250,7 @@
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="3" data-title="高精度专题"><h2 id="_3">高精度专题</h2>
+</div><div class="post-chapter" data-ch="3" data-title="高精度专题"><h2 id="高精度专题">高精度专题</h2>
 <p>本专题的三道题分别讲解了高精度加法、高精度乘法、Bigint封装。</p>
 <p><strong>高精度注意两次逆序</strong>：</p>
 <ol>
@@ -253,7 +258,7 @@
 <li>从数组中输出时，第二次逆序输出。</li>
 </ol>
 <p><img alt="" src="../../migrated/post-images/20260119152217.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 1. 先把输入的整数逆序.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 1. 先把输入的整数逆序.</span>
 <span class="c1">// 2. 从低位到高位逐位相加 (循环条件是更大的位数), 得到加法与进位.</span>
 <span class="c1">// 3. 处理边界条件: 相加时位数增加.</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
@@ -294,7 +299,7 @@
 <p><img alt="" src="../../migrated/post-images/20260119154237.png"/>
 乘积位数不会超过两数的位数之和。
 注意“贡献”（包括乘、进位）<strong>有重叠是<code>+=</code></strong>，而“保留个位”是<code>=</code>。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
@@ -337,7 +342,7 @@
 接下来给出封装好的大整数类，在 <code>Bigint</code> 结构体内重载了运算符 <code>operator[]</code> ，在结构体外<code>operator+</code> 和 <code>operator*</code> ，把上述两道题统一起来。</p>
 <p>（备注：重载的写法类似于函数/方法，毕竟运算符的本质就是一个方法。右边是参数，左边是返回值。
 在 <code>operator[]</code> 的实现中，为了能够像数组那样直接修改某一位的值，<strong>需要返回该位的引用</strong> <code>int&amp;</code> ，而不是拷贝 <code>int</code> 。）</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
@@ -411,19 +416,19 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>ps. 当然，高精度还可以用字符串实现。</p>
-</div><div class="post-chapter" data-ch="4" data-title="排序专题"><h2 id="_4">排序专题</h2>
-<h3 id="_5">知识</h3>
+</div><div class="post-chapter" data-ch="4" data-title="排序专题"><h2 id="排序专题">排序专题</h2>
+<h3 id="知识">知识</h3>
 <p><img alt="" src="../../migrated/post-images/20260119192004.png"/>
 <img alt="" src="../../migrated/post-images/20260119192103.png"/>
 笔记：sort函数和unique函数（<code>#include &lt;algorithm&gt;</code>）
 <code>sort(a, a+n, cmp)</code> 函数将数组 <code>a</code> 从 <code>a[0]</code> 到 <code>a[n - 1]</code> <strong>原地排序</strong>，默认升序。
 <code>cmp</code> 可以直接定义一个bool的元素比较函数即可。
 <code>unique(a, a+n)</code> 函数将将数组 <code>a</code> 从 <code>a[0]</code> 到 <code>a[n - 1]</code> <strong>原地去重</strong>，并且返回 <code>&amp;a[n]</code> ，可以用返回值减去 <code>a</code> 得到<strong>去重后的元素个数</strong>。</p>
-<h3 id="_6">举例</h3>
+<h3 id="举例">举例</h3>
 <p><img alt="" src="../../migrated/post-images/20260119171116.png"/>
 计数排序。
 注意，这里是根据数组内容（计数）、输出序号。而不是常见的输出数组内容。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1010</span><span class="p">;</span>
@@ -444,7 +449,7 @@
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260119171804.png"/>
 选择排序、冒泡排序、插入排序。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 选择排序:</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 选择排序:</span>
 <span class="c1">// 每次选中最小的元素, 将其置于已排序段的末尾.</span>
 <span class="c1">// 已排序段初始长度为0, 指针指向位置0.</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -459,7 +464,7 @@
 <span class="w">    </span><span class="n">swap</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">maxi</span><span class="p">]);</span>
 <span class="p">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// 选择排序的第二种写法.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 选择排序的第二种写法.</span>
 <span class="c1">// 遍历时, 如果相应元素更小, 则将它交换到指定为止.</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -467,7 +472,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// 冒泡排序.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 冒泡排序.</span>
 <span class="c1">// 每次冒泡是从前到后的交换链, 冒泡完后保证当前最大元素交换到最后.</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 下标边界: 来自对a[j]和"a[j+1]"的比较</span>
@@ -475,7 +480,7 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// 插入排序.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 插入排序.</span>
 <span class="c1">// 腾出空位, 将新的元素插入已排序的序列中.</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 初始a[0]已有序</span>
 <span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
@@ -488,7 +493,7 @@
 </code></pre></div>
 <p>（重点：快速排序的剪枝板子）
 <img alt="" src="../../migrated/post-images/20260119180906.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 快速排序板子.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 快速排序板子.</span>
 <span class="c1">// 划分 + 自顶向下分治.</span>
 <span class="c1">// 这个板子的好处是可以剪枝, 常数优化好一些,</span>
 <span class="c1">// 而且整个代码结构超级无敌对称, 不需要一边置为&lt;=、一边置为&gt;。</span>
@@ -530,7 +535,7 @@
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260119180914.png"/>
 备注：注意这里<code>MAXN = 5e6</code>，已经很大了，读入数字请用 <code>scanf</code> 而非 <code>cin</code> ，要不然会卡常（用例5搞出1.2s左右）。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 思想:</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 思想:</span>
 <span class="c1">// 看k属于的区间.</span>
 <span class="c1">// 每次划分后, [l, j], [j + 1, i - 1], [i, r] 三个区间相对大小有序.</span>
 <span class="c1">// k属于其中一个区间, 通过与下标的大小关系确定.</span>
@@ -576,7 +581,7 @@
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260119191423.png"/>
 （解一）范围小，所以用计数排序。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">1010</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="n">cnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
@@ -597,7 +602,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>（解二）STL使用sort和unique函数的代码如下：</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -620,7 +625,7 @@
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260119192747.png"/>
 自定义比较函数。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -668,7 +673,7 @@
 <del>（我还寻思着让我计票计到100位怕是有点那什么。</del>
 可以使用高精度。不过因为输入就是字符串、而字符串自带字典序比较，所以我们可以直接复用字符串的逻辑。
 但是，需要注意，<strong>字典序只能用于位数相同的数字大小比较</strong>。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
@@ -698,7 +703,7 @@
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="5" data-title="暴力枚举专题"><h2 id="_7">暴力枚举专题</h2>
+</div><div class="post-chapter" data-ch="5" data-title="暴力枚举专题"><h2 id="暴力枚举专题">暴力枚举专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260127233859.png"/>
 <img alt="" src="../../migrated/post-images/20260127233909.png"/>
 <img alt="" src="../../migrated/post-images/20260127233915.png"/>
@@ -715,7 +720,7 @@
 <img alt="" src="../../migrated/post-images/20260127234059.png"/>
 <img alt="" src="../../migrated/post-images/20260127234105.png"/>
 <img alt="" src="../../migrated/post-images/20260127234111.png"/></p>
-</div><div class="post-chapter" data-ch="6" data-title="递推与递归专题"><h2 id="_8">递推与递归专题</h2>
+</div><div class="post-chapter" data-ch="6" data-title="递推与递归专题"><h2 id="递推与递归专题">递推与递归专题</h2>
 <ol>
 <li>递推和递归，要将原问题分解为子问题。递推往往考虑“最后一次”。</li>
 <li><strong>递推</strong>大概率结果很大，<strong>要用 <code>long long</code> 甚至高精度</strong>。</li>
@@ -728,7 +733,7 @@ count[2] = 2
 </code></pre></div>
 <p>这个递推很显然在 <span class="arithmatex">\(a^n\)</span> 的数量级，因此需要高精度。</p>
 <p>首先，<span class="arithmatex">\(count[n] \le 2^n\)</span> 是显然的。粗略估算，<span class="arithmatex">\(2^{10} \approx 10^3\)</span> ，那么 <span class="arithmatex">\(2^{5000} \approx 10^{1500}\)</span> 。保险起见高精度内的数组开个1600位什么的就足够了。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
@@ -813,7 +818,7 @@ count[2] = 2
 4. 因为我用-1标记, 假如最后结果是-1, 需要修改一下
 </code></pre></div>
 <p>我们可以检验几个点，比如 <code>(1,0)</code>，<code>(0,1)</code>，<code>(1,1)</code>，<code>(2,0)</code>之类的验证上式。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span>
@@ -872,7 +877,7 @@ count[2] = 2
 ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式相减推一下通项。）
 结论上，<span class="arithmatex">\(h(n)=\frac{C_{2n}^{n}}{n+1}\)</span>，这是指数级的，大约是 <span class="arithmatex">\(O(4^n/n^{3/2})\)</span> 。
 那么n=18对应 <span class="arithmatex">\(4^{18} / 18^{3/2} &lt; 2^{36} / 2^{4 \times 3/2} = 2^{30}\)</span> ，用 <code>int</code> 装结果就行。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">h</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">};</span>
@@ -897,7 +902,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 （ps. 下述这个树的每个节点代表一次函数调用）
 <img alt="" src="../../migrated/post-images/20260120112909.png"/></li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -928,7 +933,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <span class="p">}</span>
 </code></pre></div>
 <p>第二种思考方式是使用递推： <code>f[i] = 1 + f[1] + f[2] + ... + f[i/2], f[1] = 1</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -955,7 +960,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260120112745.png"/>
 写递归时，一定记得写备忘录。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -1006,7 +1011,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <p>举个例子：
 调用函数 <code>expand("[2[2CB]]")</code> 。
 首先读入 <code>[</code> 和数字 <code>2</code> ，然后发现又有 <code>[</code> ，需要先对后面一整段调用子函数，即 <code>expand([2CB]])</code> ，调用后子函数将这一段展开为 <code>CBCB]</code> ，则字符串变为 <code>[2CBCB]</code> ，再同理展开即可。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="n">string</span><span class="w"> </span><span class="nf">expand</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -1032,13 +1037,13 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="7" data-title="贪心专题"><h2 id="_9">贪心专题</h2>
+</div><div class="post-chapter" data-ch="7" data-title="贪心专题"><h2 id="贪心专题">贪心专题</h2>
 <p>背包问题用替换论证，调度类问题可能用交换论证。</p>
 <p><img alt="" src="../../migrated/post-images/20260120130210.png"/>
 贪心策略：按照 <code>v[i] / m[i]</code> 从高到低排序，然后拿入。
 这个不是01背包（战略放弃可能得到更多），而是分数背包，贪心是最优的。</p>
 <p>贪心证明：copy-and-paste。假设最优解某次在背包中放入了价值低的金币，则可以将这个金币替换为贪心的价值高的金币，价值不会降低。如是循环，直到最优解全部替换为贪心解，价值不会降低，所以贪心解为最优解。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1088,7 +1093,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 贪心证明：调度类的问题使用交换论证。贪心得到的应该是接水时间的升序序列。反设最优解中有两者逆序（<span class="arithmatex">\(t_i&gt;t_j\)</span> 但 <span class="arithmatex">\(i &lt; j\)</span> ，则由前述可知系数 <span class="arithmatex">\(a&gt;b\)</span>），它们对等待总时长的贡献为 <span class="arithmatex">\(at_i+bt_j\)</span> 。将这两者交换后，贡献变为 <span class="arithmatex">\(at_j+bt_i\)</span> 。
 后者减前者得到 <span class="arithmatex">\(a(t_j-t_i)+b(t_i-t_j)=(a-b)(t_j-t_i)&lt;0\)</span> ，即交换后贡献的等待时长更少，矛盾。</p>
 <p>另外需要估算结果大小：<span class="arithmatex">\(n \le 1000\)</span> ，<span class="arithmatex">\(t_i \le 10^6\)</span> ，则最大情况下是 <span class="arithmatex">\((999 + 998 + \dots + 1) \times 10^6 = 999/2 \times 10^9 \approx 5 \times 10^{11}\)</span> ，这铁定是不能用 <code>int</code> （<span class="arithmatex">\(2 \times 10^9\)</span>）了。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1131,7 +1136,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <p><img alt="" src="../../migrated/post-images/20260120154139.png"/>
 结束时间越早，能够留给其他比赛的剩余时间越多。
 贪心策略：按照结束时间降序排列，选取相容的所有活动。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1168,10 +1173,10 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 这里讲解哈夫曼树，即每次选取最小的两个节点，合并、放回，如是循环，直到全部完成合并。</p>
 <p><img alt="" src="../../migrated/post-images/20260120175211.png"/>
 语法：优先队列</p>
-<div class="highlight"><pre><span></span><code><span class="n">priority_queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pq</span><span class="p">;</span><span class="w"> </span><span class="c1">// 默认为大根堆less</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="n">priority_queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pq</span><span class="p">;</span><span class="w"> </span><span class="c1">// 默认为大根堆less</span>
 <span class="n">priority_queue</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">greater</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">pq</span><span class="p">;</span><span class="w"> </span><span class="c1">// 小根堆greater</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1204,7 +1209,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 而我们每次都取的是两个最小值进行合并，并将合并结果加入队列中，
 意味着队列也是升序排序。
 而数组和队列都是升序排序，又反过来保证我们每次取到的是最小值。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
@@ -1231,7 +1236,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260120181656.png"/></p>
-</div><div class="post-chapter" data-ch="8" data-title="二分查找与二分答案专题"><h2 id="_10">二分查找与二分答案专题</h2>
+</div><div class="post-chapter" data-ch="8" data-title="二分查找与二分答案专题"><h2 id="二分查找与二分答案专题">二分查找与二分答案专题</h2>
 <blockquote>
 <p>二分的本质是一段满足某条件、另一段不满足。<br/>往往要找到满足或不满足的端点。<br/>二分是在遍历上的优化，能够使用二分的问题一定可以暴力遍历，以找到是否满足某条件的端点。</p>
 </blockquote>
@@ -1245,7 +1250,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 </ol>
 </blockquote>
 <p><img alt="" src="../../migrated/post-images/20260120181953.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -1296,7 +1301,7 @@ upper_bound(begin, end, val) - lower_bound(begin, end, val)
 
 ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1318,7 +1323,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 </code></pre></div>
 <p>另一种 <span class="arithmatex">\(O(n)\)</span> 的思路是，我们可以维护双指针手动实现类似lower_bound和upper_bound的效果：随着我们要查询的 <code>a[i] + c</code> 逐渐增大，它所在的段也逐渐右移。因此我们可以维护双指针指向它的左右端点，始终右移。
 两个指针移动的距离不超过 <code>n</code> ，所以是 <span class="arithmatex">\(O(n)\)</span> 的。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1356,7 +1361,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <blockquote>
 <p>二分模板说明：<br/>这里的二分是定义在闭区间 <code>[l, r]</code> 上的，<br/><code>[l, x]</code> 满足某性质（例中的 <code>val &gt;= m</code> ），<br/>如果要找满足该性质的最大端点，则在满足条件的部分内写 <code>ans = mid; l = mid + 1;</code> ，另一边写 <code>r = mid - 1</code> ，即利用 <code>l</code> 继续逼近。<br/>如果要找满足该性质的最小端点，则在满足条件的部分内写 <code>ans = mid; r = mid - 1;</code> ，另一边写 <code>l = mid + 1</code> ，即利用 <code>r</code> 继续逼近。</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -1402,7 +1407,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 二分条件：单调性是随着距离增大，是否能够安置。可见，距离较小时这个条件满足，距离超过某个阈值后一定不满足。
 贪心：从最左端开始，每隔大于等于 <span class="arithmatex">\(x\)</span> 的距离，能安置就安置。
 贪心证明：copy-and-paste。从前往后遍历最优解序列，找到第一个不满足贪心给出的位置的牛，将它替换为贪心给出的位置（更靠前），则该牛剩余的距离不减少，且不影响其余牛的安置。如是反复。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1452,7 +1457,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <del>但是毕竟我们还是知道一元三次方程长什么样，比如↗↘↗。它是有三段单调的。
 因此，可以考虑首先找到一个根（局部单调所以我觉得应该可以收敛？），然后在它的两侧探索，然后再根据已经找到的两个根、再在三段内探索，总共需要对六段区间执行二分，比上面200个还是好点。</del>
 根据零点存在性定理，如果中点和某端点正负相同，则零点一定在中点的另一侧。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1489,7 +1494,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="9" data-title="搜索专题"><h2 id="_11">搜索专题</h2>
+</div><div class="post-chapter" data-ch="9" data-title="搜索专题"><h2 id="搜索专题">搜索专题</h2>
 <p>深度优先：优先考虑搜索的深度，到头了再进行处理。</p>
 <p><img alt="" src="../../migrated/post-images/20260121131056.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20260121130720.png"/>
@@ -1500,7 +1505,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <li>坐标映射很像PyTorch的Tensor。函数参数使用的坐标是1~16，为了把它映射到行号和列号，需要先映射到0~15，然后使用整除<code>/</code>和取模<code>%</code>（本质是移位和位与）。而块号可以由行号和列号映射得到。当然也可以直接用原始坐标求得，见下。</li>
 </ol>
 <p>这里提供一个位运算直接求得块号的过程，仅限1~16。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map_number</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map_number</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">'''将n: 1~16映射到00110011 22332233.'''</span>
 
     <span class="n">idx</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
@@ -1510,7 +1515,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
     <span class="n">low_bits</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&amp;</span> <span class="mb">0b10</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">high_bits</span> <span class="o">+</span> <span class="n">low_bits</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// 书上没提这道题的来源, 我按照洛谷T581492微调了一下代码</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 书上没提这道题的来源, 我按照洛谷T581492微调了一下代码</span>
 <span class="c1">// 现在只打印字典序最小的一个例子, 并且打印出答案288</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
@@ -1565,7 +1570,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <p><img alt="" src="../../migrated/post-images/20260121140234.png"/>
 按行搜索，因为每一行只能放一个。
 <img alt="" src="../../migrated/post-images/20260121174824.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="mi">14</span><span class="p">][</span><span class="mi">14</span><span class="p">],</span><span class="w"> </span><span class="n">ans</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
@@ -1625,7 +1630,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <li>如果满足条件，则选择题目和不选择题目都要处理。否则只处理不选择题目。</li>
 <li>当两个时间并行时，它们重叠了，时间总数的贡献量应该取更大的那个时间（<code>max(maxtime, sum - maxtime) = sum - maxtime, if maxtime &lt;= sum / 2</code>）。</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -1673,7 +1678,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <p><img alt="" src="../../migrated/post-images/20260121181514.png"/>
 既然是任意一个点，就是要把所有情况都给遍历出来，相当于建立一个广度遍历树。
 注意：在向周围扩散时，顺便跟坐标队列一起记录下距离。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1733,7 +1738,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260121193716.png"/>
 感觉bfs你去真的想电梯/马的周游的过程就想复杂了，不如就从深度广度遍历一棵选择树的角度去想。像这道题就是二叉树带剪枝，很明确。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -1779,7 +1784,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 剪枝条件：如果<strong>目标格子的最早到达时间比被烧焦时间晚</strong>，则不能扩展。
 区别于前述的剪枝条件：已访问（<code>visited</code>）。</p>
 <p>ps. 最后一个用例有问题，有坐标大于300的情况，所以for循环至少开到305。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
@@ -1843,9 +1848,9 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h1 id="_12">基础数据结构</h1>
-</div><div class="post-chapter" data-ch="10" data-title="字符串专题"><h2 id="_13">字符串专题</h2>
-<h3 id="_14">知识</h3>
+<h1 id="基础数据结构">基础数据结构</h1>
+</div><div class="post-chapter" data-ch="10" data-title="字符串专题"><h2 id="字符串专题">字符串专题</h2>
+<h3 id="知识_1">知识</h3>
 <p>memset的头文件为cstring。
 <img alt="" src="../../migrated/post-images/20260120181150.png"/></p>
 <p>字符串的头文件为string。
@@ -1854,10 +1859,10 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <li><strong>find的返回值备注</strong>：<code>s.find(str [,pos])</code>在没找到时会返回<code>string::npos</code>, 需要强转为<code>int</code>才是-1, 否则直接输出得到 <code>size_t</code> 的最大值，可能是一个大数.</li>
 </ol>
 <p><img alt="" src="../../migrated/post-images/20260118213050.png"/></p>
-<h3 id="_15">举例</h3>
+<h3 id="举例_1">举例</h3>
 <p>以下三道题目利用字符串的七大常用方法，实现了字符计数、字符串处理和<strong>单词统计</strong>（空格法查找单词，给源文档和待查字符串前后都添加空格）。</p>
 <p><img alt="" src="../../migrated/post-images/20260118204551.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -1871,7 +1876,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260118204926.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 分析:</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 分析:</span>
 <span class="c1">// 1. 分派指令.</span>
 <span class="c1">// 2. 对于每个指令, 使用字符串常用的四个方法实现.</span>
 <span class="c1">// 坑: s.find(str [,pos])在没找到时会返回string::npos, 需要强转为int才是-1.</span>
@@ -1931,7 +1936,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260118211307.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 1. 读入但不区分大小写.</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 1. 读入但不区分大小写.</span>
 <span class="c1">// 2. 为了统计出现次数和第一次出现的位置, 可以使用 s.find(str, pos), 从pos开始查找.</span>
 <span class="c1">// 3. (重要: 空格法查找"单词") 可以给单词前后加空格' ', 以防止在单词内查找.</span>
 
@@ -1977,11 +1982,11 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="11" data-title="结构体专题"><h2 id="_16">结构体专题</h2>
-<h3 id="_17">知识</h3>
-<h3 id="_18">举例</h3>
+</div><div class="post-chapter" data-ch="11" data-title="结构体专题"><h2 id="结构体专题">结构体专题</h2>
+<h3 id="知识_2">知识</h3>
+<h3 id="举例_2">举例</h3>
 <p><img alt="" src="../../migrated/post-images/20260118215605.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2008,7 +2013,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260118221515.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 因为是操练结构体, 直接遍历即可(O(n^2)). </span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 因为是操练结构体, 直接遍历即可(O(n^2)). </span>
 <span class="c1">// 当然, 先排序再遍历会更快(O(nlogn)).</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
@@ -2047,7 +2052,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <p><img alt="" src="../../migrated/post-images/20260118222916.png"/>
 关于结构体的构造函数：在写构造函数时，不需要写 <code>struct</code> 。
 使用时，按照传参的形式。因为是在函数内部，所以定义了一个局部变量。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -2088,8 +2093,8 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="12" data-title="线性表专题"><h2 id="_19">线性表专题</h2>
-<h3 id="_20">知识</h3>
+</div><div class="post-chapter" data-ch="12" data-title="线性表专题"><h2 id="线性表专题">线性表专题</h2>
+<h3 id="知识_3">知识</h3>
 <p>本节包括栈、队列和链表。</p>
 <p><img alt="" src="../../migrated/post-images/20260121222003.png"/>
 <img alt="" src="../../migrated/post-images/20260121222020.png"/>
@@ -2097,10 +2102,10 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <img alt="" src="../../migrated/post-images/20260121222214.png"/>
 <img alt="" src="../../migrated/post-images/20260121225021.png"/>
 <img alt="" src="../../migrated/post-images/20260122160844.png"/></p>
-<h3 id="_21">举例</h3>
+<h3 id="举例_3">举例</h3>
 <p><img alt="" src="../../migrated/post-images/20260121220346.png"/>
 主要是介绍一下vector，作为数组的替代。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2121,7 +2126,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260121220725.png"/>
 坑：变量名最好别叫 <code>i, j, k</code> ，不然你写个 <code>for</code> 循环铁定出问题。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2149,7 +2154,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <p><img alt="" src="../../migrated/post-images/20260121222300.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20260121222317.png"/>
 以下是按Uva673原题写的，只有小括号和中括号，没有大括号。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stack&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
@@ -2192,7 +2197,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260121223915.png"/>
 “越早写下的括号，离可能产生匹配的地方越远，越晚得到匹配。先进后出。”</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stack&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2222,7 +2227,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260121225031.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20260121225040.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2250,11 +2255,11 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p>链表是这样的一个遍历接口：
 即用一个初始变量 <code>i</code> 和一个指向每个元素下一个的数组 <code>Next</code> 即可组织链表。</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Next</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Next</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 <span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"%d "</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260122144025.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 注意, pre, nxt和tot都是"指针", 只有key是值</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 注意, pre, nxt和tot都是"指针", 只有key是值</span>
 <span class="c1">// 这写法还挺好</span>
 <span class="c1">// 本写法不包括index数组, 所以每次由值找到指针是O(n)的, 优化见下一题</span>
 
@@ -2316,7 +2321,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <p><img alt="" src="../../migrated/post-images/20260122123625.png"/>
 前后插、维护index数组都很平常，
 但是易错的是初始化。注意要初始化置空的前提是存在无参的构造函数。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -2390,7 +2395,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <p>当然，除了手写，我们也可以使用STL的<code>&lt;list&gt;</code>来实现。
 <code>index</code>数组同样需要自己维护：
 每次新增元素时，<code>index[i] = prev(lst.end());</code>。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;list&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2455,7 +2460,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 空初始化、利用数组初始化，
 大小、迭代器it、头插尾插、在it前插、头删尾删、删除it及元素（注意备份）、遍历。
 这里很好的是可以练一练迭代器指针。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;list&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2486,7 +2491,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260122163942.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">ans</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">ans</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="kt">void</span><span class="w"> </span><span class="nf">play</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// 把函数逻辑的调用放入循环里, 一开始只是处理stk的初始放入</span>
 <span class="w">    </span><span class="n">stack</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">stk</span><span class="p">;</span><span class="w"> </span><span class="c1">// 栈用于负责"函数调用的控制流".</span>
@@ -2507,7 +2512,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p>让GPT生成了一个简单对拍验证一下，当然结果是正确的。
 <img alt="" src="../../migrated/post-images/20260122164847.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stack&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -2561,12 +2566,12 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="13" data-title="二叉树专题"><h2 id="_22">二叉树专题</h2>
+</div><div class="post-chapter" data-ch="13" data-title="二叉树专题"><h2 id="二叉树专题">二叉树专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260122182400.png"/>
 <img alt="" src="../../migrated/post-images/20260122182845.png"/>
 上图n=3，有8个国家参加，需要3轮比赛，高度为4。
 下述知识包括完全二叉树的填表：<strong>如果叶子节点数量有 <span class="arithmatex">\(2^n\)</span> 个，则叶子节点从 <span class="arithmatex">\(2^n\)</span> 开始。</strong></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -2601,7 +2606,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260122205202.png"/>
 这是使用之前的孩子-双亲表示法的开法。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2627,7 +2632,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <span class="p">}</span>
 </code></pre></div>
 <p>也可以使用结构体充当链表。另外这道题实际范围开到 <code>2e5</code> 就能过。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2656,7 +2661,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <p>前中后序遍历：本质上是dfs时，visit在函数调用的前、中、后。
 <img alt="" src="../../migrated/post-images/20260122211916.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20260122211940.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// eg. 前序: [1] 2 3 4 5  6  7</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// eg. 前序: [1] 2 3 4 5  6  7</span>
 <span class="c1">//     中序:  4  3 5 2 6 [1] 7</span>
 <span class="c1">// 递归处理字符串序列即可</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
@@ -2692,7 +2697,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260122213623.png"/>
 value: 值，size: 子树的节点个数，num: 该节点权值出现的次数（允许输入数据重复）。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#define MAXN 100010</span>
 
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2873,7 +2878,7 @@ value: 值，size: 子树的节点个数，num: 该节点权值出现的次数�
 而对于特定节点到节点 <code>i</code> 的贡献，只与两个参数有关：距离 <code>d</code> 和人数 <code>t[x]</code> 。
 因此，对和的贡献函数即是 <code>cal(int x, int d)</code> ，到节点 <code>i</code> 的和就是把所有的 <code>cal</code> 和 <code>x</code> 本身的贡献加起来，可以通过深度优先遍历实现。而对于节点 <code>i</code> 的总和其实就是 <code>cal(i, 0)</code> ，这会从节点 <code>i</code> 向外扩散求得总和。
 而题目等价于在所有可能修成医院的节点中找和最小的。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -2915,7 +2920,7 @@ value: 值，size: 子树的节点个数，num: 该节点权值出现的次数�
 在知道前序后序的情况下有不同的中序遍历，当且仅当这个节点只有一个儿子，于是可以将问题转化为找只有一个儿子的节点个数。
 如果在前序中出现AB、后序中出现BA，则这个节点一定只有一个儿子（因为前序后序只有根的位置不同，而且AB和BA当中必有一个是根），于是只要比较前序和后序序列，找满足AB和BA的个数即可。
 假设有x个节点只有一个儿子，则它可能是左儿子或右儿子，也就是说共计有 <span class="arithmatex">\(2^x\)</span> 种情况。于是答案是 <span class="arithmatex">\(2^x\)</span> 种可能的二叉树，对应 <span class="arithmatex">\(2^x\)</span> 种可能的中序遍历序列。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100010</span><span class="p">;</span>
@@ -2937,22 +2942,22 @@ value: 值，size: 子树的节点个数，num: 该节点权值出现的次数�
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="14" data-title="集合专题"><h2 id="_23">集合专题</h2>
-<h3 id="_24">知识</h3>
+</div><div class="post-chapter" data-ch="14" data-title="集合专题"><h2 id="集合专题">集合专题</h2>
+<h3 id="知识_4">知识</h3>
 <p><img alt="" src="../../migrated/post-images/20260124205529.png"/>
 <img alt="" src="../../migrated/post-images/20260124211151.png"/></p>
-<h3 id="_25">举例</h3>
+<h3 id="举例_4">举例</h3>
 <p>并查集仅仅只是一个 <code>fa</code> 数组和两个函数。
 其中最关键的是：<strong>路径压缩</strong>。（查询降低至 <span class="arithmatex">\(O(\log n)\)</span> ）
 即<code>find</code>除了找到根，还要把一路上每一个节点的<code>fa</code>都设成根。</p>
 <p><img alt="" src="../../migrated/post-images/20260123205939.png"/>
 路径压缩的两种写法：</p>
-<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">fa</span><span class="p">[</span><span class="n">x</span><span class="p">])</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">fa</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find</span><span class="p">(</span><span class="n">fa</span><span class="p">[</span><span class="n">x</span><span class="p">]);</span><span class="w">  </span><span class="c1">// 递归+路径压缩</span>
 <span class="p">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
@@ -3003,7 +3008,7 @@ value: 值，size: 子树的节点个数，num: 该节点权值出现的次数�
 相当于已有 <code>w</code> 个连通分支，将它们合并为 <code>1</code> 个连通分支需要多少次合并。
 即答案为 <code>w-1</code> 个。
 对于连通分支，方法是在合并的同时，记录有多少个代表元。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 这里是例17-2, 而P1536由于测试用例格式略有区别, 见下</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 这里是例17-2, 而P1536由于测试用例格式略有区别, 见下</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -3058,7 +3063,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 0
 </code></pre></div>
 <p>则修改为以下代码：</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// P1536</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// P1536</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
@@ -3103,7 +3108,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <img alt="" src="../../migrated/post-images/20260123213719.png"/>
 可以取一个模数，例如 <code>23333</code> 。（有趣的是，这个数以及 <code>3</code> 更少的都恰好是质数，但 <code>233333</code> 却不是）
 以下是一个拉链法哈希的实现方式。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="cp">#define mod 23333</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -3128,7 +3133,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <span class="p">}</span>
 </code></pre></div>
 <p>当然，也可以直接使用集合 <code>&lt;set&gt;</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;set&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
@@ -3147,7 +3152,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 这里的知识重点是怎么把字符串转成哈希。
 对于字符串哈希，在模数mod（23333）的基础上还引入了基数base（261）。</p>
 <p><img alt="" src="../../migrated/post-images/20260123215548.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="cp">#define MAXN 1510</span>
@@ -3185,7 +3190,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <span class="p">}</span>
 </code></pre></div>
 <p>当然，<del>如果不想好好练习哈希，</del> 也可以使用 <code>&lt;set&gt;</code> 实现。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;set&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -3206,7 +3211,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 只用到前两个字母。
 相当于统计 <code>&lt;ai, bi&gt; == &lt;aj, bj&gt;</code> 的数量。
 方法是把 <code>&lt;ai, bi&gt;</code> 哈希到一个字符串，例如 <code>MIFL</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// x -&gt; (哈希) -&gt; x % mod -&gt; (数组) -&gt; linker[x % mod]</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// x -&gt; (哈希) -&gt; x % mod -&gt; (数组) -&gt; linker[x % mod]</span>
 
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
@@ -3260,7 +3265,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 这一块的迭代器真的很微妙：<code>begin()</code> 是闭的，而 <code>end()</code> 是开的，
 导致你可以直接对 <code>begin()</code> 解引用、而 <code>end()</code> 不行，
 除此之外当然不能对 <code>begin()</code> 进行 <code>--</code> ，也不能对 <code>end()</code> 进行 <code>++</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;set&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ds</span><span class="p">;</span>
@@ -3300,7 +3305,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260124211135.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;map&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
@@ -3341,7 +3346,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260124212532.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unordered_map&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -3364,7 +3369,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="15" data-title="图专题"><h2 id="_26">图专题</h2>
+</div><div class="post-chapter" data-ch="15" data-title="图专题"><h2 id="图专题">图专题</h2>
 <p>在图里面，要干的事情是三件：
 找到所有顶点，<strong>找到一个顶点有直接连接的每一个点，以及那条边的长度</strong>。
 我愿称其为图的三件事：所有顶点，顶点邻接点，顶点邻接边。</p>
@@ -3374,7 +3379,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <img alt="" src="../../migrated/post-images/20260126202017.png"/>
 接下来干一下图的三件事：所有顶点，顶点邻接点，顶点邻接边。</p>
 <p><strong>邻接矩阵 数据结构定义：<code>v[i][j]</code>是从点 <code>i</code> 到点 <code>j</code> 的边权。</strong></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1010</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
@@ -3408,7 +3413,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <p>可以简单理解：<code>p[x]</code> 是 <code>x</code> 的所有邻居组成的数组，我们要通过下标 <code>i</code> 遍历这个数组，所以是 <code>for i : p[x]</code>。</p>
 </blockquote>
 <p><img alt="" src="../../migrated/post-images/20260126202709.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1010</span><span class="p">;</span>
@@ -3435,7 +3440,7 @@ dfs：先设置vis，后调用dfs实现相应逻辑。
 bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标记</strong>。
 而打印是通过取出队列元素实现bfs顺序，所以<strong>对节点的操作要写在循环体以内</strong>。</p>
 <p>下述是P5318，多了一个条件：如果终点相同、需要按照入点排序。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
@@ -3513,7 +3518,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <img alt="" src="../../migrated/post-images/20260127132408.png"/>
 要处理“遍历顺序”。
 优先更新高编号、然后是低编号：“倒着找”。所以是反向边。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100010</span><span class="p">;</span>
@@ -3556,7 +3561,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 计算所有任务完成的最短时间，
 转化为找DAG的一条最长链。</p>
 <p>因为需要“倒着找”，还是建反向边。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">MAXN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10010</span><span class="p">;</span>
@@ -3601,7 +3606,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <p>对于该题目，首先把所有极大值点的 <code>f</code> 值置为1。
 对于每个中间点，它的 <code>f</code> 值等于所有指向它的点的 <code>f</code> 值之和。
 因此只需要拓扑排序遍历所有点（初始点为所有极大值点），并填充 <code>f</code> ，最后遍历所有极小值点得到链的个数即可。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;queue&gt;</span>
@@ -3650,8 +3655,8 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h1 id="_27">基础数学与数论</h1>
-</div><div class="post-chapter" data-ch="16" data-title="位运算与进制转换专题"><h2 id="_28">位运算与进制转换专题</h2>
+<h1 id="基础数学与数论">基础数学与数论</h1>
+</div><div class="post-chapter" data-ch="16" data-title="位运算与进制转换专题"><h2 id="位运算与进制转换专题">位运算与进制转换专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260127213257.png"/>
 先转到10进制，然后从十进制转到该进制。</p>
 <blockquote>
@@ -3659,7 +3664,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 </blockquote>
 <p>n进制转10进制：从左往右“扫描”，将已经有的数字乘以进制（如16）（或者理解为“左移”），新扫描到的数字作为offset加入。
 10进制转n进制：从右往左“添加”，将已经有的数字取出offset（如16），然后剩下的数字除以进制（或者理解为“右移”），得到逆序。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
@@ -3701,13 +3706,13 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="17" data-title="计数原理与排列组合专题"><h2 id="_29">计数原理与排列组合专题</h2>
+</div><div class="post-chapter" data-ch="17" data-title="计数原理与排列组合专题"><h2 id="计数原理与排列组合专题">计数原理与排列组合专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260127215600.png"/>
 <img alt="" src="../../migrated/post-images/20260127220353.png"/>
 选择最局限的兔子要先选，是因为如果其他兔子先选，可能出现选择最局限的兔子无牌可选的情况，该情况无解，使得相关的计算变复杂。
 而如果我们让选择最局限的兔子先选时，构造出的一定是可行解。
 更严格的数学证明讨论个人不是很明确，欢迎感兴趣的朋友在评论区交流。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="cp">#define MOD 1000000007</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
@@ -3727,7 +3732,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260127215619.png"/></p>
 <p>打组合数表。方法是借助递推： <span class="arithmatex">\(C_n^m=C_{n-1}^{m-1}+C_{n-1}^m\)</span> ， <span class="arithmatex">\(C_i^0=1\)</span> 。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">25</span><span class="p">][</span><span class="mi">25</span><span class="p">];</span>
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -3758,7 +3763,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 在杨辉三角打表的同时，对 <span class="arithmatex">\(k\)</span> 取模。
 <img alt="" src="../../migrated/post-images/20260127221517.png"/>
 <img alt="" src="../../migrated/post-images/20260127221550.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="mi">2010</span><span class="p">][</span><span class="mi">2010</span><span class="p">];</span>
@@ -3784,17 +3789,17 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-</div><div class="post-chapter" data-ch="18" data-title="整除理论专题"><h2 id="_30">整除理论专题</h2>
-<h3 id="_31">知识</h3>
+</div><div class="post-chapter" data-ch="18" data-title="整除理论专题"><h2 id="整除理论专题">整除理论专题</h2>
+<h3 id="知识_5">知识</h3>
 <p><span class="arithmatex">\(a_1\)</span> 和 <span class="arithmatex">\(a_2\)</span> 的最大公约数记为 <span class="arithmatex">\((a_1,a_2)\)</span> ，最小公倍数记为 <span class="arithmatex">\([a_1,a_2]\)</span> 。
 <img alt="" src="../../migrated/post-images/20260127232119.png"/>
 <img alt="" src="../../migrated/post-images/20260127233229.png"/>
 <img alt="" src="../../migrated/post-images/20260127233247.png"/></p>
-<h3 id="_32">举例</h3>
+<h3 id="举例_5">举例</h3>
 <p>添加了新的工具：枚举<strong>约数</strong>。
 方法是从 <span class="arithmatex">\(1\)</span> 枚举到 <span class="arithmatex">\(\sqrt{n}\)</span> 。
 <img alt="" src="../../migrated/post-images/20260127222207.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">find_divisors</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
@@ -3829,7 +3834,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 如果枚举每对数， <span class="arithmatex">\(O(n^2)\)</span> 。
 如果枚举约数，找每个数的约数是 <span class="arithmatex">\(O(\sqrt A)\)</span> 的（<span class="arithmatex">\(A\)</span> 代表数组 <span class="arithmatex">\(a\)</span> 中所有数中约数最多的数），在找的同时对每个数是否存在进行确认是 <span class="arithmatex">\(O(1)\)</span> 的（哈希），总共 <span class="arithmatex">\(n\)</span> 个数，所以是 <span class="arithmatex">\(O(n\sqrt{A})\)</span> 。
 如果枚举倍数，每个数出现的次数相当于它对每个倍数做的贡献。事实上，是 <span class="arithmatex">\(O(n \log n)\)</span> 的，因为外层循环的变量大小会影响内层循环的步长，使得时间复杂度为 <span class="arithmatex">\(O(\sum^n_{i=1} \frac{n}{i})=O(n \log n)\)</span>。</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="cp">#define MAXN 1000010</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">MAXN</span><span class="p">],</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="n">MAXN</span><span class="p">],</span><span class="w"> </span><span class="n">w</span><span class="p">[</span><span class="n">MAXN</span><span class="p">];</span><span class="w"> </span><span class="c1">// 数列中的数字, 数字计数, 计算贡献</span>
@@ -3853,7 +3858,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260127224141.png"/>
 先通过线性筛（埃氏筛）打素数表，然后对输入的数查表。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 这是书上通过Yes或No判断某个数是否为素数的代码</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 这是书上通过Yes或No判断某个数是否为素数的代码</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="cp">#define MAXN 10000010</span>
@@ -3886,7 +3891,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <p>对于P3383，已更新为查第k小的素数。
 变式很简单，在打表的同时，用另外一个数组存下第k小的素数。
 注意大小增大到了 <span class="arithmatex">\(10^8\)</span> 。下述两个数组经过O2优化之后，实际开下来大概110M，在题目限制的512M范围内。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 这是P3383</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="c1">// 这是P3383</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="cp">#define MAXN 100000010</span>
@@ -3915,7 +3920,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260127225805.png"/>
 <img alt="" src="../../migrated/post-images/20260127230027.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstring&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="c1">// max在algorithm</span>
@@ -3974,7 +3979,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <p><img alt="" src="../../migrated/post-images/20260127232453.png"/>
 <img alt="" src="../../migrated/post-images/20260127232752.png"/>
 <img alt="" src="../../migrated/post-images/20260127232758.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="nf">gcd</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">gcd</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
@@ -3995,7 +4000,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260127232809.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdio&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="kt">int</span><span class="w"> </span><span class="nf">gcd</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">gcd</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
@@ -4023,7 +4028,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260127233324.png"/></p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;bits/stdc++.h&gt;</span>
+<div class="highlight"><pre data-lang="cpp"><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;bits/stdc++.h&gt;</span>
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="p">;</span>
 <span class="cp">#define MAXN 10010</span>
 <span class="kt">int</span><span class="w"> </span><span class="n">m1</span><span class="p">,</span><span class="w"> </span><span class="n">m2</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">pri</span><span class="p">[</span><span class="n">MAXN</span><span class="p">],</span><span class="w"> </span><span class="n">tot</span><span class="p">[</span><span class="n">MAXN</span><span class="p">],</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">MAXN</span><span class="p">];</span>
@@ -4125,6 +4130,8 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -4140,6 +4147,8 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -4164,6 +4173,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS336 · Assignment 1 · 后半段：实验</h1>
     <div class="post-meta">
       <time datetime="2026-03-10T00:00:00">2026-03-10</time>
+      <span class="post-stats">2654 字 · 约 6 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS336">#CS336</a>
       
@@ -210,7 +215,7 @@ DataLoader把它变成batch流，
 <li>看到 <code>x₂, x₃</code>，预测 <code>x₄</code></li>
 <li>看到 <code>x₂, x₃, x₄</code>，预测 <code>x₅</code></li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_batch</span><span class="p">(</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_batch</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">context_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -262,7 +267,7 @@ learning rate, learning rate warmup, other AdamW hyperparameters (β1, β2, ϵ),
 使用更大的数据集，训练语言模型。</p>
 <p>7.5 Your own modification + leaderboard
 提供了一些其他的工程实践参考（比如权重共享），以及打榜。</p>
-<h3 id="_1">第一次实验</h3>
+<h3 id="第一次实验">第一次实验</h3>
 <blockquote>
 <p>我当前做了什么？</p>
 </blockquote>
@@ -387,16 +392,16 @@ Checkpoints:
 </code></pre></div>
 <p>再看看图表，发现loss按照幂律（Scaling Law）下降得很健康，lr也是很合理的cosine，先快后慢半个周期。
 我在5090的分词器训练大约11分钟，不包含分词器在内模型训练大约运行了22分钟，整体符合文档中30-40分钟的预期。</p>
-<h3 id="_2">更多次实验</h3>
+<h3 id="更多次实验">更多次实验</h3>
 <p>白天的目标是给minitorch改造出一套pytorch+transformers的运行脚本，现代一点，训练。
 继续，cs336的各参数的sweep。</p>
 <h4 id="sweep-learning-rate">sweep: learning rate</h4>
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>scripts/lr_sweep.sh<span class="w"> </span>--use-wandb<span class="w"> </span>--train-data<span class="w"> </span>data/tinystories_train.bin<span class="w"> </span>--val-data<span class="w"> </span>data/tinystories_val.bin
+<div class="highlight"><pre data-lang="bash"><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>scripts/lr_sweep.sh<span class="w"> </span>--use-wandb<span class="w"> </span>--train-data<span class="w"> </span>data/tinystories_train.bin<span class="w"> </span>--val-data<span class="w"> </span>data/tinystories_val.bin
 </code></pre></div>
 <p>实际训练花了两个小时（每次20分钟）。图像真的很漂亮。</p>
 <p>普遍来说，learning rate偏大时，loss会下降得快一些，绝对数值也会更小。</p>
 <h4 id="sweep-batch-size">sweep: batch size</h4>
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>scripts/batch_sweep.sh<span class="w"> </span>--use-wandb<span class="w"> </span>--train-data<span class="w"> </span>data/tinystories_train.bin<span class="w"> </span>--val-data<span class="w"> </span>data/tinystories_val.bin<span class="w"> </span>--batch-sizes<span class="w"> </span><span class="m">128</span>,64,32,16,8,1
+<div class="highlight"><pre data-lang="bash"><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>scripts/batch_sweep.sh<span class="w"> </span>--use-wandb<span class="w"> </span>--train-data<span class="w"> </span>data/tinystories_train.bin<span class="w"> </span>--val-data<span class="w"> </span>data/tinystories_val.bin<span class="w"> </span>--batch-sizes<span class="w"> </span><span class="m">128</span>,64,32,16,8,1
 </code></pre></div>
 <p>在经历了bs=1存了过多的中间态checkpoint、爆了硬盘之后，痛定思痛添加了一个只保留最近三个以及最好的checkpoint的功能，并且强化了断点续训。</p>
 <p>我发现，对于bs=1这样太小的情况下， <code>tok/s</code> 会很小（大约1.5w tok/s左右？），只有在bs足够大（如64、128）时才能充分提升 <code>tok/s</code> （稳定在26w tok/s）。因此，如果要训练更快一些，似乎应该在支持的情况下充分扩大batch size。</p>
@@ -453,6 +458,8 @@ bs较大时瓶颈在GPU的算力。</p>
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -468,6 +475,8 @@ bs较大时瓶颈在GPU的算力。</p>
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -490,6 +499,7 @@ bs较大时瓶颈在GPU的算力。</p>
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

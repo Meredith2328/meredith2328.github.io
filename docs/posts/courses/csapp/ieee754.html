@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">IEEE754 浮点数与十进制数互相转换流程及例子</h1>
     <div class="post-meta">
       <time datetime="2025-06-17T00:00:00">2025-06-17</time>
+      <span class="post-stats">3407 字 · 约 8 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -113,7 +118,7 @@
 <p>edit time: 2025-06-17 01:43:17<br/>ps. 以下所有例子里的s都取0，即我们考虑的是正数和正0的浮点表示。<br/>s取1就是给正数前面添个负号。<br/>以下未引入由于精度带来舍入问题的例子。</p>
 </blockquote>
 <p><img alt="" src="../../migrated/post-images/20250617014314.png"/></p>
-<h2 id="_1">十进制数转浮点数、浮点数转十进制数步骤</h2>
+<h2 id="十进制数转浮点数-浮点数转十进制数步骤">十进制数转浮点数、浮点数转十进制数步骤</h2>
 <p><strong>十进制数转浮点数步骤：</strong></p>
 <ol>
 <li>十进制转二进制，如<span class="arithmatex">\(10.001_{2}\)</span>。</li>
@@ -124,7 +129,7 @@
 根据exp判断为规格化、非规格化、无穷大、NaN中的哪一种，
 如果为规格化和非规格化，则将exp和frac按照对应规则转化为E和M，
 进而得到表示的数 <span class="arithmatex">\(V=(-1)^s \times M \times 2^E\)</span>。</p>
-<h2 id="_2">规格化和非规格化判断</h2>
+<h2 id="规格化和非规格化判断">规格化和非规格化判断</h2>
 <blockquote>
 <p>省流：看要表示的数的二进制科学计数法的指数是否在规格化可提供的E范围内。</p>
 </blockquote>
@@ -145,7 +150,7 @@ ps. 可以记住：右边的frac从000到111对应的数逐渐增大，从而推
 <strong>要表示的数的二进制科学计数法的指数在规格化能提供的<span class="arithmatex">\([-6, 7]\)</span>范围内，就一律为规格化数。</strong>
 <strong>如果指数小于-6，则为非规格化数。</strong>
 <strong>如果指数大于7，则为无穷大。</strong></p>
-<h2 id="me">M和E是多少</h2>
+<h2 id="m和e是多少">M和E是多少</h2>
 <blockquote>
 <p>省流：<br/>根据判断出的是规格化还是非规格化，<br/>把二进制的科学计数法表示的小数部分和指数部分套进对应的规则。</p>
 </blockquote>
@@ -177,7 +182,7 @@ frac是往后补0，比如<span class="arithmatex">\(01_2\)</span>补0变成<spa
 <p>备注. “指数实在太小”是多小？
 最小的非规格化数，上例即0 0000 001，此时E=1-7=-6，M=<span class="arithmatex">\(0.001_2=2^{-3}\)</span>，这个数是<span class="arithmatex">\(2^{-9}\)</span>。
 如果再小一些、且不能舍入到最小的非规格化数，就只能舍入到0 0000 000即0了。</p>
-<h2 id="_3">例题</h2>
+<h2 id="例题">例题</h2>
 <p>以下例子不小心只有规格化和NaN，非规格化、指数太大、指数太小再找点例子练练。</p>
 <blockquote>
 <p>例题1：十进制转换为浮点表示。将0.625转换为浮点数表示，s, exp, frac分别为1, 4, 3位。</p>
@@ -272,6 +277,8 @@ ps. 建议从上表格任选位表示和十进制，练习从十进制推位表�
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -287,6 +294,8 @@ ps. 建议从上表格任选位表示和十进制，练习从十进制推位表�
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -309,6 +318,7 @@ ps. 建议从上表格任选位表示和十进制，练习从十进制推位表�
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

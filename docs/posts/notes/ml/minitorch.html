@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">MiniTorch尝试复现了PyTorch的许多API</h1>
     <div class="post-meta">
       <time datetime="2026-01-05T00:00:00">2026-01-05</time>
+      <span class="post-stats">24318 字 · 约 55 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0">#机器学习</a>
       
@@ -110,7 +115,7 @@
 <p>项目仓库：<a href="https://github.com/minitorch/minitorch">minitorch/minitorch: The full minitorch student suite.</a></p>
 <p>我的实现：<a href="https://github.com/Meredith2328/minitorch">Meredith2328/minitorch: The full minitorch student suite.</a></p>
 <p>另外推荐参考这个，写得比我多得多：<a href="https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf">MiniTorch-学习全攻略.pdf</a></p>
-</div><div class="post-chapter" data-ch="2" data-title="项目整体介绍"><h2 id="_1">项目整体介绍</h2>
+</div><div class="post-chapter" data-ch="2" data-title="项目整体介绍"><h2 id="项目整体介绍">项目整体介绍</h2>
 <p>MiniTorch是一个基于Python基础语法或Numpy，并进一步使用Numba和CUDA对矩阵运算进行优化，以实现符合PyTorch接口的一个简易版PyTorch的项目。
 原项目来自于康奈尔大学由Sasha Rush老师教授的机器学习系统课程 <a href="https://minitorch.github.io/">MiniTorch</a> 。</p>
 <p>目录：</p>
@@ -121,7 +126,7 @@
 <li>Efficiency</li>
 <li>Network</li>
 </ul>
-</div><div class="post-chapter" data-ch="3" data-title="安装环境"><h2 id="_2">安装环境</h2>
+</div><div class="post-chapter" data-ch="3" data-title="安装环境"><h2 id="安装环境">安装环境</h2>
 <p><img alt="" src="../../migrated/post-images/20250702081943.png"/></p>
 <p>将以下内容保存为requirements.txt并替换原始项目使用的requirements.txt和requirements.txt.extra：</p>
 <div class="highlight"><pre><span></span><code>backports.tarfile==1.2.0
@@ -164,7 +169,7 @@ pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu12
 </code></pre></div>
 </div><div class="post-chapter" data-ch="4" data-title="Fundamentals"><h2 id="fundamentals">Fundamentals</h2>
 <p>Fundamentals：torch的算子<code>Operator</code>，模块<code>Module</code>等。</p>
-<h3 id="_3">整体概念</h3>
+<h3 id="整体概念">整体概念</h3>
 <blockquote>
 <p>我们在什么抽象层级下，使用什么工具，做成了什么事情？</p>
 </blockquote>
@@ -183,7 +188,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 概念上这里的数据点 <code>X.shape = (N, 2)</code> ，画在图像上即是xOy平面的一些数据。绘制时，x的范围为0~1，y的范围为0或1。</p>
 <p>Task 0.5: Visualization
 之前的数据集是直接随机设置的，现在需要用PyTorch实现网络和数据集。<code>run_torch.py</code> 提供最小的网络和训练循环实现。</p>
-<h3 id="_4">实现细节</h3>
+<h3 id="实现细节">实现细节</h3>
 <ol>
 <li>
 <p>注意true置为1.0，false置为0.0。</p>
@@ -195,7 +200,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 </blockquote>
 </li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> 
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> 
 <span class="o">-&gt;</span> <span class="n">CallableIterable</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 </code></pre></div>
 <p>解读为：
@@ -223,7 +228,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 而对于稍微复杂一些的网络，像CNN、RNN之类的，则需要采用Kaiming和Xavier等初始化方法。</p>
 </li>
 </ol>
-<h3 id="_5">结果</h3>
+<h3 id="结果">结果</h3>
 <p>最终成功跑通：
 <img alt="" src="../../migrated/post-images/20250702170517.png"/>
 看起来streamlit是一个类似于tensorflow playground的可视化模块。</p>
@@ -257,7 +262,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 <p>Mathematically we can think of the transformed data as values h1,h2 which we get from applying separators with different parameters to the original data. <br/>The final prediction then applies a separator to h1,h2.<br/><img alt="" src="../../migrated/post-images/20250702174343.png"/></p>
 </blockquote>
 </div><div class="post-chapter" data-ch="6" data-title="AutoDiff"><h2 id="autodiff">AutoDiff</h2>
-<h3 id="_6">整体概念</h3>
+<h3 id="整体概念_1">整体概念</h3>
 <blockquote>
 <p>edit time: 2026-03-02 18:21:05</p>
 </blockquote>
@@ -308,7 +313,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 ScalarHistory(last_fn=&lt;class 'minitorch.scalar_functions.Add'&gt;, ctx=Context(no_grad=False, saved_values=()), inputs=[Scalar(10.000000), Scalar(20.000000)])
 </code></pre></div>
 <p>所以这里的思想同样是通过每一步多记录信息（包括将数值和计算函数进行包装），为我们整体求导提供方便。</p>
-<h4 id="_7">类方法、工厂方法知识</h4>
+<h4 id="类方法-工厂方法知识">类方法、工厂方法知识</h4>
 <blockquote>
 <p>modern python语法：<strong>类方法</strong></p>
 </blockquote>
@@ -318,7 +323,7 @@ ScalarHistory(last_fn=&lt;class 'minitorch.scalar_functions.Add'&gt;, ctx=Contex
 <li>类方法：使用 <em>@classmethod</em> 装饰器定义，第一个参数必须是 <em>cls</em>，用于访问类变量和其他类方法。</li>
 <li>静态方法：使用 <em>@staticmethod</em> 装饰器定义，不需要 <em>self</em> 或 <em>cls</em> 参数，不能访问类变量。</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
     <span class="n">class_variable</span> <span class="o">=</span> <span class="s2">"I am a class variable"</span>
 
     <span class="nd">@staticmethod</span>
@@ -339,7 +344,7 @@ cls是具体的类，所有类都需要在调用自身实现的forward的同时�
 <p>定义一个工厂类（<code>ScalarFunction</code>），它可以根据参数的不同返回不同类的实例（apply类方法），被创建的实例通常都具有共同的父类（Scalar），这正是<em>简单工厂模式</em>。
 （重复一遍，简单工厂模式根据不同传入参数创建不同实例。）
 而将实例创建的具体逻辑不统一在工厂类、而是交予专门的工厂子类完成（如Add等），这正是更进一步的<strong>工厂方法模式</strong>。工厂类只要简单地调用工厂子类变量<code>cls</code>即可。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScalarFunction</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScalarFunction</span><span class="p">:</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_backward</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">d_out</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
@@ -358,12 +363,12 @@ cls是具体的类，所有类都需要在调用自身实现的forward的同时�
         <span class="c1"># 这样的话forward只用写具体逻辑了</span>
         <span class="n">c</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">*</span><span class="n">raw_vals</span><span class="p">)</span>
 </code></pre></div>
-<h4 id="protocol">Protocol知识</h4>
+<h4 id="protocol知识">Protocol知识</h4>
 <blockquote>
 <p>edit time: 2026-03-02 16:48:31</p>
 </blockquote>
 <p>在autodiff.py中有这样一个地方引起了我的注意：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">Variable</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">accumulate_derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -427,11 +432,11 @@ cls是具体的类，所有类都需要在调用自身实现的forward的同时�
 </tr>
 </tbody>
 </table>
-<h4 id="_8">其他实现细节</h4>
+<h4 id="其他实现细节">其他实现细节</h4>
 <ol>
 <li>debug</li>
 </ol>
-<div class="highlight"><pre><span></span><code>        <span class="n">c</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">*</span><span class="n">raw_vals</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>        <span class="n">c</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">*</span><span class="n">raw_vals</span><span class="p">)</span>
 <span class="o">&gt;</span>       <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s2">"Expected return type float got </span><span class="si">%s</span><span class="s2">"</span> <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
 <span class="n">E</span>       <span class="ne">AssertionError</span><span class="p">:</span> <span class="n">Expected</span> <span class="k">return</span> <span class="nb">type</span> <span class="nb">float</span> <span class="n">got</span> <span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="err">'</span><span class="nc">int</span><span class="s1">'&gt;</span>
 <span class="n">E</span>       <span class="n">Falsifying</span> <span class="n">example</span><span class="p">:</span> <span class="n">test_one_args</span><span class="p">(</span>
@@ -444,7 +449,7 @@ cls是具体的类，所有类都需要在调用自身实现的forward的同时�
 <p>思考：为什么c是int，为什么_forward返回了一个int。追踪！
 通过给Neg加print打印类型检错，发现传入int之后加neg还是int。
 在operator里加了个强制转换，解决了问题。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="c1"># print('type of a here is ', type(a))</span>
     <span class="c1"># print('type of neg(a) here is ', type(operators.neg(a)))</span>
     <span class="k">return</span> <span class="n">operators</span><span class="o">.</span><span class="n">neg</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># 这里需要强制加个转换, 好奇怪</span>
@@ -452,7 +457,7 @@ cls是具体的类，所有类都需要在调用自身实现的forward的同时�
 <div class="highlight"><pre><span></span><code>type of a here is  &lt;class 'int'&gt;
 type of neg(a) here is  &lt;class 'int'&gt;
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">neg</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">neg</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="s2">"$f(x) = -x$"</span>
     <span class="k">return</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre></div>
@@ -539,7 +544,7 @@ x = torch.tensor(2.0, requires_grad=True)
 optimizer.zero_grad()  # 或 x.grad.zero_()
 </code></pre></div>
 <h3 id="chain-rule">Chain Rule</h3>
-<h4 id="_9">整体理解</h4>
+<h4 id="整体理解">整体理解</h4>
 <div class="arithmatex">\[\frac{dz}{dx}=\frac{dz}{dy} \cdot \frac{dy}{dx}\]</div>
 <p>对于函数 <span class="arithmatex">\(y(x, \dots)\)</span> ，
 要求 <span class="arithmatex">\(z\)</span> 对 <span class="arithmatex">\(x\)</span> 的导数，只需要求出当前函数 <span class="arithmatex">\(y\)</span> 对 <span class="arithmatex">\(x\)</span> 的导数，然后把以前计算过的导数乘到前面（例如 <span class="arithmatex">\(z\)</span> 对 <span class="arithmatex">\(y\)</span> ）。这就是链式法则。</p>
@@ -547,9 +552,9 @@ optimizer.zero_grad()  # 或 x.grad.zero_()
 这个方法接受 <code>d_output</code> （“以前计算过的导数”），把它乘到当前函数求得的导数上。
 上述实际上应该是每个函数内部的抽象层级，而不是整体计算图的抽象层级。</p>
 <p>这样的思考解耦并简化了我们对整个反向传播过程的思考：我们只要按照逆拓扑排序顺序，对每个函数执行 <code>backward</code> 、并逐个地对它们的父节点也执行 <code>backward</code> 即可。</p>
-<h4 id="_10">关键代码</h4>
+<h4 id="关键代码">关键代码</h4>
 <p>调用 <code>_backward</code> 对当前函数求导并乘以以前计算过的导数。</p>
-<div class="highlight"><pre><span></span><code>    <span class="k">def</span><span class="w"> </span><span class="nf">chain_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_output</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="k">def</span><span class="w"> </span><span class="nf">chain_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_output</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">'''计算当前函数对所有变量的偏导数, 并将它们与对应变量配对返回。'''</span>
         <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span>
         <span class="k">assert</span> <span class="n">h</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -574,7 +579,7 @@ optimizer.zero_grad()  # 或 x.grad.zero_()
         <span class="n">backpropagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_output</span><span class="p">)</span>
 </code></pre></div>
 <hr/>
-<h4 id="_11">实现细节</h4>
+<h4 id="实现细节_1">实现细节</h4>
 <p>将每个函数理解成一个黑箱操作，输入了上一个黑箱的结果，函数调用层层<strong>嵌套</strong>，
 每次求导就是逆黑箱的过程，输入了上一次逆黑箱的结果，求导结果依次<strong>相乘</strong>。</p>
 <p>每次backward就是每个逆黑箱求导的具体过程，即求导并乘d_output。
@@ -582,7 +587,7 @@ optimizer.zero_grad()  # 或 x.grad.zero_()
 那么backward输出也只有结果对a求导得到的一个值再乘d_output，即d_output / a。
 再例如forward是a+b，两个输入变量a和b，
 那么backward输出是结果对两个变量分别求偏导得到的两个值、每个值乘d_output，即d_output和d_output。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Log</span><span class="p">(</span><span class="n">ScalarFunction</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Log</span><span class="p">(</span><span class="n">ScalarFunction</span><span class="p">):</span>
     <span class="s2">"Log function $f(x) = log(x)$"</span>
 
     <span class="nd">@staticmethod</span>
@@ -600,13 +605,13 @@ optimizer.zero_grad()  # 或 x.grad.zero_()
 <p>那么chain rule就是将层层嵌套得到的最终函数一步步逆黑箱，得到计算结果。
 为了编写chain rule，我们需要每个黑箱的信息。看看history是怎么记录的。
 ps. last_fn其实是当前要计算处理的function的意思，至于为什么叫last后面就知道了</p>
-<div class="highlight"><pre><span></span><code>    <span class="n">last_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">ScalarFunction</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="n">last_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">ScalarFunction</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ctx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Context</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">inputs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Scalar</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
 </code></pre></div>
 <p>scalar实例是由一系列scalarFunction操作得到的。
 在scalarFunction这个黑盒进行apply时将history以以下形式组织：</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Create a new variable from the result with a new history.</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># Create a new variable from the result with a new history.</span>
 <span class="n">back</span> <span class="o">=</span> <span class="n">minitorch</span><span class="o">.</span><span class="n">scalar</span><span class="o">.</span><span class="n">ScalarHistory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">scalars</span><span class="p">)</span>
 <span class="k">return</span> <span class="n">minitorch</span><span class="o">.</span><span class="n">scalar</span><span class="o">.</span><span class="n">Scalar</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">back</span><span class="p">)</span>
 </code></pre></div>
@@ -615,7 +620,7 @@ cls: 当前黑盒是什么scalarFunction
 scalars: 当前黑盒的全部输入变量
 ctx: forward时记录的变量，现在直接传进去用就行，后面应该会提到</p>
 <p>回到scalar定义的chain_rule接口及相关要求。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">chain_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_output</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">chain_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_output</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 </code></pre></div>
 <blockquote>
 <p>Implement the chain_rule function in Scalar for functions of arbitrary arguments. This function should be able to backward process a function by passing it in a context and <span class="arithmatex">\(d\)</span> and then <strong>collecting the local derivatives</strong>.<br/> It should then <strong>pair these with the right variables</strong> and return them.<br/> This function is also where we filter out constants that were used on the forward pass, but do not need derivatives.</p>
@@ -631,7 +636,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 </ol>
 <p>根据测试里的顺序可以看到每个pair的variable在前面、derivative在后面。</p>
 <h3 id="backpropagate">Backpropagate</h3>
-<h4 id="_12">整体理解</h4>
+<h4 id="整体理解_1">整体理解</h4>
 <p>随着计算图的构建，
 一开始的变量（输入变量）作为叶子节点，最终的变量作为树根，形成了一个树结构。
 反向传播就是由最终节点（往往是损失函数）的值，通过链式法则，获得输入变量的导数的过程。我们只需要填入输入变量（如下述 <code>z1</code> ）的导数，而不需要管其他变量（如下述 <code>z2</code>）。</p>
@@ -648,7 +653,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 &gt;&gt;&gt; z3.__dict__
 {'unique_id': 27, 'data': 300.0, 'history': ScalarHistory(last_fn=&lt;class 'minitorch.scalar_functions.Mul'&gt;, ctx=Context(no_grad=False, saved_values=(100.0, 3)), inputs=[Scalar(100.000000), Scalar(3.000000)]), 'derivative': None, 'name': '27'}
 </code></pre></div>
-<h4 id="_13">关键代码</h4>
+<h4 id="关键代码_1">关键代码</h4>
 <p>首先获得正拓扑排序（通过dfs），然后整个逆序就得到了逆拓扑排序。</p>
 <p>以下是“正”拓扑排序的思考：
 符合后序遍历的顺序，即“<strong>一定先处理完所有依赖，才能处理当前节点</strong>”。
@@ -656,7 +661,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 <p>再把它倒过来：
 我们这里不是前序计算结果，而是后序计算梯度，需要从把值（前述“计算过的梯度”）从依赖节点传播向被依赖节点。因此需要在上述“正”拓扑排序的基础上整个倒过来，变成逆拓扑排序。
 这样的话相当于从最终函数开始传播，直到传播到输入变量，谓之“反向传播”是也。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">topological_sort</span><span class="p">(</span><span class="n">variable</span><span class="p">:</span> <span class="n">Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Variable</span><span class="p">]:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">topological_sort</span><span class="p">(</span><span class="n">variable</span><span class="p">:</span> <span class="n">Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Variable</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Computes the topological order of the computation graph.</span>
 
@@ -684,7 +689,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 对于每一个变量，从 <code>deriv_dict</code> 取得当前已积累给这个变量的 <code>d_out</code> ，
 如果已经到输入变量则写入，否则将 <code>d_out</code> 传入并调用该变量的 <code>chain_rule</code> ，以获得信息写入 <code>deriv_dict</code> 。
 叶子节点做积累，中间节点积累别人。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">backpropagate</span><span class="p">(</span><span class="n">variable</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">deriv</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">backpropagate</span><span class="p">(</span><span class="n">variable</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">deriv</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Runs backpropagation on the computation graph in order to</span>
 <span class="sd">    compute derivatives for the leave nodes.</span>
@@ -763,7 +768,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 完结撒花。</p>
 <p><img alt="" src="../../migrated/post-images/20250707232057.png"/></p>
 </div><div class="post-chapter" data-ch="7" data-title="Tensors"><h2 id="tensors">Tensors</h2>
-<h3 id="_14">整体概念</h3>
+<h3 id="整体概念_2">整体概念</h3>
 <blockquote>
 <p>edit time: 2026-03-04 20:34:31</p>
 </blockquote>
@@ -785,7 +790,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 <p>彻底地重新读并整理了一遍tensor_data.py。<br/>edit time: 2026-03-04 16:37:57</p>
 </blockquote>
 <p>TensorData是这样定义的：</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TensorData</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TensorData</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">storage</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Storage</span><span class="p">],</span>
@@ -846,7 +851,7 @@ torch.Size([2, 3])
 </code></pre></div>
 <p>其中 <code>position</code> 是一维数组storage的索引，index是多维数组视角的元组索引，strides则是shape的另一种体现。
 写成循环就是：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">index_to_position</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="n">Index</span><span class="p">,</span> <span class="n">strides</span><span class="p">:</span> <span class="n">Strides</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">index_to_position</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="n">Index</span><span class="p">,</span> <span class="n">strides</span><span class="p">:</span> <span class="n">Strides</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">pos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">strides</span><span class="p">):</span>
         <span class="n">pos</span> <span class="o">+=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">s</span>
@@ -857,7 +862,7 @@ torch.Size([2, 3])
 </blockquote>
 <p>感觉stride是一个非常有用的思考方式，把多维的index映射到了一维的position，而且更大的步长总是位于index左边。
 一开始没看知识讲解，看了之后感觉醍醐灌顶。</p>
-<h4 id="to_indexposition_to_index">to_index（position_to_index）</h4>
+<h4 id="to_index-position_to_index">to_index（position_to_index）</h4>
 <p>在引入广播之后，index和position不再是一一对应。
 引入广播时，我们没有改变低层的position，
 而是创造了多组不同的index可以映射到相同的position。
@@ -874,7 +879,7 @@ torch.Size([2, 3])
 可见，从右往左为 <code>ordinal % shape[-1], ordinal // shape[-1] % shape[-2], ...</code> 
 即把ordinal首先整除shape直到相应index位置，然后取模。</p>
 <p>进而这里的实现就很明晰了：用一个中间变量存储对应当前位的ordinal值，取模得到当前位，然后整除得到下一次迭代的中间变量。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_index</span><span class="p">(</span><span class="n">ordinal</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">out_index</span><span class="p">:</span> <span class="n">OutIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_index</span><span class="p">(</span><span class="n">ordinal</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">out_index</span><span class="p">:</span> <span class="n">OutIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">cur_pos</span> <span class="o">=</span> <span class="n">ordinal</span> <span class="o">+</span> <span class="mi">0</span> <span class="c1"># 为了Module3并行, 不能修改循环变量的trick</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">sh</span> <span class="o">=</span> <span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -882,7 +887,7 @@ torch.Size([2, 3])
         <span class="n">cur_pos</span> <span class="o">=</span> <span class="n">cur_pos</span> <span class="o">//</span> <span class="n">sh</span>
 </code></pre></div>
 <p>不妨读读从shape到stride转换的代码以加深理解：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">strides_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">strides_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">strides</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="o">...</span>     <span class="n">stride</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="o">...</span>     <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
@@ -914,7 +919,7 @@ torch.Size([4, 3, 2])
 <p>在学习了CS336 Assignment 1之后，加入了einops包的可读性例子。<br/>edit time: 2026-03-04 14:46:37</p>
 </blockquote>
 <p><code>x.permute(0, 2, 1)</code> 效果相当于 <code>einops.rearrange</code> 的：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
 <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> 
 <span class="s1">'d0 d1 d2 -&gt; d0 d2 d1'</span>
 <span class="p">)</span>
@@ -925,7 +930,7 @@ torch.Size([4, 3, 2])
 <blockquote>
 <p>相同的逻辑索引（考虑维度映射后）访问相同的元素。</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code>    <span class="k">def</span><span class="w"> </span><span class="nf">permute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorData</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="k">def</span><span class="w"> </span><span class="nf">permute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorData</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TensorData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">,</span> 
         <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">order</span><span class="p">]),</span> 
         <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">strides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">order</span><span class="p">]))</span>
@@ -954,7 +959,7 @@ torch.Size([4, 3, 2])
 <code>big_shape = (2, 3, 4), big_index = (1, 2, 3)</code>
 要转到 <code>shape = (3, 4)</code> ，则把多余那个维度删掉，<code>out_index = (2, 3)</code> 。
 再比如某个维度值为0时，应该把此处的index值置为0。</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_index</span><span class="p">(</span><span class="n">big_index</span><span class="p">,</span> <span class="n">big_shape</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">out_index</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_index</span><span class="p">(</span><span class="n">big_index</span><span class="p">,</span> <span class="n">big_shape</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">out_index</span><span class="p">):</span>
 <span class="o">...</span>     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
 <span class="o">...</span>         <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
 <span class="o">...</span>             <span class="n">out_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">big_index</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">big_shape</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)]</span>
@@ -969,7 +974,7 @@ torch.Size([4, 3, 2])
 <p>这个函数可能一开始会不容易想明白它的写法以及用途。
 其实就是，可能会有多个 <code>big_index</code> ，对应到小的 <code>out_index</code> 。
 思考下面的例子：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">minitorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">broadcast_index</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">minitorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">broadcast_index</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">out_index</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">broadcast_index</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">out_index</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">out_index</span>
@@ -988,7 +993,7 @@ torch.Size([4, 3, 2])
 <p>其实就是从低位到高位逐位取最大值。
 在某个shape用完后，其余的部分直接取更大的剩余部分。</p>
 <p>可以拿以下代码简单单元测试一下。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_shape_broadcast</span><span class="p">():</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_shape_broadcast</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">"""测试广播形状计算"""</span>
     <span class="n">test_cases</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># (shape1, shape2, expected)</span>
@@ -1020,10 +1025,10 @@ torch.Size([4, 3, 2])
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span><span class="si">:</span><span class="s2">12</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="si">:</span><span class="s2">12</span><span class="si">}</span><span class="s2"> = ✓ 正确报错"</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="tensor-operations">Tensor Operations</h3>
-<h4 id="_15">整体结构与设计模式</h4>
+<h4 id="整体结构与设计模式">整体结构与设计模式</h4>
 <p>首先看真实的PyTorch。
 可见，每个自定义函数都继承了 <code>torch.autograd.Function</code> （类比于我们继承的 <code>Function</code> ），在 <code>Function</code> 中提供 <code>apply</code> 方法，取这个函数名就得到了像模块化一样可调用的函数，这个函数的应用就是对一些Tensor执行操作并得到新的Tensor。</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyReLU</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -1062,7 +1067,7 @@ torch.Size([4, 3, 2])
 <p>然后再从设计模式的角度看看 <code>TensorBackend</code> 和 <code>TensorOps</code> 的关系。
 通过跟ai交流我才知道，不同于Java，Python并没有专门的“接口”，而是用Protocol或者ABC做的。
 先看 <code>TensorBackend</code> 。它传入一个 <code>TensorOps</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TensorBackend</span><span class="p">:</span> <span class="c1"># 使用Ops的类</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TensorBackend</span><span class="p">:</span> <span class="c1"># 使用Ops的类</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">TensorOps</span><span class="p">]):</span>
         <span class="c1"># Maps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">neg_map</span> <span class="o">=</span> <span class="n">ops</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">operators</span><span class="o">.</span><span class="n">neg</span><span class="p">)</span>
@@ -1071,8 +1076,8 @@ torch.Size([4, 3, 2])
 <p>这里写了一个典型的“依赖倒置”：外部通过传参、而不是硬编码 <code>TensorOps</code> 的具体实现类，这样的话可以很方便切换不同的 <code>TensorOps</code> 实现。
 画出来其实就是一个抽象类、三个实现和一个使用的关系。</p>
 <p><img alt="" src="../../migrated/post-images/ops_uml.png"/></p>
-<h4 id="tensor_maptensor_zip">tensor_map和tensor_zip</h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tensor_map</span><span class="p">(</span>
+<h4 id="tensor_map和tensor_zip">tensor_map和tensor_zip</h4>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tensor_map</span><span class="p">(</span>
     <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Storage</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Strides</span><span class="p">,</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Strides</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
 
@@ -1095,7 +1100,7 @@ torch.Size([4, 3, 2])
 (1) 对out_shape，我们实际上就是要生成所有可能的index，这个我们熟，之前的 <code>to_index(i, out_shape, out_index)</code> 函数就是在干这个。写个for循环让i从0开始累加一直到out_size就可以了。
 (2) 对某个特定的out_index（大的），我们可以获得in_index（小的），方法正是我们之前写过的 <code>broadcast_index(out_index, out_shape, in_shape, in_index)</code> ！前面两个参数写大的，后面两个写小的。</p>
 <p>整理一下，核心代码实际上就是：</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_size</span><span class="p">):</span> <span class="c1"># 通过for循环生成从 0 到 out_size - 1</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_size</span><span class="p">):</span> <span class="c1"># 通过for循环生成从 0 到 out_size - 1</span>
     <span class="n">to_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">,</span> <span class="n">out_index</span><span class="p">)</span> <span class="c1"># 转为 out_index</span>
     <span class="n">broadcast_index</span><span class="p">(</span><span class="n">out_index</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">,</span> <span class="n">in_shape</span><span class="p">,</span> <span class="n">in_index</span><span class="p">)</span> <span class="c1"># 获得 in_index</span>
     <span class="n">out_pos</span> <span class="o">=</span> <span class="n">index_to_position</span><span class="p">(</span><span class="n">out_index</span><span class="p">,</span> <span class="n">out_strides</span><span class="p">)</span> <span class="c1"># 转为storage需要的out_pos</span>
@@ -1107,7 +1112,7 @@ torch.Size([4, 3, 2])
 <h4 id="tensor_reduce">tensor_reduce</h4>
 <p>这里别的部分和<code>map</code>、<code>zip</code>差不多，除了对于某个特定的 <code>out_index</code> ，该位置的元素计算结果应该来自 <code>reduce_size</code> 个元素（需要写一个内层的循环），这里的 <code>reduce_size = a_shape[reduce_dim]</code> 。
 比如Layer Norm对 <code>hidden_dim</code> 做 <code>mean</code> 操作，则此时的 <code>reduce_size = hidden_dim</code> 。</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_size</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_size</span><span class="p">):</span>
     <span class="n">to_index</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">,</span> <span class="n">out_index</span><span class="p">)</span> 
     <span class="n">broadcast_index</span><span class="p">(</span><span class="n">out_index</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">,</span> <span class="n">a_shape</span><span class="p">,</span> <span class="n">a_index</span><span class="p">)</span>
 
@@ -1124,7 +1129,7 @@ torch.Size([4, 3, 2])
 </code></pre></div>
 <h3 id="autograd">Autograd</h3>
 <p>先看autograd的API效果：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">tensor1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tensor1</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">out</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -1137,7 +1142,7 @@ torch.Size([4, 3, 2])
 所以out对x的梯度是[1., 1., 1.]
 </code></pre></div>
 <p>再比如说执行乘和求和两个函数，函数梯度再发生变化：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">tensor1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">tensor1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">tensor1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">out</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">tensor1</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>
@@ -1148,7 +1153,7 @@ torch.Size([4, 3, 2])
 </blockquote>
 <p>这里别的都好说，硬算就行，
 permute函数的backward需要通过实验额外说明一下：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
@@ -1157,7 +1162,7 @@ permute函数的backward需要通过实验额外说明一下：</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">shape</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">shape</span>
@@ -1166,7 +1171,7 @@ permute函数的backward需要通过实验额外说明一下：</p>
 <p>x先执行了permute，再执行了sum，之后执行backward。
 从两个实验可以看出，无论是否执行permute，对完整过程执行backward得到的是一样的。<strong>这说明permute的backward事实上是一个逆向permute的过程，将gradient与输入张量对齐。这个符合我们的直觉：前向对这些变量进行交换，从而grad也做了交换。后向把grad按照反方向交换回去，和相应的变量对齐。</strong></p>
 <p>由此可以得到以下的实现：</p>
-<div class="highlight"><pre><span></span><code>    <span class="nd">@staticmethod</span>
+<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
         <span class="c1"># 第一个是把grad_output按照a的shape和strides重排, 第二个是order的梯度为0.0</span>
         <span class="p">(</span><span class="n">a</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_values</span>
@@ -1185,7 +1190,7 @@ permute函数的backward需要通过实验额外说明一下：</p>
 <h3 id="parallelization">parallelization</h3>
 <p>Numba教程属于是。
 比较：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
     <span class="c1"># Change 1: Move function from Python to JIT version.</span>
     <span class="n">fn</span> <span class="o">=</span> <span class="n">njit</span><span class="p">()(</span><span class="n">fn</span><span class="p">)</span>
 
@@ -1196,7 +1201,7 @@ permute函数的backward需要通过实验额外说明一下：</p>
     <span class="c1"># Change 2: Internal _map must be JIT version as well.</span>
     <span class="k">return</span> <span class="n">njit</span><span class="p">()(</span><span class="n">_map</span><span class="p">)</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span> 
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span> 
     <span class="n">fn</span> <span class="o">=</span> <span class="n">njit</span><span class="p">()(</span><span class="n">fn</span><span class="p">)</span> 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_map</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span> 
@@ -1237,14 +1242,14 @@ Parallel structure is already optimal.
 我在sigmoid实现中用到了同模块的exp函数，这是不被numba识别的，将其修改为math.exp或np.exp即可。
 同理，在operators.py中的每个函数都不能互相依赖，而只能引用math或np库。</p>
 <p>一开始：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 </code></pre></div>
 <p>修改后：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1255,7 +1260,7 @@ Parallel structure is already optimal.
 发现直接改prange解决不了问题。去读读numba的文档（<a href="https://numba.readthedocs.io/en/stable/user/parallel.html">Automatic parallelization with @jit</a>）。</p>
 <h4 id="race">race</h4>
 <p>里面讲了一个race的案例。先拿串行测试一下正常情况：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">n</span>
 <span class="mi">4</span>
@@ -1267,7 +1272,7 @@ Parallel structure is already optimal.
 <span class="n">array</span><span class="p">([</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">])</span>
 </code></pre></div>
 <p>如果写得不对，结果会如下：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nd">@njit</span><span class="p">(</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="o">...</span> <span class="k">def</span><span class="w"> </span><span class="nf">prange_wrong_result</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1289,7 +1294,7 @@ Parallel structure is already optimal.
 <span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">])</span>
 </code></pre></div>
 <p>我们可以查一下，发现numba会自动根据CPU核数把循环拆成多个线程来跑：</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="s2">"Numba 并行线程数："</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">NUMBA_NUM_THREADS</span><span class="p">)</span>    
 <span class="n">Numba</span> <span class="n">并行线程数</span><span class="err">：</span> <span class="mi">16</span>
 </code></pre></div>
@@ -1306,7 +1311,7 @@ Parallel structure is already optimal.
 <p>因此排除发现，是我把out_index和in_index的初始化拿出循环的锅，出现race了。
 它们的初始化应该是每个线程（每次循环迭代）独立的，这样就会保证各个线程之间不会race。</p>
 <p>修改后如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tensor_map</span><span class="p">(</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tensor_map</span><span class="p">(</span>
     <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Storage</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Strides</span><span class="p">,</span> <span class="n">Storage</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Strides</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_map</span><span class="p">(</span>
@@ -1352,7 +1357,7 @@ Parallel structure is already optimal.
 <p>outer loop很好理解，就是遍历结果矩阵index的那个loop，这个肯定是prange就搞定了的。
 第二个没有函数调用同上，还是不知道啥意思，略过。（我后面的理解是，好像不能调用numpy等包的<code>.dot</code>之类的实现，只能写原生python）
 第三个是理所应当的，按照numba优化的写法把reduction变量写在外面、里面+=。</p>
-<h3 id="numbacuda">关于numba.cuda</h3>
+<h3 id="关于numba-cuda">关于numba.cuda</h3>
 <p>之后看了一眼 <code>projects/run_fast_tensor.py</code> ，发现我用pip安装的<code>numba==0.60.0</code>没有<code>numba.cuda</code>，于是<code>pip uninstall</code>了一下，又用<code>conda</code>安装了<code>numba</code>和<code>cudatoolkit</code>。</p>
 <div class="highlight"><pre><span></span><code>pip uninstall numba
 conda install numba==0.60.0 cudatoolkit -c conda-forge -y
@@ -1363,7 +1368,7 @@ conda install numba==0.60.0 cudatoolkit -c conda-forge -y
 &lt;Managed Device 0&gt;
 </code></pre></div>
 <p>感觉是minitorch的代码和我numba版本不匹配，把<code>numba.cuda.is_available()</code>改了一下：</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">cuda</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">cuda</span>
 <span class="k">if</span> <span class="n">cuda</span><span class="o">.</span><span class="n">gpus</span><span class="p">:</span>
     <span class="n">GPUBackend</span> <span class="o">=</span> <span class="n">minitorch</span><span class="o">.</span><span class="n">TensorBackend</span><span class="p">(</span><span class="n">minitorch</span><span class="o">.</span><span class="n">CudaOps</span><span class="p">)</span>
 </code></pre></div>
@@ -1376,10 +1381,10 @@ Task3.4: <a href="https://github.com/feimos32/Minitorch-Learning-Introduction">f
 <p>Networks：已经开发出一个很简单的pytorch了，来拿它搞个卷积神经网络进行图像分类这种上游任务吧！</p>
 <p>不是个人学习的重点，直接合并了 Task4: <a href="https://github.com/Dearkano/MiniTorch/">Dearkano/MiniTorch: Cornell CS5781 Machine Learning Engineering</a> 以保证完整性。</p>
 <p>感谢先行者！</p>
-</div><div class="post-chapter" data-ch="10" data-title="附: 基于Pytorch代码，讲讲反向传播和计算图"><h2 id="pytorch">附: 基于Pytorch代码，讲讲反向传播和计算图</h2>
+</div><div class="post-chapter" data-ch="10" data-title="附: 基于Pytorch代码，讲讲反向传播和计算图"><h2 id="附-基于pytorch代码-讲讲反向传播和计算图">附: 基于Pytorch代码，讲讲反向传播和计算图</h2>
 <p>以下代码选取自PyTorch官方的 <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">Quickstart — PyTorch Tutorials</a>
 省略了<code>import</code>，数据集加载，设置<code>DataLoader</code>，建立模型，设置损失函数和优化器。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span> <span class="c1"># 将模型设置为训练模式</span>
     <span class="k">for</span> <span class="n">batch</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
@@ -1398,7 +1403,7 @@ Task3.4: <a href="https://github.com/feimos32/Minitorch-Learning-Introduction">f
             <span class="n">loss</span><span class="p">,</span> <span class="n">current</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="p">(</span><span class="n">batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s2">&gt;7f</span><span class="si">}</span><span class="s2">  [</span><span class="si">{</span><span class="n">current</span><span class="si">:</span><span class="s2">&gt;5d</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">&gt;5d</span><span class="si">}</span><span class="s2">]"</span><span class="p">)</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">):</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
     <span class="n">num_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
@@ -1415,7 +1420,7 @@ Task3.4: <a href="https://github.com/feimos32/Minitorch-Learning-Introduction">f
 </code></pre></div>
 <p>我们知道，在前向传播的同时也建立了计算图。用以下数值例子举例。
 ps. 数值例子由GPT生成，可能存在计算错误。</p>
-<h3 id="_16">单变量标量函数</h3>
+<h3 id="单变量标量函数">单变量标量函数</h3>
 <p>前向传播：</p>
 <div class="arithmatex">\[L = (x + 2)^2, x = 1\]</div>
 <p>计算图：</p>
@@ -1438,7 +1443,7 @@ ps. 数值例子由GPT生成，可能存在计算错误。</p>
 <strong>由上一步传播过来的值进行了函数运算得到另一个值、传播的是函数值，</strong>
 而<strong>反向</strong>的过程看作反向的一个黑箱操作（即计算图的逆向），
 <strong>由上一步传播过来的导数值乘以当前步的求导运算得到另一个导数值，传播的是导数值。</strong></p>
-<h3 id="_17">多变量标量函数</h3>
+<h3 id="多变量标量函数">多变量标量函数</h3>
 <p>前向传播：</p>
 <div class="arithmatex">\[L=(w⋅x+b)^2,w=2,x=3,b=1\]</div>
 <p>计算图：</p>
@@ -1459,7 +1464,7 @@ ps. 数值例子由GPT生成，可能存在计算错误。</p>
 <p>这里重点关注两个点：一是两个变量的加法，二是两个变量的乘法。
 将两个变量加在一起时（如<span class="arithmatex">\(z=a+b\)</span>），对每个变量的偏导值均为1。所以要得到<span class="arithmatex">\(L\)</span>对每个变量的偏导，只需<strong>把上一步传播过来的值乘以1即可</strong>。
 将两个变量乘在一起时（如<span class="arithmatex">\(a=wx\)</span>），<span class="arithmatex">\(a\)</span>对<span class="arithmatex">\(w\)</span>求导得到的是<span class="arithmatex">\(x\)</span>的值，反之对<span class="arithmatex">\(x\)</span>求导得到的是<span class="arithmatex">\(w\)</span>的值。所以要得到<span class="arithmatex">\(L\)</span>对每个变量的偏导，只需<strong>把上一步传播过来的值乘以另一个变量即可</strong>。这一事实也会运用到后面的矩阵乘法上。 </p>
-<h3 id="_18">矩阵乘法</h3>
+<h3 id="矩阵乘法">矩阵乘法</h3>
 <div class="arithmatex">\[X = \begin{bmatrix} 1 &amp; 2 \\ 3 &amp; 4 \end{bmatrix}, \quad
 W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
 <p>前向传播：</p>
@@ -1507,12 +1512,12 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
 22 &amp; 52
 \end{bmatrix}\]</div>
 <p>ps. 这里的矩阵乘法反向传播同样遵循“L对某个变量求导，就是拿传播值乘以另一个变量”，与前述“多变量标量函数”部分有共通之处。</p>
-<h3 id="minitorch">MiniTorch相关代码参考</h3>
+<h3 id="minitorch相关代码参考">MiniTorch相关代码参考</h3>
 <p>以 <code>ScalarFunction</code> 中的 <code>Log</code> 函数举例：
 在forward时，传入 <span class="arithmatex">\(a\)</span> ，计算 <span class="arithmatex">\(\log a\)</span> 并返回。
 在backward时，传入 <span class="arithmatex">\(d_{output}\)</span> 即上一步得到的导数，计算它与本步骤的导数 （ <span class="arithmatex">\(\frac{1}{a}\)</span> ） 的乘积并返回，即得到误差函数 <span class="arithmatex">\(L\)</span> 对变量 <span class="arithmatex">\(a\)</span> 的导数。
 为了在backward时计算本步骤的导数（ <span class="arithmatex">\(\frac{1}{a}\)</span> ），需要在forward中将 <span class="arithmatex">\(a\)</span> 的值记入Context中，从而在backward计算时取出。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Log</span><span class="p">(</span><span class="n">ScalarFunction</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Log</span><span class="p">(</span><span class="n">ScalarFunction</span><span class="p">):</span>
     <span class="s2">"Log function $f(x) = log(x)$"</span>
 
     <span class="nd">@staticmethod</span>
@@ -1527,7 +1532,7 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
         <span class="p">(</span><span class="n">a</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_values</span>
         <span class="k">return</span> <span class="n">operators</span><span class="o">.</span><span class="n">log_back</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">d_output</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="_19">总结</h3>
+<h3 id="总结">总结</h3>
 <p>由上述案例可知，<strong>计算图</strong>是描述前向传播、反向传播过程的一个通用手段。
 它将反向传播中每一步的导数计算简化为<strong>上一步传播的值 乘以 这一步的导数</strong>，
 通过记录前向传播中经历的函数过程及相应变量的值，达成了反向传播的计算。</p>
@@ -1595,6 +1600,8 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -1610,6 +1617,8 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -1634,6 +1643,7 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">从SGD到AdamW，优化器怎么发展过来的？</h1>
     <div class="post-meta">
       <time datetime="2026-03-11T00:00:00">2026-03-11</time>
+      <span class="post-stats">3529 字 · 约 8 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0">#机器学习</a>
       
@@ -182,7 +187,7 @@ AdamW解决了在使用Adam时应该怎么做权重衰减。</p>
 </table>
 <div class="arithmatex">\[ \theta_{t+1} = \theta_t - \eta \cdot g_t \]</div>
 <p>是理论上最基础的梯度下降，沿着梯度的反方向更新参数。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SGD</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SGD</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span>
 
@@ -199,7 +204,7 @@ AdamW解决了在使用Adam时应该怎么做权重衰减。</p>
 很像一个小球滚下来的过程。
 <img alt="" src="../../migrated/post-images/20260311195340.png"/>
 （图片来自 <a href="https://speech.ee.ntu.edu.tw/~tlkagk/courses/ML_2017/Lecture/DNN%20tip.pdf">李宏毅机器学习 Part IV: Tips for Training DNN</a> ）</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SGDMomentum</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SGDMomentum</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">momentum</span> <span class="o">=</span> <span class="n">momentum</span> <span class="c1"># 动量系数 γ</span>
@@ -221,7 +226,7 @@ AdamW解决了在使用Adam时应该怎么做权重衰减。</p>
 它考虑到不同特征出现的频率不同，高频特征可能过度训练、低频特征可能欠拟合。所以根据特征出现的频率，自适应调整学习率，让低频特征学习率更高。
 “<strong>梯度出现频繁的，学习率更高</strong>”。
 那么为什么使用平方呢？因为我们需要用到梯度的绝对数值，但直接累积会出现方向的抵消。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdaGrad</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdaGrad</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
@@ -238,7 +243,7 @@ AdamW解决了在使用Adam时应该怎么做权重衰减。</p>
 </code></pre></div>
 <p>注意，这里步长考虑的是<strong>梯度出现频繁</strong>。
 对于出现频繁，比如下述例子考虑某一步的情况，此时0.01的梯度已经出现过100次、而1.0的梯度出现过1次。下述计算发现前者此时的有效学习率大于后者（1.0 &gt; 0.1）。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># 场景1：梯度数值小但出现频繁</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># 场景1：梯度数值小但出现频繁</span>
 <span class="n">grads_frequent_small</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>  <span class="c1"># 100次，每次都0.01</span>
 <span class="n">cache_frequent</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">g</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">grads_frequent_small</span><span class="p">])</span>  <span class="c1"># = 100 * 0.0001 = 0.01</span>
 <span class="n">delta_frequent</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">cache_frequent</span><span class="p">)</span>  <span class="c1"># 0.1 / 0.1 = 1.0</span>
@@ -256,7 +261,7 @@ AdamW解决了在使用Adam时应该怎么做权重衰减。</p>
 <div class="arithmatex">\[ \theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{E[g^2]_t + \epsilon}} \cdot g_t \]</div>
 <p>AdaGrad随着梯度平方的累积，学习率会递减到0，出现学习率消失问题。
 <strong>RMSProp在AdaGrad的基础上加入了衰减</strong>（称为“指数移动平均/EMA”），使得它看的历史从无限长变成了近期历史，解决了学习率消失问题，对学习率的适应更好。</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RMSProp</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RMSProp</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">decay</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decay</span> <span class="o">=</span> <span class="n">decay</span>  <span class="c1"># 衰减率</span>
@@ -307,7 +312,7 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
 <p>因此，我们一开始的结论得证：</p>
 <div class="arithmatex">\[\hat{\mu}_t \approx E[x_t]\]</div>
 <hr/>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Adam</span><span class="p">:</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Adam</span><span class="p">:</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">=</span> <span class="n">lr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beta1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta2</span> <span class="o">=</span> <span class="n">betas</span>
@@ -347,7 +352,7 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
 现在AdamW直接用原始梯度值做梯度更新、然后对更新结果做权重衰减。
 省流一下，就是把权重衰减挪到了整个step的最后面单独做。
 不然的话，Adam的权重衰减（正则化）效果其实是被自适应学习率影响了的，这样的话才真正地同时实现了Adam和权重衰减两个目的的原始含义。</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Adam</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># Adam</span>
 <span class="c1"># 第1步：在梯度上加L2正则化</span>
 <span class="n">grad</span> <span class="o">=</span> <span class="n">grad</span> <span class="o">+</span> <span class="n">weight_decay</span> <span class="o">*</span> <span class="n">param</span>  <span class="c1"># g' = g + λθ</span>
 
@@ -358,7 +363,7 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
 <span class="c1"># 第3步：Adam更新</span>
 <span class="n">param</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">m_hat</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v_hat</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>  <span class="c1"># 更新步长包含了λθ的影响</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1"># AdamW</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># AdamW</span>
 <span class="c1"># 第1步：更新矩估计（用原始梯度）</span>
 <span class="n">exp_avg</span> <span class="o">=</span> <span class="n">beta1</span> <span class="o">*</span> <span class="n">exp_avg</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">beta1</span><span class="p">)</span> <span class="o">*</span> <span class="n">grad</span>      <span class="c1"># m = β₁m + (1-β₁)g</span>
 <span class="n">exp_avg_sq</span> <span class="o">=</span> <span class="n">beta2</span> <span class="o">*</span> <span class="n">exp_avg_sq</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">beta2</span><span class="p">)</span> <span class="o">*</span> <span class="n">grad</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># v = β₂v + (1-β₂)g²</span>
@@ -370,7 +375,7 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
 <span class="n">param</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">weight_decay</span> <span class="o">*</span> <span class="n">param</span>  <span class="c1"># θ = θ' - ηλθ</span>
 </code></pre></div>
 <p>终于得到了最终的完整代码。完结撒花！</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
         <span class="n">defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">weight_decay</span><span class="p">)</span>
@@ -472,6 +477,8 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -487,6 +494,8 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -509,6 +518,7 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

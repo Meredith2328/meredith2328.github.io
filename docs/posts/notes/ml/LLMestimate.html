@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs</h1>
     <div class="post-meta">
       <time datetime="2026-03-03T00:00:00">2026-03-03</time>
+      <span class="post-stats">4659 字 · 约 11 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%A4%A7%E6%A8%A1%E5%9E%8B">#大模型</a>
       
@@ -110,7 +115,7 @@
 <p>省流：</p>
 <div class="arithmatex">\[P ≈ 12Nd^2 + Vd\]</div>
 <!-- more -->
-<h2 id="_1">系列总览</h2>
+<h2 id="系列总览">系列总览</h2>
 <ol>
 <li><a href="LLMestimate.html">01 参数量与训练 FLOPs</a>（本篇）</li>
 <li><a href="LLMestimate2.html">02 训练的内存和计算需求</a></li>
@@ -128,7 +133,7 @@ num_heads: 25
 d_ff: 6400
 </code></pre></div>
 <p>实测得到的可训练参数量为 <code>1,557,611,200</code> = 1.56B。</p>
-<h2 id="_2">参数量实测结果</h2>
+<h2 id="参数量实测结果">参数量实测结果</h2>
 <p>以下是使用HuggingFace Transformers库实际加载了GPT2 XL并统计可训练参数量的结果。代码见下述附录A。</p>
 <div class="highlight"><pre><span></span><code>==========================================================================
 总参数量                 params: 1,557,611,200
@@ -146,7 +151,7 @@ FFN Input (c_fc)         : 10,246,400 (10.25M)
 FFN Output (c_proj)      : 10,241,600 (10.24M)
 Layer 0 总计               : 30,740,800 (30.74M)
 </code></pre></div>
-<h2 id="_3">最常用的参数量估算公式</h2>
+<h2 id="最常用的参数量估算公式">最常用的参数量估算公式</h2>
 <p>可训练参数量的估算公式为：</p>
 <div class="arithmatex">\[12Nd^2+Vd\]</div>
 <p>其中 <span class="arithmatex">\(N\)</span> 为层数 <code>num_layers</code> ， <span class="arithmatex">\(d\)</span> 为维度 <code>d_models</code> ，<span class="arithmatex">\(V\)</span> 为词表大小 <code>vocab_size</code> 。
@@ -154,7 +159,7 @@ Layer 0 总计               : 30,740,800 (30.74M)
 <p>直接代入得到：</p>
 <div class="arithmatex">\[12 \times 48 \times 1600^2 + 50257 \times 1600=1554971200=1.55B\]</div>
 <p>相比于实际值1.56B，这已经是一个非常好的估计了。</p>
-<h2 id="_4">“最常用的参数量估算公式”推导</h2>
+<h2 id="最常用的参数量估算公式-推导">“最常用的参数量估算公式”推导</h2>
 <p><img alt="" src="../../migrated/post-images/20260303103200.png"/></p>
 <p>我们需要确定这个公式适用于什么情况，所以需要引入它的适用范围。</p>
 <p>(1) Embedding
@@ -164,7 +169,7 @@ Layer 0 总计               : 30,740,800 (30.74M)
 <p>对于Attention，有 <span class="arithmatex">\(W_Q,W_K,W_V\)</span> ，还有输出使用的 <span class="arithmatex">\(W_O\)</span> ，它们都是 <span class="arithmatex">\(d \times d = d^2\)</span> 的方阵，总共就是 <span class="arithmatex">\(4d^2\)</span>。
 对于FFN，它首先负责把维度从 <span class="arithmatex">\(d\)</span> 扩大到 <span class="arithmatex">\(d_{ff}=4d\)</span> ，然后再从 <span class="arithmatex">\(d_{ff}\)</span> 缩小回 <span class="arithmatex">\(d\)</span> 。因此前者为 <span class="arithmatex">\(d \times 4d=4d^2\)</span> ，后者是 <span class="arithmatex">\(4d \times d = 4d^2\)</span> ，总共 <span class="arithmatex">\(8d^2\)</span> 。</p>
 <p>因此，一个Transformer Block内的Attention和FFN加起来应该是 <span class="arithmatex">\(12d^2\)</span> 。<span class="arithmatex">\(N\)</span> 层堆叠起来就是 <span class="arithmatex">\(12Nd^2\)</span> 。</p>
-<h2 id="_5">怎么更精确地估算参数量？</h2>
+<h2 id="怎么更精确地估算参数量">怎么更精确地估算参数量？</h2>
 <p>(1) Layer Norm
 由上可见，我们忽略了Layer Norm里面的可训练参数开销（<span class="arithmatex">\(\beta\)</span> 和 <span class="arithmatex">\(\gamma\)</span>），它们都是用于缩放的可训练向量（防止归一化不合适而添加的缩放因子），大小均为 <span class="arithmatex">\(d\)</span> ，所以每个 LayerNorm 应该还有 <span class="arithmatex">\(2d\)</span> ，符合实测的 <code>3,200</code> 。</p>
 <p>(2) Attention &amp; FFN?</p>
@@ -176,7 +181,7 @@ Attention输入和输出维度都是 <span class="arithmatex">\(d\)</span> ，�
 FFN Input输入维度是 <span class="arithmatex">\(d\)</span> 、输出维度是 <span class="arithmatex">\(4d\)</span> ，所以总共 <span class="arithmatex">\(4d^2+4d = 10246400\)</span> 正确；
 FFN Output输入维度是 <span class="arithmatex">\(4d\)</span> 、输出维度是 <span class="arithmatex">\(d\)</span> ，所以总共 <span class="arithmatex">\(4d^2+d=10241600\)</span> 正确。</p>
 <p>参数量部分完结撒花！</p>
-<h2 id="llmflops">怎么估算LLM的训练FLOPs？</h2>
+<h2 id="怎么估算llm的训练flops">怎么估算LLM的训练FLOPs？</h2>
 <blockquote>
 <p>参数量决定了模型的“内存占用”，而FLOPs（浮点运算次数）决定了模型的“计算成本”。</p>
 </blockquote>
@@ -325,7 +330,7 @@ F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
 </ol>
 <p>代入GPT2-XL参数： <span class="arithmatex">\(N=48\)</span>, <span class="arithmatex">\(d=1600\)</span>, <span class="arithmatex">\(n=1024\)</span>, <span class="arithmatex">\(V=50257\)</span>, <span class="arithmatex">\(P=1.56B\)</span>
 得到的前向 <span class="arithmatex">\(FLOPs \approx 3.507T\)</span> 。</p>
-<h2 id="d-vs-nflops">维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里？</h2>
+<h2 id="维度d增大-vs-上下文长度n增大-flops瓶颈在哪里">维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里？</h2>
 <table>
 <thead>
 <tr>
@@ -474,8 +479,8 @@ context length: from 1024 to 16,384
 </tr>
 </tbody>
 </table>
-<h2 id="a">附录A: “参数量实测结果”使用的代码</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
+<h2 id="附录a-参数量实测结果-使用的代码">附录A: “参数量实测结果”使用的代码</h2>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 
@@ -596,8 +601,8 @@ context length: from 1024 to 16,384
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"实际统计值: </span><span class="si">{</span><span class="n">layer_0_total</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"差异: </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="mf">30.72</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">layer_0_total</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M"</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="b-d-vs-nflops">附录B: “维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里”使用的代码</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<h2 id="附录b-维度d增大-vs-上下文长度n增大-flops瓶颈在哪里-使用的代码">附录B: “维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里”使用的代码</h2>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># 模型配置</span>
 <span class="n">models</span> <span class="o">=</span> <span class="p">[</span>
@@ -709,6 +714,8 @@ context length: from 1024 to 16,384
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -724,6 +731,8 @@ context length: from 1024 to 16,384
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -746,6 +755,7 @@ context length: from 1024 to 16,384
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

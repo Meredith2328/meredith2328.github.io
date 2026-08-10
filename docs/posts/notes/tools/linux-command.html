@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">值得顺便掌握一下的那些linux指令</h1>
     <div class="post-meta">
       <time datetime="2026-03-10T00:00:00">2026-03-10</time>
+      <span class="post-stats">784 字 · 约 2 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E5%B7%A5%E5%85%B7">#工具</a>
       
@@ -211,7 +216,7 @@ Tue Mar 10 11:18:13 2026
 |    0   N/A  N/A            7515      C   ...-nvme/cs336/.venv/bin/python3       1104MiB |
 +-----------------------------------------------------------------------------------------+
 </code></pre></div>
-<h2 id="-v-vv-vvv">-v -vv -vvv</h2>
+<h2 id="v-vv-vvv">-v -vv -vvv</h2>
 <p>严格来说这个不是指令，而是一个常见的命令参数。但好用。
 有许多工具默认状态给你提供的信息是很有限的，比如 <code>pip</code> 。如果加了 <code>-v</code> ，它就会给你提供更多的信息；<code>-vv</code> 更多更多……
 比如你怀疑某个指令是不是卡在网络连接问题上了、又没有信息，就可以加这个参数看看。</p>
@@ -340,6 +345,8 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -355,6 +362,8 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -377,6 +386,7 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 

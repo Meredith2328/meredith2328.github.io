@@ -1487,6 +1487,10 @@ a:hover {
   margin-left: auto;
 }
 
+.post-stats {
+  color: var(--mute);
+}
+
 /* full-width feature/cover banner at the top of a post (调浅 = lightened) */
 .post-hero {
   position: relative;
@@ -1756,10 +1760,190 @@ a:hover {
   color: var(--paper);
 }
 
+.code-lang {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.code-block.is-long pre {
+  max-height: 480px;
+  overflow: hidden;
+}
+
+.code-block.is-long::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  background: linear-gradient(transparent, var(--panel));
+  pointer-events: none;
+}
+
+.code-block.is-long.is-open pre {
+  max-height: none;
+  overflow-x: auto;
+}
+
+.code-block.is-long.is-open::after {
+  display: none;
+}
+
+.code-more {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 0 var(--shadow);
+  padding: 3px 12px;
+  cursor: pointer;
+}
+
+.code-more:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
 @media (hover: none) {
   .code-copy {
     opacity: 1;
   }
+}
+
+/* ---------- image lightbox ---------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: #2a2c2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+}
+
+.lightbox img {
+  max-width: 94vw;
+  max-height: 94vh;
+  background: var(--paper);
+  box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- random post dice ---------- */
+
+.random-dice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--ink);
+  background: var(--paper);
+  border: var(--border);
+  box-shadow: 3px 3px 0 0 var(--shadow);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.random-dice:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.random-dice:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--shadow);
+}
+
+.random-dice-text {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.random-dice-text:hover {
+  background: transparent;
+  color: var(--accent);
+}
+
+.random-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: #e8f0fe;
+  animation: random-flash 0.32s ease;
+}
+
+@keyframes random-flash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- dino game touch buttons ---------- */
+
+.dino-btn {
+  position: absolute;
+  bottom: 8px;
+  z-index: 5;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 0 var(--shadow);
+  padding: 4px 8px;
+  cursor: pointer;
+  opacity: 0.92;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dino-btn:hover,
+.dino-btn:active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.dino-btn-duck {
+  left: 8px;
+}
+
+.dino-btn-jump {
+  right: 8px;
 }
 
 /* ---------- markdown body ---------- */
@@ -1785,24 +1969,49 @@ a:hover {
 }
 
 .markdown-body h1 {
-  font-size: 28px;
+  font-size: 32px;
   padding-bottom: 8px;
   border-bottom: 4px double var(--hairline);
 }
 
 .markdown-body h2 {
-  font-size: 22px;
+  font-size: 26px;
   border-left: 6px solid var(--ink);
   padding-left: 12px;
 }
 
 .markdown-body h3 {
-  font-size: 17px;
+  font-size: 20px;
 }
 
 .markdown-body h4 {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text);
+}
+
+.markdown-body h1 .heading-anchor,
+.markdown-body h2 .heading-anchor,
+.markdown-body h3 .heading-anchor,
+.markdown-body h4 .heading-anchor {
+  float: none;
+  margin-left: -1.15em;
+  padding-right: 0.3em;
+  color: var(--mute);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.markdown-body h1:hover .heading-anchor,
+.markdown-body h2:hover .heading-anchor,
+.markdown-body h3:hover .heading-anchor,
+.markdown-body h4:hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--accent);
 }
 
 .markdown-body p {

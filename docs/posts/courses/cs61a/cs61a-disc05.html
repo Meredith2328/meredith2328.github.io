@@ -53,6 +53,10 @@
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
+      <button class="random-dice" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/><rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/><rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/><rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/></svg>
+      </button>
+
       <div class="socials">
         
           
@@ -75,7 +79,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航"><h1 id="_1">导航</h1>
+    <nav class="site-nav" aria-label="站点导航">
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -94,6 +98,7 @@
     <h1 class="post-title">CS61A · Disc 05 · 迭代、时空复杂度</h1>
     <div class="post-meta">
       <time datetime="2023-08-30T00:00:00">2023-08-30</time>
+      <span class="post-stats">1754 字 · 约 4 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CS61A">#CS61A</a>
       
@@ -110,7 +115,7 @@
 <p>edit time: 2024-07-24 12:19:44</p>
 </blockquote>
 <h2 id="q1-wwpd-iterators">Q1: WWPD: Iterators</h2>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="s2">"cs61a"</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="s2">"cs61a"</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">s_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">next</span><span class="p">(</span><span class="n">s_iter</span><span class="p">)</span>
 <span class="s1">'c'</span>
@@ -136,7 +141,7 @@
 <span class="ne">StopIteration</span>
 </code></pre></div>
 <h2 id="q2-repeated">Q2: Repeated</h2>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">repeated</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">repeated</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return the first value in iterator t that appears k times in a row,</span>
 <span class="sd">    calling next on t as few times as possible.</span>
 
@@ -170,7 +175,7 @@
 </code></pre></div>
 <h2 id="q3-something-different">Q3: Something Different</h2>
 <p>使用<code>try-except</code>块是为了在循环内调用<code>next(t)</code>足够多次、通过<code>StopIteration</code>退出循环时将其处理掉。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">differences</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">differences</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Yield the differences between adjacent values from iterator t.</span>
 
 <span class="sd">    &gt;&gt;&gt; list(differences(iter([5, 2, -100, 103])))</span>
@@ -190,7 +195,7 @@
 </code></pre></div>
 <h2 id="q4-primes-generator">Q4: Primes Generator</h2>
 <p>用<code>for</code>还是很直接的，重点提一下用<code>yield from</code>构造生成函数的递归。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">primes_gen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">primes_gen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Generates primes in decreasing order.</span>
 <span class="sd">    &gt;&gt;&gt; pg = primes_gen(7)</span>
 <span class="sd">    &gt;&gt;&gt; list(pg)</span>
@@ -202,7 +207,7 @@
             <span class="k">yield</span> <span class="n">i</span>
 </code></pre></div>
 <p>首先理解<code>yield from</code>，它是使用另外一个迭代器，效果类似于 <code>for item in iterable: yield item</code>。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generatorUsed</span><span class="p">():</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generatorUsed</span><span class="p">():</span>
     <span class="k">yield</span> <span class="s1">'Q'</span>
     <span class="k">yield</span> <span class="s1">'A'</span>
     <span class="k">yield</span> <span class="s1">'Q'</span>
@@ -214,7 +219,7 @@
 <p>仅此还不够直观，不妨了解一个词语：“<strong>委派</strong>”：上述的<code>generatorUser</code>在第一次<code>__next__()</code>时产生<code>233</code>（“自己负责的”），而在后续<code>__next__()</code>时，就“交给<code>generatorUsed</code>来负责了”，<code>generatorUsed</code>负责处理后续的三次<code>__next__()</code>。
 <del>おまかせ</del></p>
 <p>这件事和我们所学的<strong>过程-抽象</strong>其实是很类似的，以一道递归题目（disc03中Q3: Skip Factorial）为例：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">skip_factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">skip_factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Return the product of positive integers n * (n - 2) * (n - 4) * ...</span>
 
 <span class="sd">    &gt;&gt;&gt; skip_factorial(5) # 5 * 3 * 1</span>
@@ -229,7 +234,7 @@
 </code></pre></div>
 <p>它就像是本函数来负责某某情况，其他的情况处理一下之后就<strong>交给</strong> <code>skip_factorial(n - 2)</code>了。
 这个“交给”正是与这一道涉及生成器的题目相同的抽象。下述是实现：</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">primes_gen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">primes_gen</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Generates primes in decreasing order.</span>
 <span class="sd">    &gt;&gt;&gt; pg = primes_gen(7)</span>
 <span class="sd">    &gt;&gt;&gt; list(pg)</span>
@@ -244,7 +249,7 @@
 <p>上述对“交给”（委派）的阐述即是利用<code>yield from</code>构造了生成函数的递归。</p>
 <h2 id="q5-partitions">Q5: Partitions</h2>
 <p>注意这里的<code>for</code>遇到了 <code>yield</code> 时就与我们熟悉的执行顺序（一股脑全部执行完）不相同了：每次都会在<code>yield</code>那里“停一下”，直到进行下次迭代。</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">partition_gen</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">partition_gen</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Yield the partitions of n using parts up to size m.</span>
 
 <span class="sd">    &gt;&gt;&gt; for partition in sorted(partition_gen(6, 4)):</span>
@@ -360,6 +365,8 @@
       <span class="footer-sep">::</span>
       <a href="../../../rss.xml">RSS</a>
       <span class="footer-sep">::</span>
+      <button class="random-dice random-dice-text" type="button" title="闭眼抓一篇" aria-label="随机抓一篇文章">随机一篇</button>
+      <span class="footer-sep">::</span>
       <span>powered by <a href="https://github.com/meredith2328/pilog" target="_blank" rel="noopener">pilog</a></span>
     </div>
   </footer>
@@ -375,6 +382,8 @@
       <div class="dino-stage">
         <iframe class="dino-frame" src="../../../dino/index.html" title="Chrome 断网小恐龙" loading="lazy"></iframe>
         <div class="dino-loading" id="dino-loading">加载中…</div>
+        <button class="dino-btn dino-btn-duck" type="button" aria-label="下蹲">▼ 蹲</button>
+        <button class="dino-btn dino-btn-jump" type="button" aria-label="跳跃">▲ 跳</button>
       </div>
     </div>
     <button class="dino-toggle" type="button" aria-label="打开小恐龙游戏">
@@ -397,6 +406,7 @@
 
 <script src="../../../js/toc.js" defer></script>
 <script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/lightbox.js" defer></script>
 
 <script src="../../../js/giscus.js" defer></script>
 
