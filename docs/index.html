@@ -148,7 +148,7 @@
           </div>
           <h3 class="card-title">抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的</h3>
           
-          <div class="card-preview">先说结论：<strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug</strong>。训练跑完、日志好看、loss 在降、reward 在涨、grad_norm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。 这不是我们写错了什么玄学配置，而是框架在某种官方支持的使用方式下，自己把优化器建成了空的。下面把它讲清楚：什么情况会踩、怎么最小复现、根因在哪、怎么修、怎么自检。 同时满足下面三个条件就会踩：  你先用…； </div>
+          <div class="card-preview">先说结论：<strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 在“从已有的 LoRA adapter 继续训练”这条路上，藏着一个会静默空转的 bug</strong>。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter…</div>
           
           <div class="card-tags">
             

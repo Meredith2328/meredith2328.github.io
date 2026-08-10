@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="先说结论：TRL 1.9.2 的 GRPOTrainer 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug。训练跑完、日志好看、loss 在降、reward 在涨、gradnorm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。 这不是我们写错了什么玄学配置，而">
+  <meta name="description" content="先说结论：TRL 1.9.2 的 GRPOTrainer 在“从已有的 LoRA adapter 继续训练”这条路上，藏着一个会静默空转的 bug。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的">
-  <meta property="og:description" content="先说结论：TRL 1.9.2 的 GRPOTrainer 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug。训练跑完、日志好看、loss 在降、reward 在涨、gradnorm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。 这不是我们写错了什么玄学配置，而">
+  <meta property="og:description" content="先说结论：TRL 1.9.2 的 GRPOTrainer 在“从已有的 LoRA adapter 继续训练”这条路上，藏着一个会静默空转的 bug。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
   
   
@@ -103,20 +103,21 @@
   
 
   <div class="post-body markdown-body">
-    <p>先说结论：<strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 在“从已有 LoRA adapter 续训”这条路上，存在一个会静默空转的 bug</strong>。训练跑完、日志好看、loss 在降、reward 在涨、grad_norm 非零——但保存下来的权重和你喂进去的初始权重逐字节相同。模型根本没训。</p>
-<p>这不是我们写错了什么玄学配置，而是框架在某种官方支持的使用方式下，自己把优化器建成了空的。下面把它讲清楚：什么情况会踩、怎么最小复现、根因在哪、怎么修、怎么自检。</p>
-<h2 id="_1">什么情况下会踩</h2>
-<p>同时满足下面三个条件就会踩：</p>
+    <p>先说结论：<strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 在“从已有的 LoRA adapter 继续训练”这条路上，藏着一个会静默空转的 bug</strong>。</p>
+<p>怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter 逐字节相同——模型压根没被训过。</p>
+<p>这不是我们配置写错了什么冷门参数，也不是运气不好踩到了某个边角。它是框架在一个挺常规的使用方式下，自己把优化器建成了空的，而且全程不吭一声。下面我把这件事从头到尾讲清楚：什么情况会撞上、怎么用最小的例子复现、根因到底在哪、怎么绕开、以及怎么检查自己有没有中招。</p>
+<h2 id="_1">什么情况下会撞上</h2>
+<p>需要同时满足三个条件：</p>
 <ol>
-<li>你先用 <code>PeftModel.from_pretrained(base, adapter)</code> 加载了一个已有的 LoRA adapter（注意这里<strong>默认</strong> <code>is_trainable=False</code>）；</li>
-<li>把它直接交给 <code>GRPOTrainer</code>，且 <strong><code>beta != 0</code></strong>（也就是要用 KL 约束参考策略）；</li>
-<li>没有额外传 <code>peft_config</code>（因为模型已经是 PeftModel 了）。</li>
+<li>你先用 <code>PeftModel.from_pretrained(base, adapter)</code> 加载了一个已经训练好的 LoRA adapter。注意这一步<strong>默认</strong>是 <code>is_trainable=False</code>，也就是按“只用来推理”的方式加载；</li>
+<li>把它直接交给 <code>GRPOTrainer</code>，并且 <strong><code>beta != 0</code></strong>（也就是开了 KL 约束，要和参考策略做对比）；</li>
+<li>没有额外传 <code>peft_config</code>（因为模型本身已经是 PeftModel 了）。</li>
 </ol>
-<p>这不算是冷门用法：SFT 预热完再上 GRPO，是 Agentic RL 最常见的流程之一。我们用 Qwen3-0.6B 在双卡 5090 上跑了一整轮实验（100 步、带过程奖励、跑满、wandb 曲线齐全），结果权重哈希一对比，和 SFT 初始化一模一样——白跑。</p>
+<p>这算不上什么冷门场景。SFT 预热完再上 GRPO，是 Agentic RL 里最常见的流程之一。我们用 Qwen3-0.6B 在双卡 5090 上完整跑了一轮：100 步、带过程奖励、跑满、wandb 曲线齐全，看起来什么都是对的。直到某天备份时顺手对比了一下权重哈希，才发现训练产物和 SFT 初始化一模一样——那一整轮实验等于白跑。</p>
 <h2 id="_2">最小复现</h2>
-<p>我在 Kaggle 上放了一个公开的复现 notebook（CPU 就能跑，两三分钟）：</p>
+<p>我在 Kaggle 放了一个公开的复现 notebook，CPU 就能跑，两三分钟出结果：</p>
 <p><a href="https://www.kaggle.com/code/meredith10pi/trl-1-9-2-ref-adapter-silent-no-op-repro">TRL 1.9.2 ref adapter silent no-op repro</a></p>
-<p>核心代码就这几行：</p>
+<p>核心代码其实就这几行：</p>
 <div class="highlight"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>   <span class="c1"># is_trainable=False</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -126,66 +127,67 @@
 <span class="p">)</span>
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </code></pre></div>
-<p>跑完看三件事：</p>
-<div class="highlight"><pre><span></span><code>trainable params right after trainer init: 0        # ← 已经不对劲
+<p>跑完之后，注意看这几个输出：</p>
+<div class="highlight"><pre><span></span><code>trainable params right after trainer init: 0        # ← 已经不对劲了
 optimizer param count (captured at creation): 0     # ← 实锤：优化器是空的
-last log line: {'loss': -0.26, 'grad_norm': 0.001, 'reward': 0.625}   # ← 但指标活着
+last log line: {'loss': -0.26, 'grad_norm': 0.001, 'reward': 0.625}   # ← 但指标活得很好
 saved == initial: True                              # ← 什么都没训
 </code></pre></div>
-<p>对照组就改一个参数——加载时传 <code>is_trainable=True</code>：</p>
+<p>对照实验只改一个参数——加载时传 <code>is_trainable=True</code>：</p>
 <div class="highlight"><pre><span></span><code>optimizer param count (captured at creation): 12
 saved == initial: False
 </code></pre></div>
-<p>同样的脚本、同样的数据、同样的奖励，只有 <code>inference_mode</code> 不同，结果从“白跑”变成“真训”。这基本锁死了根因。</p>
+<p>同样的脚本、同样的数据、同样的奖励函数，只是 <code>inference_mode</code> 不一样，结果就从“白跑一趟”变成“真的在训”。这个对照基本把根因锁死了。</p>
 <h2 id="_3">根因（三步）</h2>
+<p>拆开看其实不复杂：</p>
 <ol>
-<li><code>PeftModel.from_pretrained(..., is_trainable=False)</code> 会在 adapter 配置里写 <code>inference_mode=True</code>。</li>
-<li><code>beta != 0</code> 时，TRL 为了算 KL 项，会自动创建一个叫 <code>ref</code> 的 adapter 作为参考策略，并且<strong>直接把 default adapter 的配置原样传过去</strong>（<code>model.add_adapter("ref", default_config)</code>）。PEFT 的 <code>inject_adapter</code> 收尾时，只要配置是 inference 模式，就会把<strong>当前激活的 adapter（default）一起冻结</strong>。</li>
-<li>于是 <code>GRPOTrainer</code> 初始化完，模型里一个可训练参数都没有，优化器创建出来是空的。</li>
+<li><code>PeftModel.from_pretrained(..., is_trainable=False)</code> 会在 adapter 的配置里写上 <code>inference_mode=True</code>——意思就是“这个 adapter 只用来推理，不训练”；</li>
+<li><code>beta != 0</code> 时，TRL 为了算 KL 项，会自动创建一个叫 <code>ref</code> 的 adapter 当作参考策略，而且<strong>直接把 default adapter 的配置原样传了过去</strong>（<code>model.add_adapter("ref", default_config)</code>）。PEFT 的 <code>inject_adapter</code> 在收尾的时候，只要配置是 inference 模式，就会把<strong>当前激活的 adapter（也就是 default）一起冻结</strong>；</li>
+<li>于是 <code>GRPOTrainer</code> 初始化完，整个模型里找不到一个可训练的参数，优化器创建出来自然是空的。</li>
 </ol>
-<p>那为什么日志还那么热闹？因为训练循环里算参考 logps 时会临时切换 adapter（<code>use_adapter</code> 里调用 <code>set_adapter</code>），把 <code>requires_grad</code> 翻来翻去：梯度照常累积、<code>grad_norm</code> 照常打印、loss 随每步采样的不同题目自然波动。<strong>只有 <code>optimizer.step()</code> 无事可做。</strong> 看起来在训练，其实只是在看风景。</p>
+<p>那为什么日志还那么热闹？因为训练循环里计算参考 logps 的时候会临时切换 adapter（<code>use_adapter</code> 里调用了 <code>set_adapter</code>），把 <code>requires_grad</code> 翻来翻去。于是梯度照常累积、<code>grad_norm</code> 照常打印，loss 也会随着每步采样的题目不同而自然波动。<strong>只有 <code>optimizer.step()</code> 无事可做。</strong> 看起来在训练，其实只是在看风景。</p>
 <h2 id="_4">怎么修</h2>
-<p>两个办法，都能让训练真正发生：</p>
-<p><strong>最快的修法</strong>：加载时传 <code>is_trainable=True</code>。</p>
+<p>两个办法都能让训练真正发生，选一个就行：</p>
+<p><strong>最快的办法</strong>：加载时传 <code>is_trainable=True</code>，一行搞定。</p>
 <div class="highlight"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">,</span> <span class="n">is_trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-<p><strong>更稳的修法</strong>：把预热权重合进基座，再新建一个干净的 LoRA（参考策略语义上也更正确——它就是一个真正的 SFT 模型）。</p>
+<p><strong>更稳的办法</strong>：把预热权重合进基座，再新建一个干净的 LoRA。这样做参考策略的语义也更干净——它就是那个真正的 SFT 模型。</p>
 <div class="highlight"><pre><span></span><code><span class="n">warm</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">warm</span><span class="o">.</span><span class="n">merge_and_unload</span><span class="p">()</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">peft_config</span><span class="o">=</span><span class="n">LoraConfig</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
 </code></pre></div>
-<p>我们在自己的项目里用的是第二种，并把它固化成了训练脚本里的哈希校验（每次训练结束打印保存权重和初始权重的 md5，一致就报警）。</p>
+<p>我们在自己的项目里用的是第二种，并且把检查固化进了训练脚本：每次训练结束都打印保存权重和初始权重的 md5，一致就直接报警。这个习惯后来救了我们好几次。</p>
 <h2 id="is_trainabletrue"><code>is_trainable=True</code> 能解决什么、不能解决什么</h2>
-<p>上面两个修法都验证有效，但它们的“能”和“不能”不一样，值得单独说清楚——免得有人以为传个参数就万事大吉。</p>
+<p>两个修法都验证有效，但它们的边界不一样。把话说清楚，免得有人以为传个参数就一劳永逸。</p>
 <p><strong><code>is_trainable=True</code> 能直接解决的：</strong></p>
 <ul>
-<li>让加载的 adapter 变成可训练，优化器非空，GRPO 真正更新权重——也就是“续训白跑”这个核心症状，一行解决；</li>
-<li>原理上它把 PEFT 的 <code>inference_mode</code> 变成 <code>False</code>，正好绕开 <code>add_adapter</code> 把 default 冻结的那一步。</li>
+<li>让加载进来的 adapter 变成可训练，优化器非空，GRPO 真正更新权重——“续训白跑”这个核心症状，一行解决；</li>
+<li>原理上它把 PEFT 的 <code>inference_mode</code> 变成 <code>False</code>，恰好绕开 <code>add_adapter</code> 冻结 default 的那一步。</li>
 </ul>
 <p><strong><code>is_trainable=True</code> 解决不了的：</strong></p>
 <ul>
-<li><strong>它不会给你任何警告。</strong> 它只是让“你这一次”没踩坑；框架不会告诉你“你差点踩坑”。同一个仓库里其他人（或者未来的你）用默认的 <code>is_trainable=False</code>，还是会静默白跑。这正是要提 issue 的原因：治本要靠框架 fail fast，不能指望每个用户恰好知道这个参数。</li>
-<li><strong>它不能换 LoRA 结构。</strong> RL 阶段想改 <code>r</code>、<code>target_modules</code> 或换新的 <code>peft_config</code>？TRL 1.9.2 对“PeftModel + peft_config”的组合直接报错，<code>is_trainable=True</code> 改不了 adapter 结构——这种场景只能 <code>merge_and_unload()</code> 之后重新建 LoRA。</li>
-<li><strong>它没消除 ref adapter 这个脆弱点。</strong> <code>is_trainable=True</code> 时 TRL 仍然会创建一个 <code>ref</code> 副本（实测它是冻结的、语义没问题），但“ref 应该冻结”这件事靠的是当前 PEFT 行为，而不是 TRL 自己的保证；框架修好之前，这个机制随时可能再咬人。</li>
-<li><strong>它对默认用法仍然是陷阱。</strong> 框架的默认行为（<code>is_trainable=False</code> + <code>beta != 0</code> → 空优化器）不改，文档里也不会写，被咬只是时间问题。</li>
+<li><strong>它不会给你任何警告。</strong> 它只是让你这一次没踩坑；框架不会告诉你“你差点踩坑”。同一个仓库里其他人、或者几个月后的你自己，用默认的 <code>is_trainable=False</code>，还是会一样地静默白跑。这正是要提 issue 的原因：治本要靠框架在初始化的时候 fail fast，不能指望每个用户恰好知道这个参数。</li>
+<li><strong>它不能换 LoRA 结构。</strong> 如果 RL 阶段想改 <code>r</code>、<code>target_modules</code>，或者想传一个新的 <code>peft_config</code>，TRL 1.9.2 对“PeftModel + peft_config”的组合会直接报错，<code>is_trainable=True</code> 改不了 adapter 结构——这种场景只能 <code>merge_and_unload()</code> 之后重新建 LoRA。</li>
+<li><strong>它没有消除 ref adapter 这个脆弱点。</strong> <code>is_trainable=True</code> 时 TRL 依然会创建一个 <code>ref</code> 副本（我们实测它是冻结的，语义上没有坏），但“ref 应该冻结”这件事目前靠的是 PEFT 的行为，而不是 TRL 自己给的保证。框架修好之前，这个机制随时可能再出问题。</li>
+<li><strong>默认用法仍然是个坑。</strong> 框架的默认行为（<code>is_trainable=False</code> + <code>beta != 0</code> → 空优化器）不改，文档里也不会写，迟早还会有人踩上去。</li>
 </ul>
-<p>所以结论是：<code>is_trainable=True</code> 是<strong>最快的逃生舱</strong>，<code>merge_and_unload</code> 是<strong>官方推荐且更可控的路径</strong>，但两者都只是绕路——真正该修的是框架本身。</p>
+<p>所以我的结论是：<code>is_trainable=True</code> 是最快的逃生舱，<code>merge_and_unload</code> 是官方推荐、也更可控的一条路，但两者本质上都是在绕路——真正该修的是框架本身。</p>
 <h2 id="trl">对 TRL 的建议</h2>
-<p>这个 bug 最危险的地方不是“没训”，而是<strong>没有任何报错</strong>。所以框架侧至少应该做两件事：</p>
+<p>这个 bug 最危险的地方不是“没训”，而是<strong>全程没有任何报错</strong>。框架侧至少应该做两件事：</p>
 <ol>
-<li><code>GRPOTrainer</code> 初始化时检查策略 adapter 有没有可训练参数，没有就直接抛错（提示 <code>is_trainable=True</code> 或传 <code>peft_config</code>）；</li>
-<li>创建 <code>ref</code> adapter 时显式冻结它，不要让它把 default 一起拖下水。</li>
+<li><code>GRPOTrainer</code> 初始化时检查策略 adapter 有没有可训练参数，没有就直接抛错，把原因讲清楚（提示 <code>is_trainable=True</code> 或者传 <code>peft_config</code>）；</li>
+<li>创建 <code>ref</code> adapter 的时候显式把它冻结，别让它把 default 一起拖下水。</li>
 </ol>
-<p>我已经把完整的证据链、根因分析、以及按 TRL 仓库模板写好的 issue / PR 草稿整理在了我们的实验仓库里，等人工确认后再提交。相关 issue 里有一个很像的 <a href="https://github.com/huggingface/trl/issues/3031">#3031</a>，但症状不一样：那边是“奖励完全不涨、梯度为 0”，一眼就能看出有问题；这边是<strong>所有指标都在动</strong>，只有对比权重哈希才能发现——比那个隐蔽得多。</p>
-<h2 id="_5">怎么自检自己有没有踩过</h2>
+<p>完整的证据链、根因分析、以及按 TRL 仓库模板写好的 issue / PR 草稿，我都整理在了实验仓库里，等人工确认后再提交。顺带一提，<a href="https://github.com/huggingface/trl/issues/3031">#3031</a> 看起来和我们很像，但症状不一样：那边是“奖励完全不涨、梯度为 0”，一眼就能看出有问题；我们这边是<strong>所有指标都在动</strong>，只有对比权重哈希才能发现——比那个隐蔽得多。</p>
+<h2 id="_5">怎么检查自己有没有中招</h2>
 <p>如果你做过“SFT 预热 → GRPO 续训”，而且当时用的是 <code>PeftModel.from_pretrained</code> 直接加载，花十秒钟自查一下：</p>
 <ul>
-<li>训练日志里打印一下 <code>optimizer.param_groups</code> 里的参数个数，是 0 就中招了；</li>
+<li>训练日志里加一行，打印 <code>optimizer.param_groups</code> 里的参数个数，是 0 就说明中招了；</li>
 <li>或者更直接：把训练后的 adapter 和初始 adapter 各算一个 md5，一样就是没训；</li>
-<li>再不济，对比一下训练前后在验证集上的表现，完全没变化也要怀疑。</li>
+<li>再懒一点：对比训练前后在验证集上的表现，完全没变化也要起疑心。</li>
 </ul>
 <p>这个 bug 教会我的还是那件事：<strong>RL 是“稀疏”的，日志会骗人，只有可观测性不会。</strong> 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。</p>
-<p>完整的技术档案（源码级根因、替代解释排除、Kaggle 复现结果）：<a href="https://github.com/Meredith2328/MathQwen/blob/main/docs/TRL_REF_ADAPTER_BUG.md">TRL_REF_ADAPTER_BUG.md</a></p>
+<p>完整的技术档案（源码级根因、替代解释排除、Kaggle 复现结果）会随 issue / PR 一起公开；在那之前，想动手复现的话，用上面那个公开的 Kaggle notebook 就够了。</p>
   </div>
 
   
