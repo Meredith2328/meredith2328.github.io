@@ -671,6 +671,8 @@
     var duckBtn = widget.querySelector(".dino-btn-duck");
     function sendDinoKey(code, key, down) {
       if (!frame || !frame.contentWindow) return;
+      var doc = frame.contentDocument || frame.contentWindow.document;
+      if (!doc) return;
       var ev = new KeyboardEvent(down ? "keydown" : "keyup", {
         key: key,
         keyCode: code,
@@ -678,7 +680,7 @@
         bubbles: true
       });
       try {
-        frame.contentWindow.dispatchEvent(ev);
+        doc.dispatchEvent(ev);
       } catch (err) {
         /* ignore */
       }

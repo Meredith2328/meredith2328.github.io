@@ -158,6 +158,18 @@ DINO_EMBED_SCRIPT = (
     "})();</script>"
 )
 
+DINO_CLICK_SCRIPT = (
+    "<script>(function(){"
+    "var c=document.getElementById('runner-container');"
+    "if(!c)return;"
+    "c.addEventListener('click',function(){"
+    "if(window.Runner&&Runner.instance_){"
+    "Runner.instance_.onKeyDown({type:'touchstart',preventDefault:function(){},keyCode:0});"
+    "}"
+    "});"
+    "})();</script>"
+)
+
 
 def log(msg: str) -> None:
     print(f"[pilog] {msg}")
@@ -766,6 +778,10 @@ def build_site(
                 DINO_BACK_STYLE + "  .sound-toggle {",
                 1,
             )
+        if "</body>" in html:
+            html = html.replace("</body>", DINO_CLICK_SCRIPT + "\n</body>", 1)
+        else:
+            html += DINO_CLICK_SCRIPT
         dino_out.write_text(html, encoding="utf-8")
         log("copied dino game")
 

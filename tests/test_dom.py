@@ -276,6 +276,12 @@ def main() -> None:
         ok &= check("dino iframe loaded", iframe.locator("canvas").count() >= 1)
         ok &= check("dino loading hidden after load",
                     page.locator("#dino-loading").evaluate("el => el.hidden"))
+        frame = next(f for f in page.frames if "dino/index.html" in f.url)
+        page.locator(".dino-btn-jump").click()
+        page.wait_for_timeout(600)
+        dino_playing = frame.evaluate(
+            "Runner.instance_ ? Runner.instance_.playing : false")
+        ok &= check("dino jump button starts game", dino_playing)
 
         # pilog-blog rich markdown: strikethrough + LaTeX math
         page.goto(base + "/posts/toy/pilog-blog.html", wait_until="networkidle")
@@ -289,6 +295,9 @@ def main() -> None:
 
         # long post section paging + styled related/series footer boxes
         page.goto(base + "/posts/notes/algo/algorithm-4.html", wait_until="networkidle")
+        page.wait_for_timeout(500)
+        load_y = page.evaluate("window.pageYOffset")
+        ok &= check("paged post does not auto-scroll on load", load_y < 50, str(load_y))
         chapters = page.locator(".post-chapter").count()
         ok &= check("long post paged into chapters", chapters >= 5, str(chapters))
         ok &= check("pager nav visible", page.locator("#post-pager").is_visible())

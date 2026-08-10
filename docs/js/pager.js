@@ -13,6 +13,7 @@
   var chapters = body.querySelectorAll(".post-chapter");
   var pages = Math.ceil(total / per);
   var page = 0;
+  var firstShow = true;
 
   var prevBtn = document.getElementById("pager-prev");
   var nextBtn = document.getElementById("pager-next");
@@ -56,6 +57,12 @@
     if (history.replaceState) {
       history.replaceState(null, "", "#ch-" + (page + 1));
     }
+    if (firstShow) {
+      // initial page load: never auto-scroll to the body
+      firstShow = false;
+      return;
+    }
+    firstShow = false;
     if (scrollTarget && scrollTarget !== body) {
       scrollToEl(scrollTarget);
     } else {
