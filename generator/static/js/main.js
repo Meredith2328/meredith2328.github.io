@@ -590,6 +590,17 @@
     var collapseBtn = document.getElementById("tree-collapse");
     if (expandBtn) expandBtn.addEventListener("click", function () { setAll(true); });
     if (collapseBtn) collapseBtn.addEventListener("click", function () { setAll(false); });
+    var leavesBtn = document.getElementById("tree-collapse-leaves");
+    if (leavesBtn) {
+      leavesBtn.addEventListener("click", function () {
+        treeRoot.querySelectorAll(".tree-folder").forEach(function (li) {
+          var hasSub = li.querySelector(
+            ":scope > .tree-children > .tree-folder"
+          );
+          li.classList.toggle("is-open", !!hasSub);
+        });
+      });
+    }
   }
 
   function locateInTree(folder) {
@@ -697,17 +708,28 @@
   if (diceBtns.length) {
     var diceRoot = window.PILOG_ROOT || "";
     var cardUrls = null;
+
+    // preload the post list so a click feels instant
+    fetch(diceRoot + "data/cards.json")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        cardUrls = data.map(function (e) { return e.url; });
+      })
+      .catch(function () {});
+
     function jumpRandom() {
       var go = function () {
         if (!cardUrls || !cardUrls.length) return;
-        // a quick tree-flash-style blink before grabbing a random toy
+        var target =
+          diceRoot + cardUrls[Math.floor(Math.random() * cardUrls.length)];
+        // roll the dice and flash the page before grabbing a random toy
+        diceBtns.forEach(function (b) { b.classList.add("is-rolling"); });
         var overlay = document.createElement("div");
         overlay.className = "random-flash";
         document.body.appendChild(overlay);
         setTimeout(function () {
-          window.location.href =
-            diceRoot + cardUrls[Math.floor(Math.random() * cardUrls.length)];
-        }, 320);
+          window.location.href = target;
+        }, 300);
       };
       if (cardUrls) {
         go();

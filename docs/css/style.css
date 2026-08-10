@@ -1873,21 +1873,29 @@ a:hover {
   box-shadow: 1px 1px 0 0 var(--shadow);
 }
 
-.random-dice-text {
-  width: auto;
-  height: auto;
-  padding: 0;
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text);
+.site-nav .nav-dice {
+  margin-left: auto;
 }
 
-.random-dice-text:hover {
-  background: transparent;
-  color: var(--accent);
+.random-dice-nav {
+  width: 28px;
+  height: 28px;
+  align-self: center;
+  margin: 2px 10px 2px 16px;
+  box-shadow: 2px 2px 0 0 var(--shadow);
+}
+
+.random-dice.is-rolling svg {
+  animation: dice-roll 0.3s steps(3) 1;
+}
+
+@keyframes dice-roll {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .random-flash {
@@ -2049,8 +2057,8 @@ a:hover {
 .markdown-body blockquote {
   margin: 0 0 1.1em;
   padding: 10px 16px;
-  background: var(--panel);
-  border-left: 5px solid var(--ink);
+  background: #e8f0fe;
+  border-left: 5px solid var(--accent);
   color: var(--text);
 }
 

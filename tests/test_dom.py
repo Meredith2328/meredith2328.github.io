@@ -166,6 +166,14 @@ def main() -> None:
         page.click("#tree-collapse")
         ok &= check("tree collapse hides children", page.locator(".tree-folder").first.evaluate(
             "el => !el.classList.contains('is-open')"))
+        page.click("#tree-expand")
+        page.click("#tree-collapse-leaves")
+        ok &= check("collapse leaves closes leaf dirs",
+                    page.locator("li[data-path='posts/toy']").evaluate(
+                        "el => !el.classList.contains('is-open')"))
+        ok &= check("collapse leaves keeps parents open",
+                    page.locator("li[data-path='posts']").evaluate(
+                        "el => el.classList.contains('is-open')"))
         page.locator(".site-nav a[data-kind='folder']", has_text="CS相关").click()
         ok &= check("tree nav stays in tree", page.locator("#view-tree").evaluate("el => !el.hidden"))
         ok &= check("tree nav flashes folder", page.locator(".tree-row.tree-flash").count() >= 1)
@@ -374,9 +382,13 @@ def main() -> None:
         page.wait_for_timeout(200)
         ok &= check("lightbox closes on Esc", page.locator(".lightbox").count() == 0)
 
-        # random dice (header + footer)
-        ok &= check("random dice in header", page.locator(".header-row .random-dice").count() == 1)
-        ok &= check("random dice in footer", page.locator(".site-footer .random-dice").count() == 1)
+        # random dice lives in the nav row and jumps to a random post
+        ok &= check("random dice in nav row", page.locator(".site-nav .random-dice").count() == 1)
+        ok &= check("no stray dice in footer", page.locator(".site-footer .random-dice").count() == 0)
+        page.wait_for_timeout(400)  # let the dice preload the post list
+        page.locator(".site-nav .random-dice").click()
+        page.wait_for_timeout(900)
+        ok &= check("dice jumps to a random post", "/posts/" in page.url, page.url)
 
         # og:image uses the cover (not favicon) and description is filled
         page.goto(base + "/posts/toy/10pi.html", wait_until="networkidle")

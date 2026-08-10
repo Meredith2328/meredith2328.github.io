@@ -241,6 +241,31 @@ def render_nav(page_url: str, ctx: MarkdownContext) -> str:
     for a in soup.find_all("a", href=True):
         if "#folder=" in a["href"]:
             a["data-kind"] = "folder"
+    # random-post dice pinned to the far right of the nav row
+    top_ul = soup.find("ul")
+    if top_ul is not None:
+        li = soup.new_tag("li")
+        li["class"] = "nav-dice"
+        btn = soup.new_tag("button")
+        btn["type"] = "button"
+        btn["class"] = "random-dice random-dice-nav"
+        btn["title"] = "闭眼抓一篇"
+        btn["aria-label"] = "随机抓一篇文章"
+        svg = BeautifulSoup(
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" '
+            'stroke="currentColor" stroke-width="2" aria-hidden="true">'
+            '<rect x="3" y="3" width="18" height="18"/>'
+            '<rect x="6" y="6" width="4" height="4" fill="currentColor" stroke="none"/>'
+            '<rect x="14" y="6" width="4" height="4" fill="currentColor" stroke="none"/>'
+            '<rect x="10" y="10" width="4" height="4" fill="currentColor" stroke="none"/>'
+            '<rect x="6" y="14" width="4" height="4" fill="currentColor" stroke="none"/>'
+            '<rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/>'
+            "</svg>",
+            "html.parser",
+        ).svg
+        btn.append(svg)
+        li.append(btn)
+        top_ul.append(li)
     return str(soup)
 
 
