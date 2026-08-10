@@ -169,6 +169,55 @@ def test_hidden_posts_feature_hero_and_nojekyll() -> None:
     print("  [PASS] hidden excluded; hero + cover + nojekyll + markdown preview present")
 
 
+def test_long_post_chapter_paging() -> None:
+    import json
+
+    from build import build_site
+
+    blog = TMP / "blogs3"
+    out = TMP / "out3"
+    if out.exists():
+        shutil.rmtree(out)
+    (blog / "posts").mkdir(parents=True, exist_ok=True)
+    (blog / "posts" / "long.md").write_text(
+        make_md(
+            "长文测试",
+            "## 第一章\n\n内容一。\n\n## 第二章\n\n内容二。\n\n"
+            "## 第三章\n\n内容三。\n\n相关：[[another|另一篇]]",
+            date="2026-01-01",
+            chapters_per_page=1,
+        ),
+        encoding="utf-8",
+    )
+    (blog / "posts" / "another.md").write_text(
+        make_md("另一篇", "正文。", date="2026-01-02"),
+        encoding="utf-8",
+    )
+    build_site(
+        config_path=ROOT / "config.json",
+        blog_dir=str(blog),
+        out_dir=str(out),
+    )
+    html = (out / "posts" / "long.html").read_text(encoding="utf-8")
+    assert html.count('class="post-chapter"') == 3, html[:400]
+    assert 'id="post-pager"' in html, html[-600:]
+    assert 'class="post-rel is-related"' in html, html[-600:]
+    assert 'data-chapters="3"' in html
+    # the footer aside must stay outside the chapter divs
+    assert html.rfind('class="post-chapter"') < html.find('class="post-rel'), (
+        "related footer should come after the last chapter"
+    )
+    # wikilinks in the styled footer still count as graph refs
+    graph = json.loads((out / "data" / "graph.json").read_text(encoding="utf-8"))
+    refs = [(l["source"], l["target"]) for l in graph["links"] if l["kind"] == "ref"]
+    assert ("posts/long", "posts/another") in refs, refs
+    # full-text index carries the whole body
+    full = json.loads((out / "data" / "fulltext.json").read_text(encoding="utf-8"))
+    long_full = next(e for e in full if e["url"] == "posts/long.html")
+    assert "内容三" in long_full["text"], long_full["text"][:200]
+    print("  [PASS] long post chapter paging + styled related footer + refs preserved")
+
+
 def main() -> None:
     if TMP.exists():
         shutil.rmtree(TMP)
@@ -177,6 +226,7 @@ def main() -> None:
         test_markdown_del_and_math()
         test_gif_thumbnail_keeps_animation()
         test_hidden_posts_feature_hero_and_nojekyll()
+        test_long_post_chapter_paging()
     finally:
         shutil.rmtree(TMP, ignore_errors=True)
     print("all feature checks passed")

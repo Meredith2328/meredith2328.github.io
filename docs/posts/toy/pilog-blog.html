@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <h1 id="pilog">用 pilog 搭建像素风博客</h1>
 <p><strong>pilog</strong> 是个人自制的<strong>所见即所得</strong>的超轻量静态博客生成器。</p>
 <p>只需要在 Obsidian 里打开  <code>blogs/</code> 目录写 Markdown，然后可以这么用：</p>
@@ -216,6 +218,12 @@
 <td>number</td>
 <td>手动排序（置顶组内、日期之前）</td>
 <td>按日期</td>
+</tr>
+<tr>
+<td><code>chapters_per_page</code></td>
+<td>int</td>
+<td>超长文章按章节分页：正文按标题切成章节，同一链接下客户端切换，每页同时显示 N 章</td>
+<td>不分页</td>
 </tr>
 </tbody>
 </table>
@@ -366,7 +374,7 @@
 </ul>
 <p>游戏整体复刻了 Chromium 官方的像素配色与手感，也定义了本站的视觉语言：灰白底、锐利直角、没有多余的圆角。</p>
 <p>想直接玩，点这里：<a href="../../dino/index.html">开始游戏</a>。</p>
-<p>相关：<a href="10pi.html">玩具箱索引</a></p>
+
 <div class="footnote">
 <hr/>
 <ol>
@@ -374,8 +382,10 @@
 <p>脚注内容会显示在页面底部。 <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">↩</a></p>
 </li>
 </ol>
-</div>
+</div><aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="10pi.html">玩具箱索引</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -439,5 +449,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

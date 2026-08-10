@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -106,10 +108,10 @@
   </div>
   
 
-  <div class="post-body markdown-body">
-    <p>顾名思义，玩具箱就应该是玩具箱。
-知识笔记、工具笔记、写出的小玩意儿，都是玩具。
-有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。</p>
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
+    <p>顾名思义，玩具箱就应该是玩具箱。</p>
+<p>知识笔记、工具笔记、写出的小玩意儿，都是玩具。</p>
+<p>有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。</p>
 <p>任何批评和建议均会受到最热烈的欢迎： <a href="https://github.com/Meredith2328/meredith2328.github.io/issues">Issues</a> / pipipi2328@gmail.com</p>
 <h2 id="_1">各种工具介绍</h2>
 <p>主要集中于深度学习常用的工具。</p>
@@ -118,30 +120,36 @@
 <a href="../notes/tools/einops.html">einops</a></p>
 <h2 id="_2">好玩的玩具们</h2>
 <p>写的奇怪的小玩意儿。</p>
-<p><a href="https://meredith2328.github.io/notegotya/">notegotya</a>
-<a href="https://meredith2328.github.io/reverseChess/">贴贴棋</a>
-<a href="https://meredith2328.github.io/freshdan/#/">freshdan</a></p>
+<p><a href="https://meredith2328.github.io/notegotya/">notegotya</a></p>
+<p><a href="https://meredith2328.github.io/reverseChess/">贴贴棋</a></p>
+<p><a href="https://meredith2328.github.io/freshdan/#/">freshdan</a></p>
 <h2 id="_3">翻译和转载的文章</h2>
 <p>有时还会翻译或转载一些我觉得很有趣的内容。</p>
-<p><a href="../reference/career-advice-by-tao.html">陶哲轩的职业建议</a>
-<a href="https://www.cs.virginia.edu/~robins/YouAndYourResearch.html">You and Your Research - Richard Hamming</a></p>
+<p><a href="../reference/career-advice-by-tao.html">陶哲轩的职业建议</a></p>
+<p><a href="../reference/fudan-mlsys-cn.html">机器学习系统课程中文翻译</a></p>
+<p><a href="https://www.cs.virginia.edu/~robins/YouAndYourResearch.html">You and Your Research - Richard Hamming</a></p>
 <h2 id="cs336">CS336</h2>
 <p>搭建起比较现代的Transformer训练循环，进行实验。</p>
-<p><a href="../courses/cs336/CS336-hw1-1.html">Assignment 1 前半段</a>
-<a href="../courses/cs336/CS336-hw1-2.html">Assignment 1 后半段</a></p>
+<p><a href="../courses/cs336/CS336-hw1-1.html">Assignment 1 前半段</a></p>
+<p><a href="../courses/cs336/CS336-hw1-2.html">Assignment 1 后半段</a></p>
 <p>为此单独写了一些知识性的专题，当然也包括之前的“各种工具介绍”。</p>
-<p><a href="../notes/ml/LLMestimate.html">估算Transformer模型参数量</a>
-<a href="../notes/ml/LLMestimate2.html">估算AdamW训练内存和计算量</a>
-<a href="../notes/ml/optimizer.html">从SGD到AdamW，优化器怎么发展过来的？</a>
-<a href="../notes/ml/softmax.html">原始softmax、数值稳定的softmax和在线softmax</a>
-<a href="../notes/ml/nanovllm.html">结合nanovllm的FlashAttention和PagedAttention主要原理概述</a></p>
+<p><a href="../notes/ml/LLMestimate.html">估算Transformer模型参数量</a></p>
+<p><a href="../notes/ml/LLMestimate2.html">估算AdamW训练内存和计算量</a></p>
+<p><a href="../notes/ml/optimizer.html">从SGD到AdamW，优化器怎么发展过来的？</a></p>
+<p><a href="../notes/ml/softmax.html">原始softmax、数值稳定的softmax和在线softmax</a></p>
+<p><a href="../notes/ml/nanovllm.html">结合nanovllm的FlashAttention和PagedAttention主要原理概述</a></p>
+<h2 id="rl">大模型训练与 RL</h2>
+<p>一些训练和开源相关的记录。</p>
+<p><a href="../notes/ml/mathqwen-0.6b-agentic-rl.html">双卡 5090 训练 Qwen3-0.6B：从数学推理到 Agentic RL</a></p>
+<p><a href="../notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">TRL 1.9.2 会“假装训练”的 bug</a></p>
+<p><a href="../notes/ml/TensorZero-6949.html">给 tensorzero 提的第一个 PR</a></p>
 <h2 id="_4">数据结构与算法</h2>
 <p>总计三套笔记：算法设计与分析（算法导论），洛谷基础篇，LeetCode HOT 100。</p>
-<p><a href="../notes/algo/algorithm-1.html">算法课-数学部分</a>
-<a href="../notes/algo/algorithm-2.html">算法课-算法部分</a>
-<a href="../notes/algo/algorithm-3.html">洛谷基础篇</a>
-<a href="../notes/algo/algorithm-4.html">LeetCode HOT 100的前50</a>
-<a href="../notes/algo/algorithm-5.html">LeetCode HOT 100的后50</a></p>
+<p><a href="../notes/algo/algorithm-1.html">算法课-数学部分</a></p>
+<p><a href="../notes/algo/algorithm-2.html">算法课-算法部分</a></p>
+<p><a href="../notes/algo/algorithm-3.html">洛谷基础篇</a></p>
+<p><a href="../notes/algo/algorithm-4.html">LeetCode HOT 100的前50</a></p>
+<p><a href="../notes/algo/algorithm-5.html">LeetCode HOT 100的后50</a></p>
 <h2 id="minitorch">minitorch</h2>
 <p>一个有趣的手写简易版PyTorch的项目。
 基于Python基础语法、或Numpy、或Numba、或CUDA，编写一个符合接口的迷你版PyTorch。
@@ -149,26 +157,28 @@
 <p><a href="../notes/ml/minitorch.html">MiniTorch</a></p>
 <h2 id="csapp">CSAPP</h2>
 <p>复旦大学软件工程专业的ICS课程lab，基本与CMU原版保持一致。</p>
-<p><a href="../courses/csapp/csapp-shelllab.html">Shelllab</a>
-<a href="../courses/csapp/csapp-cachelab.html">Cachelab</a>
-<a href="../courses/csapp/csapp-attacklab.html">Attacklab</a>
-<a href="../courses/csapp/csapp-bomblab.html">Bomblab</a>
-<a href="../courses/csapp/csapp-datalab.html">Datalab</a>
-为了辅助Datalab的讲解，单独编写了介绍浮点数的 <a href="../courses/csapp/ieee754.html">ieee754</a> 。</p>
+<p><a href="../courses/csapp/csapp-shelllab.html">Shelllab</a></p>
+<p><a href="../courses/csapp/csapp-cachelab.html">Cachelab</a></p>
+<p><a href="../courses/csapp/csapp-attacklab.html">Attacklab</a></p>
+<p><a href="../courses/csapp/csapp-bomblab.html">Bomblab</a></p>
+<p><a href="../courses/csapp/csapp-datalab.html">Datalab</a></p>
+<p>为了辅助Datalab的讲解，单独编写了介绍浮点数的 <a href="../courses/csapp/ieee754.html">ieee754</a> 。</p>
 <h2 id="cs61a-2024-summer">CS61A 2024 summer</h2>
 <p>只记录了Discussion(disc)部分的笔记：
 因为这一部分难度适中、有东西说，相关的笔记也能推广到lab和hw部分w
 跳过了不感兴趣的SQL和scheme部分。</p>
-<p><a href="../courses/cs61a/cs61a-disc07.html">disc07 树、链表</a>
-<a href="../courses/cs61a/cs61a-disc05.html">disc05 迭代、时空复杂度</a>
-<a href="../courses/cs61a/cs61a-disc04.html">disc04 树的递归</a>
-<a href="../courses/cs61a/cs61a-disc03.html">disc03 递归</a>
-<a href="../courses/cs61a/cs61a-disc02.html">disc02 高阶函数</a>
-<a href="../courses/cs61a/cs61a-disc01.html">disc01 迭代与抽象</a></p>
+<p><a href="../courses/cs61a/cs61a-disc07.html">disc07 树、链表</a></p>
+<p><a href="../courses/cs61a/cs61a-disc05.html">disc05 迭代、时空复杂度</a></p>
+<p><a href="../courses/cs61a/cs61a-disc04.html">disc04 树的递归</a></p>
+<p><a href="../courses/cs61a/cs61a-disc03.html">disc03 递归</a></p>
+<p><a href="../courses/cs61a/cs61a-disc02.html">disc02 高阶函数</a></p>
+<p><a href="../courses/cs61a/cs61a-disc01.html">disc01 迭代与抽象</a></p>
 <blockquote>
 <p>封面是 <a href="https://space.bilibili.com/3461581623003593">夏夜将终乐队</a> 的一次演出。这个乐队是因为ヨルシカ（Yorushika）结成的校园乐队。<br/><a href="xyjz.html">夏夜将终官网</a> · <a href="pilog-blog.html">用 pilog 搭建像素风博客</a> · <a href="KaguraHikari.html">未知领域</a></p>
 </blockquote>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -232,5 +242,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

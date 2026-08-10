@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,8 +104,8 @@
 
   
 
-  <div class="post-body markdown-body">
-    <p>回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。</p>
+  <div class="post-body markdown-body" data-chapters="9" data-per-page="1">
+    <div class="post-chapter" data-ch="1"><p>回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。</p>
 <!-- more -->
 <p>大致目的是完整地、成体系地过，
 然后对关键点仔细地、反复地揣摩把握，
@@ -116,7 +118,7 @@
 专题15 动态规划
 专题16 多维动态规划
 专题17 技巧</p>
-<h3 id="10">专题10 回溯</h3>
+</div><div class="post-chapter" data-ch="2" data-title="专题10 回溯"><h3 id="10">专题10 回溯</h3>
 <p>46 全排列</p>
 <p>回溯模板：结束条件，遍历选择，做出选择。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -367,7 +369,7 @@
                 res.append(q[0][1])
         return res
 </code></pre></div>
-<h3 id="11">专题11 二分查找</h3>
+</div><div class="post-chapter" data-ch="3" data-title="专题11 二分查找"><h3 id="11">专题11 二分查找</h3>
 <p>35 搜索插入位置</p>
 <p>bisect的两个函数分别叫bisect_left和bisect_right。</p>
 <p>它们的特点是，你把新元素插入到它返回的位置，数组仍然保持有序。</p>
@@ -481,7 +483,7 @@
 
         return 0
 </code></pre></div>
-<h3 id="12">专题12 栈</h3>
+</div><div class="post-chapter" data-ch="4" data-title="专题12 栈"><h3 id="12">专题12 栈</h3>
 <p>20 有效的括号</p>
 <p>注意在使用下标前先做是否为空的判断，这个是容易漏掉的。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -626,7 +628,7 @@
 
         return max_area
 </code></pre></div>
-<h3 id="13">专题13 堆</h3>
+</div><div class="post-chapter" data-ch="5" data-title="专题13 堆"><h3 id="13">专题13 堆</h3>
 <p>215 数组中的第K个最大元素</p>
 <div class="highlight"><pre><span></span><code>class Solution:
     def findKthLargest(self, nums: List[int], k: int) -&gt; int:
@@ -702,7 +704,7 @@
             # obj.addNum(num)
 # param_2 = obj.findMedian()
 </code></pre></div>
-<h3 id="14">专题14 贪心</h3>
+</div><div class="post-chapter" data-ch="6" data-title="专题14 贪心"><h3 id="14">专题14 贪心</h3>
 <p>虽然同样称为贪心，但是这一套贪心的四道题和算法导论的四道题细究起来并不是一类。</p>
 <p>算法导论的贪心一般是“做显式的贪心选择”，通过替换/交换法进行贪心论证。例如活动选择问题，每次都选择结束时间最早的相容活动，这样的话可以给其他活动留出最多的时间、以整体选择最多的活动。</p>
 <p>而这里的四道题更倾向于“迭代维护状态，以做出最优选择”。</p>
@@ -788,7 +790,7 @@
                 start = i + 1
         return res
 </code></pre></div>
-<h3 id="15">专题15 动态规划</h3>
+</div><div class="post-chapter" data-ch="7" data-title="专题15 动态规划"><h3 id="15">专题15 动态规划</h3>
 <p>动态规划的本质就是填表格查表格。</p>
 <p>某个问题可以由一些子问题的值得到，所以查子问题的表格，然后填入该问题的表格。</p>
 <p>70 爬楼梯</p>
@@ -1048,7 +1050,7 @@
                     maxlen = max(maxlen, i - stk[-1])
         return maxlen
 </code></pre></div>
-<h3 id="16">专题16 多维动态规划</h3>
+</div><div class="post-chapter" data-ch="8" data-title="专题16 多维动态规划"><h3 id="16">专题16 多维动态规划</h3>
 <p>62 不同路径</p>
 <p>完全模拟了题目要求的形状。注意一下从右下往左上转移的顺序就行。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -1150,7 +1152,7 @@
 
         return dp[m][n]
 </code></pre></div>
-<h3 id="17">专题17 技巧</h3>
+</div><div class="post-chapter" data-ch="9" data-title="专题17 技巧"><h3 id="17">专题17 技巧</h3>
 <p>136 只出现一次的数字</p>
 <p>把出现偶数次的用异或消除掉。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -1264,8 +1266,17 @@
                 l = mid + 1
         return l
 </code></pre></div>
-<p>上一篇：<a href="algorithm-4.html">04 HOT 100（前 50）</a></p>
+</div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-4.html" title="上一篇">← 04 HOT 100（前 50）</a></div></aside>
   </div>
+
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  
 
   
   <section class="post-comments">
@@ -1329,5 +1340,9 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/pager.js" defer></script>
+
+
 </body>
 </html>

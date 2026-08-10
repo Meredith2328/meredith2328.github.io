@@ -28,9 +28,18 @@
   </div>
   {% endif %}
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="{{ post.chapter_count }}" data-per-page="{{ post.chapters_per_page }}">
     {{ post.html|safe }}
   </div>
+
+  {% if post.chapter_count and post.chapter_count > 1 %}
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  {% endif %}
 
   {% if giscus and giscus.enabled and giscus.repo %}
   <section class="post-comments">
@@ -52,4 +61,10 @@
   </section>
   {% endif %}
 </article>
+{% endblock %}
+
+{% block scripts %}
+{% if post.chapter_count and post.chapter_count > 1 %}
+<script src="{{ root }}js/pager.js" defer></script>
+{% endif %}
 {% endblock %}

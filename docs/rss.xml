@@ -65,8 +65,8 @@
       </item>
       <item>
         <title>给 tensorzero 提的第一个 PR：object_storage.endpoint 支持环境变量</title>
-        <link>https://meredith2328.github.io/posts/notes/TensorZero-6949.html</link>
-        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/TensorZero-6949.html</guid>
+        <link>https://meredith2328.github.io/posts/notes/ml/TensorZero-6949.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/TensorZero-6949.html</guid>
         <pubDate>Sat, 14 Mar 2026 00:00:00 -0000</pubDate>
         <description>tensorzero 是一个做 LLM 推理和优化的框架，配置里的 &lt;code&gt;[object_storage]&lt;/code&gt; 用来管多模态推理时图片之类文件的存储。原来这个段的 &lt;code&gt;endpoint&lt;/code&gt; 只能写死一个地址，我提的 PR 让它也能写成 &lt;code&gt;env::SOME_ENV_VAR&lt;/code&gt;，启动的时候从环境变量里读。这样内网地址、测试和生产的存储端点就不用都摊在配置文件里了。 当时提的 PR 是…</description>
       </item>
@@ -89,7 +89,7 @@
         <link>https://meredith2328.github.io/posts/courses/cs336/CS336-hw1-1.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/courses/cs336/CS336-hw1-1.html</guid>
         <pubDate>Tue, 10 Mar 2026 00:00:00 -0000</pubDate>
-        <description>从分词开始，搭建起Transformer架构。  作业目录：   BPE tokenizer ；  Transformer LM ；  The cross-entropy loss function and the AdamW optimizer ；  The training loop (support: serilizing, loading model, optimizer state) ；  提到的工具： 4.1 Cross-entropy…</description>
+        <description>从分词开始，搭建起Transformer架构。  CS336 Assignment 1 分两篇记录：   前半段：架构（本篇）：BPE、Transformer LM、损失函数与优化器、训练循环 ；  后半段：实验：跑通与调参记录 ；  作业目录：   BPE tokenizer ；  Transformer LM ；  The cross-entropy loss function and the AdamW… ； </description>
       </item>
       <item>
         <title>CS336 · Assignment 1 · 后半段：实验</title>
@@ -117,7 +117,7 @@
         <link>https://meredith2328.github.io/posts/notes/ml/LLMestimate.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/LLMestimate.html</guid>
         <pubDate>Tue, 03 Mar 2026 00:00:00 -0000</pubDate>
-        <description>本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 省流： &lt;span class="arithmatex"&gt;\(P ≈ 12Nd^2 + Vd\)&lt;/span&gt;  本文的LLM基于Transformer Decoder结构，以 GPT2-XL 为例。它有以下超参数设置： 实测得到的可训练参数量为 &lt;code&gt;1,557,611,200&lt;/code&gt; = 1.56B。 以下是使用HuggingFace…</description>
+        <description>本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 省流： &lt;span class="arithmatex"&gt;\(P ≈ 12Nd^2 + Vd\)&lt;/span&gt;    01 参数量与训练 FLOPs（本篇） ；  02 训练的内存和计算需求 ；  本文的LLM基于Transformer Decoder结构，以 GPT2-XL…</description>
       </item>
       <item>
         <title>数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</title>
@@ -173,7 +173,7 @@
         <link>https://meredith2328.github.io/posts/notes/algo/algorithm-1.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/algo/algorithm-1.html</guid>
         <pubDate>Sun, 04 Jan 2026 00:00:00 -0000</pubDate>
-        <description>总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法    Lec1 复杂度的严格证明√ ；  Lec2 求和公式，1/n和ln n的关系整理√ ；  Lec2 各种分治递归求解方法及其练习√ ；  Lec4 哈希~~和布隆过滤器~~的分析√ ；  Lec8 摊还分析√ ；  Lec12 在线算法及竞争性分析√ ；  Lec13 线性规划与单纯形法√ ；  ps. 感觉Lec4 哈希和Lec5…</description>
+        <description>总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法  本系列五篇，从课程笔记到刷题整理：   01 数学篇（本篇）：复杂度证明、求和公式、分治、哈希、摊还分析、在线算法、线性规划 ；  02 算法篇：用 3x2 审视算法课的算法部分 ；  03 模板整理：基础数据结构与算法模板 ；  4.…</description>
       </item>
       <item>
         <title>Career advice 丨 职业建议（翻译自 Terence Tao 的博客）</title>
@@ -236,7 +236,7 @@
         <link>https://meredith2328.github.io/posts/courses/csapp/csapp-datalab.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/courses/csapp/csapp-datalab.html</guid>
         <pubDate>Tue, 30 Apr 2024 00:00:00 -0000</pubDate>
-        <description>对于浮点数部分，额外写了笔记，欢迎参阅： IEEE754浮点数与十进制数互相转换流程及例子  解法一；  直接考虑所求的两种情况。 利用对称差公式：x ^ y = (x&amp;amp;~y) | (y&amp;amp;~x)， 我们需要取这两种情况，所以取两次反， 并将其中一次取反运用于&lt;em&gt;狄·摩根律&lt;/em&gt;完成从|到&amp;amp;的转换，即得所求为 &lt;code&gt;~(~(x &amp;amp; ~y) &amp;amp; ~(y &amp;amp; ~x))&lt;/code&gt;。 -…</description>
+        <description>CSAPP（ICS 课程）lab 笔记：   Datalab（本篇）：位运算与浮点数 ；  Bomblab：二进制炸弹 ；  Attacklab：缓冲区攻击 ；  Cachelab：缓存模拟 ；  Shelllab：Shell 实现 ；  浮点数部分单独写了笔记，欢迎参阅 [[ieee754|IEEE754…</description>
       </item>
       <item>
         <title>友情链接们</title>
@@ -285,7 +285,7 @@
         <link>https://meredith2328.github.io/posts/courses/cs61a/cs61a-disc01.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/courses/cs61a/cs61a-disc01.html</guid>
         <pubDate>Mon, 17 Jul 2023 00:00:00 -0000</pubDate>
-        <description>Discussion 1 | CS 61A Summer 2024 eg. &lt;code&gt;race(3, 4)&lt;/code&gt; 以下先考虑前10min中构造无限循环。 第一个条件显然不符合我们的需要。 因为第二个条件是 &lt;code&gt;tortoise - hare&lt;/code&gt; ，若其为负值、则仍可以继续循环。 0-4min 由于&lt;code&gt;y&amp;gt;x&lt;/code&gt;，&lt;code&gt;hare=my &amp;gt; tortoise=mx&lt;/code&gt;，不可能追上。 5-9min 此时 &lt;code&gt;hare=5y&lt;/code&gt; ，`tortoise=mx, m = 6,…</description>
+        <description>Discussion 1 | CS 61A Summer 2024 CS61A 2024 summer Discussion 笔记（共六篇，disc06 没写）：   Disc 01 迭代与抽象（本篇） ；  Disc 02 高阶函数 ；  Disc 03 递归 ；  Disc 04 树的递归 ；  5.…</description>
       </item>
       <item>
         <title>CS61A · Disc 02 · 高阶函数</title>

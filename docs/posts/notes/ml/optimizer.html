@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>Adam = Momentum + RMSProp</p>
 <!-- more -->
 <blockquote>
@@ -420,8 +422,10 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
 
         <span class="k">return</span> <span class="n">loss</span>
 </code></pre></div>
-<p>相关：<a href="minitorch.html">minitorch 里的实现</a> · <a href="LLMestimate2.html">训练内存与计算量估算</a></p>
+<aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="minitorch.html">minitorch 里的实现</a><a class="post-rel-link" href="LLMestimate2.html">训练内存与计算量估算</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -485,5 +489,7 @@ E[\hat{\mu}_t] &amp;= E\left[ (1-\beta) \sum_{i=1}^t \beta^{t-i} x_i \right] \\
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

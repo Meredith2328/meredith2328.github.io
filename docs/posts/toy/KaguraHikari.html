@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -106,7 +108,7 @@
   </div>
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>by. ~~看少女歌剧看魔怔了的~~十派</p>
 <p>如何界定神乐光的萌点？<br/>
 首先可以盖棺定论地说，神乐光绝对不是“傲娇”一词就能概括的。<br/>
@@ -142,6 +144,8 @@
 3.“不够成熟的作品”的魅力在哪里？<br/>
 如果能够回答清楚第3个问题，就能理解笔者为什么对“日常番”有长久的喜爱了，也能够理解为什么神乐光的“天然”是其最大的萌点、而不是其他了。</p>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -205,5 +209,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

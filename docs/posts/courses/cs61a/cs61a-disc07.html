@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <h2 id="q1-is-bst">Q1: Is BST</h2>
 <p>左子树的所有节点的值都小于等于父节点的值，
 右子树的所有节点的值都大于父节点的值。</p>
@@ -375,8 +377,10 @@ Place the division pattern from the example above in a <code>while</code> stat
     <span class="n">p</span><span class="o">.</span><span class="n">rest</span> <span class="o">=</span> <span class="n">Link</span><span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">before</span>
 </code></pre></div>
-<p>上一篇：<a href="cs61a-disc05.html">Disc 05 迭代、时空复杂度</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="cs61a-disc05.html" title="上一篇">← Disc 05 迭代、时空复杂度</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -440,5 +444,7 @@ Place the division pattern from the example above in a <code>while</code> stat
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

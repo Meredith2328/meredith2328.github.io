@@ -7,6 +7,7 @@ published: true
 hideInList: false
 feature: null
 isTop: false
+chapters_per_page: 3
 ---
 参考：《深入浅出程序设计竞赛（基础篇）（汪楚奇）》。
 

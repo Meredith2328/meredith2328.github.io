@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>原来只是精度、数量级，再加上偏移量这个从无符号数到有符号数的工程实现。
 <del>浮点数从未如此简单。</del> （不是）</p>
 <!-- more -->
@@ -220,8 +222,10 @@ s=0。
 <p><strong>附录：对于上述s, exp, frac三个二进制段长度为1, 4, 3的非负数表格完整示例：</strong>
 <img alt="" src="../../migrated/post-images/20250617184539.png"/>
 ps. 建议从上表格任选位表示和十进制，练习从十进制推位表示或从位表示推十进制，熟练掌握转换方法。</p>
-<p>相关：<a href="csapp-datalab.html">Datalab</a></p>
+<aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="csapp-datalab.html">Datalab</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -285,5 +289,7 @@ ps. 建议从上表格任选位表示和十进制，练习从十进制推位表�
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

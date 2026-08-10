@@ -7,6 +7,7 @@ published: true
 hideInList: false
 feature: null
 isTop: false
+chapters_per_page: 1
 ---
 总而言之是叽里呱啦一些《算法导论》笔记
 基础算法案例，分治，比较算法与随机化，动态规划，贪心，最短路径，

@@ -7,6 +7,7 @@ published: true
 hideInList: false
 feature: null
 isTop: false
+chapters_per_page: 1
 ---
 
 项目文档链接：[MiniTorch](https://minitorch.github.io/)

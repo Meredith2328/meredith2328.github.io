@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -106,11 +108,13 @@
   </div>
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p><a href="http://tlp.fenesisu.moe/" title="这是TLP's Blog，强大的大蛇老师！">TLP's Blog</a></p>
 <p><a href="https://xlog.abli.me/" title="Abligail老师的Blog！有趣的人增加了">星间纪行 - 不著名星际贡献者不完全记录</a></p>
 <p><a href="https://hz-xiaxz.github.io/typst-blog/" title="natsu san的Blog，有趣的物理人！">Xia's Blog</a></p>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -174,5 +178,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

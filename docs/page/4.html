@@ -48,6 +48,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -139,8 +141,10 @@
       <a class="card-link" href="../posts/courses/cs61a/cs61a-disc04.html">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="2023-08-30">2023-08-30</time>
-            
+            <span class="card-meta-left">
+              <time datetime="2023-08-30">2023-08-30</time>
+              
+            </span>
             
             
             <span class="card-folder" title="点击目录片段筛选">
@@ -167,8 +171,10 @@
       <a class="card-link" href="../posts/courses/cs61a/cs61a-disc05.html">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="2023-08-30">2023-08-30</time>
-            
+            <span class="card-meta-left">
+              <time datetime="2023-08-30">2023-08-30</time>
+              
+            </span>
             
             
             <span class="card-folder" title="点击目录片段筛选">
@@ -195,8 +201,10 @@
       <a class="card-link" href="../posts/courses/cs61a/cs61a-disc07.html">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="2023-08-30">2023-08-30</time>
-            
+            <span class="card-meta-left">
+              <time datetime="2023-08-30">2023-08-30</time>
+              
+            </span>
             
             
             <span class="card-folder" title="点击目录片段筛选">
@@ -223,8 +231,10 @@
       <a class="card-link" href="../posts/courses/cs61a/cs61a-disc01.html">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="2023-07-17">2023-07-17</time>
-            
+            <span class="card-meta-left">
+              <time datetime="2023-07-17">2023-07-17</time>
+              
+            </span>
             
             
             <span class="card-folder" title="点击目录片段筛选">
@@ -234,7 +244,7 @@
           </div>
           <h3 class="card-title">CS61A · Disc 01 · 迭代与抽象</h3>
           
-          <div class="card-preview">Discussion 1 | CS 61A Summer 2024 eg. <code>race(3, 4)</code> 以下先考虑前10min中构造无限循环。 第一个条件显然不符合我们的需要。 因为第二个条件是 <code>tortoise - hare</code> ，若其为负值、则仍可以继续循环。 0-4min 由于<code>y&gt;x</code>，<code>hare=my &gt; tortoise=mx</code>，不可能追上。 5-9min 此时 <code>hare=5y</code> ，`tortoise=mx, m = 6,…</div>
+          <div class="card-preview">Discussion 1 | CS 61A Summer 2024 CS61A 2024 summer Discussion 笔记（共六篇，disc06 没写）：   Disc 01 迭代与抽象（本篇） ；  Disc 02 高阶函数 ；  Disc 03 递归 ；  Disc 04 树的递归 ；  5.…</div>
           
           <div class="card-tags">
             
@@ -251,8 +261,10 @@
       <a class="card-link" href="../posts/courses/cs61a/cs61a-disc02.html">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="2023-07-17">2023-07-17</time>
-            
+            <span class="card-meta-left">
+              <time datetime="2023-07-17">2023-07-17</time>
+              
+            </span>
             
             
             <span class="card-folder" title="点击目录片段筛选">
@@ -281,8 +293,10 @@
       <a class="card-link" href="../posts/toy/zi-she.html">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="2022-08-13">2022-08-13</time>
-            
+            <span class="card-meta-left">
+              <time datetime="2022-08-13">2022-08-13</time>
+              
+            </span>
             
             
             <span class="card-folder" title="点击目录片段筛选">
@@ -731,6 +745,17 @@
           
         
           
+          <li class="tree-file" data-path="posts/notes/ml/TensorZero-6949">
+            <a class="tree-row" href="../posts/notes/ml/TensorZero-6949.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">给 tensorzero 提的第一个 PR：object_storage.endpoint 支持环境变量</span>
+              <span class="tree-date">2026-03-14</span>
+            </a>
+          </li>
+          
+        
+          
           <li class="tree-file" data-path="posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop">
             <a class="tree-row" href="../posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
               <span class="tree-toggle tree-toggle-empty"></span>
@@ -791,17 +816,6 @@
         
       
             </ul>
-          </li>
-          
-        
-          
-          <li class="tree-file" data-path="posts/notes/TensorZero-6949">
-            <a class="tree-row" href="../posts/notes/TensorZero-6949.html">
-              <span class="tree-toggle tree-toggle-empty"></span>
-              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">给 tensorzero 提的第一个 PR：object_storage.endpoint 支持环境变量</span>
-              <span class="tree-date">2026-03-14</span>
-            </a>
           </li>
           
         

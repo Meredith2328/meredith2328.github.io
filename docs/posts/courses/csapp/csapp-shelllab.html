@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -106,7 +108,7 @@
   </div>
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
 <p>待修改：当前仅仅包含了作业报告的提交内容。</p>
 </blockquote>
@@ -406,8 +408,10 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>上一篇：<a href="csapp-cachelab.html">Cachelab</a> · 另见：<a href="../../notes/tools/linux-command.html">Linux 指令笔记</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="csapp-cachelab.html" title="上一篇">← Cachelab</a><a class="post-rel-link" href="../../notes/tools/linux-command.html">Linux 指令笔记</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -471,5 +475,7 @@ Sigprocmask(SIG_SETMASK, &amp;prev_mask, NULL);
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

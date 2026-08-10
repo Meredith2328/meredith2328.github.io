@@ -11,8 +11,17 @@ isTop: false
 ---
 > 最近没写什么其他好玩的东西，拿课堂作业报告水一水blog。
 
-对于浮点数部分，额外写了笔记，欢迎参阅：
-[IEEE754浮点数与十进制数互相转换流程及例子](https://meredith2328.github.io/post/ieee754/)
+## 系列总览
+
+CSAPP（ICS 课程）lab 笔记：
+
+1. [[csapp-datalab|Datalab]]（本篇）：位运算与浮点数
+2. [[csapp-bomblab|Bomblab]]：二进制炸弹
+3. [[csapp-attacklab|Attacklab]]：缓冲区攻击
+4. [[csapp-cachelab|Cachelab]]：缓存模拟
+5. [[csapp-shelllab|Shelllab]]：Shell 实现
+
+浮点数部分单独写了笔记，欢迎参阅 [[ieee754|IEEE754 浮点数与十进制数互相转换流程及例子]]。
 
 ## 运行结果
 

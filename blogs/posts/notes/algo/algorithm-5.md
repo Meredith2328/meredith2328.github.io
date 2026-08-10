@@ -7,6 +7,7 @@ published: true
 hideInList: false
 feature: null
 isTop: false
+chapters_per_page: 1
 ---
 回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。
 

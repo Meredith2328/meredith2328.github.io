@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -106,7 +108,7 @@
   </div>
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>已发布至 <a href="https://meredith2328.github.io/freshdan/#/">freshdan</a></p>
 <!-- more -->
 <p>假期内跟 <a href="https://github.com/JingYiJun">@Jingyijun</a> 老师聊天时画了这个饼，和 <a href="https://github.com/CodingMizore">@CodingMizore</a> 激烈交流、以及参考了 <a href="https://github.com/Cameudis">@Cameudis</a> 老师的意见之后，终于成为一个比较完整的项目。</p>
@@ -114,6 +116,8 @@
 <p>对于后续完善发展，考虑过添加社团社群圈子wiki，由各社团及学生组织负责人编写自己组织的相关资料和联系信息，这样的话会比现在靠公众号、百团、口口相传的宣传效果要更好，同时也应当有助于增加人手、积极完善更新。但这个饼不是靠我自己能做的。想要多结交一些志同道合的朋友。</p>
 <p>freshdan/鲜蛋，先这样吧。</p>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -177,5 +181,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

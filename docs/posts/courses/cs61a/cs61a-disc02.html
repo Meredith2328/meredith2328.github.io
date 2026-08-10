@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p><a href="https://cs61a.org/disc/disc02/">Discussion 2 | CS 61A Summer 2024</a></p>
 <h2 id="q1-warm-up">Q1: Warm Up</h2>
 <p>这里的等号是数学等号，不是赋值↓</p>
@@ -213,8 +215,10 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
 <li>Determine whether the implementation really works on your original example.</li>
 <li>Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)</li>
 </ol>
-<p>上一篇：<a href="cs61a-disc01.html">Disc 01 迭代与抽象</a> · 下一篇：<a href="cs61a-disc03.html">Disc 03 递归</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="cs61a-disc01.html" title="上一篇">← Disc 01 迭代与抽象</a><a class="post-rel-link" href="cs61a-disc03.html" title="下一篇">Disc 03 递归 →</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -278,5 +282,7 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

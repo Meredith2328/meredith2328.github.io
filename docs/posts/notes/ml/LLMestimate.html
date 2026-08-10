@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 $$P ≈ 12Nd^2 + Vd$$ 本文的LLM基于Transformer Decoder结构，以 GPT2-XL 为例。它有以下超参数设置： 实测得到的可训练参数量为 1,557,611,200 = 1.56B。 ">
+  <meta name="description" content="本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 $$P ≈ 12Nd^2 + Vd$$ [[LLMestimate|01 参数量与训练 FLOPs]]（本篇） [[LLMestimate2|02 训练的内存和计算需求]] 本文的LLM基于Transformer Dec">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs">
-  <meta property="og:description" content="本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 $$P ≈ 12Nd^2 + Vd$$ 本文的LLM基于Transformer Decoder结构，以 GPT2-XL 为例。它有以下超参数设置： 实测得到的可训练参数量为 1,557,611,200 = 1.56B。 ">
+  <meta property="og:description" content="本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 $$P ≈ 12Nd^2 + Vd$$ [[LLMestimate|01 参数量与训练 FLOPs]]（本篇） [[LLMestimate2|02 训练的内存和计算需求]] 本文的LLM基于Transformer Dec">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/LLMestimate.html">
   
   <meta property="og:image" content="https://meredith2328.github.io/posts/migrated/post-images/20260303103200.png">
@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,13 +104,18 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。</p>
 <p>省流：</p>
 <div class="arithmatex">\[P ≈ 12Nd^2 + Vd\]</div>
 <!-- more -->
+<h2 id="_1">系列总览</h2>
+<ol>
+<li><a href="LLMestimate.html">01 参数量与训练 FLOPs</a>（本篇）</li>
+<li><a href="LLMestimate2.html">02 训练的内存和计算需求</a></li>
+</ol>
 <blockquote>
-<p>本文是第一篇。第二篇为 <a href="https://meredith2328.github.io/post/LLMestimate2/">怎么估算LLM训练的内存和计算需求？推一推、测一测  | 十派的玩具箱</a> 。<br/>edit time: 2026-03-05 17:03:20</p>
+<p>edit time: 2026-03-05 17:03:20</p>
 </blockquote>
 <p>本文的LLM基于Transformer Decoder结构，以 <a href="https://huggingface.co/openai-community/gpt2-xl">GPT2-XL</a> 为例。它有以下超参数设置：</p>
 <div class="highlight"><pre><span></span><code>GPT2-XL
@@ -120,7 +127,7 @@ num_heads: 25
 d_ff: 6400
 </code></pre></div>
 <p>实测得到的可训练参数量为 <code>1,557,611,200</code> = 1.56B。</p>
-<h2 id="_1">参数量实测结果</h2>
+<h2 id="_2">参数量实测结果</h2>
 <p>以下是使用HuggingFace Transformers库实际加载了GPT2 XL并统计可训练参数量的结果。代码见下述附录A。</p>
 <div class="highlight"><pre><span></span><code>==========================================================================
 总参数量                 params: 1,557,611,200
@@ -138,7 +145,7 @@ FFN Input (c_fc)         : 10,246,400 (10.25M)
 FFN Output (c_proj)      : 10,241,600 (10.24M)
 Layer 0 总计               : 30,740,800 (30.74M)
 </code></pre></div>
-<h2 id="_2">最常用的参数量估算公式</h2>
+<h2 id="_3">最常用的参数量估算公式</h2>
 <p>可训练参数量的估算公式为：</p>
 <div class="arithmatex">\[12Nd^2+Vd\]</div>
 <p>其中 <span class="arithmatex">\(N\)</span> 为层数 <code>num_layers</code> ， <span class="arithmatex">\(d\)</span> 为维度 <code>d_models</code> ，<span class="arithmatex">\(V\)</span> 为词表大小 <code>vocab_size</code> 。
@@ -146,7 +153,7 @@ Layer 0 总计               : 30,740,800 (30.74M)
 <p>直接代入得到：</p>
 <div class="arithmatex">\[12 \times 48 \times 1600^2 + 50257 \times 1600=1554971200=1.55B\]</div>
 <p>相比于实际值1.56B，这已经是一个非常好的估计了。</p>
-<h2 id="_3">“最常用的参数量估算公式”推导</h2>
+<h2 id="_4">“最常用的参数量估算公式”推导</h2>
 <p><img alt="" src="../../migrated/post-images/20260303103200.png"/></p>
 <p>我们需要确定这个公式适用于什么情况，所以需要引入它的适用范围。</p>
 <p>(1) Embedding
@@ -156,7 +163,7 @@ Layer 0 总计               : 30,740,800 (30.74M)
 <p>对于Attention，有 <span class="arithmatex">\(W_Q,W_K,W_V\)</span> ，还有输出使用的 <span class="arithmatex">\(W_O\)</span> ，它们都是 <span class="arithmatex">\(d \times d = d^2\)</span> 的方阵，总共就是 <span class="arithmatex">\(4d^2\)</span>。
 对于FFN，它首先负责把维度从 <span class="arithmatex">\(d\)</span> 扩大到 <span class="arithmatex">\(d_{ff}=4d\)</span> ，然后再从 <span class="arithmatex">\(d_{ff}\)</span> 缩小回 <span class="arithmatex">\(d\)</span> 。因此前者为 <span class="arithmatex">\(d \times 4d=4d^2\)</span> ，后者是 <span class="arithmatex">\(4d \times d = 4d^2\)</span> ，总共 <span class="arithmatex">\(8d^2\)</span> 。</p>
 <p>因此，一个Transformer Block内的Attention和FFN加起来应该是 <span class="arithmatex">\(12d^2\)</span> 。<span class="arithmatex">\(N\)</span> 层堆叠起来就是 <span class="arithmatex">\(12Nd^2\)</span> 。</p>
-<h2 id="_4">怎么更精确地估算参数量？</h2>
+<h2 id="_5">怎么更精确地估算参数量？</h2>
 <p>(1) Layer Norm
 由上可见，我们忽略了Layer Norm里面的可训练参数开销（<span class="arithmatex">\(\beta\)</span> 和 <span class="arithmatex">\(\gamma\)</span>），它们都是用于缩放的可训练向量（防止归一化不合适而添加的缩放因子），大小均为 <span class="arithmatex">\(d\)</span> ，所以每个 LayerNorm 应该还有 <span class="arithmatex">\(2d\)</span> ，符合实测的 <code>3,200</code> 。</p>
 <p>(2) Attention &amp; FFN?</p>
@@ -652,8 +659,10 @@ context length: from 1024 to 16,384
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Total = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'total'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  A占比 = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'A_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, B占比 = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'B_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
 </code></pre></div>
-<p>下一篇：<a href="LLMestimate2.html">02 内存和计算需求</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="LLMestimate2.html" title="下一篇">02 内存和计算需求 →</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -717,5 +726,7 @@ context length: from 1024 to 16,384
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

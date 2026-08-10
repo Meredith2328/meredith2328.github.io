@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,13 +104,15 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>在线阅读： <a href="https://meredith2328.github.io/fudan-mlsys-cn/">MLSys 中文翻译</a>
 搞到网页上方便阅读。</p>
 <!-- more -->
 <p>原网页链接： <a href="https://memxlife.github.io/courses/mlsys.html">MLSys</a>
 课程名称：复旦大学2025-2026春机器学习系统课程（尚笠老师）</p>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -172,5 +176,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

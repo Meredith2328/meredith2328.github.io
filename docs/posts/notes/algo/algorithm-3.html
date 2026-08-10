@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,8 +104,8 @@
 
   
 
-  <div class="post-body markdown-body">
-    <p>参考：《深入浅出程序设计竞赛（基础篇）（汪楚奇）》。</p>
+  <div class="post-body markdown-body" data-chapters="18" data-per-page="3">
+    <div class="post-chapter" data-ch="1"><p>参考：《深入浅出程序设计竞赛（基础篇）（汪楚奇）》。</p>
 <!-- more -->
 <p>（可参考：<a href="https://gitee.com/cyberdash/data-structures-cpp">数据结构（C++模板实现）</a>）</p>
 <p>基本上知道思路之后大部分代码都是自己完整写出来的（部分难题和跳过的题目除外），然后再补了一点细节。</p>
@@ -131,7 +133,7 @@
 <li><strong>估算输出大小</strong>：对于 <em>递推</em> 等结果数值较大的问题，请使用 <em>long long</em> 甚至高精度。可以借助 <code>int</code> 占4B、使用32位、最大值为2147483647来估算大小。</li>
 </ul>
 <h1 id="_1">基础算法</h1>
-<h2 id="_2">模拟专题</h2>
+</div><div class="post-chapter" data-ch="2" data-title="模拟专题"><h2 id="_2">模拟专题</h2>
 <p>这一部分包括三道题目（<strong>计数和方向</strong>），第一道是简单的模拟计数，第二道是经典的棋盘问题、含方向和边界处理，第三道是经典的围成圈击鼓传花。</p>
 <p><img alt="" src="../../migrated/post-images/20260119095533.png"/></p>
 <div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
@@ -242,7 +244,7 @@
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_3">高精度专题</h2>
+</div><div class="post-chapter" data-ch="3" data-title="高精度专题"><h2 id="_3">高精度专题</h2>
 <p>本专题的三道题分别讲解了高精度加法、高精度乘法、Bigint封装。</p>
 <p><strong>高精度注意两次逆序</strong>：</p>
 <ol>
@@ -408,7 +410,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>ps. 当然，高精度还可以用字符串实现。</p>
-<h2 id="_4">排序专题</h2>
+</div><div class="post-chapter" data-ch="4" data-title="排序专题"><h2 id="_4">排序专题</h2>
 <h3 id="_5">知识</h3>
 <p><img alt="" src="../../migrated/post-images/20260119192004.png"/>
 <img alt="" src="../../migrated/post-images/20260119192103.png"/>
@@ -695,7 +697,7 @@
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_7">暴力枚举专题</h2>
+</div><div class="post-chapter" data-ch="5" data-title="暴力枚举专题"><h2 id="_7">暴力枚举专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260127233859.png"/>
 <img alt="" src="../../migrated/post-images/20260127233909.png"/>
 <img alt="" src="../../migrated/post-images/20260127233915.png"/>
@@ -712,7 +714,7 @@
 <img alt="" src="../../migrated/post-images/20260127234059.png"/>
 <img alt="" src="../../migrated/post-images/20260127234105.png"/>
 <img alt="" src="../../migrated/post-images/20260127234111.png"/></p>
-<h2 id="_8">递推与递归专题</h2>
+</div><div class="post-chapter" data-ch="6" data-title="递推与递归专题"><h2 id="_8">递推与递归专题</h2>
 <ol>
 <li>递推和递归，要将原问题分解为子问题。递推往往考虑“最后一次”。</li>
 <li><strong>递推</strong>大概率结果很大，<strong>要用 <code>long long</code> 甚至高精度</strong>。</li>
@@ -1029,7 +1031,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_9">贪心专题</h2>
+</div><div class="post-chapter" data-ch="7" data-title="贪心专题"><h2 id="_9">贪心专题</h2>
 <p>背包问题用替换论证，调度类问题可能用交换论证。</p>
 <p><img alt="" src="../../migrated/post-images/20260120130210.png"/>
 贪心策略：按照 <code>v[i] / m[i]</code> 从高到低排序，然后拿入。
@@ -1228,7 +1230,7 @@ ps. 递推还要顺手分析一下数值大小。（可以朴素地用求和式�
 <span class="p">}</span>
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260120181656.png"/></p>
-<h2 id="_10">二分查找与二分答案专题</h2>
+</div><div class="post-chapter" data-ch="8" data-title="二分查找与二分答案专题"><h2 id="_10">二分查找与二分答案专题</h2>
 <blockquote>
 <p>二分的本质是一段满足某条件、另一段不满足。<br/>往往要找到满足或不满足的端点。<br/>二分是在遍历上的优化，能够使用二分的问题一定可以暴力遍历，以找到是否满足某条件的端点。</p>
 </blockquote>
@@ -1486,7 +1488,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_11">搜索专题</h2>
+</div><div class="post-chapter" data-ch="9" data-title="搜索专题"><h2 id="_11">搜索专题</h2>
 <p>深度优先：优先考虑搜索的深度，到头了再进行处理。</p>
 <p><img alt="" src="../../migrated/post-images/20260121131056.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20260121130720.png"/>
@@ -1841,7 +1843,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="p">}</span>
 </code></pre></div>
 <h1 id="_12">基础数据结构</h1>
-<h2 id="_13">字符串专题</h2>
+</div><div class="post-chapter" data-ch="10" data-title="字符串专题"><h2 id="_13">字符串专题</h2>
 <h3 id="_14">知识</h3>
 <p>memset的头文件为cstring。
 <img alt="" src="../../migrated/post-images/20260120181150.png"/></p>
@@ -1974,7 +1976,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_16">结构体专题</h2>
+</div><div class="post-chapter" data-ch="11" data-title="结构体专题"><h2 id="_16">结构体专题</h2>
 <h3 id="_17">知识</h3>
 <h3 id="_18">举例</h3>
 <p><img alt="" src="../../migrated/post-images/20260118215605.png"/></p>
@@ -2085,7 +2087,7 @@ ps. lower_bound(a, a+n, val + 1)等价于upper_bound(a, a+n, val).
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_19">线性表专题</h2>
+</div><div class="post-chapter" data-ch="12" data-title="线性表专题"><h2 id="_19">线性表专题</h2>
 <h3 id="_20">知识</h3>
 <p>本节包括栈、队列和链表。</p>
 <p><img alt="" src="../../migrated/post-images/20260121222003.png"/>
@@ -2558,7 +2560,7 @@ stack在追求极致运行速度时，需要打开-O2优化。否则需要自己
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_22">二叉树专题</h2>
+</div><div class="post-chapter" data-ch="13" data-title="二叉树专题"><h2 id="_22">二叉树专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260122182400.png"/>
 <img alt="" src="../../migrated/post-images/20260122182845.png"/>
 上图n=3，有8个国家参加，需要3轮比赛，高度为4。
@@ -2934,7 +2936,7 @@ value: 值，size: 子树的节点个数，num: 该节点权值出现的次数�
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_23">集合专题</h2>
+</div><div class="post-chapter" data-ch="14" data-title="集合专题"><h2 id="_23">集合专题</h2>
 <h3 id="_24">知识</h3>
 <p><img alt="" src="../../migrated/post-images/20260124205529.png"/>
 <img alt="" src="../../migrated/post-images/20260124211151.png"/></p>
@@ -3361,7 +3363,7 @@ eg. 输入#1分下述的四组，每组开头是 <code>n</code> 和 <code>m</cod
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_26">图专题</h2>
+</div><div class="post-chapter" data-ch="15" data-title="图专题"><h2 id="_26">图专题</h2>
 <p>在图里面，要干的事情是三件：
 找到所有顶点，<strong>找到一个顶点有直接连接的每一个点，以及那条边的长度</strong>。
 我愿称其为图的三件事：所有顶点，顶点邻接点，顶点邻接边。</p>
@@ -3648,7 +3650,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="p">}</span>
 </code></pre></div>
 <h1 id="_27">基础数学与数论</h1>
-<h2 id="_28">位运算与进制转换专题</h2>
+</div><div class="post-chapter" data-ch="16" data-title="位运算与进制转换专题"><h2 id="_28">位运算与进制转换专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260127213257.png"/>
 先转到10进制，然后从十进制转到该进制。</p>
 <blockquote>
@@ -3698,7 +3700,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_29">计数原理与排列组合专题</h2>
+</div><div class="post-chapter" data-ch="17" data-title="计数原理与排列组合专题"><h2 id="_29">计数原理与排列组合专题</h2>
 <p><img alt="" src="../../migrated/post-images/20260127215600.png"/>
 <img alt="" src="../../migrated/post-images/20260127220353.png"/>
 选择最局限的兔子要先选，是因为如果其他兔子先选，可能出现选择最局限的兔子无牌可选的情况，该情况无解，使得相关的计算变复杂。
@@ -3781,7 +3783,7 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_30">整除理论专题</h2>
+</div><div class="post-chapter" data-ch="18" data-title="整除理论专题"><h2 id="_30">整除理论专题</h2>
 <h3 id="_31">知识</h3>
 <p><span class="arithmatex">\(a_1\)</span> 和 <span class="arithmatex">\(a_2\)</span> 的最大公约数记为 <span class="arithmatex">\((a_1,a_2)\)</span> ，最小公倍数记为 <span class="arithmatex">\([a_1,a_2]\)</span> 。
 <img alt="" src="../../migrated/post-images/20260127232119.png"/>
@@ -4066,8 +4068,17 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
 </code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260127225831.png"/>
 初步学习完结撒花！</p>
-<p>上一篇：<a href="algorithm-2.html">02 算法篇</a> · 下一篇：<a href="algorithm-4.html">04 HOT 100（前 50）</a></p>
+</div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-2.html" title="上一篇">← 02 算法篇</a><a class="post-rel-link" href="algorithm-4.html" title="下一篇">04 HOT 100（前 50） →</a></div></aside>
   </div>
+
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  
 
   
   <section class="post-comments">
@@ -4131,5 +4142,9 @@ bfs：注意bfs中的vis是指是否入队，所以<strong>vis要在入队前标
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/pager.js" defer></script>
+
+
 </body>
 </html>

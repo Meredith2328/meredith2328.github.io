@@ -211,7 +211,7 @@ a:hover {
   color: var(--ink);
   background: var(--paper);
   border: 2px solid var(--ink);
-  padding: 6px 10px;
+  padding: 6px 44px 6px 10px;
   width: 240px;
   outline: none;
 }
@@ -223,6 +223,32 @@ a:hover {
 #search-input:focus {
   background: #fff;
   box-shadow: 3px 3px 0 0 var(--shadow);
+}
+
+.search-fulltext {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 1px 6px;
+  cursor: pointer;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.search-fulltext:hover {
+  color: var(--text);
+}
+
+.search-fulltext.is-on {
+  color: var(--ink);
+  background: var(--panel);
+  border-color: var(--hairline);
 }
 
 .search-results {
@@ -762,6 +788,13 @@ a:hover {
   color: var(--mute);
   letter-spacing: 0.05em;
   margin-bottom: 8px;
+}
+
+.card-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .card-folder {
@@ -1481,6 +1514,85 @@ a:hover {
   margin: 40px 0 16px;
   padding-top: 18px;
   border-top: var(--border);
+}
+
+/* ---------- long post section paging ---------- */
+
+.post-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+#pager-select {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--paper);
+  border: var(--border);
+  padding: 4px 6px;
+  max-width: 340px;
+  cursor: pointer;
+}
+
+.post-pager .pixel-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+.post-pager .pixel-btn:disabled:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.post-chapter + .post-chapter {
+  margin-top: 6px;
+}
+
+.post-rel {
+  margin: 32px 0 8px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: var(--shadow-px);
+  font-family: var(--font-mono);
+}
+
+.post-rel-label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.post-rel-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.post-rel-link {
+  display: inline-block;
+  padding: 5px 10px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 12px;
+  box-shadow: 2px 2px 0 0 var(--shadow);
+}
+
+.post-rel-link:hover {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 /* ---------- markdown body ---------- */

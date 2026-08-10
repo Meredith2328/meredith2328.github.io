@@ -11,7 +11,7 @@ tags:
 
 tensorzero 是一个做 LLM 推理和优化的框架，配置里的 `[object_storage]` 用来管多模态推理时图片之类文件的存储。原来这个段的 `endpoint` 只能写死一个地址，我提的 PR 让它也能写成 `env::SOME_ENV_VAR`，启动的时候从环境变量里读。这样内网地址、测试和生产的存储端点就不用都摊在配置文件里了。
 
-当时提的 PR 是 tensorzero/tensorzero#6949，链接现在打不开了，不过功能最后合了进去，官方[配置文档](https://www.tensorzero.com/docs/gateway/configuration-reference)里也写明了 `endpoint` 支持 `env::` 这种写法。
+当时提的 PR 是 tensorzero/tensorzero#6949，链接现在打不开了（原仓库已Archived，看不到pr了），不过功能最后合了进去，官方[配置文档](https://www.tensorzero.com/docs/gateway/configuration-reference)里也写明了 `endpoint` 支持 `env::` 这种写法。
 
 ## 感悟：对 ai 工作流的优化
 

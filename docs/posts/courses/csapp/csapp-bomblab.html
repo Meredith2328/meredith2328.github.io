@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -106,7 +108,7 @@
   </div>
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
 <p>最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。<br/>因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。</p>
 </blockquote>
@@ -367,8 +369,10 @@ num4 = %eax = 2</p>
 <h2 id="phase_1">phase_1: 比较字符串</h2>
 <p>strings_not_equal的返回值(%eax)为0就跳出去，意味着要求All strings are created equal. 识得唔识得啊。</p>
 <p>从相应位置读入所需字符串即可。</p>
-<p>上一篇：<a href="csapp-datalab.html">Datalab</a> · 下一篇：<a href="csapp-attacklab.html">Attacklab</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="csapp-datalab.html" title="上一篇">← Datalab</a><a class="post-rel-link" href="csapp-attacklab.html" title="下一篇">Attacklab →</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -432,5 +436,7 @@ num4 = %eax = 2</p>
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

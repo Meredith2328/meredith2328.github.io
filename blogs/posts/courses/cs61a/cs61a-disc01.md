@@ -11,6 +11,18 @@ isTop: false
 [Discussion 1 | CS 61A Summer 2024](https://cs61a.org/disc/disc01/)
 
 > edit time: 2024-07-17 17:57:15
+
+## 系列总览
+
+CS61A 2024 summer Discussion 笔记（共六篇，disc06 没写）：
+
+1. [[cs61a-disc01|Disc 01 迭代与抽象]]（本篇）
+2. [[cs61a-disc02|Disc 02 高阶函数]]
+3. [[cs61a-disc03|Disc 03 递归]]
+4. [[cs61a-disc04|Disc 04 树的递归]]
+5. [[cs61a-disc05|Disc 05 迭代、时空复杂度]]
+6. [[cs61a-disc07|Disc 07 树、链表]]
+
 ## Q1: Race
 
 eg. `race(3, 4)`

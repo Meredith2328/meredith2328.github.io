@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,8 +104,8 @@
 
   
 
-  <div class="post-body markdown-body">
-    <p>总而言之是叽里呱啦一些《算法导论》笔记
+  <div class="post-body markdown-body" data-chapters="13" data-per-page="1">
+    <div class="post-chapter" data-ch="1"><p>总而言之是叽里呱啦一些《算法导论》笔记
 基础算法案例，分治，比较算法与随机化，动态规划，贪心，最短路径，
 网络流，回溯，在线算法，P/NP，近似算法</p>
 <!-- more -->
@@ -131,7 +133,7 @@ Lec13 线性规划主要是数学分析方法，略过√
 <del>Lec15 人工智能算法没讲，略过</del>
 Lec16 P/NP主要是规约分析√
 Lec17 近似算法可以√</p>
-<h2 id="3x2">关于我提到的“3x2”</h2>
+</div><div class="post-chapter" data-ch="2" data-title="关于我提到的“3x2”"><h2 id="3x2">关于我提到的“3x2”</h2>
 <blockquote>
 <p>edit time: 2025-12-15 13:21:02</p>
 </blockquote>
@@ -151,7 +153,7 @@ Lec17 近似算法可以√</p>
 <li>递归或循环的循环不变量是什么？</li>
 <li>如何向不懂算法的人解释清楚这个算法的过程？</li>
 </ul>
-<h2 id="lec1">Lec1 简单排序</h2>
+</div><div class="post-chapter" data-ch="3" data-title="Lec1 简单排序"><h2 id="lec1">Lec1 简单排序</h2>
 <h3 id="_1">插入排序</h3>
 <p>直觉：我们可以把新的元素插入已排好序的序列的合理位置，使得有序序列长度增加。</p>
 <ul>
@@ -213,7 +215,7 @@ Merge(A, l, mid, mid + 1, r) {
 </ul>
 </li>
 </ul>
-<h2 id="lec2">Lec2 分治</h2>
+</div><div class="post-chapter" data-ch="4" data-title="Lec2 分治"><h2 id="lec2">Lec2 分治</h2>
 <h3 id="_3">二分查找</h3>
 <p>直觉：我们可以通过每一次迭代时的信息，排除掉数组中一部分不满足性质的段，只在满足性质的段中查找所需元素。</p>
 <ul>
@@ -340,7 +342,7 @@ BSEARCH(A, l, r, x) {
 <p>如何 <span class="arithmatex">\(O(n \log n)\)</span> 地采样 <span class="arithmatex">\(2n-1\)</span> 个点？
 <img alt="" src="../../migrated/post-images/20251215145414.png"/>
 关键注意：我们通过计算两个子过程 <span class="arithmatex">\(A_{even}\)</span>，获得了原过程 <span class="arithmatex">\(A\)</span> 的两个点。这是非常amazing的。</p>
-<h2 id="lec3">Lec3 比较算法与随机化</h2>
+</div><div class="post-chapter" data-ch="5" data-title="Lec3 比较算法与随机化"><h2 id="lec3">Lec3 比较算法与随机化</h2>
 <h3 id="_7">堆排序</h3>
 <blockquote>
 <p>非常易错：<strong>建立堆是 <span class="arithmatex">\(O(n)\)</span> 的。</strong><br/>而每次更新是 <span class="arithmatex">\(O(\log n)\)</span> 的。</p>
@@ -505,7 +507,7 @@ SELECT函数过程：（<span class="arithmatex">\(T(n)\)</span>）</p>
 划分是 <span class="arithmatex">\(\Theta(n)\)</span> 的，扫一遍、把小于的放左边、大于的放右边就行。
 然后对前 <span class="arithmatex">\(i\)</span> 大的数执行归并排序，最坏是 <span class="arithmatex">\(\Theta(i \lg i)\)</span> 的。
 总之，最坏是 <span class="arithmatex">\(\Theta(n+i\lg i)\)</span> 。</p>
-<h2 id="lec6">Lec6 动态规划太能用这个结构讲了，来讲讲讲讲</h2>
+</div><div class="post-chapter" data-ch="6" data-title="Lec6 动态规划太能用这个结构讲了，来讲讲讲讲"><h2 id="lec6">Lec6 动态规划太能用这个结构讲了，来讲讲讲讲</h2>
 <blockquote>
 <p>动态规划是为了<strong>解决分治中的重叠子问题</strong>引入的，通过记录子问题的解、或者优先计算子问题，来解决分治问题。要求<strong>问题的最优解由子问题的最优解组成</strong>。<br/>可以从以下角度思考：<br/>(1) <strong>转移变量</strong>。某个变量是从少往多计算、能够产生转移关系的吗？（“重叠子问题”）<br/>(2) <strong>选择（变量）</strong>。在做出选择后，原问题拆分成一个或多个子问题。为了计算函数，往往需要遍历选择变量，并且只选择其中的某一个特定值。<br/>(3) <strong>函数定义</strong>。函数有哪些变量根据(1)决定，函数的定义方式和初值条件由问题决定，函数的递推由(2)确定。<br/><del>哇我这3点总结得太精辟了</del><br/>edit time: 2025-12-23 11:10:36</p>
 </blockquote>
@@ -652,7 +654,7 @@ n个端点（概率记为 <span class="arithmatex">\(b_i\)</span> ，从1到n）
 <p><img alt="" src="../../migrated/post-images/20251223112757.png"/>
 <img alt="" src="../../migrated/post-images/20251223112803.png"/>
 <img alt="" src="../../migrated/post-images/20251223112815.png"/></p>
-<h2 id="lec7">Lec7 贪心及其证明</h2>
+</div><div class="post-chapter" data-ch="7" data-title="Lec7 贪心及其证明"><h2 id="lec7">Lec7 贪心及其证明</h2>
 <blockquote>
 <p>证明：<br/>思路(1) 归纳。<strong>把 贪心得到的解 与 最优解 用剪切-粘贴方法进行比较</strong>。<br/>思路(2) 交换。<strong>分析最优解“逆序”的地方</strong>。因为贪心得到的解一定是根据贪心策略从小到大排序的。</p>
 </blockquote>
@@ -751,7 +753,7 @@ n个端点（概率记为 <span class="arithmatex">\(b_i\)</span> ，从1到n）
 <p><img alt="" src="../../migrated/post-images/20251223140607.png"/>
 <img alt="" src="../../migrated/post-images/20251223140615.png"/>
 <img alt="" src="../../migrated/post-images/20251223140621.png"/></p>
-<h2 id="lec9">Lec9 最短路径</h2>
+</div><div class="post-chapter" data-ch="8" data-title="Lec9 最短路径"><h2 id="lec9">Lec9 最短路径</h2>
 <blockquote>
 <p>关键是松弛操作。<br/>当 <span class="arithmatex">\(d[j] &gt; d[i] + w(i,j)\)</span> 时，执行松弛 <span class="arithmatex">\(d[j] \leftarrow d[i] + w(i,j)\)</span> 。</p>
 <p>单源最短路径：</p>
@@ -803,7 +805,7 @@ n个端点（概率记为 <span class="arithmatex">\(b_i\)</span> ，从1到n）
 <img alt="" src="../../migrated/post-images/20251224200246.png"/>
 <img alt="" src="../../migrated/post-images/20251224200257.png"/></p>
 <p>TODO</p>
-<h2 id="lec10">Lec10 网络流</h2>
+</div><div class="post-chapter" data-ch="9" data-title="Lec10 网络流"><h2 id="lec10">Lec10 网络流</h2>
 <blockquote>
 <p><strong>把多个子分配（及其约束）给汇总起来，</strong><br/><strong>让汇总最大，</strong><br/><strong>从而得到分开的子分配的方案。</strong></p>
 <p>Edmonds-Karp：BFS建分层图（<span class="arithmatex">\(O(|E|)\)</span>），完成所有增广（<span class="arithmatex">\(O(|V||E|)\)</span>）。 <span class="arithmatex">\(O(|V||E|^2)\)</span><br/>Dinic：BFS建分层图（<span class="arithmatex">\(O(|E|)\)</span>）、DFS找阻塞流（<span class="arithmatex">\(O(|V||E|)\)</span>），循环 <span class="arithmatex">\(|V|\)</span> 次。<span class="arithmatex">\(O(|V|^2|E|)\)</span></p>
@@ -889,7 +891,7 @@ n个端点（概率记为 <span class="arithmatex">\(b_i\)</span> ，从1到n）
 <li>割值 = 放弃的收益（右边项目收益）+ 付出的租金（左边项目用到的设备租金）。</li>
 <li>总利润 = 总收益 - 割值 → 要使割值最小，就是<strong>最小割</strong>！</li>
 </ul>
-<h2 id="lec11">Lec11 回溯</h2>
+</div><div class="post-chapter" data-ch="10" data-title="Lec11 回溯"><h2 id="lec11">Lec11 回溯</h2>
 <blockquote>
 <p><strong><em>可能因为过程中没有可选的选项而回溯，</em>*
 </strong>也可能因为完成了整个解的构造而回溯。***</p>
@@ -1028,7 +1030,7 @@ n个端点（概率记为 <span class="arithmatex">\(b_i\)</span> ，从1到n）
 <img alt="" src="../../migrated/post-images/20251224175139.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20251224175039.png"/>
 <img alt="" src="../../migrated/post-images/20251224175152.png"/></p>
-<h2 id="lec12">Lec12 在线算法及竞争分析</h2>
+</div><div class="post-chapter" data-ch="11" data-title="Lec12 在线算法及竞争分析"><h2 id="lec12">Lec12 在线算法及竞争分析</h2>
 <p>滑雪问题、电梯问题、约会问题、缺页中断</p>
 <blockquote>
 <p>一定要注意输入是<em>一系列事件的序列</em>。</p>
@@ -1254,7 +1256,7 @@ y&gt;S-E时，最优解是一开始就爬楼梯即时间成本为S，BLTN时间�
 <blockquote>
 <p>总之，上述的对抗构造，<strong>让任何的在线算法都只能剩1个点</strong>。<br/>但是假如我们可以预知未来，一开始就知道对抗构造最终得到的树的所有边，树一定是二分图，所以可以只删二分图中点比较少的那部分。<strong>剩下的点数至少为n/2</strong>。<br/>因此：<br/><span class="arithmatex">\({OPT \over ALG} \ge {n/2 \over 1}={n \over 2}\)</span> 。<br/>即没有任何确定性算法能保证竞争比小于n/2得证。</p>
 </blockquote>
-<h2 id="lec16-pnp">Lec16 P和NP未完成</h2>
+</div><div class="post-chapter" data-ch="12" data-title="Lec16 P和NP未完成"><h2 id="lec16-pnp">Lec16 P和NP未完成</h2>
 <p>P是可以快速求解，
 NP是Yes实例可以快速验证，
 NP-hard是所有NP问题可规约到的问题，
@@ -1382,7 +1384,7 @@ Circuit-SAT可以规约到3-SAT，因为可以把二元逻辑蕴含改成三元�
 <p>之后3-SAT规约到Ind-Set，方法是把每个画出来，正和反的连个线，找独立集。（独立集：<strong>选点两两不相连</strong>）</p>
 <p>之后Ind-Set和Clique（最大团）互推，因为在给边取补的图中，S就是最大团。</p>
 <p>之后Ind-Set和Vertex-Cover（点覆盖）互推，因为V-S就是点覆盖。（<strong>点覆盖：选点覆盖所有边</strong>）</p>
-<h2 id="lec17">Lec17 近似算法未完成</h2>
+</div><div class="post-chapter" data-ch="13" data-title="Lec17 近似算法未完成"><h2 id="lec17">Lec17 近似算法未完成</h2>
 <blockquote>
 <p>“和最优解的值的比较”得到近似比，近似比取等的是紧实例，近似比越接近1越好。</p>
 </blockquote>
@@ -1406,8 +1408,17 @@ Circuit-SAT可以规约到3-SAT，因为可以把二元逻辑蕴含改成三元�
 <p>原问题无法直接贪心，因为有前后依赖。这个算法导论讲过。
 分数背包才能直接贪心。
 因此，0-1背包需要一个贪心近似。</p>
-<p>上一篇：<a href="algorithm-1.html">01 数学篇</a> · 下一篇：<a href="algorithm-3.html">03 模板整理</a></p>
+</div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-1.html" title="上一篇">← 01 数学篇</a><a class="post-rel-link" href="algorithm-3.html" title="下一篇">03 模板整理 →</a></div></aside>
   </div>
+
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  
 
   
   <section class="post-comments">
@@ -1471,5 +1482,9 @@ Circuit-SAT可以规约到3-SAT，因为可以把二元逻辑蕴含改成三元�
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/pager.js" defer></script>
+
+
 </body>
 </html>

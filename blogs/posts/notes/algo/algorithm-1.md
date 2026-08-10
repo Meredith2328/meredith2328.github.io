@@ -7,6 +7,7 @@ published: true
 hideInList: false
 feature: null
 isTop: false
+chapters_per_page: 1
 ---
 总而言之是噼里啪啦一些《算法导论》笔记
 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法
@@ -17,6 +18,16 @@ isTop: false
 > 相关配套书籍为《算法导论》，课程中选取了其中的大部分主干内容，不涉及过难的内容。
 > 本文是学习过程中的两篇笔记中的第一篇（数学篇），加入了个人的理解和一些辅助学习的脚手架。
 > 如有不妥当之处还望多指正，可以在下面评论区或者 https://github.com/Meredith2328/meredith2328.github.io 里提issues反馈。
+
+## 系列总览
+
+本系列五篇，从课程笔记到刷题整理：
+
+1. [[algorithm-1|01 数学篇]]（本篇）：复杂度证明、求和公式、分治、哈希、摊还分析、在线算法、线性规划
+2. [[algorithm-2|02 算法篇]]：用 3x2 审视算法课的算法部分
+3. [[algorithm-3|03 模板整理]]：基础数据结构与算法模板
+4. [[algorithm-4|04 LeetCode HOT 100（前 50）]]
+5. [[algorithm-5|05 LeetCode HOT 100（后 50）]]
 
 1. Lec1 复杂度的严格证明√
 2. Lec2 求和公式，1/n和ln n的关系整理√

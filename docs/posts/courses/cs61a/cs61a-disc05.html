@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
 <p>edit time: 2024-07-24 12:19:44</p>
 </blockquote>
@@ -308,8 +310,10 @@
 <p>则</p>
 <div class="arithmatex">\[a(n)=S(n-1)=C\times2^{n-1}\]</div>
 <p>即为<span class="arithmatex">\(O(2^n)\)</span>。</p>
-<p>上一篇：<a href="cs61a-disc04.html">Disc 04 树的递归</a> · 下一篇：<a href="cs61a-disc07.html">Disc 07 树、链表</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="cs61a-disc04.html" title="上一篇">← Disc 04 树的递归</a><a class="post-rel-link" href="cs61a-disc07.html" title="下一篇">Disc 07 树、链表 →</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -373,5 +377,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

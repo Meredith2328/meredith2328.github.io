@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,8 +104,8 @@
 
   
 
-  <div class="post-body markdown-body">
-    <p>哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。</p>
+  <div class="post-body markdown-body" data-chapters="10" data-per-page="1">
+    <div class="post-chapter" data-ch="1"><p>哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。</p>
 <!-- more -->
 <p><img alt="" src="../../migrated/post-images/20260302113711.png"/></p>
 <p>专题1 哈希
@@ -119,7 +121,7 @@
 链表的一个重要工具是prev指针，用于指示前一个节点。
 专题8 二叉树
 专题9 图</p>
-<h3 id="_1">专题一 哈希</h3>
+</div><div class="post-chapter" data-ch="2" data-title="专题一 哈希"><h3 id="_1">专题一 哈希</h3>
 <p>1 两数之和</p>
 <p>需要返回索引，所以记录索引。</p>
 <p>在遍历的同时，将已遍历过的元素索引记录在哈希表中，即可确定与当前元素组成两数之和的数是否存在。</p>
@@ -165,7 +167,7 @@
             sz = max(sz, cur_sz)
         return sz
 </code></pre></div>
-<h3 id="_2">专题二 双指针</h3>
+</div><div class="post-chapter" data-ch="3" data-title="专题二 双指针"><h3 id="_2">专题二 双指针</h3>
 <p>283 移动零</p>
 <p>两侧两个指针，一个负责寻找非0元素，一个负责记录0元素的位置。</p>
 <p>实际上使用一个指针应该也可以，两个指针只是为了方便我们确定指针交换元素已经处理了前面所有的元素，后面的都是我们添加上去的0。</p>
@@ -300,7 +302,7 @@
 
         return ans
 </code></pre></div>
-<h3 id="_3">专题三 滑动窗口</h3>
+</div><div class="post-chapter" data-ch="4" data-title="专题三 滑动窗口"><h3 id="_3">专题三 滑动窗口</h3>
 <p>3 无重复字符的最长子串</p>
 <div class="highlight"><pre><span></span><code>class Solution:
     def lengthOfLongestSubstring(self, s: str) -&gt; int:
@@ -366,7 +368,7 @@
                 res.append(l)
         return res
 </code></pre></div>
-<h3 id="_4">专题四 子串</h3>
+</div><div class="post-chapter" data-ch="5" data-title="专题四 子串"><h3 id="_4">专题四 子串</h3>
 <p>560 和为 K 的子数组</p>
 <p>最容易想到的是遍历全部子数组。当然，过不了用例。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -432,7 +434,7 @@
                 left += 1
         return "" if ans_left &lt; 0 else s[ans_left: ans_right + 1]
 </code></pre></div>
-<h3 id="_5">专题五 数组</h3>
+</div><div class="post-chapter" data-ch="6" data-title="专题五 数组"><h3 id="_5">专题五 数组</h3>
 <p>53 最大子数组和</p>
 <p>（解法一 前缀和）</p>
 <p>要找到哪一段的和最大，首先转换成前缀和，</p>
@@ -571,7 +573,7 @@
         # 按顺序全部有, 那就肯定是更大的
         return n + 1
 </code></pre></div>
-<h3 id="_6">专题六 矩阵</h3>
+</div><div class="post-chapter" data-ch="7" data-title="专题六 矩阵"><h3 id="_6">专题六 矩阵</h3>
 <p>73 矩阵置零</p>
 <p>最基础的空间O(mn)的思路是把(row, col)保存下来，然后模拟。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -714,7 +716,7 @@
                 x += 1
         return False
 </code></pre></div>
-<h3 id="_7">专题七 链表</h3>
+</div><div class="post-chapter" data-ch="8" data-title="专题七 链表"><h3 id="_7">专题七 链表</h3>
 <p>160 相交链表</p>
 <p>双指针每次都同时往右移动一格，</p>
 <p>如果相交，要么是有交点，要么是都为None。</p>
@@ -1109,7 +1111,7 @@ class Solution:
             # param_1 = obj.get(key)
 # obj.put(key,value)
 </code></pre></div>
-<h3 id="_8">专题八 二叉树</h3>
+</div><div class="post-chapter" data-ch="9" data-title="专题八 二叉树"><h3 id="_8">专题八 二叉树</h3>
 <p>94 二叉树的中序遍历</p>
 <div class="highlight"><pre><span></span><code># Definition for a binary tree node.
 # class TreeNode:
@@ -1595,7 +1597,7 @@ class Solution:
         maxGain(root)
         return self.res
 </code></pre></div>
-<h3 id="dfsbfs">专题九 图：DFS和BFS遍历</h3>
+</div><div class="post-chapter" data-ch="10" data-title="专题九 图：DFS和BFS遍历"><h3 id="dfsbfs">专题九 图：DFS和BFS遍历</h3>
 <p>图这个专题是十分有趣的。最主要是DFS和BFS两种遍历方式。</p>
 <p>为了两种写法都练得很熟练，我们往往可以把两种函数的接口设成高度相似的，这样可以无缝切换。</p>
 <blockquote>
@@ -1848,8 +1850,17 @@ class Solution:
         # param_2 = obj.search(word)
 # param_3 = obj.startsWith(prefix)
 </code></pre></div>
-<p>上一篇：<a href="algorithm-3.html">03 模板整理</a> · 下一篇：<a href="algorithm-5.html">05 HOT 100（后 50）</a></p>
+</div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-3.html" title="上一篇">← 03 模板整理</a><a class="post-rel-link" href="algorithm-5.html" title="下一篇">05 HOT 100（后 50） →</a></div></aside>
   </div>
+
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  
 
   
   <section class="post-comments">
@@ -1913,5 +1924,9 @@ class Solution:
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/pager.js" defer></script>
+
+
 </body>
 </html>

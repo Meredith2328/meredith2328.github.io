@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>数据结构与算法 · 01 · 数学篇：从几个专题审视算法课的数学部分 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法 Lec1 复杂度的严格证明√ Lec2 求和公式，1/n和ln n的关系整理√ Lec2 各种分治递归求解方法及其练习√ Lec4 哈希和布隆过滤器的分析√ Lec8 摊还分析√ Lec12 在线">
+  <meta name="description" content="总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法 本系列五篇，从课程笔记到刷题整理： [[algorithm-1|01 数学篇]]（本篇）：复杂度证明、求和公式、分治、哈希、摊还分析、在线算法、线性规划 [[algorithm-2|02 算法篇]">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="数据结构与算法 · 01 · 数学篇：从几个专题审视算法课的数学部分">
-  <meta property="og:description" content="总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法 Lec1 复杂度的严格证明√ Lec2 求和公式，1/n和ln n的关系整理√ Lec2 各种分治递归求解方法及其练习√ Lec4 哈希和布隆过滤器的分析√ Lec8 摊还分析√ Lec12 在线">
+  <meta property="og:description" content="总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法 本系列五篇，从课程笔记到刷题整理： [[algorithm-1|01 数学篇]]（本篇）：复杂度证明、求和公式、分治、哈希、摊还分析、在线算法、线性规划 [[algorithm-2|02 算法篇]">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/algo/algorithm-1.html">
   
   <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/255328257592.jpg">
@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,15 +104,26 @@
 
   
 
-  <div class="post-body markdown-body">
-    <p>总而言之是噼里啪啦一些《算法导论》笔记
+  <div class="post-body markdown-body" data-chapters="9" data-per-page="1">
+    <div class="post-chapter" data-ch="1"><p>总而言之是噼里啪啦一些《算法导论》笔记
 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法</p>
 <!-- more -->
 <blockquote>
 <p>基于复旦大学2025-2026秋软件工程专业黄橙老师“算法设计与分析”课程内容，感谢老师的辛勤付出！<br/>相关配套书籍为《算法导论》，课程中选取了其中的大部分主干内容，不涉及过难的内容。<br/>本文是学习过程中的两篇笔记中的第一篇（数学篇），加入了个人的理解和一些辅助学习的脚手架。<br/>如有不妥当之处还望多指正，可以在下面评论区或者 https://github.com/Meredith2328/meredith2328.github.io 里提issues反馈。</p>
 </blockquote>
+</div><div class="post-chapter" data-ch="2" data-title="系列总览"><h2 id="_1">系列总览</h2>
+<p>本系列五篇，从课程笔记到刷题整理：</p>
 <ol>
-<li>Lec1 复杂度的严格证明√</li>
+<li><a href="algorithm-1.html">01 数学篇</a>（本篇）：复杂度证明、求和公式、分治、哈希、摊还分析、在线算法、线性规划</li>
+<li><a href="algorithm-2.html">02 算法篇</a>：用 3x2 审视算法课的算法部分</li>
+<li><a href="algorithm-3.html">03 模板整理</a>：基础数据结构与算法模板</li>
+<li><a href="algorithm-4.html">04 LeetCode HOT 100（前 50）</a></li>
+<li>
+<p><a href="algorithm-5.html">05 LeetCode HOT 100（后 50）</a></p>
+</li>
+<li>
+<p>Lec1 复杂度的严格证明√</p>
+</li>
 <li>Lec2 求和公式，1/n和ln n的关系整理√</li>
 <li>Lec2 各种分治递归求解方法及其练习√</li>
 <li>Lec4 哈希~~和布隆过滤器~~的分析√</li>
@@ -120,7 +133,7 @@
 </ol>
 <p>ps. 感觉Lec4 哈希和Lec5 布隆过滤器写得太糙了
 回头可以连带简单实验和分析搞一个整体一点的小专题</p>
-<h2 id="lec1">Lec1 渐进复杂度</h2>
+</div><div class="post-chapter" data-ch="3" data-title="Lec1 渐进复杂度"><h2 id="lec1">Lec1 渐进复杂度</h2>
 <blockquote>
 <p>这一节大部分内容来自笔记 Lec1 算法基础 。</p>
 <p>直觉：<span class="arithmatex">\(f(n)=O(g(n))\)</span> </p>
@@ -130,7 +143,7 @@
 <li>（如果n的次数相同，大O符号允许相差常数加法和乘法）</li>
 </ol>
 </blockquote>
-<h3 id="_1">定义</h3>
+<h3 id="_2">定义</h3>
 <ol>
 <li>
 <p>直觉图片
@@ -153,7 +166,7 @@ eg. <span class="arithmatex">\(n = O(n^2)\)</span>，但<span class="arithmatex"
 </ol>
 <p><img alt="" src="../../migrated/post-images/20250911103208.png"/></p>
 <p><img alt="" src="../../migrated/post-images/20250911103239.png"/></p>
-<h3 id="_2">判定的简单例子</h3>
+<h3 id="_3">判定的简单例子</h3>
 <p>证明：<span class="arithmatex">\(\frac{1}{2}n^2-3n=\Theta(n^2)\)</span>。</p>
 <p><img alt="" src="../../migrated/post-images/20250911144849.png"/></p>
 <p>证明：<span class="arithmatex">\(6n^3 \ne \Theta(n^2)\)</span>。</p>
@@ -172,13 +185,13 @@ eg. <span class="arithmatex">\(n = O(n^2)\)</span>，但<span class="arithmatex"
 因为<span class="arithmatex">\(f(n)=an+b \le an+|b|\)</span>，只要取<span class="arithmatex">\(n_0 \ge 1\)</span>，就有<span class="arithmatex">\(an+|b| \le (a+|b|)n \le (a+|b|)n^2\)</span>。
 这符合所求的形式，即取 <span class="arithmatex">\(c=a+|b|\)</span> 。</p>
 <p>综上所述，通过取 <span class="arithmatex">\(c=a+|b|\)</span>和<span class="arithmatex">\(n_0=\max (1,-b/a)\)</span>，原结论得证。</p>
-<h3 id="_3">性质</h3>
+<h3 id="_4">性质</h3>
 <p>自反性（<span class="arithmatex">\(O\)</span>、<span class="arithmatex">\(\Theta\)</span>、<span class="arithmatex">\(\Omega\)</span>），对称性（仅 <span class="arithmatex">\(\Theta\)</span> ），传递性（全部五个），转置对称性。
 <img alt="" src="../../migrated/post-images/20250911152314.png"/>
 <img alt="" src="../../migrated/post-images/20250911152337.png"/></p>
 <p>不存在的性质：
 <img alt="" src="../../migrated/post-images/20250911152359.png"/></p>
-<h3 id="_4">对阶乘的额外说明</h3>
+<h3 id="_5">对阶乘的额外说明</h3>
 <p>要一眼看到 <span class="arithmatex">\(\lg n!\)</span> 和 <span class="arithmatex">\(\sum_{k=1}^n \lg k\)</span> 这两种形式，就能想到它们的互相转换。</p>
 <p><img alt="" src="../../migrated/post-images/20251225144900.png"/>
 除了结论，
@@ -255,17 +268,17 @@ f(n)=n，g(n)=2n，
 那么再加上外面两层循环，总共应该是 <span class="arithmatex">\(\Theta(n^3)\)</span> 了。</p>
 </li>
 </ol>
-<h2 id="lec2">Lec2 求和符号及其上界</h2>
+</div><div class="post-chapter" data-ch="4" data-title="Lec2 求和符号及其上界"><h2 id="lec2">Lec2 求和符号及其上界</h2>
 <p>常数从1到n求和： <span class="arithmatex">\(\Theta(n)\)</span>
 <span class="arithmatex">\(i\)</span> 从1到n求和： <span class="arithmatex">\(\Theta(n^2)\)</span>
 <span class="arithmatex">\(i^2\)</span> 从1到n求和： <span class="arithmatex">\(\Theta(n^3)\)</span></p>
 <p>回顾一下等差等比公式。</p>
 <p><img alt="" src="../../migrated/post-images/20251225151810.png"/></p>
-<h3 id="_5">求和简单练习</h3>
+<h3 id="_6">求和简单练习</h3>
 <p>DeepSeek说想到这个拆项是通过离散分部积分。 什么是离散分部积分 
 （没仔细检查，因为类似求和式一般化的求解并不在本课程主干内容中，先去看别的了。但是拆差分这个事情确实有点像分部积分。如果有兴趣回头可以捣鼓一下。）</p>
 <p><img alt="" src="../../migrated/post-images/20251225152252.png"/></p>
-<h3 id="_6">和式的上界</h3>
+<h3 id="_7">和式的上界</h3>
 <p>第一种：<strong>利用大小关系</strong> <span class="arithmatex">\(a_k \le \max a_k\)</span>
 第二种：<strong>利用比值</strong> <span class="arithmatex">\(a_k \le a_1r^k\)</span></p>
 <p><img alt="" src="../../migrated/post-images/20251225153046.png"/>
@@ -283,7 +296,7 @@ ps. 以上这个也可以作为一种调和级数发散的证明。虽然ln n发
 <p>从而有以下上下界证明过程：</p>
 <p><img alt="" src="../../migrated/post-images/20251225150100.png"/>
 <img alt="" src="../../migrated/post-images/20251225150107.png"/></p>
-<h4 id="_7">用积分近似求和</h4>
+<h4 id="_8">用积分近似求和</h4>
 <p>上述微元法所揭示的积分和求和的关系，还可以用于近似。
 例如下式
 <img alt="" src="../../migrated/post-images/20251229220646.png"/>
@@ -299,7 +312,7 @@ ps. 以上这个也可以作为一种调和级数发散的证明。虽然ln n发
 <p>总结：<span class="arithmatex">\(\ln x\)</span>积分一下差不多是 <span class="arithmatex">\(x \ln x\)</span> ，所以<span class="arithmatex">\(\ln n\)</span>求和和 <span class="arithmatex">\(\Theta(n \ln n)\)</span> 同阶。<br/>详细证明可以通过积分上限多取一个、积分下限多取一个得到。</p>
 </blockquote>
 <p><img alt="" src="../../migrated/post-images/20251225144900.png"/></p>
-<h3 id="_8">递归方程的和式</h3>
+<h3 id="_9">递归方程的和式</h3>
 <p><img alt="" src="../../migrated/post-images/20251225154650.png"/>
 思考：
 为了解上述递归方程，我们希望能够<strong>构造出两个上下限不同的和式作差</strong>。
@@ -309,11 +322,11 @@ ps. 以上这个也可以作为一种调和级数发散的证明。虽然ln n发
 将上述<strong>递归方程的和式</strong>转换成了一个<strong>递归方程</strong>。
 接下来就可以通过下述“递归方程求解的四种方法”求解了。
 比如设 <span class="arithmatex">\(G(n) = {T(n) \over {n+1}}\)</span> 然后代入法解出来之类的。</p>
-<h2 id="lec2_1">Lec2 递归方程求解</h2>
+</div><div class="post-chapter" data-ch="5" data-title="Lec2 递归方程求解"><h2 id="lec2_1">Lec2 递归方程求解</h2>
 <blockquote>
 <p>四种方法：<strong>代入法、递归树、尝试法、主定理。</strong><br/>全部掌握。</p>
 </blockquote>
-<h3 id="_9">代入法</h3>
+<h3 id="_10">代入法</h3>
 <blockquote>
 <p>题型：</p>
 <ul>
@@ -355,7 +368,7 @@ ps. 以上这个也可以作为一种调和级数发散的证明。虽然ln n发
 <img alt="" src="../../migrated/post-images/20251225155235.png"/></p>
 <p>我们也可以用积分近似上述和式，直观验证我们得到的结果。
 <img alt="" src="../../migrated/post-images/20251225162649.png"/></p>
-<h3 id="_10">递归树</h3>
+<h3 id="_11">递归树</h3>
 <blockquote>
 <p>题型：比值关系<br/>解法：</p>
 <ol>
@@ -393,7 +406,7 @@ ps. 以上这个也可以作为一种调和级数发散的证明。虽然ln n发
 左边的求和式好解，求和内与 <span class="arithmatex">\(i\)</span> 无关，所以直接是 <span class="arithmatex">\(n \log n \lfloor \log n \rfloor\)</span> 。下取整不影响阶数，可以直接理解为 <span class="arithmatex">\(n \log^2 n\)</span> ，只是为了方便而额外说明。</p>
 <p>右边的求和式可以理解成 <span class="arithmatex">\(0 + 1 + \dots + x, x \le \log n\)</span> ，从而 <span class="arithmatex">\(x = \lfloor \log n \rfloor\)</span> 。项数是 <span class="arithmatex">\(\lfloor \log n \rfloor + 1\)</span> ，首项是 <span class="arithmatex">\(0\)</span> ，尾项是 <span class="arithmatex">\(\lfloor \log n \rfloor\)</span> ，则求和结果为 <span class="arithmatex">\(\lfloor \log n \rfloor (\lfloor \log n \rfloor + 1)/2\)</span> 。</p>
 <p>一减，仍然留下来 <span class="arithmatex">\(\Theta(n \log^2 n)\)</span> 的主项。</p>
-<h3 id="_11">尝试法</h3>
+<h3 id="_12">尝试法</h3>
 <blockquote>
 <p>题型：含求和式的递归方程，可能比代入法快，但要看你眼力如何。</p>
 <p><strong>假设 <span class="arithmatex">\(T(n) = cf(n)\)</span> ，验证代入后右边确实为 <span class="arithmatex">\(cf(n) + 小量\)</span> 的形式。
@@ -421,7 +434,7 @@ ps. 对于ilogi求和的说明，参见前述“求和符号”一章的“用�
 <img alt="" src="../../migrated/post-images/20251225162348.png"/>
 右边是 <span class="arithmatex">\(2cn^2/3\)</span> ，系数上多了一个 <span class="arithmatex">\(2/3\)</span> ，这也是不允许的。一定严格地让系数也相同。</p>
 <hr/>
-<h3 id="_12">主定理</h3>
+<h3 id="_13">主定理</h3>
 <blockquote>
 <p>含比值关系的递归方程。比递归树做得快，毕竟相当于直接背结论。<br/>主要步骤是把 <span class="arithmatex">\(f(n)\)</span> 和 <span class="arithmatex">\(n^{\log _ba}\)</span> 进行比较。<br/>如果 <span class="arithmatex">\(f(n)\)</span> 比 <span class="arithmatex">\(n^{\log _ba}\)</span> 增长快，而且 <span class="arithmatex">\(f(n)\)</span> <em>满足子问题总工作量比原问题小一点</em> （<span class="arithmatex">\(af(n/b) \le cf(n), c \le 1\)</span>）<del>，不然主导的不是根层 <span class="arithmatex">\(f(n)\)</span> 了</del>，则 <span class="arithmatex">\(T(n)\)</span> 是 <span class="arithmatex">\(\Theta(f(n))\)</span> 。<br/>如果 <span class="arithmatex">\(f(n)\)</span> 比 <span class="arithmatex">\(n^{\log _ba}\)</span> 增长慢，<span class="arithmatex">\(T(n)\)</span> 是 <span class="arithmatex">\(\Theta(n^{\log _ba})\)</span> 。<br/>如果 <span class="arithmatex">\(f(n)\)</span> 和 <span class="arithmatex">\(n^{\log _ba}\)</span> 增长一样快，<span class="arithmatex">\(T(n) = \Theta(n^{\log _ba}) \lg n\)</span> 。<br/><img alt="" src="../../migrated/post-images/20251225191202.png"/></p>
 </blockquote>
@@ -456,7 +469,7 @@ ps. 对于ilogi求和的说明，参见前述“求和符号”一章的“用�
 <p>实际上条件2也不满足：
 不存在 <span class="arithmatex">\(c&lt;1\)</span> 使得 <span class="arithmatex">\(\exists n_0,\forall n \ge n_0\)</span>，<span class="arithmatex">\(2f(n/2) \le cf(n)\)</span> 即 <span class="arithmatex">\(\log n \le {1 \over {1-c}}\)</span> 。</p>
 <p>但是可以使用其他方式，如递归树。见递归树例3。</p>
-<h3 id="_13">练习</h3>
+<h3 id="_14">练习</h3>
 <p><img alt="" src="../../migrated/post-images/20251225212157.png"/>
 <img alt="" src="../../migrated/post-images/20251225212751.png"/>
 <img alt="" src="../../migrated/post-images/20251225212757.png"/>
@@ -501,7 +514,7 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 <span class="arithmatex">\(H(x)=H(x/2)+1\)</span></p>
 <p>故由主定理， <span class="arithmatex">\(H(x) = \Theta(\lg x)\)</span> ，则 <span class="arithmatex">\(G(x) = \Theta(2^x \lg x)\)</span> 
 再把 <span class="arithmatex">\(2^x\)</span> 换回 <span class="arithmatex">\(n\)</span> 有 <span class="arithmatex">\(T(n)=G(x)=\Theta(n \lg \lg n)\)</span> 。</p>
-<h3 id="_14">一类考试常见题型的说明</h3>
+<h3 id="_15">一类考试常见题型的说明</h3>
 <blockquote>
 <p>在整理往年题时，发现这类子问题划分不均等的递归式求解比较常见。<br/>关键是，“<strong>递归树每层子问题复杂度加起来是否与原问题相等</strong>”。<br/>如果相等，意味着最终得到的复杂度<strong>可能</strong>阶数比 <span class="arithmatex">\(f(n)\)</span> 更高。<br/>如果小于，最终得到的复杂度<strong>可能</strong>与 <span class="arithmatex">\(f(n)\)</span> 同阶。</p>
 </blockquote>
@@ -541,17 +554,17 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 <p><img alt="" src="../../migrated/post-images/20251228175546.png"/>
 <img alt="" src="../../migrated/post-images/20251228175650.png"/>
 <img alt="" src="../../migrated/post-images/20251228175659.png"/></p>
-<h2 id="lec3">Lec3 指示器随机变量</h2>
+</div><div class="post-chapter" data-ch="6" data-title="Lec3 指示器随机变量"><h2 id="lec3">Lec3 指示器随机变量</h2>
 <blockquote>
 <p>关键是要引出新工具：指示器随机变量，对随机算法进行分析。<br/>用于<strong>把原来的求和式转换成对随机变量的求和</strong>，从而便于求解期望。</p>
 </blockquote>
-<h3 id="_15">指示器随机变量</h3>
+<h3 id="_16">指示器随机变量</h3>
 <p>我们首先定义指示器随机变量，用于表示“划分 <span class="arithmatex">\(k:n-k-1\)</span> ”。
 <img alt="" src="../../migrated/post-images/20251229224334.png"/></p>
 <p>接下来分析这个随机变量单个的期望。
 <img alt="" src="../../migrated/post-images/20251229224518.png"/></p>
 <p>再接下来假设所有划分都是等可能的，则<strong>可以利用 <span class="arithmatex">\(E(X_k)\)</span> 帮助计算其他期望</strong>。</p>
-<h3 id="_16">随机快速排序分析</h3>
+<h3 id="_17">随机快速排序分析</h3>
 <p>下述是随机快速排序<strong>最坏情况</strong>的递归式的各种情况，
 它假设了第𝑖个元素总是落在分区的较大一侧（上界）得到以下这些式子。
 <img alt="" src="../../migrated/post-images/20251229224703.png"/>
@@ -571,7 +584,7 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 这是好于一般的快速排序最坏情况为 <span class="arithmatex">\(O(n^2)\)</span> 的。</strong>
 细节见下。
 <img alt="" src="../../migrated/post-images/20251229225129.png"/></p>
-<h3 id="_17">随机快速选择分析</h3>
+<h3 id="_18">随机快速选择分析</h3>
 <p>每个情况比随机快速排序少个子问题，只剩一个子问题。
 毕竟随机快速选择我们只要一直往要选的那个元素那边走就行，另外一半不需要管。
 <img alt="" src="../../migrated/post-images/20251229225537.png"/>
@@ -579,8 +592,8 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 <img alt="" src="../../migrated/post-images/20251229225645.png"/>
 应该可以类似地使用第二类数学归纳法进行证明。我没有详细尝试过。</p>
 <p>总之随机快速选择算法最坏情况是 <span class="arithmatex">\(\Theta(n^2)\)</span> 的，期望是 <span class="arithmatex">\(O(n)\)</span> 的。</p>
-<h2 id="lec4">Lec4 哈希</h2>
-<h3 id="_18">全域哈希</h3>
+</div><div class="post-chapter" data-ch="7" data-title="Lec4 哈希"><h2 id="lec4">Lec4 哈希</h2>
+<h3 id="_19">全域哈希</h3>
 <blockquote>
 <p>直觉很简单：<br/>对于确定的哈希函数，可以构造很坏的输入，使得这个哈希函数冲突严重。<br/>因此选取一个哈希函数族，<strong>随机从其中选择某个哈希函数，消除最坏情况</strong>。<br/>其余都是对这个的证明。</p>
 </blockquote>
@@ -597,7 +610,7 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 <img alt="" src="../../migrated/post-images/20251226232705.png"/>
 <img alt="" src="../../migrated/post-images/20251226232710.png"/>
 <img alt="" src="../../migrated/post-images/20251226232716.png"/></p>
-<h3 id="_19">完全哈希</h3>
+<h3 id="_20">完全哈希</h3>
 <blockquote>
 <p>在<strong>全部键已知且不变</strong>的情况下，<br/>这里的<strong>两级哈希</strong>是一种完全哈希的实现方式，<br/>能保证 <span class="arithmatex">\(\Theta(1)\)</span> 查找、无冲突、使用的空间为 <span class="arithmatex">\(O(n)\)</span> 。</p>
 </blockquote>
@@ -658,11 +671,11 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 </ul>
 </li>
 </ul>
-<h3 id="_20">习题</h3>
+<h3 id="_21">习题</h3>
 <p><img alt="" src="../../migrated/post-images/20251226234503.png"/>
 <img alt="" src="../../migrated/post-images/20251226234524.png"/>
 <img alt="" src="../../migrated/post-images/20251226234535.png"/></p>
-<h2 id="lec8">Lec8 摊还分析</h2>
+</div><div class="post-chapter" data-ch="8" data-title="Lec8 摊还分析"><h2 id="lec8">Lec8 摊还分析</h2>
 <blockquote>
 <p>“对于长度为n的操作序列”</p>
 </blockquote>
@@ -670,7 +683,7 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 <p>聚合法：分析每个操作的代价上界 <span class="arithmatex">\(t_i\)</span> ，从而求得总序列的 <span class="arithmatex">\(T(n) / n\)</span>
 核算 法（记账法）：存钱花钱
 势能法：不绑定在每个操作上，而是绑定在整体能否做功上</p>
-<h3 id="_21">栈操作序列</h3>
+<h3 id="_22">栈操作序列</h3>
 <blockquote>
 <p>设push和pop都是O(1)的，<br/>Multipop(S, k)即pop k次的代价为 min(|S|, k) 。<br/>请分析<strong>n个栈操作序列的平摊代价</strong>。</p>
 </blockquote>
@@ -679,7 +692,7 @@ g. <span class="arithmatex">\(n^2 + (n-2)^2 + ... + 2^2 = \sum_{i=0}^{n-1} (n-2i
 <p>如果粗糙地分析，每个Multipop最坏是 <span class="arithmatex">\(O(n)\)</span> ，最坏情况是n个序列都是Multipop，这样的话 <span class="arithmatex">\(T(n)=O(n^2)\)</span> ，平摊代价 <span class="arithmatex">\(T(n)/n=O(n)\)</span> 。</p>
 <p>实际上，精细地分析，每个对象在压入之后最多被弹出一次，即pop数（包括在multipop内）不会超过push数。</p>
 <p>对于长度为n的序列，最多有n次push（其实n-1也差不多，我们这里看阶数即可），从而最多有n次pop。因此，n个栈操作序列的代价 <span class="arithmatex">\(T(n) \le 2n = O(n)\)</span> 。则平摊代价 <span class="arithmatex">\(T(n)/n = O(1)\)</span> 。</p>
-<h3 id="_22">二进制计数器</h3>
+<h3 id="_23">二进制计数器</h3>
 <blockquote>
 <p>对于<strong>n个二进制计数递增（increment）操作的序列，请分析序列的平摊代价。</strong><br/>设二进制计数器总位数为k。<br/><strong>每次操作的代价</strong>即“需要翻转的比特数”，例如从11到100需要翻转3个二进制位。</p>
 </blockquote>
@@ -697,7 +710,7 @@ n次递增从0加到了n，需要使用<span class="arithmatex">\(\log_2 n+1\)</
 <p>根据<strong>对每个位的改变的精确分析</strong>，可知
 <span class="arithmatex">\(T(n)=\sum_{i=0}^{\lg n}n/2^i &lt; n\sum_{i=0}^{\infty}1/2^i=2n=O(n)\)</span>
 则每个递增操作的平摊代价是 <span class="arithmatex">\(T(n)/n=O(1)\)</span> 。</p>
-<h3 id="_23">核算法</h3>
+<h3 id="_24">核算法</h3>
 <blockquote>
 <p>平摊代价总和 比 实际代价总和 大。<br/>核算法分析平摊代价：“提前付一下” “已经付过了”<br/>你这个操作以后还会有代价，所以你多付一下</p>
 </blockquote>
@@ -709,7 +722,7 @@ cost(multipop)=0</p>
 <p><img alt="" src="../../migrated/post-images/20251226170453.png"/></p>
 <p>例2 二进制计数器</p>
 <p>cost(Increment)=2</p>
-<h3 id="_24">势能法</h3>
+<h3 id="_25">势能法</h3>
 <p>与核算法不同，它将势能作为一个整体储存，
 而不是将信用与数据结构中单个对象关联分开储存。
 “势能”：“能够做功”</p>
@@ -741,7 +754,7 @@ multipop同理，平摊代价为0。</p>
 则势能差为
 <span class="arithmatex">\(\Phi(D_i)-\Phi(D_{i-1}) \le (b_{i-1}-t_i+1) - b_{i-1} = 1-t_i\)</span></p>
 <p>故摊还代价\=实际代价 + 势能差 <span class="arithmatex">\(\le (t_i+1) + (1-t_i)=2\)</span> 得证。</p>
-<h3 id="_25">动态表</h3>
+<h3 id="_26">动态表</h3>
 <hr/>
 <p>聚合法：
 <img alt="" src="../../migrated/post-images/20251226184522.png"/>
@@ -757,7 +770,7 @@ n次插入的总开销 &lt;= n + (2^j)从0加到lg n-1 &lt;= 3n = O(n)
 <img alt="" src="../../migrated/post-images/20251226184306.png"/></p>
 <hr/>
 <p>势能法原理差不多，但是过程有点繁，不写了。</p>
-<h3 id="_26">习题</h3>
+<h3 id="_27">习题</h3>
 <p><img alt="" src="../../migrated/post-images/20251226172413.png"/></p>
 <p>a.
 通过一个简单数值例子说明这种数据结构，它将整个集合按照二进制划分成相应的元素个数。</p>
@@ -794,18 +807,18 @@ n次插入的总开销 &lt;= n + (2^j)从0加到lg n-1 &lt;= 3n = O(n)
 <p><img alt="" src="../../migrated/post-images/20251226161510.png"/>
 <img alt="" src="../../migrated/post-images/20251226161517.png"/>
 <img alt="" src="../../migrated/post-images/20251226161525.png"/></p>
-<h2 id="lec13">Lec13 线性规划</h2>
+</div><div class="post-chapter" data-ch="9" data-title="Lec13 线性规划"><h2 id="lec13">Lec13 线性规划</h2>
 <blockquote>
 <p>狠狠做题。</p>
 </blockquote>
-<h3 id="_27">读题建模</h3>
+<h3 id="_28">读题建模</h3>
 <p><img alt="" src="../../migrated/post-images/20251226234849.png"/>
 <img alt="" src="../../migrated/post-images/20251226234856.png"/>
 <img alt="" src="../../migrated/post-images/20251226235255.png"/>
 <img alt="" src="../../migrated/post-images/20251226235304.png"/>
 <img alt="" src="../../migrated/post-images/20251226235318.png"/>
 <img alt="" src="../../migrated/post-images/20251226235445.png"/></p>
-<h3 id="_28"><del>对偶单纯形法</del></h3>
+<h3 id="_29"><del>对偶单纯形法</del></h3>
 <blockquote>
 <p>建议只做熟两阶段法，不然条件可能会混。</p>
 <p>步骤：</p>
@@ -1368,7 +1381,7 @@ n次插入的总开销 &lt;= n + (2^j)从0加到lg n-1 &lt;= 3n = O(n)
 却不一定是全局最值
 实际上全局最值是180，120的4140
 恭喜你浪费了很多时间去看对偶单纯形法，，</p>
-<h3 id="_29">两阶段法</h3>
+<h3 id="_30">两阶段法</h3>
 <blockquote>
 <p>分两阶段：<br/>第一阶段 设松弛变量和人工变量<br/>优化人工变量，人工变量是每个&gt;=和=式子需要添加的变量（&lt;=不添加）。<br/>要求优化结果是所有人工变量全取0。<br/>第二阶段 设松弛变量<br/>优化目标函数。</p>
 <p>第一/二阶段每一步做的事情：<br/>先利用 <span class="arithmatex">\(\lambda\)</span> 最小确定换入变量，后利用<span class="arithmatex">\(\theta=b/\alpha\)</span>正值最小确定换出变量。</p>
@@ -2480,8 +2493,17 @@ C=(1,1,1,-1)</p>
 <blockquote>
 <p>超级无敌总结！两阶段法！<br/>第一阶段： <span class="arithmatex">\(\lambda\)</span> 全部非负 且 人工变量全部换出 时停止。<br/>第二阶段： <span class="arithmatex">\(\lambda\)</span> 全部非负 时停止。<br/>两个阶段只有目标函数，即 <span class="arithmatex">\(C\)</span> 和 <span class="arithmatex">\(C_B\)</span> 不同，其余的 <span class="arithmatex">\(\alpha\)</span> 和 <span class="arithmatex">\(b\)</span> 全部共享。<br/>edit time: 2025-12-30 11:49:07</p>
 </blockquote>
-<p>下一篇：<a href="algorithm-2.html">02 算法篇</a></p>
+</div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-2.html" title="下一篇">02 算法篇 →</a></div></aside>
   </div>
+
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  
 
   
   <section class="post-comments">
@@ -2545,5 +2567,9 @@ C=(1,1,1,-1)</p>
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/pager.js" defer></script>
+
+
 </body>
 </html>

@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>WanDB是一个python库/日志托管平台，帮我们详细记录并整理了训练过程中的各种参数和指标变化，
 省去了需要自己<strong>详细记录日志</strong>、<strong>绘制图表</strong>的麻烦，并且可以做<strong>超参数搜索</strong>等进阶用法。</p>
 <!-- more -->
@@ -533,8 +535,10 @@ wandb.finish()
 <p>而在wandb的后台中，这三次 <code>run</code> 被整理到同一个 <code>sweep</code> 中，便于互相比较。</p>
 <p><img alt="" src="../../migrated/post-images/20260309134622.png"/>
 <img alt="" src="../../migrated/post-images/20260309134635.png"/></p>
-<p>相关：<a href="../ml/mathqwen-0.6b-agentic-rl.html">训练记录里的 WanDB</a></p>
+<aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="../ml/mathqwen-0.6b-agentic-rl.html">训练记录里的 WanDB</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -598,5 +602,7 @@ wandb.finish()
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

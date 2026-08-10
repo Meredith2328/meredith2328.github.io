@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,14 +104,14 @@
 
   
 
-  <div class="post-body markdown-body">
-    <p>项目文档链接：<a href="https://minitorch.github.io/">MiniTorch</a>
+  <div class="post-body markdown-body" data-chapters="10" data-per-page="1">
+    <div class="post-chapter" data-ch="1"><p>项目文档链接：<a href="https://minitorch.github.io/">MiniTorch</a>
 项目仓库：<a href="https://github.com/minitorch/minitorch">minitorch/minitorch: The full minitorch student suite.</a></p>
 <p>我的实现：<a href="https://github.com/Meredith2328/minitorch">Meredith2328/minitorch: The full minitorch student suite.</a>
 （完成√并整理√了Fundamentals, ML Primer, AutoDiff, Tensors, 
 完成了Efficiency部分，未涉及Networks部分。）</p>
 <p>另外推荐参考这个，写得比我多得多：<a href="https://dezeming.top/wp-content/uploads/2022/02/MiniTorch-%E5%AD%A6%E4%B9%A0%E5%85%A8%E6%94%BB%E7%95%A5.pdf">MiniTorch-学习全攻略.pdf</a></p>
-<h2 id="_1">项目整体介绍</h2>
+</div><div class="post-chapter" data-ch="2" data-title="项目整体介绍"><h2 id="_1">项目整体介绍</h2>
 <p>MiniTorch是一个基于Python基础语法或Numpy，并进一步使用Numba和CUDA对矩阵运算进行优化，以实现符合PyTorch接口的一个简易版PyTorch的项目。
 原项目来自于康奈尔大学由Sasha Rush老师教授的机器学习系统课程 <a href="https://minitorch.github.io/">MiniTorch</a> 。</p>
 <p>目录：</p>
@@ -120,7 +122,7 @@
 <li>Efficiency</li>
 <li>Network</li>
 </ul>
-<h2 id="_2">安装环境</h2>
+</div><div class="post-chapter" data-ch="3" data-title="安装环境"><h2 id="_2">安装环境</h2>
 <p><img alt="" src="../../migrated/post-images/20250702081943.png"/></p>
 <p>将以下内容保存为requirements.txt并替换原始项目使用的requirements.txt和requirements.txt.extra：</p>
 <div class="highlight"><pre><span></span><code>backports.tarfile==1.2.0
@@ -161,7 +163,7 @@ pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu12
 <p>运行测试的方法举例：</p>
 <div class="highlight"><pre><span></span><code>pytest tests/ -m task3_1
 </code></pre></div>
-<h2 id="fundamentals">Fundamentals</h2>
+</div><div class="post-chapter" data-ch="4" data-title="Fundamentals"><h2 id="fundamentals">Fundamentals</h2>
 <p>Fundamentals：torch的算子<code>Operator</code>，模块<code>Module</code>等。</p>
 <h3 id="_3">整体概念</h3>
 <blockquote>
@@ -232,7 +234,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 <blockquote>
 <p>ps. 这里有一个实现细节踩坑：<br/>operators.py里的函数不能相互依赖，比如sigmoid不能用同模块下的exp，但是可以用math.exp等，这是为了Efficiency一章numba能够识别相关函数。</p>
 </blockquote>
-<h2 id="ml-primer">ML Primer</h2>
+</div><div class="post-chapter" data-ch="5" data-title="ML Primer"><h2 id="ml-primer">ML Primer</h2>
 <p>ML Primer：讲了一点机器学习基础，以二分类为例，无代码作业。</p>
 <p>文中对ReLU的理解例子十分有趣，看一看：</p>
 <blockquote>
@@ -255,7 +257,7 @@ PyTorch的基本数据结构，概念上是一个树的节点，节点值包括 
 <blockquote>
 <p>Mathematically we can think of the transformed data as values h1,h2 which we get from applying separators with different parameters to the original data. <br/>The final prediction then applies a separator to h1,h2.<br/><img alt="" src="../../migrated/post-images/20250702174343.png"/></p>
 </blockquote>
-<h2 id="autodiff">AutoDiff</h2>
+</div><div class="post-chapter" data-ch="6" data-title="AutoDiff"><h2 id="autodiff">AutoDiff</h2>
 <h3 id="_6">整体概念</h3>
 <blockquote>
 <p>edit time: 2026-03-02 18:21:05</p>
@@ -761,7 +763,7 @@ ctx: forward时记录的变量，现在直接传进去用就行，后面应该�
 其中实现算子的backward时，需要什么变量，forward就存过来什么变量。（也可以为了节省计算而存入一些计算好的值，我这里直接传变量再算一遍了）
 完结撒花。</p>
 <p><img alt="" src="../../migrated/post-images/20250707232057.png"/></p>
-<h2 id="tensors">Tensors</h2>
+</div><div class="post-chapter" data-ch="7" data-title="Tensors"><h2 id="tensors">Tensors</h2>
 <h3 id="_14">整体概念</h3>
 <blockquote>
 <p>edit time: 2026-03-04 20:34:31</p>
@@ -1173,7 +1175,7 @@ permute函数的backward需要通过实验额外说明一下：</p>
 </code></pre></div>
 <p>之后2.4和2.5逐渐遇到一些小的神奇的bug（修完忘记记录了，可惜），不知道是框架代码写错了还是我写错了。反正修改掉其中一者之后最后能跑就行。</p>
 <p>只需要实现各个函数的backward，就可以复用和第三部分一样的Autodiff、Backpropagation逻辑。</p>
-<h2 id="efficiency">Efficiency</h2>
+</div><div class="post-chapter" data-ch="8" data-title="Efficiency"><h2 id="efficiency">Efficiency</h2>
 <p>Efficiency：使用<code>numba</code>并行和CUDA编程等方式提升效率。</p>
 <p>参考了：</p>
 <ol>
@@ -1371,13 +1373,13 @@ conda install numba==0.60.0 cudatoolkit -c conda-forge -y
 Task3.3: <a href="https://github.com/atgctg/minitorch">atgctg/minitorch: Solutions for http://minitorch.github.io</a>
 Task3.4: <a href="https://github.com/feimos32/Minitorch-Learning-Introduction">feimos32/Minitorch-Learning-Introduction</a></p>
 <p>感谢先行者！</p>
-<h2 id="network">Network</h2>
+</div><div class="post-chapter" data-ch="9" data-title="Network"><h2 id="network">Network</h2>
 <p>Networks：已经开发出一个很简单的pytorch了，来拿它搞个卷积神经网络进行图像分类这种上游任务吧！
 不是个人学习的重点，直接合并了 Task4: <a href="https://github.com/Dearkano/MiniTorch/">Dearkano/MiniTorch: Cornell CS5781 Machine Learning Engineering</a> 以保证完整性。
 感谢先行者！</p>
 <p>nn.py里面的class Max有问题
 TODO</p>
-<h2 id="pytorch">附: 基于Pytorch代码，讲讲反向传播和计算图</h2>
+</div><div class="post-chapter" data-ch="10" data-title="附: 基于Pytorch代码，讲讲反向传播和计算图"><h2 id="pytorch">附: 基于Pytorch代码，讲讲反向传播和计算图</h2>
 <p>以下代码选取自PyTorch官方的 <a href="https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html">Quickstart — PyTorch Tutorials</a>
 省略了<code>import</code>，数据集加载，设置<code>DataLoader</code>，建立模型，设置损失函数和优化器。</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
@@ -1540,8 +1542,17 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
 <blockquote>
 <p>edit time: 2025-07-02 17:07:11 （Fundamentals√）<br/>edit time: 2025-07-02 17:54:05 （ML Primer√）<br/>edit time: 2025-07-07 23:33:57 （AutoDiff√）<br/>edit time: 2025-07-15 17:18:18 （Tensors√）<br/>edit time: 2025-07-23 22:29:56‎ （Efficiency√）<br/>edit time: 2025-08-03 22:09:45 （附: 基于Pytorch代码，讲讲反向传播和计算图√）</p>
 </blockquote>
-<p>相关：<a href="optimizer.html">优化器</a> · <a href="softmax.html">在线 Softmax</a> · <a href="../tools/einops.html">einops</a></p>
+</div><aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="optimizer.html">优化器</a><a class="post-rel-link" href="softmax.html">在线 Softmax</a><a class="post-rel-link" href="../tools/einops.html">einops</a></div></aside>
   </div>
+
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
+    <select id="pager-select" aria-label="跳转到章节"></select>
+    <span class="pager-info" id="pager-info"></span>
+    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
+  </nav>
+  
 
   
   <section class="post-comments">
@@ -1605,5 +1616,9 @@ W = \begin{bmatrix} 1 &amp; 0 \\ 2 &amp; 1 \end{bmatrix}\]</div>
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+<script src="../../../js/pager.js" defer></script>
+
+
 </body>
 </html>

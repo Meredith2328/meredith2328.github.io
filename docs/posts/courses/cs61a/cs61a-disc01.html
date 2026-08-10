@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>CS61A · Disc 01 · 迭代与抽象 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="Discussion 1 | CS 61A Summer 2024 eg. race(3, 4) 以下先考虑前10min中构造无限循环。 第一个条件显然不符合我们的需要。 因为第二个条件是 tortoise - hare ，若其为负值、则仍可以继续循环。 0-4min 由于y&gt;x，hare=my &gt; tortoise=">
+  <meta name="description" content="Discussion 1 | CS 61A Summer 2024 CS61A 2024 summer Discussion 笔记（共六篇，disc06 没写）： [[cs61a-disc01|Disc 01 迭代与抽象]]（本篇） [[cs61a-disc02|Disc 02 高阶函数]] [[cs61a-disc0">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="CS61A · Disc 01 · 迭代与抽象">
-  <meta property="og:description" content="Discussion 1 | CS 61A Summer 2024 eg. race(3, 4) 以下先考虑前10min中构造无限循环。 第一个条件显然不符合我们的需要。 因为第二个条件是 tortoise - hare ，若其为负值、则仍可以继续循环。 0-4min 由于y&gt;x，hare=my &gt; tortoise=">
+  <meta property="og:description" content="Discussion 1 | CS 61A Summer 2024 CS61A 2024 summer Discussion 笔记（共六篇，disc06 没写）： [[cs61a-disc01|Disc 01 迭代与抽象]]（本篇） [[cs61a-disc02|Disc 02 高阶函数]] [[cs61a-disc0">
   <link rel="canonical" href="https://meredith2328.github.io/posts/courses/cs61a/cs61a-disc01.html">
   
   
@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,11 +104,21 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p><a href="https://cs61a.org/disc/disc01/">Discussion 1 | CS 61A Summer 2024</a></p>
 <blockquote>
 <p>edit time: 2024-07-17 17:57:15</p>
 </blockquote>
+<h2 id="_1">系列总览</h2>
+<p>CS61A 2024 summer Discussion 笔记（共六篇，disc06 没写）：</p>
+<ol>
+<li><a href="cs61a-disc01.html">Disc 01 迭代与抽象</a>（本篇）</li>
+<li><a href="cs61a-disc02.html">Disc 02 高阶函数</a></li>
+<li><a href="cs61a-disc03.html">Disc 03 递归</a></li>
+<li><a href="cs61a-disc04.html">Disc 04 树的递归</a></li>
+<li><a href="cs61a-disc05.html">Disc 05 迭代、时空复杂度</a></li>
+<li><a href="cs61a-disc07.html">Disc 07 树、链表</a></li>
+</ol>
 <h2 id="q1-race">Q1: Race</h2>
 <p>eg. <code>race(3, 4)</code></p>
 <p>以下先考虑前10min中构造无限循环。
@@ -242,7 +254,7 @@
 </code></pre></div>
 <p>类似上一题的思考：
 逐个判断“是否有某一位数小于它的高位数”？</p>
-<h2 id="_1">总结</h2>
+<h2 id="_2">总结</h2>
 <p>很明显，Q3-Q5反映了相同的从一个具体案例，引出解决过程的描述、对该过程描述中的实体的抽象、再反过来利用抽象测试是否满足该案例，以及是否满足其他案例这样的“迭代过程”。
 这个思想贯穿整个课程及教材，务必仔细体会。</p>
 <p>如下摘录相关思想的原文。</p>
@@ -268,8 +280,10 @@
 <li>Check that <code>is_prime(9)</code> will return <code>False</code> by thinking through the execution of the code.</li>
 <li>Check that <code>is_prime(3)</code> will return <code>True</code> and <code>is_prime(1)</code> will return <code>False</code>.</li>
 </ol>
-<p>下一篇：<a href="cs61a-disc02.html">Disc 02 高阶函数</a></p>
+<aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="cs61a-disc02.html" title="下一篇">Disc 02 高阶函数 →</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -333,5 +347,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

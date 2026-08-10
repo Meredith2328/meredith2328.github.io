@@ -104,7 +104,7 @@ python pilog.py serve --watch                # 本地预览 + 自动重建
 
 6. 运行 `python build.py`（或开着 `serve.py --watch` 自动重建），检查效果后提交。
 
-   另外两个可选 front matter 字段：`pin: true` 让文章在卡片视图置顶；`highlight: true` 给文章加黄色描边（三种视图都显示）。
+   另外几个可选 front matter 字段：`pin: true` 让文章在卡片视图置顶；`highlight: true` 给文章加黄色描边（三种视图都显示）；`chapters_per_page: N` 让超长文章按标题切分成章节、在同一链接下分页显示（每页 N 章）。
 
 ## 文件管理（manager 的“文件管理”页）
 

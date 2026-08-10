@@ -14,17 +14,56 @@
   var current = -1;
   var items = [];
   var timer = null;
+  var fulltextBtn = document.getElementById("search-fulltext");
+  var fullOn = false;
+  var fulltextByUrl = null;
+  var fulltextApplied = false;
+  var baseTextByUrl = {};
 
   function loadIndex() {
     if (loaded) return Promise.resolve(index);
     loaded = true;
     return fetch(root + "data/search.json")
       .then(function (r) { return r.json(); })
-      .then(function (data) { index = data; return data; })
+      .then(function (data) {
+        index = data;
+        baseTextByUrl = {};
+        data.forEach(function (e) { baseTextByUrl[e.url] = e.text; });
+        return data;
+      })
       .catch(function () {
         loaded = false;
         return [];
       });
+  }
+
+  function ensureFulltext() {
+    if (fulltextByUrl) return Promise.resolve();
+    return fetch(root + "data/fulltext.json")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        fulltextByUrl = {};
+        data.forEach(function (e) { fulltextByUrl[e.url] = e.text; });
+      })
+      .catch(function () {
+        fulltextByUrl = {};
+      });
+  }
+
+  function applyFulltext() {
+    if (fulltextApplied || !fulltextByUrl || !index) return;
+    index.forEach(function (e) {
+      if (fulltextByUrl[e.url]) e.text = fulltextByUrl[e.url];
+    });
+    fulltextApplied = true;
+  }
+
+  function restoreIndex() {
+    if (!fulltextApplied || !index) return;
+    index.forEach(function (e) {
+      if (baseTextByUrl[e.url] != null) e.text = baseTextByUrl[e.url];
+    });
+    fulltextApplied = false;
   }
 
   function esc(s) {
@@ -86,6 +125,13 @@
     items = [];
     if (!query) {
       results.hidden = true;
+      return;
+    }
+    if (fullOn && !fulltextApplied) {
+      ensureFulltext().then(function () {
+        applyFulltext();
+        if (input.value.trim() === query) render();
+      });
       return;
     }
     var q = query.toLowerCase();
@@ -152,6 +198,23 @@
       loadIndex().then(function () { render(); });
     }
   });
+
+  if (fulltextBtn) {
+    fulltextBtn.addEventListener("click", function () {
+      fullOn = !fullOn;
+      fulltextBtn.classList.toggle("is-on", fullOn);
+      fulltextBtn.setAttribute("aria-pressed", fullOn ? "true" : "false");
+      if (fullOn) {
+        ensureFulltext().then(function () {
+          applyFulltext();
+          if (query) render();
+        });
+      } else {
+        restoreIndex();
+        if (query) render();
+      }
+    });
+  }
 
   input.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {

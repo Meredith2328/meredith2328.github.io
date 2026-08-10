@@ -61,8 +61,10 @@ def main() -> None:
         ok &= check("default view global exposed",
                     page.evaluate("window.PILOG_DEFAULT_VIEW") == "cards")
         first_title = page.locator(".card-title").first.inner_text()
-        ok &= check("newest post first", "pilog" in first_title and "像素" in first_title,
-                    first_title[:30])
+        ok &= check("pinned index card first", "十派的玩具箱" in first_title, first_title[:30])
+        second_title = page.locator(".card-title").nth(1).inner_text()
+        ok &= check("newest post follows pin", "TRL" in second_title and "假装训练" in second_title,
+                    second_title[:40])
         ok &= check("highlight card shown", page.locator(".card.is-highlight").count() >= 1)
         body_font = page.evaluate("getComputedStyle(document.body).fontFamily")
         ok &= check("sans font stack", "Inter" in body_font or "Segoe" in body_font, body_font[:60])
@@ -70,7 +72,7 @@ def main() -> None:
         ok &= check("card height reasonable", 150 < card_h < 320, str(card_h))
         thumb_w = page.locator(".card-thumb img").first.bounding_box()["width"]
         ok &= check("thumb column ~132px", abs(thumb_w - 132) < 6, str(thumb_w))
-        pre = page.locator(".card-preview").first.inner_text()
+        pre = page.locator(".card", has_text="用 pilog 搭建").locator(".card-preview").first.inner_text()
         ok &= check("manual preview shown", "个人自制" in pre and "博客框架" in pre, pre[:40])
         ok &= check("tag chips on cards", page.locator(".card .tag-chip").count() >= 4)
         ok &= check("no nested links in previews", page.locator(".card-preview a").count() == 0)
@@ -96,7 +98,7 @@ def main() -> None:
         page.locator(".folder-part[data-folder='posts/toy']").first.click()
         ok &= check("folder chip appears", page.locator(".sel-chip.sel-folder").count() == 1)
         vis = page.locator(".card:visible").count()
-        ok &= check("folder filter narrows cards", vis == 8, str(vis))
+        ok &= check("folder filter narrows cards", vis == 9, str(vis))
         page.locator(".sel-chip .sel-x").first.click()
 
         # only one folder condition at a time: selecting another folder
@@ -110,7 +112,7 @@ def main() -> None:
         ok &= check("folder chip replaced",
                     "posts/notes" in page.locator(".sel-chip.sel-folder").first.inner_text())
         vis = page.locator(".card:visible").count()
-        ok &= check("folder filter switched", vis == 14, str(vis))
+        ok &= check("folder filter switched", vis == 17, str(vis))
         page.evaluate("window.pilogFilters.selectFolder('posts/notes')")
         page.wait_for_timeout(200)
         ok &= check("same folder keeps condition",
@@ -136,7 +138,7 @@ def main() -> None:
         page.route("**/data/cards.json", lambda route: route.fulfill(
             status=200, content_type="application/json", body="not-json"))
         page.goto(base + "/", wait_until="networkidle")
-        page.locator(".filter-tags .tag-chip").first.click()
+        page.locator(".filter-tags .tag-chip", has_text="大模型").first.click()
         page.wait_for_timeout(400)
         vis = page.locator(".card:visible").count()
         ok &= check("tag filter works without cards.json", vis >= 1, str(vis))
@@ -236,6 +238,19 @@ def main() -> None:
         page.locator(".sel-chip .sel-x").first.click()
         page.fill("#search-input", "")
 
+        # full-text search toggle: deep body text only matches when enabled
+        page.fill("#search-input", "初步学习完结撒花")
+        page.wait_for_timeout(700)
+        ok &= check("default search ignores deep text", page.locator(".search-item").count() == 0)
+        page.click("#search-fulltext")
+        page.wait_for_timeout(1000)
+        ok &= check("fulltext toggle active", page.locator("#search-fulltext.is-on").count() == 1)
+        ok &= check("fulltext finds deep text", page.locator(".search-item").count() >= 1)
+        page.click("#search-fulltext")
+        page.wait_for_timeout(500)
+        ok &= check("fulltext toggle off restores", page.locator(".search-item").count() == 0)
+        page.fill("#search-input", "")
+
         # post page
         page.goto(base + "/posts/toy/pilog-blog.html", wait_until="networkidle")
         ok &= check("pygments highlight", page.locator(".highlight").count() >= 1)
@@ -256,6 +271,21 @@ def main() -> None:
         page.goto(base + "/posts/toy/pilog-blog.html", wait_until="networkidle")
         ok &= check("strikethrough renders", page.locator("del").count() >= 1)
         ok &= check("latex math markup present", page.locator(".arithmatex").count() >= 2)
+
+        # long post section paging + styled related/series footer boxes
+        page.goto(base + "/posts/notes/algo/algorithm-4.html", wait_until="networkidle")
+        chapters = page.locator(".post-chapter").count()
+        ok &= check("long post paged into chapters", chapters >= 5, str(chapters))
+        ok &= check("pager nav visible", page.locator("#post-pager").is_visible())
+        ok &= check("series nav box styled", page.locator(".post-rel.is-series").count() == 1)
+        info1 = page.locator("#pager-info").inner_text()
+        ok &= check("pager starts at chapter 1", "第 1 章" in info1, info1)
+        page.click("#pager-next")
+        page.wait_for_timeout(400)
+        info2 = page.locator("#pager-info").inner_text()
+        ok &= check("pager next switches chapter", "第 2 章" in info2, info2)
+        page.goto(base + "/posts/notes/ml/mathqwen-0.6b-agentic-rl.html", wait_until="networkidle")
+        ok &= check("related box styled", page.locator(".post-rel.is-related").count() == 1)
 
         # screenshots sanity
         for name in ["01-cards.png", "02-tree.png", "03-graph.png", "05-post.png", "06-mobile.png"]:

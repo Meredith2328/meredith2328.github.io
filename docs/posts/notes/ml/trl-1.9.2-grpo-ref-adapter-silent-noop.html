@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p><strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。</strong></p>
 <p>怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter 逐字节相同——模型压根没被训过。</p>
 <p>这不是我们配置写错了什么冷门参数，也不是运气不好踩到了某个边角。它是框架在一个挺常规的使用方式下，自己把优化器建成了空的，而且全程不吭一声。下面我把这件事从头到尾讲清楚：什么情况会撞上、怎么用最小的例子复现、根因到底在哪、怎么绕开、以及怎么检查自己有没有中招。</p>
@@ -190,8 +192,10 @@ saved == initial: False
 <p>更完整的信息可以参考前述的issue和pr。</p>
 <p>这个 bug 教会我的还是那件事：<strong>RL 是“稀疏”的，日志会骗人，只有可观测性不会。</strong> 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。</p>
 <p><del>毕竟真金白银拿去租卡训的模型，结果训了半天实验是废的，这谁绷得住啊</del></p>
-<p>相关：<a href="mathqwen-0.6b-agentic-rl.html">完整踩坑记录</a></p>
+<aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="mathqwen-0.6b-agentic-rl.html">完整踩坑记录</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -255,5 +259,7 @@ saved == initial: False
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

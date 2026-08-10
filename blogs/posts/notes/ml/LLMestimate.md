@@ -16,7 +16,11 @@ $$P ≈ 12Nd^2 + Vd$$
 
 <!-- more -->
 
-> 本文是第一篇。第二篇为 [怎么估算LLM训练的内存和计算需求？推一推、测一测  | 十派的玩具箱](https://meredith2328.github.io/post/LLMestimate2/) 。
+## 系列总览
+
+1. [[LLMestimate|01 参数量与训练 FLOPs]]（本篇）
+2. [[LLMestimate2|02 训练的内存和计算需求]]
+
 > edit time: 2026-03-05 17:03:20
 
 本文的LLM基于Transformer Decoder结构，以 [GPT2-XL](https://huggingface.co/openai-community/gpt2-xl) 为例。它有以下超参数设置：

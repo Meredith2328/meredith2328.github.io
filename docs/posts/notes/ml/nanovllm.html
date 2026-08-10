@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
 <p>edit time: 2026-05-16 18:20:34 做了FlashAttention部分好耶<br/>edit time: 2026-05-16 19:04:38 做了PagedAttention部分好耶</p>
 </blockquote>
@@ -466,8 +468,10 @@ PagedAttention：block size = 4 tokens，按需动态分配
 <li>Block3（<code>[G,H]</code>），ref_count=1</li>
 </ul>
 <p><strong>核心优势</strong>：通过引用计数，我们节省了 2 blocks × 2 = 4 tokens 的显存。实际场景中，系统 prompt 可能很长（如 1000 tokens），共享效果非常显著。</p>
-<p>相关：<a href="softmax.html">在线 Softmax</a></p>
+<aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="softmax.html">在线 Softmax</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -531,5 +535,7 @@ PagedAttention：block size = 4 tokens，按需动态分配
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

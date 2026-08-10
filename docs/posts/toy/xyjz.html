@@ -49,6 +49,8 @@
       <div class="search-wrap" id="search-wrap">
         <input id="search-input" type="search" placeholder="搜索 标题 / 全文 / 标签…"
                autocomplete="off" aria-label="搜索">
+        <button class="search-fulltext" id="search-fulltext" type="button"
+                title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
 
@@ -102,7 +104,7 @@
 
   
 
-  <div class="post-body markdown-body">
+  <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <h1 id="_1">夏夜将终：一个乐队官网的诞生</h1>
 <p>2023 年夏末，几个学生因为夜鹿（ヨルシカ / Yorushika）走到了一起，组了一支校园乐队，名字叫「夏夜将终」。</p>
 <p>后来，他们给自己做了一个 <a href="https://meredith2328.github.io/xyjz/">夏夜将终 OFFICIAL SITE</a> 。就像是 <a href="https://yorushika.com/">ヨルシカ OFFICIAL SITE</a> 一样。</p>
@@ -121,8 +123,10 @@
 <blockquote>
 <p>所以夏夜其实还不会结束——</p>
 </blockquote>
-<p>相关：<a href="10pi.html">玩具箱索引</a></p>
+<aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="10pi.html">玩具箱索引</a></div></aside>
   </div>
+
+  
 
   
   <section class="post-comments">
@@ -186,5 +190,7 @@
           onload="try{if(window.renderMathInElement){renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],throwOnError:false});}}catch(e){}"></script>
   <script src="../../js/search.js" defer></script>
   
+
+
 </body>
 </html>

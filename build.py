@@ -244,6 +244,121 @@ def _sanitize_preview_html(html: str) -> str:
     return str(soup)
 
 
+CHAPTER_LEVELS = ("h2", "h3", "h4", "h1")
+
+
+def split_chapters(html: str, per_page: int) -> tuple[str, int]:
+    """Wrap a rendered post body into `.post-chapter` blocks for client-side
+    section paging (all chapters ship in the same page, JS toggles visibility).
+
+    Chapters are cut at the finest common heading level: h2 by default, then
+    h3 / h4 / h1 for posts that only use deeper headings. Returns
+    (new_html, chapter_count); chapter_count < 2 means paging is not worth it
+    and the original html is returned unchanged.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    if soup.find("html"):
+        return html, 0
+    level = None
+    for tag in CHAPTER_LEVELS:
+        if len(soup.find_all(tag)) >= 2:
+            level = tag
+            break
+    if level is None:
+        return html, 0
+
+    groups: list[list] = []
+    current: list = []
+    for child in list(soup.children):
+        name = getattr(child, "name", None)
+        if name == level:
+            if current:
+                groups.append(current)
+            current = [child]
+        else:
+            current.append(child)
+    if current:
+        groups.append(current)
+    if len(groups) < 2:
+        return html, 0
+
+    for i, group in enumerate(groups):
+        node = soup.new_tag("div")
+        node["class"] = "post-chapter"
+        node["data-ch"] = str(i + 1)
+        for el in group:
+            if getattr(el, "name", None) == level:
+                node["data-title"] = el.get_text(" ", strip=True)
+                break
+        for el in group:
+            node.append(el.extract())
+        soup.append(node)
+    return str(soup), len(groups)
+
+
+FOOTER_PREFIXES = ("上一篇：", "下一篇：", "相关：")
+
+
+def style_footers(html: str) -> str:
+    """Turn the trailing 上一篇/下一篇/相关 footer paragraphs into a styled
+    `aside.post-rel` block. The links stay as wikilink-derived <a> elements,
+    so graph refs recorded at render time are unaffected.
+
+    The aside is moved to the end of the fragment (after any chapter divs),
+    so it stays visible on every chapter page of a paged post.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    found = []
+    for p in soup.find_all("p"):
+        text = p.get_text(" ", strip=True)
+        if text.startswith(FOOTER_PREFIXES):
+            found.append(p)
+    if not found:
+        return html
+
+    aside = soup.new_tag("aside")
+    aside["class"] = "post-rel"
+    label = soup.new_tag("span")
+    label["class"] = "post-rel-label"
+    items = soup.new_tag("div")
+    items["class"] = "post-rel-items"
+
+    for p in found:
+        text = p.get_text(" ", strip=True)
+        is_series = "上一篇" in text or "下一篇" in text
+        aside["class"] += " is-series" if is_series else " is-related"
+        if label.string is None:
+            label.string = "系列导航" if is_series else "相关文章"
+        role = "plain"
+        for child in list(p.children):
+            if isinstance(child, str):
+                s = str(child)
+                if "上一篇" in s:
+                    role = "prev"
+                elif "下一篇" in s:
+                    role = "next"
+                else:
+                    role = "plain"
+                continue
+            if getattr(child, "name", None) != "a":
+                continue
+            a = child
+            if role == "prev":
+                a.insert(0, "← ")
+                a["title"] = "上一篇"
+            elif role == "next":
+                a.append(" →")
+                a["title"] = "下一篇"
+            a["class"] = a.get("class", []) + ["post-rel-link"]
+            items.append(a.extract())
+        p.extract()
+
+    aside.append(label)
+    aside.append(items)
+    soup.append(aside)
+    return str(soup)
+
+
 def build_site(
     config_path: str | Path = "config.json",
     blog_dir: str | None = None,
@@ -293,6 +408,11 @@ def build_site(
         post.html = rendered.html
         post.refs = rendered.refs
         post.image_sources = rendered.image_sources
+        if post.chapters_per_page > 0:
+            post.html, post.chapter_count = split_chapters(
+                post.html, post.chapters_per_page
+            )
+        post.html = style_footers(post.html)
 
         if post.preview:
             preview_html = render_markdown(
@@ -352,9 +472,11 @@ def build_site(
     )
 
     search_entries = []
+    fulltext_entries = []
     for post in posts:
         body_soup = BeautifulSoup(post.html, "html.parser")
-        text = body_soup.get_text(" ", strip=True)[:1600]
+        full_text = body_soup.get_text(" ", strip=True)
+        text = full_text[:1600]
         search_entries.append(
             {
                 "url": post.url,
@@ -365,8 +487,12 @@ def build_site(
                 "text": text,
             }
         )
+        fulltext_entries.append({"url": post.url, "text": full_text})
     (out_root / "data" / "search.json").write_text(
         json.dumps(search_entries, ensure_ascii=False), encoding="utf-8"
+    )
+    (out_root / "data" / "fulltext.json").write_text(
+        json.dumps(fulltext_entries, ensure_ascii=False), encoding="utf-8"
     )
 
     # 4. templates

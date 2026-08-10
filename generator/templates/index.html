@@ -38,8 +38,10 @@
       <a class="card-link" href="{{ root }}{{ post.url }}">
         <div class="card-body">
           <div class="card-meta">
-            <time datetime="{{ post.date_str }}">{{ post.date_str }}</time>
-            {% if post.pin %}<span class="pin-badge">置顶</span>{% endif %}
+            <span class="card-meta-left">
+              <time datetime="{{ post.date_str }}">{{ post.date_str }}</time>
+              {% if post.pin %}<span class="pin-badge">置顶</span>{% endif %}
+            </span>
             {% set segs = folder_segments(post.folder) %}
             {% if segs %}
             <span class="card-folder" title="点击目录片段筛选">

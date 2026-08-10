@@ -28,6 +28,8 @@ class Post:
     hidden: bool = False
     feature: str = ""
     order: float | None = None
+    chapters_per_page: int = 0
+    chapter_count: int = 0
     folder: str = ""
     url: str = ""
     html: str = ""
@@ -198,11 +200,23 @@ def scan_posts(blog_root: Path, ctx: MarkdownContext) -> list[Post]:
                 if fm.get("order") is not None
                 else None
             ),
+            chapters_per_page=_parse_chapters(fm.get("chapters_per_page")),
             folder=folder,
             word_count=len(re.sub(r"\s+", "", body)),
         )
         posts.append(post)
     return posts
+
+
+def _parse_chapters(value) -> int:
+    """Front matter `chapters_per_page` -> int (0 means no section paging)."""
+    if value is None:
+        return 0
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        return 0
+    return n if n > 0 else 0
 
 
 def _parse_feature(value) -> str:
