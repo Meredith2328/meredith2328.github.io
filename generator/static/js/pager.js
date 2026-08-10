@@ -37,7 +37,11 @@
 
   function scrollToEl(el) {
     var top = el.getBoundingClientRect().top + window.pageYOffset - 24;
-    window.scrollTo({ top: top, behavior: "smooth" });
+    if (window.pilogSmoothScroll) {
+      window.pilogSmoothScroll(top);
+    } else {
+      window.scrollTo({ top: top, behavior: "smooth" });
+    }
   }
 
   function show(scrollTarget) {
@@ -55,7 +59,13 @@
     if (scrollTarget && scrollTarget !== body) {
       scrollToEl(scrollTarget);
     } else {
-      body.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.pilogSmoothScroll) {
+        window.pilogSmoothScroll(
+          body.getBoundingClientRect().top + window.pageYOffset - 8
+        );
+      } else {
+        body.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   }
 

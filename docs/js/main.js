@@ -3,6 +3,44 @@
 (function () {
   "use strict";
 
+  /* shared smooth scroll: rAF-based so consecutive calls always restart from
+     the current position (native scrollTo({behavior:'smooth'}) can get stuck
+     when a previous animation is still running and only move a few pixels) */
+  var scrollAnim = null;
+
+  function cancelScrollAnim() {
+    if (scrollAnim) {
+      cancelAnimationFrame(scrollAnim);
+      scrollAnim = null;
+    }
+  }
+
+  window.pilogSmoothScroll = function (targetY, duration) {
+    duration = duration || 360;
+    cancelScrollAnim();
+    var startY = window.pageYOffset;
+    var delta = targetY - startY;
+    if (Math.abs(delta) < 1) return;
+    var t0 = null;
+
+    function ease(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function frame(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / duration);
+      window.scrollTo(0, startY + delta * ease(k));
+      scrollAnim = k < 1 ? requestAnimationFrame(frame) : null;
+    }
+    scrollAnim = requestAnimationFrame(frame);
+  };
+
+  // let manual scrolling take over immediately
+  ["wheel", "touchstart"].forEach(function (ev) {
+    window.addEventListener(ev, cancelScrollAnim, { passive: true });
+  });
+
   var VIEWS = ["cards", "tree", "graph"];
   var home = !!document.getElementById("card-grid");
 

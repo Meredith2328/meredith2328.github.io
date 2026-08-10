@@ -47,7 +47,11 @@
 
   function scrollToHeading(h) {
     var top = h.getBoundingClientRect().top + window.pageYOffset - 24;
-    window.scrollTo({ top: top, behavior: "smooth" });
+    if (window.pilogSmoothScroll) {
+      window.pilogSmoothScroll(top);
+    } else {
+      window.scrollTo({ top: top, behavior: "smooth" });
+    }
   }
 
   toc.addEventListener("click", function (e) {

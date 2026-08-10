@@ -18,12 +18,31 @@
   var fullOn = false;
   var fulltextByUrl = null;
   var fulltextApplied = false;
+  var fulltextFailed = false;
   var baseTextByUrl = {};
+
+  function fetchTimeout(url, ms) {
+    var ctrl =
+      typeof AbortController !== "undefined" ? new AbortController() : null;
+    var opt = ctrl ? { signal: ctrl.signal } : {};
+    var t = setTimeout(function () {
+      if (ctrl) ctrl.abort();
+    }, ms);
+    return fetch(url, opt)
+      .then(function (r) {
+        clearTimeout(t);
+        return r;
+      })
+      .catch(function (e) {
+        clearTimeout(t);
+        throw e;
+      });
+  }
 
   function loadIndex() {
     if (loaded) return Promise.resolve(index);
     loaded = true;
-    return fetch(root + "data/search.json")
+    return fetchTimeout(root + "data/search.json", 10000)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         index = data;
@@ -39,14 +58,16 @@
 
   function ensureFulltext() {
     if (fulltextByUrl) return Promise.resolve();
-    return fetch(root + "data/fulltext.json")
+    return fetchTimeout(root + "data/fulltext.json", 10000)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         fulltextByUrl = {};
+        fulltextFailed = false;
         data.forEach(function (e) { fulltextByUrl[e.url] = e.text; });
       })
       .catch(function () {
-        fulltextByUrl = {};
+        fulltextByUrl = null;
+        fulltextFailed = true;
       });
   }
 
@@ -83,6 +104,14 @@
     );
   }
 
+  function lowText(e) {
+    if (e._lowText !== e.text) {
+      e._lowText = e.text;
+      e._low = (e.text || "").toLowerCase();
+    }
+    return e._low;
+  }
+
   function score(entry, q) {
     // "#xxx" searches tags only (exact beats prefix); plain "xxx" never
     // matches tags, so tag results do not flood normal searches
@@ -99,7 +128,7 @@
     }
     var t = entry.title.toLowerCase();
     var f = (entry.folder || "").toLowerCase();
-    var text = (entry.text || "").toLowerCase();
+    var text = lowText(entry);
     if (t === q) return 300;
     if (t.indexOf(q) === 0) return 200;
     if (t.indexOf(q) >= 0) return 120;
@@ -110,7 +139,7 @@
 
   function snippet(entry, q) {
     var text = entry.text || "";
-    var lower = text.toLowerCase();
+    var lower = lowText(entry);
     var at = lower.indexOf(q);
     var start = Math.max(0, at - 28);
     var slice = text.slice(start, start + 96);
@@ -128,6 +157,10 @@
       return;
     }
     if (fullOn && !fulltextApplied) {
+      if (fulltextFailed) {
+        showEmpty("全文索引加载失败，请检查网络后重试");
+        return;
+      }
       ensureFulltext().then(function () {
         applyFulltext();
         if (input.value.trim() === query) render();
@@ -142,16 +175,7 @@
       .slice(0, 8);
 
     if (!scored.length) {
-      var img = document.createElement("img");
-      img.className = "search-empty-img";
-      img.src = root + "img/pixel-empty.svg";
-      img.alt = "";
-      results.appendChild(img);
-      var empty = document.createElement("div");
-      empty.className = "search-empty";
-      empty.textContent = "没有匹配「" + query + "」的文章";
-      results.appendChild(empty);
-      results.hidden = false;
+      showEmpty("没有匹配「" + query + "」的文章");
       return;
     }
 
@@ -182,6 +206,20 @@
     results.hidden = false;
   }
 
+  function showEmpty(msg) {
+    results.innerHTML = "";
+    var img = document.createElement("img");
+    img.className = "search-empty-img";
+    img.src = root + "img/pixel-empty.svg";
+    img.alt = "";
+    results.appendChild(img);
+    var empty = document.createElement("div");
+    empty.className = "search-empty";
+    empty.textContent = msg;
+    results.appendChild(empty);
+    results.hidden = false;
+  }
+
   function onInput() {
     query = input.value.trim();
     clearTimeout(timer);
@@ -205,6 +243,7 @@
       fulltextBtn.classList.toggle("is-on", fullOn);
       fulltextBtn.setAttribute("aria-pressed", fullOn ? "true" : "false");
       if (fullOn) {
+        fulltextFailed = false;
         ensureFulltext().then(function () {
           applyFulltext();
           if (query) render();

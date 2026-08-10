@@ -300,6 +300,27 @@ def main() -> None:
         page.evaluate("window.scrollTo(0, document.querySelector('.post-body').offsetHeight)")
         page.wait_for_timeout(500)
         ok &= check("TOC scroll-spy active", page.locator("#post-toc a.is-active").count() == 1)
+        # repeated TOC clicks: each must land on its target (the second click
+        # must not get stuck from the first animation still running)
+        page.goto(base + "/posts/notes/ml/minitorch.html", wait_until="networkidle")
+        page.locator("#post-toc a", has_text="Efficiency").click()
+        page.wait_for_timeout(700)
+        dist1 = page.evaluate("""(() => {
+          const a = Array.from(document.querySelectorAll('#post-toc a'))
+            .find(x => x.textContent.indexOf('Efficiency') >= 0);
+          const h = document.getElementById(a.getAttribute('href').slice(1));
+          return Math.abs(h.getBoundingClientRect().top - 24);
+        })()""")
+        ok &= check("TOC first click lands on section", dist1 < 90, str(dist1))
+        page.locator("#post-toc a", has_text="项目整体介绍").click()
+        page.wait_for_timeout(700)
+        dist2 = page.evaluate("""(() => {
+          const a = document.querySelector('#post-toc a');
+          const h = document.getElementById(a.getAttribute('href').slice(1));
+          return Math.abs(h.getBoundingClientRect().top - 24);
+        })()""")
+        ok &= check("TOC second click reaches first section",
+                    dist2 < 90, f"dist {dist2}")
 
         # prev/next post navigation (card order, wraps at the ends)
         page.goto(base + "/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html",
