@@ -106,6 +106,19 @@
 
   <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <p class="pager-hint" id="pager-hint">本文较长，可开启章节分页阅读，或使用右侧目录跳转。</p>
+    <div class="pager-controls">
+      <button class="pixel-btn" type="button" id="pager-toggle">开启分页</button>
+      <button class="pixel-btn" type="button" id="pager-prev" hidden>← 上一页</button>
+      <select id="pager-select" aria-label="跳转到章节" hidden></select>
+      <span class="pager-info" id="pager-info" hidden></span>
+      <button class="pixel-btn" type="button" id="pager-next" hidden>下一页 →</button>
+    </div>
+  </nav>
+  
+
   <div class="post-body markdown-body" data-chapters="13" data-per-page="1">
     <div class="post-chapter" data-ch="1"><p>总而言之是叽里呱啦一些《算法导论》笔记
 基础算法案例，分治，比较算法与随机化，动态规划，贪心，最短路径，
@@ -1412,15 +1425,6 @@ Circuit-SAT可以规约到3-SAT，因为可以把二元逻辑蕴含改成三元�
 因此，0-1背包需要一个贪心近似。</p>
 </div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-1.html" title="上一篇">← 01 数学篇</a><a class="post-rel-link" href="algorithm-3.html" title="下一篇">03 模板整理 →</a></div></aside>
   </div>
-
-  
-  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
-    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
-    <select id="pager-select" aria-label="跳转到章节"></select>
-    <span class="pager-info" id="pager-info"></span>
-    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
-  </nav>
-  
 
   
   <nav class="post-nav" aria-label="上一篇 / 下一篇">

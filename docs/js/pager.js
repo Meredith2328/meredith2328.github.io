@@ -14,12 +14,15 @@
   var pages = Math.ceil(total / per);
   var page = 0;
   var firstShow = true;
+  var enabled = false;
 
   var prevBtn = document.getElementById("pager-prev");
   var nextBtn = document.getElementById("pager-next");
   var info = document.getElementById("pager-info");
   var select = document.getElementById("pager-select");
-  if (!prevBtn || !nextBtn || !info || !select) return;
+  var toggleBtn = document.getElementById("pager-toggle");
+  var hint = document.getElementById("pager-hint");
+  if (!prevBtn || !nextBtn || !info || !select || !toggleBtn || !hint) return;
 
   chapters.forEach(function (ch, i) {
     var opt = document.createElement("option");
@@ -45,18 +48,35 @@
     }
   }
 
+  function updateHash() {
+    if (!history.replaceState) return;
+    if (enabled) {
+      history.replaceState(null, "", "#ch-" + (page + 1));
+    } else {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+  }
+
+  function setEnabled(on) {
+    enabled = on;
+    toggleBtn.textContent = on ? "关闭长文章分页" : "开启长文章分页";
+    toggleBtn.classList.toggle("is-on", on);
+    hint.hidden = on;
+    prevBtn.hidden = !on;
+    nextBtn.hidden = !on;
+    select.hidden = !on;
+    info.hidden = !on;
+  }
+
   function show(scrollTarget) {
     var start = page * per;
     chapters.forEach(function (ch, i) {
-      ch.hidden = i < start || i >= start + per;
+      ch.hidden = enabled && (i < start || i >= start + per);
     });
     prevBtn.disabled = page === 0;
     nextBtn.disabled = page >= pages - 1;
     info.textContent = rangeText();
     select.value = String(start);
-    if (history.replaceState) {
-      history.replaceState(null, "", "#ch-" + (page + 1));
-    }
     if (firstShow) {
       // initial page load: never auto-scroll to the body
       firstShow = false;
@@ -65,14 +85,6 @@
     firstShow = false;
     if (scrollTarget && scrollTarget !== body) {
       scrollToEl(scrollTarget);
-    } else {
-      if (window.pilogSmoothScroll) {
-        window.pilogSmoothScroll(
-          body.getBoundingClientRect().top + window.pageYOffset - 8
-        );
-      } else {
-        body.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
     }
   }
 
@@ -80,12 +92,14 @@
     if (page > 0) {
       page--;
       show();
+      updateHash();
     }
   });
   nextBtn.addEventListener("click", function () {
     if (page < pages - 1) {
       page++;
       show();
+      updateHash();
     }
   });
   select.addEventListener("change", function () {
@@ -93,7 +107,13 @@
     if (!isNaN(i)) {
       page = Math.floor(i / per);
       show();
+      updateHash();
     }
+  });
+  toggleBtn.addEventListener("click", function () {
+    setEnabled(!enabled);
+    updateHash();
+    show();
   });
 
   var initialHash = location.hash;
@@ -102,12 +122,25 @@
   var m = initialHash.match(/^#ch-(\d+)$/);
   if (m) {
     var wanted = parseInt(m[1], 10) - 1;
-    if (!isNaN(wanted) && wanted >= 0 && wanted < pages) page = wanted;
+    if (!isNaN(wanted) && wanted >= 0 && wanted < pages) {
+      page = wanted;
+      setEnabled(true);
+      updateHash();
+    } else {
+      setEnabled(false);
+    }
+  } else {
+    // default: traditional full-length display, paging is opt-in
+    setEnabled(false);
   }
 
   window.pilogPager = {
     jumpToHeading: function (h) {
       if (!h) return false;
+      if (!enabled) {
+        scrollToEl(h);
+        return true;
+      }
       var ch = h.closest(".post-chapter");
       if (!ch) return false;
       var idx = Array.prototype.indexOf.call(chapters, ch);

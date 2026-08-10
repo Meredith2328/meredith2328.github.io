@@ -300,17 +300,39 @@ def main() -> None:
         ok &= check("paged post does not auto-scroll on load", load_y < 50, str(load_y))
         chapters = page.locator(".post-chapter").count()
         ok &= check("long post paged into chapters", chapters >= 5, str(chapters))
+        visible_chapters = page.locator(".post-chapter:visible").count()
+        ok &= check("pager defaults to traditional display",
+                    visible_chapters == chapters, f"{visible_chapters}/{chapters}")
         ok &= check("pager nav visible", page.locator("#post-pager").is_visible())
         ok &= check("series nav box styled", page.locator(".post-rel.is-series").count() == 1)
+        ok &= check("pager at top with hint",
+                    page.locator(".pager-hint").count() == 1 and
+                    page.evaluate("document.querySelector('.post-body').previousElementSibling.id === 'post-pager'"))
         ok &= check("post TOC built", page.locator("#post-toc").is_visible() and
                     page.locator("#post-toc a").count() >= 5,
                     str(page.locator("#post-toc a").count()))
+        page.click("#pager-toggle")
+        page.wait_for_timeout(300)
         info1 = page.locator("#pager-info").inner_text()
         ok &= check("pager starts at chapter 1", "第 1 章" in info1, info1)
+        ok &= check("paging hides other chapters",
+                    page.locator(".post-chapter:visible").count() == 1)
+        page.evaluate("window.scrollTo(0, 320)")
+        page.wait_for_timeout(200)
+        page.evaluate("""(() => {
+          window.__scrollCalls = 0;
+          var orig = window.pilogSmoothScroll;
+          window.pilogSmoothScroll = function () {
+            window.__scrollCalls++;
+            return orig.apply(this, arguments);
+          };
+        })()""")
         page.click("#pager-next")
         page.wait_for_timeout(400)
         info2 = page.locator("#pager-info").inner_text()
         ok &= check("pager next switches chapter", "第 2 章" in info2, info2)
+        scroll_calls = page.evaluate("window.__scrollCalls")
+        ok &= check("pager switch does not scroll to top", scroll_calls == 0, str(scroll_calls))
         # clicking a TOC entry for a hidden chapter switches to its page
         page.locator("#post-toc a", has_text="专题四").click()
         page.wait_for_timeout(600)
@@ -326,7 +348,7 @@ def main() -> None:
         # must not get stuck from the first animation still running)
         page.goto(base + "/posts/notes/ml/minitorch.html", wait_until="networkidle")
         page.locator("#post-toc a", has_text="Efficiency").click()
-        page.wait_for_timeout(700)
+        page.wait_for_timeout(2200)
         dist1 = page.evaluate("""(() => {
           const a = Array.from(document.querySelectorAll('#post-toc a'))
             .find(x => x.textContent.indexOf('Efficiency') >= 0);
@@ -335,7 +357,7 @@ def main() -> None:
         })()""")
         ok &= check("TOC first click lands on section", dist1 < 90, str(dist1))
         page.locator("#post-toc a", has_text="项目整体介绍").click()
-        page.wait_for_timeout(700)
+        page.wait_for_timeout(2200)
         dist2 = page.evaluate("""(() => {
           const a = document.querySelector('#post-toc a');
           const h = document.getElementById(a.getAttribute('href').slice(1));

@@ -106,6 +106,19 @@
 
   <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
 
+  
+  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
+    <p class="pager-hint" id="pager-hint">本文较长，可开启章节分页阅读，或使用右侧目录跳转。</p>
+    <div class="pager-controls">
+      <button class="pixel-btn" type="button" id="pager-toggle">开启分页</button>
+      <button class="pixel-btn" type="button" id="pager-prev" hidden>← 上一页</button>
+      <select id="pager-select" aria-label="跳转到章节" hidden></select>
+      <span class="pager-info" id="pager-info" hidden></span>
+      <button class="pixel-btn" type="button" id="pager-next" hidden>下一页 →</button>
+    </div>
+  </nav>
+  
+
   <div class="post-body markdown-body" data-chapters="5" data-per-page="1">
     <div class="post-chapter" data-ch="1"><p>从分词开始，搭建起Transformer架构。</p>
 <!-- more -->
@@ -1701,15 +1714,6 @@ Saved tokenizer artifacts:
 <p><a href="https://docs.pytorch.org/docs/stable/nn.html#containers">torch.nn — PyTorch 2.10 documentation</a></p>
 </div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="CS336-hw1-2.html" title="下一篇">后半段：实验 →</a></div></aside>
   </div>
-
-  
-  <nav class="post-pager" id="post-pager" aria-label="章节分页导航">
-    <button class="pixel-btn" type="button" id="pager-prev">← 上一页</button>
-    <select id="pager-select" aria-label="跳转到章节"></select>
-    <span class="pager-info" id="pager-info"></span>
-    <button class="pixel-btn" type="button" id="pager-next">下一页 →</button>
-  </nav>
-  
 
   
   <nav class="post-nav" aria-label="上一篇 / 下一篇">

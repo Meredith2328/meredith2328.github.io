@@ -22,6 +22,7 @@
     var delta = targetY - startY;
     if (Math.abs(delta) < 1) return;
     var t0 = null;
+    var settleAttempts = 0;
 
     function ease(t) {
       return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -31,7 +32,34 @@
       if (t0 === null) t0 = ts;
       var k = Math.min(1, (ts - t0) / duration);
       window.scrollTo(0, startY + delta * ease(k));
-      scrollAnim = k < 1 ? requestAnimationFrame(frame) : null;
+      if (k < 1) {
+        scrollAnim = requestAnimationFrame(frame);
+      } else {
+        scrollAnim = null;
+        settle();
+      }
+    }
+
+    // images decoding after the animation can grow the page and clamp us
+    // short of the target; keep settling until the position actually lands
+    function settle() {
+      if (Math.abs(window.pageYOffset - targetY) < 40) return;
+      var stillLoading = false;
+      for (var i = 0; i < document.images.length; i++) {
+        if (!document.images[i].complete) {
+          stillLoading = true;
+          break;
+        }
+      }
+      if (stillLoading && settleAttempts < 60) {
+        settleAttempts++;
+        setTimeout(function () {
+          window.scrollTo(0, targetY);
+          settle();
+        }, 250);
+      } else {
+        window.scrollTo(0, targetY);
+      }
     }
     scrollAnim = requestAnimationFrame(frame);
   };
