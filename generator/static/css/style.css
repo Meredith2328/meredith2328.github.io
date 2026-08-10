@@ -1800,11 +1800,6 @@ a:hover {
   font-size: 17px;
 }
 
-.markdown-body h3::before {
-  content: "## ";
-  color: var(--mute);
-}
-
 .markdown-body h4 {
   font-size: 15px;
   color: var(--text);
