@@ -1707,20 +1707,30 @@ a:hover {
 
 .code-block {
   position: relative;
+  margin: 0 0 1.2em;
+}
+
+.code-block pre {
+  margin: 0;
+  /* reserve a slim top strip so the copy button sits inside the block
+     without ever overlapping the code */
+  padding-top: 34px;
 }
 
 .code-copy {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 7px;
+  right: 7px;
   z-index: 2;
   font-family: var(--font-mono);
   font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--mute);
+  color: var(--ink);
   background: var(--paper);
-  border: 1px solid var(--hairline);
-  padding: 2px 8px;
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 0 var(--shadow);
+  padding: 2px 9px;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.15s ease;
@@ -1731,9 +1741,19 @@ a:hover {
   opacity: 1;
 }
 
+.code-copy:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.code-copy:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 var(--shadow);
+}
+
 .code-copy.is-copied {
-  color: var(--accent);
-  border-color: var(--accent);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 @media (hover: none) {
