@@ -1,5 +1,5 @@
 ---
-title: CS61A disc04 树的递归
+title: CS61A · Disc 04 · 树的递归
 date: 2023-08-30 09:57:10
 tags:
 - CS61A
@@ -250,3 +250,5 @@ t1 = tree(3, [tree(4), t2])
 result = label(min(branches(max([t1, t2], key=label)), key=label))
 print(result)
 ```
+
+上一篇：[[cs61a-disc03|Disc 03 递归]] · 下一篇：[[cs61a-disc05|Disc 05 迭代、时空复杂度]] · 另见：[[cs61a-disc07|Disc 07 树、链表]]

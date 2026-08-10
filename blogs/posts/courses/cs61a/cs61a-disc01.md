@@ -1,5 +1,5 @@
 ---
-title: CS61A disc01 “迭代与抽象”
+title: CS61A · Disc 01 · 迭代与抽象
 date: 2023-07-17 22:44:34
 tags:
 - CS61A
@@ -206,3 +206,5 @@ For example, in the `is_prime` problem below, you could:
 4. Implement `is_prime` (you get to do this part with your group).
 5. Check that `is_prime(9)` will return `False` by thinking through the execution of the code.
 6. Check that `is_prime(3)` will return `True` and `is_prime(1)` will return `False`.
+
+下一篇：[[cs61a-disc02|Disc 02 高阶函数]]

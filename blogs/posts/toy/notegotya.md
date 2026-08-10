@@ -3,7 +3,7 @@ preview_image: posts/migrated/post-images/notegotya.gif
 title: 做了一个叫notegotya的五线谱识谱练习玩具
 date: 2026-05-16 19:08:41
 tags:
-- 奇怪的东西
+- 项目
 published: true
 hideInList: false
 feature: posts/migrated/post-images/notegotya.gif
@@ -16,3 +16,5 @@ isTop: false
 <!-- more -->
 
 耶
+
+相关：[[reverseChess|贴贴棋]]

@@ -387,3 +387,5 @@ hash_to_block_id 新增：h_GH → Block3
 - Block3（`[G,H]`），ref_count=1
 
 **核心优势**：通过引用计数，我们节省了 2 blocks × 2 = 4 tokens 的显存。实际场景中，系统 prompt 可能很长（如 1000 tokens），共享效果非常显著。
+
+相关：[[softmax|在线 Softmax]]

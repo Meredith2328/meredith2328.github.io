@@ -1,5 +1,5 @@
 ---
-title: CS61A disc05 迭代、时空复杂度
+title: CS61A · Disc 05 · 迭代、时空复杂度
 date: 2023-08-30 09:57:27
 tags:
 - CS61A
@@ -244,3 +244,5 @@ $$S(n)=2S(n-1)=2^nS(1)=C \times 2^n$$
 则
 $$a(n)=S(n-1)=C\times2^{n-1}$$
 即为$O(2^n)$。
+
+上一篇：[[cs61a-disc04|Disc 04 树的递归]] · 下一篇：[[cs61a-disc07|Disc 07 树、链表]]

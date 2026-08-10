@@ -1,5 +1,5 @@
 ---
-title: 怎么估算LLM训练的内存和计算需求？推一推、测一测
+title: LLM 估算 · 02 · 怎么估算训练的内存和计算需求
 date: 2026-03-12 19:01:53
 tags:
 - 大模型
@@ -663,3 +663,5 @@ for r in results:
 
 print("=" * 60)
 ```
+
+上一篇：[[LLMestimate|01 参数量与训练 FLOPs]] · 另见：[[mathqwen-0.6b-agentic-rl|实战：双卡 5090 训练 Qwen3-0.6B]]

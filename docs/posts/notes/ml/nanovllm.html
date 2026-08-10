@@ -466,6 +466,7 @@ PagedAttention：block size = 4 tokens，按需动态分配
 <li>Block3（<code>[G,H]</code>），ref_count=1</li>
 </ul>
 <p><strong>核心优势</strong>：通过引用计数，我们节省了 2 blocks × 2 = 4 tokens 的显存。实际场景中，系统 prompt 可能很长（如 1000 tokens），共享效果非常显著。</p>
+<p>相关：<a href="softmax.html">在线 Softmax</a></p>
   </div>
 
   

@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wandb 曲线漂漂亮亮。可你把训练前">
+  <meta name="description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wand">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优化器是空的">
-  <meta property="og:description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wandb 曲线漂漂亮亮。可你把训练前">
+  <meta property="og:description" content="TRL 1.9.2 的 GRPOTrainer 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。 怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、gradnorm 非零，wand">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
   
   
@@ -103,9 +103,10 @@
   
 
   <div class="post-body markdown-body">
-    <p><strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 有一个“静默”的bug，使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。</strong></p>
+    <p><strong>TRL 1.9.2 的 <code>GRPOTrainer</code> 有一个“静默”的bug，如果先SFT再RL就可能碰到。使得模型可能并没有真的从已有的 LoRA adapter 继续训练，但是看起来仍然一切正常。</strong></p>
 <p>怎么个“静默”法呢？训练能完整跑完，日志看起来一切正常：loss 在降、reward 在涨、grad_norm 非零，wandb 曲线漂漂亮亮。可你把训练前后的权重拿去一对比，发现保存下来的 adapter 和你喂进去的初始 adapter 逐字节相同——模型压根没被训过。</p>
 <p>这不是我们配置写错了什么冷门参数，也不是运气不好踩到了某个边角。它是框架在一个挺常规的使用方式下，自己把优化器建成了空的，而且全程不吭一声。下面我把这件事从头到尾讲清楚：什么情况会撞上、怎么用最小的例子复现、根因到底在哪、怎么绕开、以及怎么检查自己有没有中招。</p>
+<p>已提交 <a href="https://github.com/huggingface/trl/issues/6700">Issue #6700 · huggingface/trl</a> 和 <a href="https://github.com/huggingface/trl/pull/6701">Pull Request #6701 · huggingface/trl</a> ，坐等审核。</p>
 <h2 id="_1">什么情况下会撞上</h2>
 <p>需要同时满足三个条件：</p>
 <ol>
@@ -186,8 +187,10 @@ saved == initial: False
 <li>或者另一种方式：把训练后的 adapter 和初始 adapter 各算一个 md5，一样就是没训；</li>
 <li>再懒一点：对比训练前后在验证集上的表现，”百分比完全没变化“也要起疑心。</li>
 </ul>
-<p>这个 bug 教会我的还是那件事：<strong>RL 是“稀疏”的，日志会骗人，只有可观测性不会。</strong> 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。<del>毕竟真金白银拿去租卡训的模型，结果训了半天实验是废的，这谁绷得住啊</del></p>
-<p>完整的技术档案（源码级根因、替代解释排除、Kaggle 复现结果）会随 issue / PR 一起公开；在那之前，想动手复现的话，用上面那个公开的 Kaggle notebook 就够了。</p>
+<p>更完整的信息可以参考前述的issue和pr。</p>
+<p>这个 bug 教会我的还是那件事：<strong>RL 是“稀疏”的，日志会骗人，只有可观测性不会。</strong> 训练脚本里那一行哈希校验，是我们这个项目里最值钱的一行代码。</p>
+<p><del>毕竟真金白银拿去租卡训的模型，结果训了半天实验是废的，这谁绷得住啊</del></p>
+<p>相关：<a href="mathqwen-0.6b-agentic-rl.html">完整踩坑记录</a></p>
   </div>
 
   

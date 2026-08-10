@@ -1,5 +1,5 @@
 ---
-title: 【数据结构与算法4】LeetCode HOT 100 in Python（前50）
+title: 数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）
 date: 2026-03-02 11:36:27
 tags:
 - 数据结构与算法
@@ -2108,3 +2108,5 @@ class Trie:
         # param_2 = obj.search(word)
 # param_3 = obj.startsWith(prefix)
 ```
+
+上一篇：[[algorithm-3|03 模板整理]] · 下一篇：[[algorithm-5|05 HOT 100（后 50）]]

@@ -11,7 +11,8 @@ isTop: false
 
 这篇文章是我最近一个月做的一组实验的记录。起因很简单：想看看 0.6B 这种“小参数”模型，
 在两张 RTX 5090 上，到底能不能用强化学习训出像样的数学推理和 Agent 能力。
-起点是 [Datawhale HelloAgents 第十一章 Agentic-RL](https://datawhalechina.github.io/hello-agents/#/./chapter11/第十一章 Agentic-RL) ，之后延伸出了一堆东西。
+
+探索起点是 [Datawhale HelloAgents 第十一章 Agentic-RL](https://datawhalechina.github.io/hello-agents/#/./chapter11/第十一章 Agentic-RL) ，之后延伸出了一堆东西。
 从 GSM8K 数学推理，到多轮工具调用，再到自己搭一个跨应用的工具基准，
 最后还顺手用 QLoRA 挑战了一下 72B 的微调。
 
@@ -126,7 +127,7 @@ Multi-tool（汇率/单位换算跨工具）、Planning（场景目标自主规�
 SFT 之后六档任务全部达到 97–100%。
 
 但这里发生了一件很值得写的事：**我们最初报告“SFT→GRPO 与 SFT 持平（98.3%）”，
-后来发现那是假的。**
+后来发现因为TRL官方框架的bug，这个持平结果其实是假的。**
 
 在训练过程中，顺手对远端所有 adapter 做了一次 md5 哈希比对，结果发现：
 所有从 SFT 初始化的 GRPO 产物，和 SFT 初始化权重**逐字节相同**。
@@ -139,7 +140,7 @@ TRL 会在模型里复制一份初始权重当 KL 参照，训练日志一切正
 我还把这个校验写进了训练脚本：每次训练结束打印保存哈希和初始哈希，
 两者相同就直接报警，以后不会再犯。
 
-修复后复跑 Hard，真实结果和之前完全不一样：
+修复后复跑 Hard，以下才是真实结果，和之前我们错误报告的结果完全不一样：
 
 | 模型 | 单调用评测器 | 多调用评测器 |
 |---|---|---|
@@ -340,3 +341,5 @@ wandb 有对应的 run id；数字一旦修改，所有文档同步更新。
 - 实验报告：[REPORT.md](https://github.com/Meredith2328/MathQwen/blob/main/REPORT.md)
 - 30 页论文：[paper.pdf](https://github.com/Meredith2328/MathQwen/blob/main/paper/paper.pdf)
 - 全部训练曲线：[wandb agenticrl](https://wandb.ai/10pi-fudan-university-school-of-management/agenticrl)
+
+相关：[[LLMestimate2|训练内存估算]] · [[trl-1.9.2-grpo-ref-adapter-silent-noop|TRL 假训练 bug]] · [[wandb|WanDB]]

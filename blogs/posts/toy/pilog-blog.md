@@ -2,7 +2,7 @@
 title: 用 pilog 搭建像素风博客
 date: 2026-07-30
 tags:
-- 奇怪的东西
+- 项目
 highlight: true
 preview: 一套个人自制的轻量静态博客框架：所有东西都可以用Markdown修改。 读取 `blogs/` 目录下的 Markdown，生成卡片 / 清单 / 图谱三种视图，Chrome小恐龙风格。
 preview_image: assets/cover-pixel.png
@@ -166,3 +166,5 @@ $$
 游戏整体复刻了 Chromium 官方的像素配色与手感，也定义了本站的视觉语言：灰白底、锐利直角、没有多余的圆角。
 
 想直接玩，点这里：[开始游戏](dino/index.html)。
+
+相关：[[10pi|玩具箱索引]]

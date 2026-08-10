@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
-  <title>怎么估算LLM的参数量和训练FLOPs？推一推、测一测 · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <title>LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs · 10PI&#39;S BLOG丨十派的玩具箱</title>
   <meta name="description" content="本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 $$P ≈ 12Nd^2 + Vd$$ 本文的LLM基于Transformer Decoder结构，以 GPT2-XL 为例。它有以下超参数设置： 实测得到的可训练参数量为 1,557,611,200 = 1.56B。 ">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
-  <meta property="og:title" content="怎么估算LLM的参数量和训练FLOPs？推一推、测一测">
+  <meta property="og:title" content="LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs">
   <meta property="og:description" content="本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 $$P ≈ 12Nd^2 + Vd$$ 本文的LLM基于Transformer Decoder结构，以 GPT2-XL 为例。它有以下超参数设置： 实测得到的可训练参数量为 1,557,611,200 = 1.56B。 ">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/LLMestimate.html">
   
@@ -90,7 +90,7 @@
 <article class="post">
   <header class="post-header">
     <a class="back-link" href="../../../index.html">← 返回首页</a>
-    <h1 class="post-title">怎么估算LLM的参数量和训练FLOPs？推一推、测一测</h1>
+    <h1 class="post-title">LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs</h1>
     <div class="post-meta">
       <time datetime="2026-03-03T00:00:00">2026-03-03</time>
       
@@ -652,6 +652,7 @@ context length: from 1024 to 16,384
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Total = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'total'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  A占比 = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'A_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, B占比 = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'B_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
 </code></pre></div>
+<p>下一篇：<a href="LLMestimate2.html">02 内存和计算需求</a></p>
   </div>
 
   

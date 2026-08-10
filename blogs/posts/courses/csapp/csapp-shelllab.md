@@ -1,6 +1,6 @@
 ---
 preview_image: posts/migrated/post-images/csapp-shelllab.png
-title: 'CSAPP: shelllab'
+title: 'CSAPP · Shelllab'
 date: 2024-06-27 13:15:58
 tags:
 - CSAPP
@@ -373,3 +373,5 @@ void do_bgfg(char **argv)
 	}
 }
 ```
+
+上一篇：[[csapp-cachelab|Cachelab]] · 另见：[[linux-command|Linux 指令笔记]]

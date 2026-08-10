@@ -1,5 +1,5 @@
 ---
-title: CS61A disc02 高阶函数
+title: CS61A · Disc 02 · 高阶函数
 date: 2023-07-17 22:45:22
 tags:
 - CS61A
@@ -136,3 +136,5 @@ Remember the problem-solving approach from last discussion; it works just as wel
 4. Implement the process in code using those additional names.
 5. Determine whether the implementation really works on your original example.
 6. Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)
+
+上一篇：[[cs61a-disc01|Disc 01 迭代与抽象]] · 下一篇：[[cs61a-disc03|Disc 03 递归]]

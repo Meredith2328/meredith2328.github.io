@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
-  <title>怎么估算LLM训练的内存和计算需求？推一推、测一测 · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <title>LLM 估算 · 02 · 怎么估算训练的内存和计算需求 · 10PI&#39;S BLOG丨十派的玩具箱</title>
   <meta name="description" content="本部分适合于知道AdamW更新流程、但没有尝试推导过peak memory和计算量、计算时间的朋友。 $$A{per\layer} ≈ 9BLd + 2BhL^2$$ $$C ≈ 6 × P × D$$ Problem (adamwAccounting): Resource accounting for trainin">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
-  <meta property="og:title" content="怎么估算LLM训练的内存和计算需求？推一推、测一测">
+  <meta property="og:title" content="LLM 估算 · 02 · 怎么估算训练的内存和计算需求">
   <meta property="og:description" content="本部分适合于知道AdamW更新流程、但没有尝试推导过peak memory和计算量、计算时间的朋友。 $$A{per\layer} ≈ 9BLd + 2BhL^2$$ $$C ≈ 6 × P × D$$ Problem (adamwAccounting): Resource accounting for trainin">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/ml/LLMestimate2.html">
   
@@ -90,7 +90,7 @@
 <article class="post">
   <header class="post-header">
     <a class="back-link" href="../../../index.html">← 返回首页</a>
-    <h1 class="post-title">怎么估算LLM训练的内存和计算需求？推一推、测一测</h1>
+    <h1 class="post-title">LLM 估算 · 02 · 怎么估算训练的内存和计算需求</h1>
     <div class="post-meta">
       <time datetime="2026-03-12T00:00:00">2026-03-12</time>
       
@@ -643,6 +643,7 @@ LARGE    772.1M   12.56      21.83      42.4%
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 </code></pre></div>
+<p>上一篇：<a href="LLMestimate.html">01 参数量与训练 FLOPs</a> · 另见：<a href="mathqwen-0.6b-agentic-rl.html">实战：双卡 5090 训练 Qwen3-0.6B</a></p>
   </div>
 
   

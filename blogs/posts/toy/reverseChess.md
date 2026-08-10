@@ -3,7 +3,7 @@ preview_image: posts/migrated/post-images/reverseChess.png
 title: 贴贴棋（reverseChess）介绍
 date: 2026-02-26 14:13:45
 tags:
-- 奇怪的东西
+- 项目
 published: true
 hideInList: false
 feature: posts/migrated/post-images/reverseChess.png
@@ -23,3 +23,5 @@ isTop: false
 
 开局黑方有3个棋子、白方有5个棋子，每方需要尽力增加自己的棋子、消灭对方的棋子。
 其余介绍看图不言自明。
+
+相关：[[notegotya|识谱练习玩具]]

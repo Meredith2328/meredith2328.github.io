@@ -1,5 +1,5 @@
 ---
-title: CS61A disc07 树、链表
+title: CS61A · Disc 07 · 树、链表
 date: 2023-08-30 09:57:47
 tags:
 - CS61A
@@ -310,3 +310,5 @@ def store_digits(n):
     p.rest = Link(n % 10)
     return before
 ```
+
+上一篇：[[cs61a-disc05|Disc 05 迭代、时空复杂度]]

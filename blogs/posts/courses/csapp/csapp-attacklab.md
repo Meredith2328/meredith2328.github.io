@@ -1,6 +1,6 @@
 ---
 preview_image: posts/migrated/post-images/csapp-attacklab.png
-title: 'CSAPP: attacklab'
+title: 'CSAPP · Attacklab'
 date: 2024-05-15 22:29:44
 tags:
 - CSAPP
@@ -412,3 +412,5 @@ cat phase1.txt | ./hex2raw | ./ctarget -q
 ```
 
 即可。
+
+上一篇：[[csapp-bomblab|Bomblab]] · 下一篇：[[csapp-cachelab|Cachelab]]

@@ -1,5 +1,5 @@
 ---
-title: 【数据结构与算法5】LeetCode HOT 100 in Python（后50）
+title: 数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）
 date: 2026-03-02 11:38:24
 tags:
 - 数据结构与算法
@@ -1460,3 +1460,5 @@ class Solution:
                 l = mid + 1
         return l
 ```
+
+上一篇：[[algorithm-4|04 HOT 100（前 50）]]

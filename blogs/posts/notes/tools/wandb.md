@@ -441,3 +441,5 @@ for i in range(3):  # 跑3次
 
 ![](posts/migrated/post-images/20260309134622.png)
 ![](posts/migrated/post-images/20260309134635.png)
+
+相关：[[mathqwen-0.6b-agentic-rl|训练记录里的 WanDB]]

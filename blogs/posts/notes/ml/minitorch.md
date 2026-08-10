@@ -1684,3 +1684,5 @@ class Log(ScalarFunction):
 > edit time: 2025-07-15 17:18:18 （Tensors√）
 > edit time: 2025-07-23 22:29:56‎ （Efficiency√）
 > edit time: 2025-08-03 22:09:45 （附: 基于Pytorch代码，讲讲反向传播和计算图√）
+
+相关：[[optimizer|优化器]] · [[softmax|在线 Softmax]] · [[einops|einops]]

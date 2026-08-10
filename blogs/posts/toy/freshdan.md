@@ -3,7 +3,7 @@ preview_image: posts/migrated/post-images/freshdan-xin-sheng-wiki-xiang-mu.png
 title: freshdan 新生wiki项目
 date: 2024-08-26 17:26:23
 tags:
-- 奇怪的东西
+- 项目
 published: true
 hideInList: false
 feature: posts/migrated/post-images/freshdan-xin-sheng-wiki-xiang-mu.png

@@ -1,6 +1,6 @@
 ---
 preview_image: posts/migrated/post-images/csapp-bomblab.png
-title: 'CSAPP: bomblab'
+title: 'CSAPP · Bomblab'
 date: 2024-04-30 11:09:39
 tags:
 - CSAPP
@@ -259,3 +259,5 @@ num4 = %eax = 2
 strings_not_equal的返回值(%eax)为0就跳出去，意味着要求All strings are created equal. 识得唔识得啊。
 
 从相应位置读入所需字符串即可。
+
+上一篇：[[csapp-datalab|Datalab]] · 下一篇：[[csapp-attacklab|Attacklab]]

@@ -1,6 +1,6 @@
 ---
 preview_image: posts/migrated/post-images/csapp-cachelab.png
-title: 'CSAPP: cachelab'
+title: 'CSAPP · Cachelab'
 date: 2024-06-05 14:54:18
 tags:
 - CSAPP
@@ -455,3 +455,5 @@ if (M == 64) {
 ![](posts/migrated/post-images/1717570567470.png)
 
 成功通过。
+
+上一篇：[[csapp-attacklab|Attacklab]] · 下一篇：[[csapp-shelllab|Shelllab]]

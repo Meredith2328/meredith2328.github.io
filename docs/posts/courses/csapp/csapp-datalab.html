@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
-  <title>CSAPP: datalab · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <title>CSAPP · Datalab · 10PI&#39;S BLOG丨十派的玩具箱</title>
   <meta name="description" content="对于浮点数部分，额外写了笔记，欢迎参阅： IEEE754浮点数与十进制数互相转换流程及例子 直接考虑所求的两种情况。 利用对称差公式：x ^ y = (x&amp;\y) | (y&amp;\x)， 我们需要取这两种情况，所以取两次反， 并将其中一次取反运用于狄·摩根律完成从|到&amp;的转换，即得所求为 ((x &amp; y) &amp; (y &amp; x">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
-  <meta property="og:title" content="CSAPP: datalab">
+  <meta property="og:title" content="CSAPP · Datalab">
   <meta property="og:description" content="对于浮点数部分，额外写了笔记，欢迎参阅： IEEE754浮点数与十进制数互相转换流程及例子 直接考虑所求的两种情况。 利用对称差公式：x ^ y = (x&amp;\y) | (y&amp;\x)， 我们需要取这两种情况，所以取两次反， 并将其中一次取反运用于狄·摩根律完成从|到&amp;的转换，即得所求为 ((x &amp; y) &amp; (y &amp; x">
   <link rel="canonical" href="https://meredith2328.github.io/posts/courses/csapp/csapp-datalab.html">
   
@@ -90,7 +90,7 @@
 <article class="post">
   <header class="post-header">
     <a class="back-link" href="../../../index.html">← 返回首页</a>
-    <h1 class="post-title">CSAPP: datalab</h1>
+    <h1 class="post-title">CSAPP · Datalab</h1>
     <div class="post-meta">
       <time datetime="2024-04-30T00:00:00">2024-04-30</time>
       
@@ -101,7 +101,7 @@
   </header>
 
   
-  <div class="post-hero" role="img" aria-label="CSAPP: datalab">
+  <div class="post-hero" role="img" aria-label="CSAPP · Datalab">
     <img class="post-hero-img" src="../../../posts/migrated/post-images/csapp-datalab.png" alt="">
   </div>
   
@@ -279,6 +279,7 @@ return sameSign ^ 0x1;
 <p>其余非规格化数的情况在精度范围内，<code>frac = x + 149</code>，此时要表示成float串，只有frac部分，表示的值恰好为实际值<span class="arithmatex">\(V\)</span>，$V=2^{-126} \times 2^{-23} \times 2^x=2^{x-149} $，故返回 <code>1 &lt;&lt; (x + 149)</code> 。直到左移至exp不为0，所以这种情况的边界条件是<code>x &lt;= -127</code>。</p>
 <p>当<code>x + 149 &gt;= 23</code>即<code>x &gt;= -126</code>时，开始规格化表示。对于规格化数，能表示的最大数的数量级应为exp除了第一位以外全为1、即<code>exp==127</code>，因此当<code>x &gt; 127</code>时返回+INF即<code>0xFF &lt;&lt; 23</code>。</p>
 <p>其余规格化数的情况是<code>-126 &lt;= x &lt;= 127</code>，此时要表示成float串，<code>e = E + 127 = x + 127</code>，而frac部分均为0，即返回<code>(x + 127) &lt;&lt; 23</code>。</p>
+<p>下一篇：<a href="csapp-bomblab.html">Bomblab</a> · 浮点数相关：<a href="ieee754.html">ieee754</a></p>
   </div>
 
   

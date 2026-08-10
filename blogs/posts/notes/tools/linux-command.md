@@ -225,3 +225,5 @@ Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker
 ```
 
 `-vvv` 就不说了。肯定更多。
+
+相关：[[csapp-shelllab|Shelllab]]

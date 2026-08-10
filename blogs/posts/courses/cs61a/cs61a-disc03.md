@@ -1,5 +1,5 @@
 ---
-title: CS61A disc03 递归
+title: CS61A · Disc 03 · 递归
 date: 2023-08-30 09:56:28
 tags:
 - CS61A
@@ -296,3 +296,5 @@ For example, the following sets make change for `15`:
 
 当然，如果认真听了课，学会了 `count_partition` 那道更一般的情况，这一道题也是相似的。最终要总结出类似于以下这样的命题：
 - In `count_partitions` from lecture, the recursive case is to partition `n-m` using parts up to size `m` **and** to partition `n` using parts up to size `m-1`. （引自 [Discussion 4 | CS 61A Summer 2024](https://cs61a.org/disc/disc04/) ）
+
+上一篇：[[cs61a-disc02|Disc 02 高阶函数]] · 下一篇：[[cs61a-disc04|Disc 04 树的递归]]

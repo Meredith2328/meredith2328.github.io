@@ -83,3 +83,5 @@ channels_last_transformed = rearrange(
 ```
 
 没有了。以上就是基础用法。去实践吧。这个包真的意料之外地好用。
+
+相关：[[minitorch|minitorch 里的张量变换]]

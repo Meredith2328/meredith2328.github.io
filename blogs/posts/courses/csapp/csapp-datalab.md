@@ -1,6 +1,6 @@
 ---
 preview_image: posts/migrated/post-images/csapp-datalab.png
-title: 'CSAPP: datalab'
+title: 'CSAPP · Datalab'
 date: 2024-04-30 11:05:18
 tags:
 - CSAPP
@@ -299,3 +299,5 @@ return sameSign ^ 0x1;
 当`x + 149 >= 23`即`x >= -126`时，开始规格化表示。对于规格化数，能表示的最大数的数量级应为exp除了第一位以外全为1、即`exp==127`，因此当`x > 127`时返回+INF即`0xFF << 23`。
 
 其余规格化数的情况是`-126 <= x <= 127`，此时要表示成float串，`e = E + 127 = x + 127`，而frac部分均为0，即返回`(x + 127) << 23`。
+
+下一篇：[[csapp-bomblab|Bomblab]] · 浮点数相关：[[ieee754|ieee754]]

@@ -91,11 +91,11 @@
   <div class="filter-tags">
     <span class="filter-label">筛选</span>
     
-    <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
-    
     <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
     
     <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
+    
+    <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
     
     <button class="filter-more" id="filter-more" type="button">更多标签 ▾</button>
   </div>
@@ -121,6 +121,8 @@
       
       <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
       
+      <button class="tag-chip" type="button" data-tag="项目">#项目</button>
+      
     </div>
   </div>
 </div>
@@ -131,6 +133,66 @@
   </div>
 
   <div class="card-grid" id="card-grid">
+    
+    <article class="card" data-tags="CS336 " data-folder="posts/courses/cs336" data-date="2026-03-10">
+      
+      <a class="card-link" href="../posts/courses/cs336/CS336-hw1-1.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <time datetime="2026-03-10">2026-03-10</time>
+            
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses">courses</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses/cs336">cs336</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">CS336 · Assignment 1 · 前半段：架构</h3>
+          
+          <div class="card-preview">从分词开始，搭建起Transformer架构。  作业目录：   BPE tokenizer ；  Transformer LM ；  The cross-entropy loss function and the AdamW optimizer ；  The training loop (support: serilizing, loading model, optimizer state) ；  提到的工具： 4.1 Cross-entropy…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="CS336">#CS336</button>
+            
+          </div>
+        </div>
+        
+        <div class="card-thumb">
+          <img src="../assets/.thumbs/c5919d2aaec2.jpg" alt="" loading="lazy">
+        </div>
+        
+      </a>
+    </article>
+    
+    <article class="card" data-tags="CS336 " data-folder="posts/courses/cs336" data-date="2026-03-10">
+      
+      <a class="card-link" href="../posts/courses/cs336/CS336-hw1-2.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <time datetime="2026-03-10">2026-03-10</time>
+            
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses">courses</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/courses/cs336">cs336</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">CS336 · Assignment 1 · 后半段：实验</h3>
+          
+          <div class="card-preview">已经搭建起了训练循环，接下来做一些实验。训得有多快？有多好？  之前的实现接口不是很好用，更进一步包装了一下，并麻烦GPT帮我优化了naive实现。 由于 <code>test_tokenizer</code> 中 <code>import resource</code> 这个库只能在linux中使用，决定将核心代码拷贝到linux环境下进行测试。 而为了保证实现的正确性，在原来的windows环境下利用gpt撰写了 <code>test_tokenizer_windows.py</code>…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="CS336">#CS336</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
     
     <article class="card" data-tags="工具 " data-folder="posts/notes/tools" data-date="2026-03-10">
       
@@ -206,7 +268,7 @@
             </span>
             
           </div>
-          <h3 class="card-title">怎么估算LLM的参数量和训练FLOPs？推一推、测一测</h3>
+          <h3 class="card-title">LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs</h3>
           
           <div class="card-preview">本Blog适合于知道 Transformer 基础结构、但没有尝试推导过参数量和FLOPs的朋友。 省流： <span class="arithmatex">\(P ≈ 12Nd^2 + Vd\)</span>  本文的LLM基于Transformer Decoder结构，以 GPT2-XL 为例。它有以下超参数设置： 实测得到的可训练参数量为 <code>1,557,611,200</code> = 1.56B。 以下是使用HuggingFace…</div>
           
@@ -238,7 +300,7 @@
             </span>
             
           </div>
-          <h3 class="card-title">【数据结构与算法4】LeetCode HOT 100 in Python（前50）</h3>
+          <h3 class="card-title">数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</h3>
           
           <div class="card-preview">哈希，双指针，滑动窗口，子串，数组，矩阵，链表，二叉树，图。  专题1 哈希 需要什么就哈希记录什么。 专题2 双指针 对双指针的理解是：两个指针向中间收缩的问题，收缩的一般是“不收缩的话，后续搜索得到的解均不符合题意”的那个指针。 专题3 滑动窗口 滑动窗口往往是把右边延长到满足条件，之后把左边收缩到差点不满足条件。 专题4 子串 专题5 数组 专题6 矩阵 专题7 链表 链表的一个重要工具是prev指针，用于指示前一个节点。 专题8 二叉树 专题9…</div>
           
@@ -270,7 +332,7 @@
             </span>
             
           </div>
-          <h3 class="card-title">【数据结构与算法5】LeetCode HOT 100 in Python（后50）</h3>
+          <h3 class="card-title">数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）</h3>
           
           <div class="card-preview">回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。  大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题10 回溯 专题11 二分查找 专题12 栈 专题13 堆 专题14 贪心 专题15 动态规划 专题16 多维动态规划 专题17 技巧 46 全排列 回溯模板：结束条件，遍历选择，做出选择。 78 子集 回溯需要考虑当前start时可以做哪些选择。 17…</div>
           
@@ -288,7 +350,7 @@
       </a>
     </article>
     
-    <article class="card is-cover" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2026-02-26">
+    <article class="card is-cover" data-tags="项目 " data-folder="posts/toy" data-date="2026-02-26">
       
       <span class="card-cover" style="background-image:url('../posts/migrated/post-images/reverseChess.png')"></span>
       
@@ -310,7 +372,7 @@
           
           <div class="card-tags">
             
-            <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
+            <button class="tag-chip" type="button" data-tag="项目">#项目</button>
             
           </div>
         </div>
@@ -360,7 +422,7 @@
             </span>
             
           </div>
-          <h3 class="card-title">【数据结构与算法3】基础数据结构与算法模板整理</h3>
+          <h3 class="card-title">数据结构与算法 · 03 · 基础数据结构与算法模板整理</h3>
           
           <div class="card-preview">参考：《深入浅出程序设计竞赛（基础篇）（汪楚奇）》。  （可参考：数据结构（C++模板实现）） 基本上知道思路之后大部分代码都是自己完整写出来的（部分难题和跳过的题目除外），然后再补了一点细节。 往后推的同时，还需要加强巩固一些重点的专题，做做课后习题： 学过某个知识了，不代表这个知识已经掌握甚至融会贯通了。做题是为了这个目的，而不是堆数字：“增加题量”。 整本书粗略地学习了一…</div>
           
@@ -392,7 +454,7 @@
             </span>
             
           </div>
-          <h3 class="card-title">【数据结构与算法2】算法篇：用3x2审视算法课的算法部分</h3>
+          <h3 class="card-title">数据结构与算法 · 02 · 算法篇：用3x2审视算法课的算法部分</h3>
           
           <div class="card-preview">总而言之是叽里呱啦一些《算法导论》笔记 基础算法案例，分治，比较算法与随机化，动态规划，贪心，最短路径， 网络流，回溯，在线算法，P/NP，近似算法  直觉+过程+伪代码： 上下文、复杂度， 边界、核心设置， 不变量、自然语言解释。 Lec1 数学基础√ Lec2 分治√ Lec3 比较算法与随机化√ Lec4 哈希 不太能用这个结构讲√ <del>Lec5 布隆过滤器 不太能用这个结构讲</del> Lec6 动态规划必须可以√ Lec7 贪心可以√ Lec8…</div>
           
@@ -437,66 +499,6 @@
         
         <div class="card-thumb">
           <img src="../assets/.thumbs/520eb72bc971.jpg" alt="" loading="lazy">
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card" data-tags="数据结构与算法 " data-folder="posts/notes/algo" data-date="2026-01-04">
-      
-      <a class="card-link" href="../posts/notes/algo/algorithm-1.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <time datetime="2026-01-04">2026-01-04</time>
-            
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/algo">algo</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">【数据结构与算法1】数学篇：从几个专题审视算法课的数学部分</h3>
-          
-          <div class="card-preview">总而言之是噼里啪啦一些《算法导论》笔记 时间复杂度，求和公式，分治，哈希，摊还分析，在线算法与竞争分析，线性规划与单纯形法    Lec1 复杂度的严格证明√ ；  Lec2 求和公式，1/n和ln n的关系整理√ ；  Lec2 各种分治递归求解方法及其练习√ ；  Lec4 哈希~~和布隆过滤器~~的分析√ ；  Lec8 摊还分析√ ；  Lec12 在线算法及竞争性分析√ ；  Lec13 线性规划与单纯形法√ ；  ps. 感觉Lec4 哈希和Lec5…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="数据结构与算法">#数据结构与算法</button>
-            
-          </div>
-        </div>
-        
-        <div class="card-thumb">
-          <img src="../assets/.thumbs/255328257592.jpg" alt="" loading="lazy">
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card" data-tags="翻译 " data-folder="posts/reference" data-date="2025-08-01">
-      
-      <a class="card-link" href="../posts/reference/career-advice-by-tao.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <time datetime="2025-08-01">2025-08-01</time>
-            
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/reference">reference</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">Career advice 丨 职业建议（翻译自 Terence Tao 的博客）</h3>
-          
-          <div class="card-preview">原文链接： Career advice | What's new 作者：陶哲轩（Terence Tao）  <strong>声明：本页面中的“我”指原作者。仅为了方便个人查阅、而将原页面做了中文翻译，并修订了一些过时链接。翻译时间为2025年8月1日。未取得原作者的版权同意，仅供个人学习使用。一切版权归原作者所有。</strong> 以下是我收集的关于数学学术职业问题的各种建议，大致按建议在哪个阶段最适用进行…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
-            
-          </div>
         </div>
         
       </a>
@@ -572,7 +574,7 @@
             <a class="tree-row" href="../posts/courses/cs61a/cs61a-disc01.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS61A disc01 “迭代与抽象”</span>
+              <span class="tree-name">CS61A · Disc 01 · 迭代与抽象</span>
               <span class="tree-date">2023-07-17</span>
             </a>
           </li>
@@ -583,7 +585,7 @@
             <a class="tree-row" href="../posts/courses/cs61a/cs61a-disc02.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS61A disc02 高阶函数</span>
+              <span class="tree-name">CS61A · Disc 02 · 高阶函数</span>
               <span class="tree-date">2023-07-17</span>
             </a>
           </li>
@@ -594,7 +596,7 @@
             <a class="tree-row" href="../posts/courses/cs61a/cs61a-disc03.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS61A disc03 递归</span>
+              <span class="tree-name">CS61A · Disc 03 · 递归</span>
               <span class="tree-date">2023-08-30</span>
             </a>
           </li>
@@ -605,7 +607,7 @@
             <a class="tree-row" href="../posts/courses/cs61a/cs61a-disc04.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS61A disc04 树的递归</span>
+              <span class="tree-name">CS61A · Disc 04 · 树的递归</span>
               <span class="tree-date">2023-08-30</span>
             </a>
           </li>
@@ -616,7 +618,7 @@
             <a class="tree-row" href="../posts/courses/cs61a/cs61a-disc05.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS61A disc05 迭代、时空复杂度</span>
+              <span class="tree-name">CS61A · Disc 05 · 迭代、时空复杂度</span>
               <span class="tree-date">2023-08-30</span>
             </a>
           </li>
@@ -627,7 +629,7 @@
             <a class="tree-row" href="../posts/courses/cs61a/cs61a-disc07.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS61A disc07 树、链表</span>
+              <span class="tree-name">CS61A · Disc 07 · 树、链表</span>
               <span class="tree-date">2023-08-30</span>
             </a>
           </li>
@@ -653,7 +655,7 @@
             <a class="tree-row" href="../posts/courses/cs336/CS336-hw1-1.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS336 Assignment 1 前半段记录：架构</span>
+              <span class="tree-name">CS336 · Assignment 1 · 前半段：架构</span>
               <span class="tree-date">2026-03-10</span>
             </a>
           </li>
@@ -664,7 +666,7 @@
             <a class="tree-row" href="../posts/courses/cs336/CS336-hw1-2.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CS336 Assignment 1 后半段记录：实验</span>
+              <span class="tree-name">CS336 · Assignment 1 · 后半段：实验</span>
               <span class="tree-date">2026-03-10</span>
             </a>
           </li>
@@ -690,7 +692,7 @@
             <a class="tree-row" href="../posts/courses/csapp/csapp-attacklab.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CSAPP: attacklab</span>
+              <span class="tree-name">CSAPP · Attacklab</span>
               <span class="tree-date">2024-05-15</span>
             </a>
           </li>
@@ -701,7 +703,7 @@
             <a class="tree-row" href="../posts/courses/csapp/csapp-bomblab.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CSAPP: bomblab</span>
+              <span class="tree-name">CSAPP · Bomblab</span>
               <span class="tree-date">2024-04-30</span>
             </a>
           </li>
@@ -712,7 +714,7 @@
             <a class="tree-row" href="../posts/courses/csapp/csapp-cachelab.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CSAPP: cachelab</span>
+              <span class="tree-name">CSAPP · Cachelab</span>
               <span class="tree-date">2024-06-05</span>
             </a>
           </li>
@@ -723,7 +725,7 @@
             <a class="tree-row" href="../posts/courses/csapp/csapp-datalab.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CSAPP: datalab</span>
+              <span class="tree-name">CSAPP · Datalab</span>
               <span class="tree-date">2024-04-30</span>
             </a>
           </li>
@@ -734,7 +736,7 @@
             <a class="tree-row" href="../posts/courses/csapp/csapp-shelllab.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">CSAPP: shelllab</span>
+              <span class="tree-name">CSAPP · Shelllab</span>
               <span class="tree-date">2024-06-27</span>
             </a>
           </li>
@@ -786,7 +788,7 @@
             <a class="tree-row" href="../posts/notes/algo/algorithm-1.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">【数据结构与算法1】数学篇：从几个专题审视算法课的数学部分</span>
+              <span class="tree-name">数据结构与算法 · 01 · 数学篇：从几个专题审视算法课的数学部分</span>
               <span class="tree-date">2026-01-04</span>
             </a>
           </li>
@@ -797,7 +799,7 @@
             <a class="tree-row" href="../posts/notes/algo/algorithm-2.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">【数据结构与算法2】算法篇：用3x2审视算法课的算法部分</span>
+              <span class="tree-name">数据结构与算法 · 02 · 算法篇：用3x2审视算法课的算法部分</span>
               <span class="tree-date">2026-01-05</span>
             </a>
           </li>
@@ -808,7 +810,7 @@
             <a class="tree-row" href="../posts/notes/algo/algorithm-3.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">【数据结构与算法3】基础数据结构与算法模板整理</span>
+              <span class="tree-name">数据结构与算法 · 03 · 基础数据结构与算法模板整理</span>
               <span class="tree-date">2026-01-18</span>
             </a>
           </li>
@@ -819,7 +821,7 @@
             <a class="tree-row" href="../posts/notes/algo/algorithm-4.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">【数据结构与算法4】LeetCode HOT 100 in Python（前50）</span>
+              <span class="tree-name">数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</span>
               <span class="tree-date">2026-03-02</span>
             </a>
           </li>
@@ -830,7 +832,7 @@
             <a class="tree-row" href="../posts/notes/algo/algorithm-5.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">【数据结构与算法5】LeetCode HOT 100 in Python（后50）</span>
+              <span class="tree-name">数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）</span>
               <span class="tree-date">2026-03-02</span>
             </a>
           </li>
@@ -856,7 +858,7 @@
             <a class="tree-row" href="../posts/notes/ml/LLMestimate.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">怎么估算LLM的参数量和训练FLOPs？推一推、测一测</span>
+              <span class="tree-name">LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs</span>
               <span class="tree-date">2026-03-03</span>
             </a>
           </li>
@@ -867,7 +869,7 @@
             <a class="tree-row" href="../posts/notes/ml/LLMestimate2.html">
               <span class="tree-toggle tree-toggle-empty"></span>
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
-              <span class="tree-name">怎么估算LLM训练的内存和计算需求？推一推、测一测</span>
+              <span class="tree-name">LLM 估算 · 02 · 怎么估算训练的内存和计算需求</span>
               <span class="tree-date">2026-03-12</span>
             </a>
           </li>
@@ -989,6 +991,17 @@
         
       
             </ul>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/notes/TensorZero-6949">
+            <a class="tree-row" href="../posts/notes/TensorZero-6949.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">给 tensorzero 提的第一个 PR：object_storage.endpoint 支持环境变量</span>
+              <span class="tree-date">2026-03-14</span>
+            </a>
           </li>
           
         

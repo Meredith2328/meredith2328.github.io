@@ -1,5 +1,5 @@
 ---
-title: 怎么估算LLM的参数量和训练FLOPs？推一推、测一测
+title: LLM 估算 · 01 · 怎么估算参数量和训练 FLOPs
 date: 2026-03-03 10:21:39
 tags:
 - 大模型
@@ -389,3 +389,5 @@ for model in models:
         print(f"  Total = {result['total']:.2e}")
         print(f"  A占比 = {result['A_ratio']:.1f}%, B占比 = {result['B_ratio']:.1f}%")
 ```
+
+下一篇：[[LLMestimate2|02 内存和计算需求]]
