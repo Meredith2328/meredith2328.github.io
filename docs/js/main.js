@@ -722,8 +722,7 @@
         if (!cardUrls || !cardUrls.length) return;
         var target =
           diceRoot + cardUrls[Math.floor(Math.random() * cardUrls.length)];
-        // roll the dice and flash the page before grabbing a random toy
-        diceBtns.forEach(function (b) { b.classList.add("is-rolling"); });
+        // one quick page flash, then grab the random toy
         var overlay = document.createElement("div");
         overlay.className = "random-flash";
         document.body.appendChild(overlay);
