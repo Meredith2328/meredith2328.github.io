@@ -132,6 +132,23 @@ def main() -> None:
         check("widget hides credit text", layout["creditHidden"])
         check("sound toggle remains", layout["soundVisible"])
 
+        # narrow viewports hide the sound bar so it cannot cover the game
+        page.set_viewport_size({"width": 390, "height": 844})
+        page.wait_for_timeout(500)
+        mobile_layout = dino_frame.evaluate("""
+            () => {
+              const sound = document.querySelector('#sound-toggle');
+              const canvas = document.querySelector('#runner-canvas').getBoundingClientRect();
+              return {
+                soundVisible: !!sound && sound.getBoundingClientRect().height > 0,
+                canvasVisible: canvas.top >= 0 && canvas.bottom <= window.innerHeight
+              };
+            }
+        """)
+        check("mobile embed hides sound bar", not mobile_layout["soundVisible"])
+        check("mobile canvas stays visible", mobile_layout["canvasVisible"])
+        page.set_viewport_size({"width": 1280, "height": 900})
+
         # 6. views switch and render
         page.goto(base + "/", wait_until="networkidle")
         page.click('[data-view="tree"]')
