@@ -75,7 +75,7 @@
       </div>
     </div>
     
-    <nav class="site-nav" aria-label="站点导航">
+    <nav class="site-nav" aria-label="站点导航"><h2 id="导航">导航</h2>
 <ul>
 <li><a href="../../../index.html">首页</a></li>
 <li><a href="../../toy/10pi.html">关于</a></li>
@@ -181,9 +181,9 @@
 import wandb
 import random
 import time</p>
-<h1 id="1-初始化一个新的run">1. 初始化一个新的run</h1>
+<h2 id="1-初始化一个新的run">1. 初始化一个新的run</h2>
 <p>wandb.init(project="colab-demo", name="basic-example")</p>
-<h1 id="2-模拟训练过程">2. 模拟训练过程</h1>
+<h2 id="2-模拟训练过程">2. 模拟训练过程</h2>
 <p>for epoch in range(10):
     # 模拟一些指标
     loss = 1 / (epoch + 1) + random.random() * 0.1
@@ -197,7 +197,7 @@ wandb.log({
 
 time.sleep(1)  # 模拟训练时间
 </code></pre></div>
-<h1 id="4-结束run">4. 结束run</h1>
+<h2 id="4-结束run">4. 结束run</h2>
 <p>wandb.finish()
 print("实验完成！请查看wandb仪表板")</p>
 <div class="highlight"><pre data-lang="python"><span></span><code>发现它帮我在终端生成了直观的变化图和总结。

@@ -8,8 +8,6 @@ preview: 一套个人自制的轻量静态博客框架：所有东西都可以�
 preview_image: assets/cover-pixel.png
 ---
 
-# 用 pilog 搭建像素风博客
-
 **pilog** 是个人自制的**所见即所得**的超轻量静态博客生成器。
 
 只需要在 Obsidian 里打开  `blogs/` 目录写 Markdown，然后可以这么用：

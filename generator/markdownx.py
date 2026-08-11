@@ -644,6 +644,12 @@ def render_markdown(text: str, src_file: Path, page_url: str,
     # Obsidian-style callouts: `> [!type] title` -> styled boxes
     _style_callouts(soup)
 
+    # the page's <h1> comes from the template title; demote any in-body H1 so
+    # Obsidian-style notes that use `# 第 N 节`-style titles don't duplicate
+    # the page title and stay inside the h2/h3 TOC
+    for h in soup.find_all("h1"):
+        h.name = "h2"
+
     return Rendered(html=str(soup), refs=refs, image_sources=image_sources)
 
 

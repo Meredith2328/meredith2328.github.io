@@ -12,8 +12,6 @@ isTop: false
 > man, what can I say.jpg
 > ![](posts/migrated/post-images/1717570490815.png)
 
-# Cachelab
-
 ```
 python2.7 driver.py
 ```

@@ -6,8 +6,6 @@ tags:
 preview: 2026 年夏末，因为夜鹿（ヨルシカ）走到一起的校园乐队「夏夜将终」，把官网复刻成了 Yorushika 官网的样子。
 ---
 
-# 夏夜将终：一个乐队官网的诞生
-
 2023 年夏末，几个学生因为夜鹿（ヨルシカ / Yorushika）走到了一起，组了一支校园乐队，名字叫「夏夜将终」。
 
 后来，他们给自己做了一个 [夏夜将终 OFFICIAL SITE](https://meredith2328.github.io/xyjz/) 。就像是 [ヨルシカ OFFICIAL SITE](https://yorushika.com/) 一样。

@@ -180,14 +180,29 @@ def log(msg: str) -> None:
     print(f"[pilog] {msg}")
 
 
+def _copy_icon(src: Path, dst: Path) -> None:
+    """copy2 with retries; Windows may briefly memory-map the destination
+    (WinError 1224) when a browser has the icon open, so fall back to the
+    previous file instead of failing the whole build."""
+    last_exc: OSError | None = None
+    for attempt in range(3):
+        try:
+            shutil.copy2(src, dst)
+            return
+        except OSError as exc:
+            last_exc = exc
+            time.sleep(0.5)
+    log(f"warning: cannot write icon {dst.name}: {last_exc}")
+
+
 def make_dino_icons(root: Path, out: Path) -> None:
     """Crop the official dino sprite for favicon / widget icons."""
     sprite = root / "dino" / "reference" / "sprite_2x.png"
     custom_logo = root / "blogs" / "assets" / "logo.png"
     if custom_logo.exists():
         (out / "img").mkdir(parents=True, exist_ok=True)
-        shutil.copy2(custom_logo, out / "img" / "dino-icon.png")
-        shutil.copy2(custom_logo, out / "favicon.png")
+        _copy_icon(custom_logo, out / "img" / "dino-icon.png")
+        _copy_icon(custom_logo, out / "favicon.png")
         log("custom logo applied")
         return
     if not sprite.exists():
