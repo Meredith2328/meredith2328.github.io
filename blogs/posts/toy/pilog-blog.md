@@ -36,6 +36,7 @@ pilog没有数据库、没有后端，只有一个个 Markdown 文件和一个�
 把 `blogs/` 目录直接作为 Obsidian 仓库打开，就能获得双向链接、图谱视图等本地能力。
 - 文章引用：额外支持Obsidian式的 `[[另一篇文章]]` 写法。
 - 图片引用：额外支持 `![[图片名.png]]` 写法，推荐在控制台中将 pilog 的附件默认保存位置和 Obsidian 的设置保持一致，例如 `assets` 。
+- 提示框：`> [!note] 标题` 这类 Obsidian callout 会渲染成彩色提示框（支持 note / warning / example / tip / danger / question 等类型）。
 
 比如以下是图片引用的经典写法：
 

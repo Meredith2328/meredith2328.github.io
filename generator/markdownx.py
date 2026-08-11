@@ -237,6 +237,111 @@ def _collect_code_langs(text: str) -> list[str]:
     return langs
 
 
+CALLOUT_RE = re.compile(r"^\s*\[!(\w+)\](.*)$", re.S)
+CALLOUT_LABELS = {
+    "note": "笔记",
+    "info": "信息",
+    "tip": "提示",
+    "important": "重要",
+    "success": "成功",
+    "question": "问题",
+    "warning": "警告",
+    "failure": "失败",
+    "danger": "危险",
+    "bug": "Bug",
+    "example": "例子",
+    "quote": "引用",
+    "abstract": "摘要",
+    "todo": "待办",
+}
+
+
+def _style_callouts(soup) -> None:
+    """Turn Obsidian-style callouts (`> [!note] title`) into styled boxes.
+
+    python-markdown merges adjacent blockquote lines into one <blockquote>,
+    so a blockquote may contain several callout segments plus plain quote
+    content; split them apart here.
+    """
+    for bq in list(soup.find_all("blockquote")):
+        children = list(bq.children)
+        has_marker = any(
+            ch.name == "p" and CALLOUT_RE.match(ch.get_text())
+            for ch in children
+        )
+        if not has_marker:
+            continue
+
+        segments: list[tuple[str, list]] = []
+        current: list = []
+        current_kind = "plain"
+        for ch in children:
+            if ch.name == "p":
+                m = CALLOUT_RE.match(ch.get_text())
+                if m:
+                    if current:
+                        segments.append((current_kind, current))
+                    current = [ch]
+                    current_kind = m.group(1).lower()
+                    continue
+            current.append(ch)
+        if current:
+            segments.append((current_kind, current))
+
+        for kind, els in segments:
+            if kind == "plain":
+                nbq = soup.new_tag("blockquote")
+                for el in els:
+                    nbq.append(el.extract())
+                bq.insert_before(nbq)
+                continue
+
+            div = soup.new_tag("div")
+            div["class"] = "callout callout-" + kind
+            title = soup.new_tag("div")
+            title["class"] = "callout-title"
+            header = els[0]
+            # the marker line and the first content line may be merged into one
+            # <p> joined by <br/>; keep the marker line as the title and move
+            # the rest into the body
+            br = header.find("br")
+            title_nodes = []
+            body_head = []
+            seen_br = False
+            for node in list(header.children):
+                if not seen_br:
+                    if node is br:
+                        seen_br = True
+                        continue
+                    title_nodes.append(node)
+                else:
+                    body_head.append(node)
+            if title_nodes and isinstance(title_nodes[0], str):
+                m = CALLOUT_RE.match(title_nodes[0])
+                if m:
+                    rest = m.group(2).strip()
+                    if rest:
+                        title_nodes[0] = rest
+                    else:
+                        title_nodes.pop(0)
+            header.extract()
+            if title_nodes:
+                for node in title_nodes:
+                    title.append(node)
+            else:
+                title.string = CALLOUT_LABELS.get(kind, kind)
+            body = soup.new_tag("div")
+            body["class"] = "callout-body"
+            for node in body_head:
+                body.append(node)
+            for el in els[1:]:
+                body.append(el.extract())
+            div.append(title)
+            div.append(body)
+            bq.insert_before(div)
+        bq.decompose()
+
+
 def _md_instance() -> md_lib.Markdown:
     return md_lib.Markdown(
         extensions=[
@@ -535,6 +640,9 @@ def render_markdown(text: str, src_file: Path, page_url: str,
     for pre, lang in zip(soup.find_all("pre"), _collect_code_langs(text)):
         if lang:
             pre["data-lang"] = lang
+
+    # Obsidian-style callouts: `> [!type] title` -> styled boxes
+    _style_callouts(soup)
 
     return Rendered(html=str(soup), refs=refs, image_sources=image_sources)
 

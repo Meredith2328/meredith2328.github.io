@@ -63,7 +63,7 @@ def main() -> None:
         first_title = page.locator(".card-title").first.inner_text()
         ok &= check("pinned index card first", "十派的玩具箱" in first_title, first_title[:30])
         second_title = page.locator(".card-title").nth(1).inner_text()
-        ok &= check("newest post follows pin", "TRL" in second_title and "假装训练" in second_title,
+        ok &= check("newest post follows pin", "科学理论" in second_title and "翻译" in second_title,
                     second_title[:40])
         ok &= check("highlight card shown", page.locator(".card.is-highlight").count() >= 1)
         body_font = page.evaluate("getComputedStyle(document.body).fontFamily")
@@ -114,7 +114,7 @@ def main() -> None:
         ok &= check("folder chip replaced",
                     "posts/notes" in page.locator(".sel-chip.sel-folder").first.inner_text())
         vis = page.locator(".card:visible").count()
-        ok &= check("folder filter switched", vis == 17, str(vis))
+        ok &= check("folder filter switched", vis == 18, str(vis))
         page.evaluate("window.pilogFilters.selectFolder('posts/notes')")
         page.wait_for_timeout(200)
         ok &= check("same folder keeps condition",
@@ -371,7 +371,7 @@ def main() -> None:
                   wait_until="networkidle")
         prev_href = page.locator(".post-nav-link.is-prev").get_attribute("href")
         next_href = page.locator(".post-nav-link.is-next").get_attribute("href")
-        ok &= check("prev points to previous post", prev_href and "10pi" in prev_href, str(prev_href))
+        ok &= check("prev points to previous post", prev_href and "notes" in prev_href, str(prev_href))
         ok &= check("next points to next post", next_href and "mathqwen" in next_href, str(next_href))
         page.goto(base + "/posts/toy/zi-she.html", wait_until="networkidle")
         wrap_href = page.locator(".post-nav-link.is-next").get_attribute("href")

@@ -2066,6 +2066,80 @@ a:hover {
   margin: 0;
 }
 
+.markdown-body .callout {
+  border: var(--border);
+  box-shadow: 3px 3px 0 0 var(--shadow);
+  margin: 0 0 1.1em;
+}
+
+.markdown-body .callout-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 7px 12px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.markdown-body .callout-title::before {
+  content: "▶";
+  font-size: 9px;
+}
+
+.markdown-body .callout-title p {
+  margin: 0;
+}
+
+.markdown-body .callout-body {
+  padding: 10px 14px;
+  background: var(--paper);
+}
+
+.markdown-body .callout-body > :first-child {
+  margin-top: 0;
+}
+
+.markdown-body .callout-body > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body .callout-note .callout-title,
+.markdown-body .callout-info .callout-title {
+  background: #1a73e8;
+}
+
+.markdown-body .callout-tip .callout-title,
+.markdown-body .callout-success .callout-title,
+.markdown-body .callout-example .callout-title {
+  background: #188038;
+}
+
+.markdown-body .callout-warning .callout-title {
+  background: #fbbc04;
+  color: #3c4043;
+}
+
+.markdown-body .callout-danger .callout-title,
+.markdown-body .callout-failure .callout-title,
+.markdown-body .callout-bug .callout-title,
+.markdown-body .callout-important .callout-title {
+  background: #d93025;
+}
+
+.markdown-body .callout-question .callout-title {
+  background: #9334e6;
+}
+
+.markdown-body .callout-abstract .callout-title,
+.markdown-body .callout-todo .callout-title,
+.markdown-body .callout-quote .callout-title {
+  background: #5f6368;
+}
+
 .markdown-body hr {
   border: none;
   border-top: 4px double var(--hairline);

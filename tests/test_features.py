@@ -218,6 +218,40 @@ def test_long_post_chapter_paging() -> None:
     print("  [PASS] long post chapter paging + styled related footer + refs preserved")
 
 
+def test_obsidian_callouts() -> None:
+    from build import build_site
+
+    blog = TMP / "blogs4"
+    out = TMP / "out4"
+    if out.exists():
+        shutil.rmtree(out)
+    (blog / "posts").mkdir(parents=True, exist_ok=True)
+    (blog / "posts" / "callout.md").write_text(
+        make_md(
+            "提示框测试",
+            "普通引用。\n\n> [!note] 定义与要点\n> 内容甲。\n\n"
+            "> [!warning] 易错点\n> 内容乙。\n\n> [!example]\n> 内容丙。",
+            date="2026-01-03",
+        ),
+        encoding="utf-8",
+    )
+    build_site(
+        config_path=ROOT / "config.json",
+        blog_dir=str(blog),
+        out_dir=str(out),
+    )
+    html = (out / "posts" / "callout.html").read_text(encoding="utf-8")
+    assert 'class="callout callout-note"' in html, html[:600]
+    assert 'class="callout callout-warning"' in html, html[:600]
+    assert 'class="callout callout-example"' in html, html[:600]
+    # titles extracted, content stays in the body, empty titles fall back to
+    # the type label, and plain blockquotes are untouched
+    assert "定义与要点" in html and "内容甲" in html
+    assert "例子" in html and "内容丙" in html
+    assert "<blockquote>" in html
+    print("  [PASS] obsidian callouts render as styled boxes")
+
+
 def main() -> None:
     if TMP.exists():
         shutil.rmtree(TMP)
@@ -227,6 +261,7 @@ def main() -> None:
         test_gif_thumbnail_keeps_animation()
         test_hidden_posts_feature_hero_and_nojekyll()
         test_long_post_chapter_paging()
+        test_obsidian_callouts()
     finally:
         shutil.rmtree(TMP, ignore_errors=True)
     print("all feature checks passed")
