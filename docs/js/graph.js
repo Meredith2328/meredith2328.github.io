@@ -464,7 +464,7 @@
     var longPressTimer = setTimeout(function () {
       longPressTimer = null;
       longPressed = true;
-      toggleNodeFocus(n);
+      setNodeFocus(n);
     }, 500);
     var move = function (ev) {
       if (dragging !== n) return;
@@ -492,9 +492,15 @@
         longPressTimer = null;
       }
       if (moved || longPressed) return;
-      if (n.type === "dir") toggleDir(n.id);
-      else if (n.type === "root") toggleAll();
-      else if (n.url) window.location.href = n.url;
+      if (n.type === "dir") {
+        toggleDir(n.id);
+        if (focusNode) applyFocus(focusNode); // re-apply highlight after render
+      } else if (n.type === "root") {
+        toggleAll();
+        if (focusNode) applyFocus(focusNode);
+      } else if (n.url) {
+        window.location.href = n.url;
+      }
     };
     svg.addEventListener("pointermove", move);
     svg.addEventListener("pointerup", up);
@@ -519,8 +525,11 @@
 
   var focusNode = null;
 
-  function toggleNodeFocus(n) {
-    if (focusNode) {
+  function setNodeFocus(n) {
+    // long-pressing the same node toggles the highlight off; long-pressing a
+    // different node switches the focus center; clicking empty background
+    // also cancels (clearFocus)
+    if (focusNode === n) {
       focusNode = null;
       clearFocus();
       return;

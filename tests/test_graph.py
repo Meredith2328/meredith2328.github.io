@@ -281,35 +281,95 @@ def main() -> None:
         zb2 = z_now()
         ok &= check("hold zoom-in zooms in", bool(zb2 and za and zb2 > za + 0.05), f"{za} -> {zb2}")
 
-        # 10c. long-press a node highlights its direct neighbors; again cancels
+        # 10c. long-press highlights a node's neighbors; long-pressing the same
+        # node toggles it off; long-pressing another switches the center;
+        # clicking empty background also cancels
         page.click("#graph-recenter")
         page.wait_for_timeout(400)
-        # bring the graph area fully into view so the node is reachable
-        page.evaluate("""(() => {
-          const w = document.querySelector('.graph-wrap');
-          window.scrollTo(0, w.getBoundingClientRect().top + window.pageYOffset - 20);
-        })()""")
-        page.wait_for_timeout(300)
-        rbox = page.locator('.graph-node[data-id=""]').bounding_box()
-        page.mouse.move(rbox["x"] + rbox["width"] / 2, rbox["y"] + rbox["height"] / 2)
-        page.mouse.down()
-        page.wait_for_timeout(700)
-        page.mouse.up()
-        page.wait_for_timeout(300)
+
+        def long_press_xy(x, y):
+            page.mouse.move(x, y)
+            page.mouse.down()
+            page.wait_for_timeout(700)
+            page.mouse.up()
+            page.wait_for_timeout(300)
+
+        def pick_visible_dir(ids):
+            # scroll-behavior: smooth animates scrollBy, so wait for it to
+            # settle before measuring where the node actually is
+            for node_id in ids:
+                moved = page.evaluate(
+                    "(id) => { const g = document.querySelector('.graph-node[data-id=\"' + id + '\"]');"
+                    " if (!g) return false; const b = g.getBoundingClientRect();"
+                    " window.scrollBy(0, b.top + b.height / 2 - window.innerHeight / 2);"
+                    " return true; }",
+                    node_id,
+                )
+                if not moved:
+                    continue
+                page.wait_for_timeout(600)
+                hit = page.evaluate(
+                    "(id) => { const g = document.querySelector('.graph-node[data-id=\"' + id + '\"]');"
+                    " if (!g) return null; const b = g.getBoundingClientRect();"
+                    " const cx = b.x + b.width / 2, cy = b.y + b.height / 2;"
+                    " if (cx < 0 || cy < 0 || cx > innerWidth || cy > innerHeight) return null;"
+                    " const top = document.elementFromPoint(cx, cy);"
+                    " const topNode = top && top.closest ? top.closest('.graph-node') : null;"
+                    " if (topNode === g) return { x: cx, y: cy, id: id }; return null; }",
+                    node_id,
+                )
+                if hit:
+                    return hit
+            return None
+
+        ids = ["posts/toy", "posts/notes", "posts/courses", "posts/reference"]
+        p1 = pick_visible_dir(ids)
+        page.wait_for_timeout(400)
+        long_press_xy(p1["x"], p1["y"])
         op = page.evaluate(
             "Array.from(document.querySelectorAll('.graph-node')).map(g => g.style.opacity)")
         dims = sum(1 for o in op if o == "0.12")
         lits = sum(1 for o in op if o == "1")
         ok &= check("long-press highlights neighbors", dims > 0 and 0 < lits < len(op),
                     f"lit={lits} dim={dims}")
-        page.mouse.move(rbox["x"] + rbox["width"] / 2, rbox["y"] + rbox["height"] / 2)
-        page.mouse.down()
-        page.wait_for_timeout(700)
-        page.mouse.up()
+        # long-pressing the same node toggles the highlight off
+        long_press_xy(p1["x"], p1["y"])
+        op_off = page.evaluate(
+            "Array.from(document.querySelectorAll('.graph-node')).map(g => g.style.opacity)")
+        ok &= check("same-node long-press toggles off",
+                    all(o in ("", "1") for o in op_off), str(set(op_off)))
+        # long-press a DIFFERENT sibling dir -> focus center switches
+        p2 = pick_visible_dir([i for i in ids if i != p1["id"]])
+        page.wait_for_timeout(400)
+        long_press_xy(p2["x"], p2["y"])
+        id1_op = page.evaluate(
+            "(id) => document.querySelector('.graph-node[data-id=\"' + id + '\"]').style.opacity",
+            p1["id"])
+        id2_op = page.evaluate(
+            "(id) => document.querySelector('.graph-node[data-id=\"' + id + '\"]').style.opacity",
+            p2["id"])
+        ok &= check("long-press switches focus center",
+                    id2_op == "1" and id1_op == "0.12",
+                    f"{p1['id']}={id1_op} {p2['id']}={id2_op}")
+        # clicking empty background cancels the highlight
+        blank = page.evaluate("""(() => {
+          const r = document.getElementById('graph-svg').getBoundingClientRect();
+          const svg = document.getElementById('graph-svg');
+          const x0 = Math.max(r.x + 20, 10);
+          const y1 = Math.min(r.y + r.height - 20, innerHeight - 20);
+          const y0 = Math.max(r.y + 20, 10);
+          for (let gy = y0; gy <= y1; gy += 50) {
+            for (let gx = x0; gx < Math.min(r.x + r.width - 20, innerWidth - 10); gx += 50) {
+              if (document.elementFromPoint(gx, gy) === svg) return { x: gx, y: gy };
+            }
+          }
+          return null;
+        })()""")
+        page.mouse.click(blank["x"], blank["y"])
         page.wait_for_timeout(300)
         op2 = page.evaluate(
             "Array.from(document.querySelectorAll('.graph-node')).map(g => g.style.opacity)")
-        ok &= check("long-press again cancels focus",
+        ok &= check("background click cancels focus",
                     all(o in ("", "1") for o in op2), str(set(op2)))
 
         # 10d. recenter fits the visible nodes inside the viewport
@@ -323,6 +383,39 @@ def main() -> None:
           return minX >= r.x - 4 && minY >= r.y - 4 && maxX <= r.x + r.width + 4 && maxY <= r.y + r.height + 4;
         })()""")
         ok &= check("recenter fits visible graph", fit)
+
+        # 10e. while focused, short-clicking a dir still toggles it and the
+        # highlight stays (re-applied after render)
+        page.click("#graph-recenter")
+        page.wait_for_timeout(400)
+        pt2 = pick_visible_dir(
+            ["posts", "posts/toy", "posts/notes", "posts/courses", "posts/reference"])
+        long_press_xy(pt2["x"], pt2["y"])
+        nodes_before = page.locator(".graph-node").count()
+        ok &= check("focus on dir dims others", nodes_before > 5)
+        # short-click collapses the focused dir (whole tree under posts)
+        page.mouse.down()
+        page.wait_for_timeout(80)
+        page.mouse.up()
+        page.wait_for_timeout(400)
+        nodes_collapsed = page.locator(".graph-node").count()
+        ok &= check("focused dir short-click collapses + focus kept",
+                    nodes_collapsed < nodes_before,
+                    f"{nodes_before}->{nodes_collapsed}")
+        # short-click expands again; focus still applied
+        page.mouse.down()
+        page.wait_for_timeout(80)
+        page.mouse.up()
+        page.wait_for_timeout(400)
+        nodes2 = page.locator(".graph-node").count()
+        lit_children = page.evaluate(
+            "(id) => Array.from(document.querySelectorAll('.graph-node[data-id^=\"' + id + '/\"]')).filter(g => g.style.opacity === '1').length",
+            pt2["id"])
+        dims2 = page.evaluate(
+            "Array.from(document.querySelectorAll('.graph-node')).filter(g => g.style.opacity === '0.12').length")
+        ok &= check("focused dir short-click expands, children stay highlighted",
+                    nodes2 >= nodes_before and lit_children > 0 and dims2 > 0,
+                    f"nodes={nodes2} lit={lit_children} dim={dims2}")
 
         # 11. filter tag clicked in graph view -> cards-view hint
         page.locator(".filter-tags .tag-chip").first.click()
