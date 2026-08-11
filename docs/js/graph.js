@@ -460,9 +460,19 @@
     var originX = n.x, originY = n.y;
     var originPt = toSvg(startX, startY);
     var applied = false;
+    var longPressed = false;
+    var longPressTimer = setTimeout(function () {
+      longPressTimer = null;
+      longPressed = true;
+      toggleNodeFocus(n);
+    }, 500);
     var move = function (ev) {
       if (dragging !== n) return;
       var dx = ev.clientX - startX, dy = ev.clientY - startY;
+      if (longPressTimer && Math.hypot(dx, dy) > 6) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
       if (!applied && Math.hypot(dx, dy) < 4) return;  // ignore click jitter
       var pt = toSvg(ev.clientX, ev.clientY);
       n.x = originX + (pt.x - originPt.x);
@@ -477,7 +487,11 @@
       n.fixed = false;
       svg.removeEventListener("pointermove", move);
       svg.removeEventListener("pointerup", up);
-      if (moved) return;
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+      if (moved || longPressed) return;
       if (n.type === "dir") toggleDir(n.id);
       else if (n.type === "root") toggleAll();
       else if (n.url) window.location.href = n.url;
@@ -503,6 +517,44 @@
     return set;
   }
 
+  var focusNode = null;
+
+  function toggleNodeFocus(n) {
+    if (focusNode) {
+      focusNode = null;
+      clearFocus();
+      return;
+    }
+    focusNode = n;
+    applyFocus(n);
+  }
+
+  function applyFocus(n) {
+    var nb = neighbors(n);
+    Object.keys(nodeEls).forEach(function (id) {
+      if (hidden[id]) return;
+      var el = nodeEls[id];
+      el.style.opacity = (id === n.id || nb[id]) ? "1" : "0.12";
+    });
+    linkEls.forEach(function (line) {
+      var l = null;
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].el === line) { l = links[i]; break; }
+      }
+      if (l) {
+        line.style.opacity = (l.source === n || l.target === n) ? "1" : "0.12";
+      }
+    });
+  }
+
+  function clearFocus() {
+    focusNode = null;
+    Object.keys(nodeEls).forEach(function (id) {
+      if (!hidden[id]) nodeEls[id].style.opacity = "1";
+    });
+    linkEls.forEach(function (l) { l.style.opacity = "1"; });
+  }
+
   function showTip(e, n) {
     var tags = (n.tags && n.tags.length) ? n.tags.join(" · ") : (n.folder || "根目录");
     tip.innerHTML = "<b>" + escapeHtml(n.fullLabel) + "</b><span>" +
@@ -518,6 +570,10 @@
 
   function clearHover() {
     tip.hidden = true;
+    if (focusNode) {
+      applyFocus(focusNode);
+      return;
+    }
     Object.keys(nodeEls).forEach(function (id) {
       nodeEls[id].style.opacity = "1";
     });
@@ -527,6 +583,7 @@
   function onNodeMove(e, n) {
     if (dragging === n) return;
     showTip(e, n);
+    if (focusNode) return;
     var nb = neighbors(n);
     Object.keys(nodeEls).forEach(function (id) {
       nodeEls[id].style.opacity = (id === n.id || nb[id]) ? "1" : "0.22";
@@ -537,6 +594,7 @@
   svg.addEventListener("pointerdown", function (e) {
     if (e.target === svg || e.target === linksG || e.target === envLayer) {
       cancelFlashAnim();
+      clearFocus();
       e.preventDefault();
       panning = true;
       moved = false;
@@ -605,19 +663,32 @@
     applyTransform();
   }
 
+  function fitBBox(minX, minY, maxX, maxY, pad, minZ, maxZ, dur) {
+    var rect = svg.getBoundingClientRect();
+    var z = Math.min(maxZ, Math.max(minZ,
+      Math.min((rect.width - 40) / (maxX - minX + pad * 2),
+               (rect.height - 40) / (maxY - minY + pad * 2))));
+    var tx = rect.width / 2 - ((minX + maxX) / 2) * z;
+    var ty = rect.height / 2 - ((minY + maxY) / 2) * z;
+    animateTransform([zoom, ox, oy], [z, tx, ty], dur);
+    snakeDirty = true;
+  }
+
   function recenterView() {
     if (!data) return;
-    var rootId = null;
+    var xs = [], ys = [];
     Object.keys(nodes).forEach(function (id) {
-      if (nodes[id].type === "root") rootId = id;
+      if (hidden[id]) return;
+      var n = nodes[id];
+      xs.push(n.x - n.w / 2, n.x + n.w / 2);
+      ys.push(n.y - n.h / 2, n.y + n.h / 2);
     });
-    if (rootId == null) return;
-    var n = nodes[rootId];
-    var rect = svg.getBoundingClientRect();
-    var tx = rect.width / 2 - n.x * zoom;
-    var ty = rect.height / 2 - n.y * zoom;
-    animateTransform([zoom, ox, oy], [zoom, tx, ty], 280);
-    snakeDirty = true;
+    if (!xs.length) return;
+    fitBBox(
+      Math.min.apply(null, xs), Math.min.apply(null, ys),
+      Math.max.apply(null, xs), Math.max.apply(null, ys),
+      70, 0.4, 2.2, 300
+    );
   }
 
   var hold = { raf: null, fn: null, last: 0 };
@@ -666,15 +737,15 @@
   function panHandler(dx, dy) {
     return function (dt) {
       var rect = svg.getBoundingClientRect();
-      var speed = Math.max(120, rect.width * 0.35); // px per second
-      var step = dt > 0 ? speed * dt : rect.width * 0.06;
+      var speed = Math.max(320, rect.width * 0.85); // px per second
+      var step = dt > 0 ? speed * dt : rect.width * 0.15;
       panBy(-dx * step, -dy * step);
     };
   }
 
   function zoomHandler(factor) {
     return function (dt) {
-      zoomBy(dt > 0 ? Math.pow(1.5, dt) : factor);
+      zoomBy(dt > 0 ? Math.pow(factor, dt * 2) : factor);
     };
   }
 
@@ -830,7 +901,7 @@
     });
     if (!found) return;
 
-    var pad = 34;
+    var pad = 46;
     var flash = document.createElementNS(NS, "rect");
     flash.setAttribute("class", "graph-flash");
     flash.setAttribute("x", minX - pad);
@@ -842,15 +913,8 @@
       flash.remove();
     });
 
-    // gentle zoom toward the subtree, easing in and keeping the viewport
-    var rect = svg.getBoundingClientRect();
-    var cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-    var targetZoom = Math.min(1.18, Math.max(zoom, 1.1));
-    var tx = rect.width / 2 - cx * targetZoom;
-    var ty = rect.height / 2 - cy * targetZoom;
-    // the located viewport (size + position) stays where it lands; only the
-    // flash highlight fades away
-    animateTransform([zoom, ox, oy], [targetZoom, tx, ty], 320);
+    // zoom to fit the subtree's bounding box so its nodes fill the view
+    fitBBox(minX, minY, maxX, maxY, 46, 0.4, 2.2, 320);
   }
 
   /* ============================================================

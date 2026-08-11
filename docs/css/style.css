@@ -1794,6 +1794,7 @@ a:hover {
 .code-block.is-long pre {
   max-height: 480px;
   overflow: hidden;
+  padding-bottom: 52px;
 }
 
 .code-block.is-long::after {
@@ -1810,6 +1811,7 @@ a:hover {
 .code-block.is-long.is-open pre {
   max-height: none;
   overflow-x: auto;
+  padding-bottom: 14px;
 }
 
 .code-block.is-long.is-open::after {

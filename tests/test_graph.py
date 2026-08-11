@@ -252,6 +252,78 @@ def main() -> None:
                                           abs(vp0["oy"] - vp1["oy"]) > 5)),
                     f"{vp0} -> {vp1}")
 
+        # 10b. hold zoom-out must zoom out (and hold zoom-in must zoom in)
+        page.click("#graph-expand-all")
+        page.wait_for_timeout(400)
+
+        def z_now():
+            return page.evaluate("""(() => {
+              const t = document.querySelector('#graph-svg g').getAttribute('transform');
+              const m = t.match(/scale\\(([\\d.]+)\\)/);
+              return m ? parseFloat(m[1]) : null;
+            })()""")
+
+        zb = z_now()
+        box = page.locator("#graph-zoom-out").bounding_box()
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+        page.mouse.down()
+        page.wait_for_timeout(500)
+        page.mouse.up()
+        page.wait_for_timeout(200)
+        za = z_now()
+        ok &= check("hold zoom-out zooms out", bool(za and zb and za < zb - 0.05), f"{zb} -> {za}")
+        box = page.locator("#graph-zoom-in").bounding_box()
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+        page.mouse.down()
+        page.wait_for_timeout(400)
+        page.mouse.up()
+        page.wait_for_timeout(200)
+        zb2 = z_now()
+        ok &= check("hold zoom-in zooms in", bool(zb2 and za and zb2 > za + 0.05), f"{za} -> {zb2}")
+
+        # 10c. long-press a node highlights its direct neighbors; again cancels
+        page.click("#graph-recenter")
+        page.wait_for_timeout(400)
+        # bring the graph area fully into view so the node is reachable
+        page.evaluate("""(() => {
+          const w = document.querySelector('.graph-wrap');
+          window.scrollTo(0, w.getBoundingClientRect().top + window.pageYOffset - 20);
+        })()""")
+        page.wait_for_timeout(300)
+        rbox = page.locator('.graph-node[data-id=""]').bounding_box()
+        page.mouse.move(rbox["x"] + rbox["width"] / 2, rbox["y"] + rbox["height"] / 2)
+        page.mouse.down()
+        page.wait_for_timeout(700)
+        page.mouse.up()
+        page.wait_for_timeout(300)
+        op = page.evaluate(
+            "Array.from(document.querySelectorAll('.graph-node')).map(g => g.style.opacity)")
+        dims = sum(1 for o in op if o == "0.12")
+        lits = sum(1 for o in op if o == "1")
+        ok &= check("long-press highlights neighbors", dims > 0 and 0 < lits < len(op),
+                    f"lit={lits} dim={dims}")
+        page.mouse.move(rbox["x"] + rbox["width"] / 2, rbox["y"] + rbox["height"] / 2)
+        page.mouse.down()
+        page.wait_for_timeout(700)
+        page.mouse.up()
+        page.wait_for_timeout(300)
+        op2 = page.evaluate(
+            "Array.from(document.querySelectorAll('.graph-node')).map(g => g.style.opacity)")
+        ok &= check("long-press again cancels focus",
+                    all(o in ("", "1") for o in op2), str(set(op2)))
+
+        # 10d. recenter fits the visible nodes inside the viewport
+        page.click("#graph-recenter")
+        page.wait_for_timeout(500)
+        fit = page.evaluate("""(() => {
+          const r = document.getElementById('graph-svg').getBoundingClientRect();
+          const els = document.querySelectorAll('.graph-node');
+          let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+          els.forEach(g => { const b = g.getBoundingClientRect(); minX=Math.min(minX,b.x); minY=Math.min(minY,b.y); maxX=Math.max(maxX,b.x+b.width); maxY=Math.max(maxY,b.y+b.height); });
+          return minX >= r.x - 4 && minY >= r.y - 4 && maxX <= r.x + r.width + 4 && maxY <= r.y + r.height + 4;
+        })()""")
+        ok &= check("recenter fits visible graph", fit)
+
         # 11. filter tag clicked in graph view -> cards-view hint
         page.locator(".filter-tags .tag-chip").first.click()
         ok &= check("filter hint in graph view", page.locator(".filter-hint.is-show").count() == 1)
