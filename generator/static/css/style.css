@@ -2109,35 +2109,35 @@ a:hover {
 
 .markdown-body .callout-note .callout-title,
 .markdown-body .callout-info .callout-title {
-  background: #1a73e8;
+  background: #1a66d0;
 }
 
 .markdown-body .callout-tip .callout-title,
 .markdown-body .callout-success .callout-title,
 .markdown-body .callout-example .callout-title {
-  background: #188038;
+  background: #15702f;
 }
 
 .markdown-body .callout-warning .callout-title {
-  background: #fbbc04;
-  color: #3c4043;
+  background: #f0b400;
+  color: #3a3d40;
 }
 
 .markdown-body .callout-danger .callout-title,
 .markdown-body .callout-failure .callout-title,
 .markdown-body .callout-bug .callout-title,
 .markdown-body .callout-important .callout-title {
-  background: #d93025;
+  background: #c5231d;
 }
 
 .markdown-body .callout-question .callout-title {
-  background: #9334e6;
+  background: #872fd4;
 }
 
 .markdown-body .callout-abstract .callout-title,
 .markdown-body .callout-todo .callout-title,
 .markdown-body .callout-quote .callout-title {
-  background: #5f6368;
+  background: #565b61;
 }
 
 .markdown-body hr {
