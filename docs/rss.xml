@@ -9,8 +9,8 @@
     <generator>pilog</generator>
       <item>
         <title>深度学习必将拥有一套科学理论 · 翻译</title>
-        <link>https://meredith2328.github.io/posts/notes/ml/notes.html</link>
-        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/notes.html</guid>
+        <link>https://meredith2328.github.io/posts/notes/ml/science-of-dl.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/science-of-dl.html</guid>
         <pubDate>Tue, 11 Aug 2026 00:00:00 -0000</pubDate>
         <description>这篇论文提出一个核心主张：深度学习正在形成一套真正的科学理论，而它的形态将是一种“学习力学”——从第一性原理出发、高度数学化地研究训练过程的动力学。作者将机制可解释性比作“深度学习的生物学”（定性解剖模型），而学习力学则是“深度学习的物理学”（定量研究学习如何展开）。全文围绕一个关键观察展开：学习就是参数空间中的运动，而物理学提供了思考运动的成熟工具；加之深度学习系统完全可测量，这为理论研究创造了前所未有的条件。 论文从五个“口袋”论证理论正在涌现：**存在可解析求解的设定、有洞察力的极限揭示基本行为、简单方程捕…</description>
       </item>
