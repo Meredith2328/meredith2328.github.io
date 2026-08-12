@@ -1057,15 +1057,32 @@ class Solution:
         return head
 ```
 
-25 K个一组翻转链表
 
-为了简化，仍然是直接交换值，而不是链表指针。
 
-为了简化，直接使用数组作为缓冲区。
+[25. K 个一组翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/)
 
-方法是，如果缓冲区中个数到达K个，则逆序添加。否则直接正序添加。
+~~跟接雨水坐一桌的字节高频面试题~~
 
-```
+这个题目要分两层去思考。
+
+- 第一层是，如果拿到一个链表的闭区间 `[head, tail]` ，我们如何做到翻转。（`def reverse`）
+- 第二层是，我们如何正确地拿到整个链表的每一段闭区间 `[head, tail]` 的端点。（`def reverseKGroup`）
+
+对于第一层，我们的答案是：每次从头部取出一个节点插入尾部。
+
+> 方便记忆小tips：
+>
+> head和tail从来不会被改变。所以我们需要front和cur作为循环使用的变量。
+>
+> while循环里第一行是为了在改变指针前保存信息。这四行的写法恰好是首尾相接的（数据搬运环环相扣），干净得令人叹服。
+
+对于第二层，我们的答案是：每次维护 `prev` ， `head` ，`tail` ，`nxt` 四个指针。
+
+对 `[head, tail]` 这一段执行 `reverse` 函数，然后把这一段连回整个链表、并切换到下一段。
+
+如果长度不够 `K` ，就提前返回。
+
+```python
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
@@ -1073,36 +1090,38 @@ class Solution:
 #         self.next = next
 class Solution:
     def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
-        alist = [0] * k
-        cur = head
-        dummy = ListNode()
-        newcur = dummy
-        cnt = 0
-        finished = 0
-
-        while cur:
-            for i in range(k):
-                if not cur:
-                    finished = 1
-                    break
-                alist[i] = cur.val
-                cur = cur.next
-                cnt += 1
-            cnt %= k
-
-            if finished:
-                for i in range(cnt):
-                    newcur.next = ListNode(alist[i])
-                    newcur = newcur.next
-                break
-            else:
-                alist = list(reversed(alist))
-                for i in range(k):
-                    newcur.next = ListNode(alist[i])
-                    newcur = newcur.next
+        def reverse(head, tail): # head和tail从来都不动
+            front = tail.next
+            cur = head
+            while front != tail:
+                nxt = cur.next
+                cur.next = front
+                front = cur
+                cur = nxt
+            return tail, head
+        
+        dummy = ListNode(0, head)
+        prev = dummy
+        while head:
+            tail = prev
+            for _ in range(k):
+                tail = tail.next
+                if not tail:
+                    return dummy.next
+            
+            nxt = tail.next
+            head, tail = reverse(head, tail)
+            prev.next = head
+            tail.next = nxt
+            prev = tail
+            head = nxt
 
         return dummy.next
 ```
+
+
+
+
 
 138 随机链表的复制
 
@@ -1197,40 +1216,45 @@ class Solution:
             return self.merge2Lists(list1, list2)
 ```
 
-146 LRU缓存
 
-使用OrderedDict实现类似链表的效果：
 
-move_to_end()模拟最近使用，
+[146. LRU 缓存](https://leetcode.cn/problems/lru-cache/)
 
-popitem(last=False)取出最久未使用。
+这个题目用于学习 **collections.OrderedDict** 的语法。这个结构在算法里常常用到：
 
-```
+我们需要把**dict**和**双向链表**这两个功能结合起来。这样又方便插入删除（从中间取出节点之类的）、又可以快速查找。有下述两个API：
+
+- `move_to_end(key, last=True)` 用于把某个元素移动到末尾。
+
+- `popitem(last=False)` 用于删除在开头的元素。
+
+> 有些同学可能跟我一样常常分不清哪里是last和front。
+>
+> 可以试着直觉上想象一个“小火车”，所以front就是“车头”。
+>
+> 我自己更习惯于想：它总是按照内存顺序直觉上“从左往右排列”的，所以车头就朝向“右边”。
+>
+> 至于这道题，保证 `move_to_end` 和 `popitem` 用的 `last` 变量反过来就好啦。
+
+```python
 class LRUCache:
 
     def __init__(self, capacity: int):
-        self.c = capacity
-        self.d = OrderedDict()
+        self.capacity = capacity
+        self.cache = OrderedDict()
 
     def get(self, key: int) -> int:
-        if key not in self.d:
+        if key not in self.cache:
             return -1
-        self.d.move_to_end(key)
-        return self.d[key]
-
+        self.cache.move_to_end(key)
+        return self.cache[key]
 
     def put(self, key: int, value: int) -> None:
-        if key in self.d:
-            self.d.move_to_end(key)
-        self.d[key] = value
-        if len(self.d) > self.c:
-            self.d.popitem(last=False)
-
-
-            # Your LRUCache object will be instantiated and called as such:
-            # obj = LRUCache(capacity)
-            # param_1 = obj.get(key)
-# obj.put(key,value)
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)
 ```
 
 ### 专题八 二叉树

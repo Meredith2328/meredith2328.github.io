@@ -94,7 +94,7 @@
     <h1 class="post-title">数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</h1>
     <div class="post-meta">
       <time datetime="2026-03-02T00:00:00">2026-03-02</time>
-      <span class="post-stats">5129 字 · 约 12 分钟</span>
+      <span class="post-stats">5856 字 · 约 14 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -973,46 +973,56 @@ class Solution:
             cur2 = cur2.next.next
         return head
 </code></pre></div>
-<p>25 K个一组翻转链表</p>
-<p>为了简化，仍然是直接交换值，而不是链表指针。</p>
-<p>为了简化，直接使用数组作为缓冲区。</p>
-<p>方法是，如果缓冲区中个数到达K个，则逆序添加。否则直接正序添加。</p>
-<div class="highlight"><pre><span></span><code># Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
-class Solution:
-    def reverseKGroup(self, head: Optional[ListNode], k: int) -&gt; Optional[ListNode]:
-        alist = [0] * k
-        cur = head
-        dummy = ListNode()
-        newcur = dummy
-        cnt = 0
-        finished = 0
+<p><a href="https://leetcode.cn/problems/reverse-nodes-in-k-group/">25. K 个一组翻转链表</a></p>
+<p><del>跟接雨水坐一桌的字节高频面试题</del></p>
+<p>这个题目要分两层去思考。</p>
+<ul>
+<li>第一层是，如果拿到一个链表的闭区间 <code>[head, tail]</code> ，我们如何做到翻转。（<code>def reverse</code>）</li>
+<li>第二层是，我们如何正确地拿到整个链表的每一段闭区间 <code>[head, tail]</code> 的端点。（<code>def reverseKGroup</code>）</li>
+</ul>
+<p>对于第一层，我们的答案是：每次从头部取出一个节点插入尾部。</p>
+<blockquote>
+<p>方便记忆小tips：</p>
+<p>head和tail从来不会被改变。所以我们需要front和cur作为循环使用的变量。</p>
+<p>while循环里第一行是为了在改变指针前保存信息。这四行的写法恰好是首尾相接的（数据搬运环环相扣），干净得令人叹服。</p>
+</blockquote>
+<p>对于第二层，我们的答案是：每次维护 <code>prev</code> ， <code>head</code> ，<code>tail</code> ，<code>nxt</code> 四个指针。</p>
+<p>对 <code>[head, tail]</code> 这一段执行 <code>reverse</code> 函数，然后把这一段连回整个链表、并切换到下一段。</p>
+<p>如果长度不够 <code>K</code> ，就提前返回。</p>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="c1"># Definition for singly-linked list.</span>
+<span class="c1"># class ListNode:</span>
+<span class="c1">#     def __init__(self, val=0, next=None):</span>
+<span class="c1">#         self.val = val</span>
+<span class="c1">#         self.next = next</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reverseKGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ListNode</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ListNode</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">reverse</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">):</span> <span class="c1"># head和tail从来都不动</span>
+            <span class="n">front</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="n">next</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">head</span>
+            <span class="k">while</span> <span class="n">front</span> <span class="o">!=</span> <span class="n">tail</span><span class="p">:</span>
+                <span class="n">nxt</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">next</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">front</span>
+                <span class="n">front</span> <span class="o">=</span> <span class="n">cur</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">nxt</span>
+            <span class="k">return</span> <span class="n">tail</span><span class="p">,</span> <span class="n">head</span>
 
-        while cur:
-            for i in range(k):
-                if not cur:
-                    finished = 1
-                    break
-                alist[i] = cur.val
-                cur = cur.next
-                cnt += 1
-            cnt %= k
+        <span class="n">dummy</span> <span class="o">=</span> <span class="n">ListNode</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">head</span><span class="p">)</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">dummy</span>
+        <span class="k">while</span> <span class="n">head</span><span class="p">:</span>
+            <span class="n">tail</span> <span class="o">=</span> <span class="n">prev</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="n">tail</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="n">next</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">tail</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">dummy</span><span class="o">.</span><span class="n">next</span>
 
-            if finished:
-                for i in range(cnt):
-                    newcur.next = ListNode(alist[i])
-                    newcur = newcur.next
-                break
-            else:
-                alist = list(reversed(alist))
-                for i in range(k):
-                    newcur.next = ListNode(alist[i])
-                    newcur = newcur.next
+            <span class="n">nxt</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="n">next</span>
+            <span class="n">head</span><span class="p">,</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span>
+            <span class="n">prev</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span>
+            <span class="n">tail</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">nxt</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">tail</span>
+            <span class="n">head</span> <span class="o">=</span> <span class="n">nxt</span>
 
-        return dummy.next
+        <span class="k">return</span> <span class="n">dummy</span><span class="o">.</span><span class="n">next</span>
 </code></pre></div>
 <p>138 随机链表的复制</p>
 <p>需要创建链表的深拷贝，关键是需要重新建立指针。</p>
@@ -1096,35 +1106,41 @@ class Solution:
             list2 = self.mergeKLists(lists[int(len(lists) / 2):])
             return self.merge2Lists(list1, list2)
 </code></pre></div>
-<p>146 LRU缓存</p>
-<p>使用OrderedDict实现类似链表的效果：</p>
-<p>move_to_end()模拟最近使用，</p>
-<p>popitem(last=False)取出最久未使用。</p>
-<div class="highlight"><pre><span></span><code>class LRUCache:
+<p><a href="https://leetcode.cn/problems/lru-cache/">146. LRU 缓存</a></p>
+<p>这个题目用于学习 <strong>collections.OrderedDict</strong> 的语法。这个结构在算法里常常用到：</p>
+<p>我们需要把<strong>dict</strong>和<strong>双向链表</strong>这两个功能结合起来。这样又方便插入删除（从中间取出节点之类的）、又可以快速查找。有下述两个API：</p>
+<ul>
+<li>
+<p><code>move_to_end(key, last=True)</code> 用于把某个元素移动到末尾。</p>
+</li>
+<li>
+<p><code>popitem(last=False)</code> 用于删除在开头的元素。</p>
+</li>
+</ul>
+<blockquote>
+<p>有些同学可能跟我一样常常分不清哪里是last和front。</p>
+<p>可以试着直觉上想象一个“小火车”，所以front就是“车头”。</p>
+<p>我自己更习惯于想：它总是按照内存顺序直觉上“从左往右排列”的，所以车头就朝向“右边”。</p>
+<p>至于这道题，保证 <code>move_to_end</code> 和 <code>popitem</code> 用的 <code>last</code> 变量反过来就好啦。</p>
+</blockquote>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LRUCache</span><span class="p">:</span>
 
-    def __init__(self, capacity: int):
-        self.c = capacity
-        self.d = OrderedDict()
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">capacity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
-    def get(self, key: int) -&gt; int:
-        if key not in self.d:
-            return -1
-        self.d.move_to_end(key)
-        return self.d[key]
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-
-    def put(self, key: int, value: int) -&gt; None:
-        if key in self.d:
-            self.d.move_to_end(key)
-        self.d[key] = value
-        if len(self.d) &gt; self.c:
-            self.d.popitem(last=False)
-
-
-            # Your LRUCache object will be instantiated and called as such:
-            # obj = LRUCache(capacity)
-            # param_1 = obj.get(key)
-# obj.put(key,value)
+    <span class="k">def</span><span class="w"> </span><span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 </div><div class="post-chapter" data-ch="9" data-title="专题八 二叉树"><h3 id="专题八-二叉树">专题八 二叉树</h3>
 <p>94 二叉树的中序遍历</p>
