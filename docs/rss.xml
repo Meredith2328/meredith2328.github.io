@@ -15,6 +15,13 @@
         <description>DSH 上线之后陆陆续续折腾了几个小工具：&lt;strong&gt;便签&lt;/strong&gt;、&lt;strong&gt;新会话按钮内可切换模式&lt;/strong&gt;、&lt;strong&gt;Alt+Space最小化或唤起窗口&lt;/strong&gt;。都是自己用着顺手的东西，整理一下放在这里。 顺便整理了我对DSH的“四种模式”的简单理解。  github.com/Meredith2328/dsh-sticky-note 是输入框工具栏左边的一个便签按钮，打开是一个可以拉伸的小面板。 随手记点子/…</description>
       </item>
       <item>
+        <title>DSH有可能覆盖丢失你自己改的文件</title>
+        <link>https://meredith2328.github.io/posts/toy/overwrite-incident.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/overwrite-incident.html</guid>
+        <pubDate>Fri, 14 Aug 2026 00:00:00 -0000</pubDate>
+        <description>写博客文章的时候碰上一件挺吓人的事：我在 Typora 里改好的文章，被 AI 助手在另一个流程里整体重写覆盖了。工具其实提示过"文件在外部被修改过"，但助手无视了这个警告，照样把文件写掉了。 事情的经过大概是这样的。我一边用 Typora 编辑刚写的那篇 DSH 小工具介绍，一边让 DSH 里的助手去给文章补图、调整一下文字。助手的做法是整体重写整份文件，而不是只改我要求的那一小块。坏就坏在它写之前，工具自己弹了个警告，说这个文件在我读它之后又被外部改过了——那个外部改动就是我在 Typora…</description>
+      </item>
+      <item>
         <title>深度学习必将拥有一套科学理论 · 翻译</title>
         <link>https://meredith2328.github.io/posts/notes/ml/science-of-dl.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/ml/science-of-dl.html</guid>

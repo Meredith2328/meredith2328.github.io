@@ -4,16 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
-  <title>DSH 上线之后我做的几个小工具 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="DSH 上线之后陆陆续续折腾了几个小工具：便签、新会话按钮内可切换模式、Alt+Space最小化或唤起窗口。都是自己用着顺手的东西，整理一下放在这里。 顺便整理了我对DSH的“四种模式”的简单理解。 ">
+  <title>DSH有可能覆盖丢失你自己改的文件 · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <meta name="description" content="写博客文章的时候碰上一件挺吓人的事：我在 Typora 里改好的文章，被 AI 助手在另一个流程里整体重写覆盖了。工具其实提示过&#34;文件在外部被修改过&#34;，但助手无视了这个警告，照样把文件写掉了。 事情的">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
-  <meta property="og:title" content="DSH 上线之后我做的几个小工具">
-  <meta property="og:description" content="DSH 上线之后陆陆续续折腾了几个小工具：便签、新会话按钮内可切换模式、Alt+Space最小化或唤起窗口。都是自己用着顺手的东西，整理一下放在这里。 顺便整理了我对DSH的“四种模式”的简单理解。 ">
-  <link rel="canonical" href="https://meredith2328.github.io/posts/toy/dsh-tools.html">
+  <meta property="og:title" content="DSH有可能覆盖丢失你自己改的文件">
+  <meta property="og:description" content="写博客文章的时候碰上一件挺吓人的事：我在 Typora 里改好的文章，被 AI 助手在另一个流程里整体重写覆盖了。工具其实提示过&#34;文件在外部被修改过&#34;，但助手无视了这个警告，照样把文件写掉了。 事情的">
+  <link rel="canonical" href="https://meredith2328.github.io/posts/toy/overwrite-incident.html">
   
   
-  <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/cb99683ecd09.jpg">
+  <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2026-08-14T00:00:00">
 
   <link rel="icon" href="../../favicon.png">
@@ -91,12 +91,12 @@
 <article class="post">
   <header class="post-header">
     <a class="back-link" href="../../index.html">← 返回首页</a>
-    <h1 class="post-title">DSH 上线之后我做的几个小工具</h1>
+    <h1 class="post-title">DSH有可能覆盖丢失你自己改的文件</h1>
     <div class="post-meta">
       <time datetime="2026-08-14T00:00:00">2026-08-14</time>
-      <span class="post-stats">1586 字 · 约 4 分钟</span>
+      <span class="post-stats">1054 字 · 约 3 分钟</span>
       
-      <a class="tag-chip" href="../../index.html#tag=%E9%A1%B9%E7%9B%AE">#项目</a>
+      <a class="tag-chip" href="../../index.html#tag=%E5%A5%87%E6%80%AA%E7%9A%84%E4%B8%9C%E8%A5%BF">#奇怪的东西</a>
       
       <span class="post-folder">▣ posts/toy</span>
     </div>
@@ -109,86 +109,25 @@
   
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
-    <p>DSH 上线之后陆陆续续折腾了几个小工具：<strong>便签</strong>、<strong>新会话按钮内可切换模式</strong>、<strong>Alt+Space最小化或唤起窗口</strong>。都是自己用着顺手的东西，整理一下放在这里。</p>
-<p>顺便整理了我对DSH的“四种模式”的简单理解。</p>
-<!-- more -->
-<h2 id="dsh-sticky-note-便签">dsh-sticky-note：便签</h2>
-<p><a href="https://github.com/Meredith2328/dsh-sticky-note">github.com/Meredith2328/dsh-sticky-note</a></p>
-<blockquote>
-<p><strong>类似微软原生的便签功能的DSH集成版，支持一些Markdown语法，并且可以快速发送给DSH。</strong></p>
-</blockquote>
-<p><img alt="示意图：便签面板（点子/感想/TODO，Markdown 预览、自动保存、一键发送）" src="../migrated/post-images/dsh-sticky-note.png"/></p>
-<p>是输入框工具栏左边的一个便签按钮，打开是一个可以拉伸的小面板。</p>
-<p>随手记点子/感想/TODO，实时保存到归档目录。</p>
-<ul>
-<li>Markdown 预览和一套编辑快捷键</li>
-<li>一键发送到对话</li>
-<li>存储是按 点子/感想/TODO/归档 四个子目录分类，落在本地目录里</li>
-<li>设置里可以修改许多的定制项，比如目录保存在哪里、多久自动保存一次、多久自动删除不用的便签</li>
-</ul>
-<p>顺便合到几个awesome的pr里啦，欢迎大家用用看。</p>
-<h2 id="dsh-sidebar-mode-把模式切换塞进-新会话-按钮">dsh-sidebar-mode：把模式切换塞进「新会话」按钮</h2>
-<p><a href="https://github.com/Meredith2328/dsh-sidebar-mode">github.com/Meredith2328/dsh-sidebar-mode</a></p>
-<blockquote>
-<p><strong>把默认的四种模式切换塞进「新会话」按钮里，新会话创建更方便。</strong></p>
-</blockquote>
-<p><img alt="示意图：新会话按钮内嵌预设标签，点击弹出预设菜单" src="../migrated/post-images/dsh-sidebar-mode.png"/></p>
-<p>我发现我使用的过程中，根据自己需求、在创建新会话之前首先切换到合适的模式，这样用得还挺频繁。所以做了这样一个小插件，实现这个功能。</p>
-<p>这个小显示和设置里的“Agent预设”，以及新会话里的模式切换都是双向同步的。</p>
-<h2 id="dsh-hotkey-alt-space-唤起-dsh">dsh-hotkey：Alt+Space 唤起 DSH</h2>
-<p><a href="https://github.com/Meredith2328/dsh-hotkey">github.com/Meredith2328/dsh-hotkey</a></p>
-<blockquote>
-<p><strong>Alt+Space</strong> 一键唤起 / 最小化 DeepSeek Harness 的窗口。</p>
-</blockquote>
-<p>找不到窗口就自动打开 DSH 地址。</p>
-<p>为什么是独立小工具，而不是 skill / MCP / 插件：</p>
-<ul>
-<li>skill 只是一份给 Agent 的指令文本，不能常驻监听按键。</li>
-<li>MCP / Cordis 插件跑在 Harness 自己的进程或页面里，管不到窗口的最小化 / 恢复，更注册不了操作系统级全局热键。</li>
-<li>全局热键 + 窗口管理必须由 OS 层的常驻进程来做，所以最合适的形式就是一个极小的 Windows 可执行程序（C# 编译，无需安装任何运行时）。</li>
-</ul>
-<h2 id="我对-dsh-默认的四种模式的理解">我对 DSH 默认的四种模式的理解</h2>
-<p>顺便整理了一下我对 DSH 四种模式的理解，省流如下。</p>
-<table>
-<thead>
-<tr>
-<th>模式</th>
-<th>描述</th>
-<th>备注</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>标准模式</td>
-<td>随便用</td>
-<td></td>
-</tr>
-<tr>
-<td>PTC模式</td>
-<td>类似标准模式，这个更适用于<strong>需要并行读一堆文件</strong>的场景</td>
-<td>比如一个大的代码库，或者整理很多资料文件</td>
-</tr>
-<tr>
-<td>极简模式</td>
-<td>略</td>
-<td></td>
-</tr>
-<tr>
-<td>创造模式</td>
-<td>适用于你<strong>想改造DSH</strong>，例如自己折腾插件等等</td>
-<td>我觉得暂时来说，满足折腾需求的比例更多，对开发使用的助益取决于你的折腾的投入产出是否适合你自己</td>
-</tr>
-</tbody>
-</table>
+    <p>写博客文章的时候碰上一件挺吓人的事：我在 Typora 里改好的文章，被 AI 助手在另一个流程里整体重写覆盖了。工具其实提示过"文件在外部被修改过"，但助手无视了这个警告，照样把文件写掉了。</p>
+<p>事情的经过大概是这样的。我一边用 Typora 编辑刚写的那篇 DSH 小工具介绍，一边让 DSH 里的助手去给文章补图、调整一下文字。助手的做法是整体重写整份文件，而不是只改我要求的那一小块。坏就坏在它写之前，工具自己弹了个警告，说这个文件在我读它之后又被外部改过了——那个外部改动就是我在 Typora 里的编辑。正常的做法是停下来，重新读一遍文件，看看我的改动是什么，再决定怎么合并。但助手没有停，直接把整份文件按它自己的版本写了回去。</p>
+<p>等我发现的时候，我在 Typora 里改的内容已经不在文件里了。更麻烦的是，这些改动从来没进过 git——它只存在于磁盘上，被覆盖之后就等于没了。git 的历史、reflog、悬空对象里都找不到，因为我的改动压根没被 git 碰过。</p>
+<p>那最后是怎么找回来的呢？靠的是 Typora 的自动备份。Typora 会在后台把被外部替换过的文件存一份副本，放在 AppData 的 backups 目录里。我在那个目录里翻到了我改完的完整版本，一字不差。真的是虚惊一场。</p>
+<p>这件事让我想了不少。</p>
+<p>工具给的警告其实是信号，不是噪音。那个"文件在外部被修改"的提示，本质上是工具在保护我——它检测到磁盘上的内容和它上次看到的不一致，说明有别的进程动过这个文件。无视它继续操作，等于把保护的开关关掉。以后遇到这种提示，应该立刻停下来，搞清楚发生了什么，再决定下一步。</p>
+<p>改动只要没进 git，就是脆弱的。编辑器里的内容、磁盘上的文件，都只是一份临时状态。真正可靠的版本历史还是得靠版本管理，或者说，靠编辑器自己的自动备份。这次是 Typora 的 backups 救了我，但下次未必有这么好的运气。</p>
+<p>所以我把这条教训固化成了规则。现在我的 DSH 全局配置里有一条硬性约定：写任何已有文件之前必须先读最新内容；工具提示文件被外部改动时立即停止，绝不直接覆盖；重写、覆盖、移动文件之前先备份一份到安全位置。这些规则会注入到以后每一个会话里，不管是我自己写还是助手代写，都得先守这条底线。</p>
+<p>跟 AI 协作的时候，人最容易放松警惕的就是"反正它会帮我做"这种心态。但这次的经历告诉我，越是自动化代劳，越要在关键节点上留一双眼睛。文件的命运不能完全交给对方，重要的东西，要么自己留一份，要么确保有一个可靠的备份机制兜底。</p>
+<p>这次运气好，文章找回来了。但把运气变成规则，才不算白摔这一跤。</p>
   </div>
 
   
   <nav class="post-nav" aria-label="上一篇 / 下一篇">
     
-    <a class="post-nav-link is-prev" href="../../posts/toy/10pi.html">← 上一篇<br><span class="post-nav-title">十派的玩具箱有哪些内容？</span></a>
+    <a class="post-nav-link is-prev" href="../../posts/toy/dsh-tools.html">← 上一篇<br><span class="post-nav-title">DSH 上线之后我做的几个小工具</span></a>
     
     
-    <a class="post-nav-link is-next" href="../../posts/toy/overwrite-incident.html">下一篇 →<br><span class="post-nav-title">DSH有可能覆盖丢失你自己改的文件</span></a>
+    <a class="post-nav-link is-next" href="../../posts/notes/ml/science-of-dl.html">下一篇 →<br><span class="post-nav-title">深度学习必将拥有一套科学理论 · 翻译</span></a>
     
   </nav>
   

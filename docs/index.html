@@ -200,6 +200,36 @@
       </a>
     </article>
     
+    <article class="card" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2026-08-14">
+      
+      <a class="card-link" href="posts/toy/overwrite-incident.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-meta-left">
+              <time datetime="2026-08-14">2026-08-14</time>
+              
+            </span>
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/toy">toy</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">DSH有可能覆盖丢失你自己改的文件</h3>
+          
+          <div class="card-preview">写博客文章的时候碰上一件挺吓人的事：我在 Typora 里改好的文章，被 AI 助手在另一个流程里整体重写覆盖了。工具其实提示过"文件在外部被修改过"，但助手无视了这个警告，照样把文件写掉了。 事情的经过大概是这样的。我一边用 Typora 编辑刚写的那篇 DSH 小工具介绍，一边让 DSH 里的助手去给文章补图、调整一下文字。助手的做法是整体重写整份文件，而不是只改我要求的那一小块。坏就坏在它写之前，工具自己弹了个警告，说这个文件在我读它之后又被外部改过了——那个外部改动就是我在 Typora…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
+    
     <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-08-11">
       
       <a class="card-link" href="posts/notes/ml/science-of-dl.html">
@@ -477,36 +507,6 @@
           <div class="card-tags">
             
             <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
-            
-          </div>
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-03-14">
-      
-      <a class="card-link" href="posts/notes/ml/TensorZero-6949.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-meta-left">
-              <time datetime="2026-03-14">2026-03-14</time>
-              
-            </span>
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/ml">ml</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">给 tensorzero 提的第一个 PR：object_storage.endpoint 支持环境变量</h3>
-          
-          <div class="card-preview">tensorzero 是一个做 LLM 推理和优化的框架，配置里的 <code>[object_storage]</code> 用来管多模态推理时图片之类文件的存储。原来这个段的 <code>endpoint</code> 只能写死一个地址，我提的 PR 让它也能写成 <code>env::SOME_ENV_VAR</code>，启动的时候从环境变量里读。这样内网地址、测试和生产的存储端点就不用都摊在配置文件里了。 当时提的 PR 是…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
             
           </div>
         </div>
@@ -1141,6 +1141,17 @@
               <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
               <span class="tree-name">做了一个叫notegotya的五线谱识谱练习玩具</span>
               <span class="tree-date">2026-05-16</span>
+            </a>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/toy/overwrite-incident">
+            <a class="tree-row" href="posts/toy/overwrite-incident.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
+              <span class="tree-name">DSH有可能覆盖丢失你自己改的文件</span>
+              <span class="tree-date">2026-08-14</span>
             </a>
           </li>
           

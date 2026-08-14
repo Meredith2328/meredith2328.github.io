@@ -134,6 +134,36 @@
 
   <div class="card-grid" id="card-grid">
     
+    <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-03-14">
+      
+      <a class="card-link" href="../posts/notes/ml/TensorZero-6949.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-meta-left">
+              <time datetime="2026-03-14">2026-03-14</time>
+              
+            </span>
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/ml">ml</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">给 tensorzero 提的第一个 PR：object_storage.endpoint 支持环境变量</h3>
+          
+          <div class="card-preview">tensorzero 是一个做 LLM 推理和优化的框架，配置里的 <code>[object_storage]</code> 用来管多模态推理时图片之类文件的存储。原来这个段的 <code>endpoint</code> 只能写死一个地址，我提的 PR 让它也能写成 <code>env::SOME_ENV_VAR</code>，启动的时候从环境变量里读。这样内网地址、测试和生产的存储端点就不用都摊在配置文件里了。 当时提的 PR 是…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
+    
     <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-03-12">
       
       <a class="card-link" href="../posts/notes/ml/LLMestimate2.html">
@@ -489,40 +519,6 @@
             <button class="tag-chip" type="button" data-tag="工具">#工具</button>
             
           </div>
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card" data-tags="数据结构与算法 " data-folder="posts/notes/algo" data-date="2026-01-18">
-      
-      <a class="card-link" href="../posts/notes/algo/algorithm-3.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-meta-left">
-              <time datetime="2026-01-18">2026-01-18</time>
-              
-            </span>
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/algo">algo</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">数据结构与算法 · 03 · 基础数据结构与算法模板整理</h3>
-          
-          <div class="card-preview">参考：《深入浅出程序设计竞赛（基础篇）（汪楚奇）》。  （可参考：数据结构（C++模板实现）） 基本上知道思路之后大部分代码都是自己完整写出来的（部分难题和跳过的题目除外），然后再补了一点细节。 往后推的同时，还需要加强巩固一些重点的专题，做做课后习题： 学过某个知识了，不代表这个知识已经掌握甚至融会贯通了。做题是为了这个目的，而不是堆数字：“增加题量”。 整本书粗略地学习了一…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="数据结构与算法">#数据结构与算法</button>
-            
-          </div>
-        </div>
-        
-        <div class="card-thumb">
-          <img src="../assets/.thumbs/f7c80d7b7d1b.jpg" alt="" loading="lazy">
         </div>
         
       </a>
@@ -1155,6 +1151,17 @@
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
               <span class="tree-name">做了一个叫notegotya的五线谱识谱练习玩具</span>
               <span class="tree-date">2026-05-16</span>
+            </a>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/toy/overwrite-incident">
+            <a class="tree-row" href="../posts/toy/overwrite-incident.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">DSH有可能覆盖丢失你自己改的文件</span>
+              <span class="tree-date">2026-08-14</span>
             </a>
           </li>
           
