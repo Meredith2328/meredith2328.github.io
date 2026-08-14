@@ -94,7 +94,7 @@
     <h1 class="post-title">DSH有可能覆盖丢失你自己改的文件，记得修一下</h1>
     <div class="post-meta">
       <time datetime="2026-08-14T00:00:00">2026-08-14</time>
-      <span class="post-stats">989 字 · 约 3 分钟</span>
+      <span class="post-stats">1005 字 · 约 3 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=bugfix">#bugfix</a>
       
@@ -134,6 +134,19 @@
 </code></pre></div>
 <p>这条规则会注入到以后的每个会话里。</p>
 <p>跟 AI 协作时，重要的东西要么自己留一份，要么确保有可靠的备份机制（如Git自动化提交、以及自动化备份的工作流）。这次运气好找回来了，把教训固化成规则，后面就不容易再犯。</p>
+<h2 id="ai自己给的过程完整记录复盘">AI自己给的过程完整记录复盘</h2>
+<div class="highlight"><pre data-lang="markdown"><span></span><code>我按工具调用和时间戳把这条链精确还原了一遍。覆盖发生在**第二次整体重写 <span class="sb">`dsh-tools.md`</span> 的那次工具调用序列**上，当时的时间大概是 16:31 前后。拆开看是三步：
+
+<span class="gs">**第一步：`write` 返回警告。**</span> 我处理你那条"config.json 审查 + 我刚才改了文字表述"的消息时，要第二次重写 <span class="sb">`dsh-tools.md`</span>（补 sidebar-mode 的图、改文字）。工具立刻返回了 <span class="sb">`Error: cannot write... file changed since it was read — re-read the file, then retry`</span>。这个错误本身就说明：文件自工具上次操作以来被外部改过了——那个外部改动就是你在 Typora 里的保存。
+
+<span class="gs">**第二步：`read` 只读了前 10 行，检查失效。**</span> 收到警告后我调用 <span class="sb">`read`</span>（limit 10）确认文件状态，看到前 10 行还是"DSH 上线之后陆陆续续折腾了几个小工具…"就判断文件没变。问题在于，你改动的第一处恰好加在第 11 行附近（"顺便整理了我对DSH的'四种模式'的简单理解。"），前 10 行两版完全一样，我的截断读取根本看不到差异。这一步的思考链是错的：工具已经明确告诉我文件被外部改过，我却用一段读不出差异的内容说服自己"没问题"。
+
+<span class="gs">**第三步：`write` 再次执行，覆盖了你的版本。**</span> 我接着把同样的内容又写了一遍，这次成功了——你的 Typora 改动被整体覆盖。
+
+把时间线对上就清楚了：我第一次创建初版并提交（`3bbff72`，16:09）之后，你大约 16:25 在 Typora 里保存了你的版本（这个保存触发了 Typora 的自动备份，也就是后来找回内容的那份 <span class="sb">`backups\1\1`</span>），我在 16:31 左右做第二次重写时撞上你的改动，收到警告、检查不充分、照样覆盖。直到你那条"dsh-tools我改的内容怎么丢失了"我才发现。
+
+所以要说"在哪一次"的话：是**第二次 <span class="sb">`write dsh-tools.md`</span> 那条工具调用**；要说"在哪段思考链"的话，是**收到 <span class="sb">`file changed since it was read`</span> 警告后，用截断读取自我确认、没有停下来找你确认**的那一段判断。教训后来固化成了全局 AGENTS.md 里的"外部改动即停止，宁可停下来问用户"。
+</code></pre></div>
   </div>
 
   
