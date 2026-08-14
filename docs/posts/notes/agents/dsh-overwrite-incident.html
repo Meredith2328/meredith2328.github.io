@@ -10,7 +10,7 @@
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="DSH有可能覆盖丢失你自己改的文件，记得修一下">
   <meta property="og:description" content="写博客的时候遇到一件事：我在 Typora 里改好的文章，被 DSH 里的助手在另一个流程里整体重写覆盖了。工具当时提示过文件在外部被修改过，但助手没有停下来确认，直接按自己的版本把文件写了回去。 事">
-  <link rel="canonical" href="https://meredith2328.github.io/posts/notes/agents/overwrite-incident.html">
+  <link rel="canonical" href="https://meredith2328.github.io/posts/notes/agents/dsh-overwrite-incident.html">
   
   
   <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
@@ -94,9 +94,7 @@
     <h1 class="post-title">DSH有可能覆盖丢失你自己改的文件，记得修一下</h1>
     <div class="post-meta">
       <time datetime="2026-08-14T00:00:00">2026-08-14</time>
-      <span class="post-stats">780 字 · 约 2 分钟</span>
-      
-      <a class="tag-chip" href="../../../index.html#tag=%E5%A5%87%E6%80%AA%E7%9A%84%E4%B8%9C%E8%A5%BF">#奇怪的东西</a>
+      <span class="post-stats">800 字 · 约 2 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=bugfix">#bugfix</a>
       
@@ -112,23 +110,31 @@
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>写博客的时候遇到一件事：我在 Typora 里改好的文章，被 DSH 里的助手在另一个流程里整体重写覆盖了。工具当时提示过文件在外部被修改过，但助手没有停下来确认，直接按自己的版本把文件写了回去。</p>
+<h2 id="经过">经过</h2>
 <p>事情的经过是，我一边用 Typora 编辑那篇 DSH 小工具介绍，一边让助手去给文章补图、调整文字。助手用的是整体重写的方式，写之前工具弹了警告，说文件在我上次读它之后又被外部改过了——那个外部改动就是我在 Typora 里的编辑。正常的做法是停下来重新读一遍，看我的改动是什么，再决定怎么处理。但那次没有，文件直接被覆盖了。</p>
 <p>发现的时候，我在 Typora 里改的内容已经不在文件里。这些改动没进过 git，只存在于磁盘上，覆盖之后就找不回来了——git 的历史、reflog、悬空对象里都没有，因为改动从来没被 git 记录过。</p>
-<p>最后是靠 Typora 的自动备份找回来的。Typora 会把被外部替换过的文件存一份副本，放在 AppData 的 backups 目录里，我在那里翻到了完整版本。</p>
+<p>最后是靠 <strong>Typora 的自动备份</strong>找回来的。Typora 会把被外部替换过的文件存一份副本，放在 AppData 的 backups 目录里，我在那里翻到了完整版本。</p>
+<h2 id="教训">教训</h2>
 <p>这件事有几个值得记的地方。</p>
-<p>工具给的警告是信号。那个"文件在外部被修改"的提示，检测到磁盘内容和上次看到的不一致，说明有别的进程动过文件。遇到这种提示应该停下来确认，而不是继续操作。</p>
+<p>工具给的警告是信号。那个 <strong>"文件在外部被修改"</strong> 的提示，检测到磁盘内容和上次看到的不一致，说明有别的进程动过文件。遇到这种提示应该停下来确认，而不是继续操作。</p>
 <p>改动没进 git 就是脆弱的。编辑器里的内容、磁盘上的文件都只是一份临时状态，可靠的历史得靠版本管理或编辑器自己的自动备份。这次是 Typora 的 backups 兜底，下次未必有这种运气。</p>
-<p>所以我把这条教训固化成了规则。DSH 的全局配置里加了一条硬性约定：写任何已有文件之前必须先读最新内容；工具提示文件被外部改动时立即停止，绝不直接覆盖；重写、覆盖、移动文件之前先备份一份到安全位置。这条规则会注入到以后的每个会话里。</p>
+<p>所以我把这条教训固化成了规则。DSH 的全局配置里加了一条硬性约定：</p>
+<ul>
+<li>写任何已有文件之前，先读最新内容；</li>
+<li>工具提示文件被外部改动时，立即停止，绝不直接覆盖；</li>
+<li>重写、覆盖、移动文件之前，先备份一份到安全位置。</li>
+</ul>
+<p>这条规则会注入到以后的每个会话里。</p>
 <p>跟 AI 协作时，重要的东西要么自己留一份，要么确保有可靠的备份机制。这次运气好找回来了，把教训固化成规则，后面就不容易再犯。</p>
   </div>
 
   
   <nav class="post-nav" aria-label="上一篇 / 下一篇">
     
-    <a class="post-nav-link is-prev" href="../../../posts/notes/agents/dsh-tools.html">← 上一篇<br><span class="post-nav-title">DSH 上线之后我做的几个小工具</span></a>
+    <a class="post-nav-link is-prev" href="../../../posts/toy/10pi.html">← 上一篇<br><span class="post-nav-title">十派的玩具箱有哪些内容？</span></a>
     
     
-    <a class="post-nav-link is-next" href="../../../posts/notes/ml/science-of-dl.html">下一篇 →<br><span class="post-nav-title">深度学习必将拥有一套科学理论 · 翻译</span></a>
+    <a class="post-nav-link is-next" href="../../../posts/notes/agents/dsh-tools.html">下一篇 →<br><span class="post-nav-title">DSH 上线之后我做的几个小工具</span></a>
     
   </nav>
   
