@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>DSH 上线之后我做的几个小工具 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手的东西，整理一下放在这里。 github.com/Meredith2328/dsh-sticky-note 左下角便签：随手记点子/感想/TO">
+  <meta name="description" content="DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手的东西，整理一下放在这里。 顺便整理了我对DSH的“四种模式”的简单理解。 github.com/Meredith2328/dsh-stick">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="DSH 上线之后我做的几个小工具">
-  <meta property="og:description" content="DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手的东西，整理一下放在这里。 github.com/Meredith2328/dsh-sticky-note 左下角便签：随手记点子/感想/TO">
+  <meta property="og:description" content="DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手的东西，整理一下放在这里。 顺便整理了我对DSH的“四种模式”的简单理解。 github.com/Meredith2328/dsh-stick">
   <link rel="canonical" href="https://meredith2328.github.io/posts/toy/dsh-tools.html">
   
   
@@ -94,7 +94,7 @@
     <h1 class="post-title">DSH 上线之后我做的几个小工具</h1>
     <div class="post-meta">
       <time datetime="2026-08-14T00:00:00">2026-08-14</time>
-      <span class="post-stats">1253 字 · 约 3 分钟</span>
+      <span class="post-stats">1447 字 · 约 4 分钟</span>
       
       <a class="tag-chip" href="../../index.html#tag=%E9%A1%B9%E7%9B%AE">#项目</a>
       
@@ -110,39 +110,71 @@
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <p>DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手的东西，整理一下放在这里。</p>
+<p>顺便整理了我对DSH的“四种模式”的简单理解。</p>
 <!-- more -->
 <h2 id="dsh-sticky-note-便签">dsh-sticky-note：便签</h2>
 <p><a href="https://github.com/Meredith2328/dsh-sticky-note">github.com/Meredith2328/dsh-sticky-note</a></p>
-<p>左下角便签：随手记点子/感想/TODO，实时保存到归档目录，清单+悬浮归档。</p>
-<p>功能大概是：Markdown 预览、一套编辑快捷键、草稿复用（继续写同一个文件）、一键发送到对话、历史便签查看/编辑/归档、标记保留防止自动清除。存储是按 点子/感想/TODO/归档 四个子目录分类的 md 文件，落在本地目录里，路径可以在设置里改。</p>
-<p>做的时候比较在意的小交互（都是自己提的需求）：</p>
+<blockquote>
+<p><strong>类似微软原生的便签功能的DSH集成版，支持一些Markdown语法，并且可以快速发送给DSH。</strong></p>
+</blockquote>
+<p>是输入框工具栏左边的一个便签按钮，打开是一个可以拉伸的小面板。</p>
+<p>随手记点子/感想/TODO，实时保存到归档目录。</p>
 <ul>
-<li>单机历史条目 = 预备发送，双击 = 查看；</li>
-<li>状态只在标题右边浅浅地显示一下，不要弹个胶囊出来；</li>
-<li>打开目录的按钮只要个图标，不要那三个字。</li>
+<li>Markdown 预览和一套编辑快捷键</li>
+<li>一键发送到对话</li>
+<li>存储是按 点子/感想/TODO/归档 四个子目录分类，落在本地目录里</li>
+<li>设置里可以修改许多的定制项，比如目录保存在哪里、多久自动保存一次、多久自动删除不用的便签</li>
 </ul>
+<p>顺便合到几个awesome的pr里啦，欢迎大家用用看。</p>
 <h2 id="dsh-sidebar-mode-把模式切换塞进-新会话-按钮">dsh-sidebar-mode：把模式切换塞进「新会话」按钮</h2>
 <p><a href="https://github.com/Meredith2328/dsh-sidebar-mode">github.com/Meredith2328/dsh-sidebar-mode</a></p>
-<p>把默认的四种模式切换塞进「新会话」按钮里，新会话创建更方便。</p>
+<p><strong>把默认的四种模式切换塞进「新会话」按钮里，新会话创建更方便。</strong></p>
 <p><img alt="示意图：新会话按钮内嵌预设标签，点击弹出预设菜单" src="../migrated/post-images/dsh-sidebar-mode.png"/></p>
-<p>点「新会话」按钮里最左边的小字就弹出预设菜单（标准 / PTC / 创造 / 极简，当前项打勾），点选即切换，跟设置里的「Agent 预设」双向同步，新会话页的徽章也跟着变。</p>
+<p>我发现我使用的过程中，根据自己需求、在创建新会话之前首先切换到合适的模式，这样用得还挺频繁。所以做了这样一个小插件，实现这个功能。</p>
+<p>这个小显示和设置里的“Agent预设”，以及新会话里的模式切换都是双向同步的。</p>
 <h2 id="dsh-hotkey-alt-space-唤起-dsh">dsh-hotkey：Alt+Space 唤起 DSH</h2>
 <p><a href="https://github.com/Meredith2328/dsh-hotkey">github.com/Meredith2328/dsh-hotkey</a></p>
-<p>Alt+Space 一键唤起 / 最小化 DeepSeek Harness 的零依赖 Windows 小工具：按一下把最小化的 DSH 窗口唤起并置顶，再按一下最小化，找不到窗口就自动打开 DSH 地址。</p>
+<p><strong>Alt+Space</strong> 一键唤起 / 最小化 DeepSeek Harness 的窗口。</p>
+<p>找不到窗口就自动打开 DSH 地址。</p>
 <p>为什么是独立小工具，而不是 skill / MCP / 插件：</p>
 <ul>
 <li>skill 只是一份给 Agent 的指令文本，不能常驻监听按键。</li>
 <li>MCP / Cordis 插件跑在 Harness 自己的进程或页面里，管不到窗口的最小化 / 恢复，更注册不了操作系统级全局热键。</li>
 <li>全局热键 + 窗口管理必须由 OS 层的常驻进程来做，所以最合适的形式就是一个极小的 Windows 可执行程序（C# 编译，无需安装任何运行时）。</li>
 </ul>
-<h2 id="顺带记一下-dsh-的四种模式">顺带记一下 DSH 的四种模式</h2>
-<p>DSH四种模式省流：</p>
-<ul>
-<li>标准模式：随便用</li>
-<li>PTC模式：用于需要读一堆文件的场景，比如一个大的代码库，或者很多资料文件</li>
-<li>极简模式：不说了</li>
-<li>创造模式：适用于你想改造DSH，例如自己折腾插件等等。我觉得满足折腾需求的比例更多，对开发使用的助益取决于你的折腾的投入产出是否适合你自己</li>
-</ul>
+<h2 id="我对-dsh-默认的四种模式的理解">我对 DSH 默认的四种模式的理解</h2>
+<p>顺便整理了一下我对 DSH 四种模式的理解，省流如下。</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>描述</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标准模式</td>
+<td>随便用</td>
+<td></td>
+</tr>
+<tr>
+<td>PTC模式</td>
+<td>类似标准模式，这个更适用于<strong>需要并行读一堆文件</strong>的场景</td>
+<td>比如一个大的代码库，或者整理很多资料文件</td>
+</tr>
+<tr>
+<td>极简模式</td>
+<td>略</td>
+<td></td>
+</tr>
+<tr>
+<td>创造模式</td>
+<td>适用于你<strong>想改造DSH</strong>，例如自己折腾插件等等</td>
+<td>我觉得暂时来说，满足折腾需求的比例更多，对开发使用的助益取决于你的折腾的投入产出是否适合你自己</td>
+</tr>
+</tbody>
+</table>
   </div>
 
   
