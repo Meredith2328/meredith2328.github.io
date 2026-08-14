@@ -9,15 +9,15 @@
     <generator>pilog</generator>
       <item>
         <title>DSH 上线之后我做的几个小工具</title>
-        <link>https://meredith2328.github.io/posts/toy/dsh-tools.html</link>
-        <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/dsh-tools.html</guid>
+        <link>https://meredith2328.github.io/posts/notes/agents/dsh-tools.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/dsh-tools.html</guid>
         <pubDate>Fri, 14 Aug 2026 00:00:00 -0000</pubDate>
         <description>DSH 上线之后陆陆续续折腾了几个小工具：&lt;strong&gt;便签&lt;/strong&gt;、&lt;strong&gt;新会话按钮内可切换模式&lt;/strong&gt;、&lt;strong&gt;Alt+Space最小化或唤起窗口&lt;/strong&gt;。都是自己用着顺手的东西，整理一下放在这里。 顺便整理了我对DSH的“四种模式”的简单理解。  github.com/Meredith2328/dsh-sticky-note 是输入框工具栏左边的一个便签按钮，打开是一个可以拉伸的小面板。 随手记点子/…</description>
       </item>
       <item>
         <title>DSH有可能覆盖丢失你自己改的文件，记得修一下</title>
-        <link>https://meredith2328.github.io/posts/toy/overwrite-incident.html</link>
-        <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/overwrite-incident.html</guid>
+        <link>https://meredith2328.github.io/posts/notes/agents/overwrite-incident.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/overwrite-incident.html</guid>
         <pubDate>Fri, 14 Aug 2026 00:00:00 -0000</pubDate>
         <description>写博客的时候遇到一件事：我在 Typora 里改好的文章，被 DSH 里的助手在另一个流程里整体重写覆盖了。工具当时提示过文件在外部被修改过，但助手没有停下来确认，直接按自己的版本把文件写了回去。 事情的经过是，我一边用 Typora 编辑那篇 DSH 小工具介绍，一边让助手去给文章补图、调整文字。助手用的是整体重写的方式，写之前工具弹了警告，说文件在我上次读它之后又被外部改过了——那个外部改动就是我在 Typora…</description>
       </item>

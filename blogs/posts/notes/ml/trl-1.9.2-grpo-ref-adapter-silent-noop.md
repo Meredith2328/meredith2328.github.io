@@ -3,6 +3,7 @@ title: 抓到一个会“假装训练”的 bug：TRL 1.9.2 续训 LoRA 时优�
 date: 2026-08-10 18:30:00
 tags:
 - 大模型
+- bugfix
 published: true
 hideInList: false
 feature: null

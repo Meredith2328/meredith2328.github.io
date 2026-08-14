@@ -3,6 +3,7 @@ title: DSH有可能覆盖丢失你自己改的文件，记得修一下
 date: 2026-08-14
 tags:
 - 奇怪的东西
+- bugfix
 published: true
 hideInList: false
 ---

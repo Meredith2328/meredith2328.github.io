@@ -103,6 +103,8 @@
     <input id="filter-more-search" type="search" placeholder="搜索标签…">
     <div class="filter-more-list" id="filter-more-list">
       
+      <button class="tag-chip" type="button" data-tag="bugfix">#bugfix</button>
+      
       <button class="tag-chip" type="button" data-tag="CS336">#CS336</button>
       
       <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
@@ -166,9 +168,9 @@
       </a>
     </article>
     
-    <article class="card" data-tags="项目 " data-folder="posts/toy" data-date="2026-08-14">
+    <article class="card" data-tags="项目 " data-folder="posts/notes/agents" data-date="2026-08-14">
       
-      <a class="card-link" href="posts/toy/dsh-tools.html">
+      <a class="card-link" href="posts/notes/agents/dsh-tools.html">
         <div class="card-body">
           <div class="card-meta">
             <span class="card-meta-left">
@@ -178,7 +180,7 @@
             
             
             <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/toy">toy</button>
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/agents">agents</button>
             </span>
             
           </div>
@@ -200,9 +202,9 @@
       </a>
     </article>
     
-    <article class="card" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2026-08-14">
+    <article class="card" data-tags="奇怪的东西 bugfix " data-folder="posts/notes/agents" data-date="2026-08-14">
       
-      <a class="card-link" href="posts/toy/overwrite-incident.html">
+      <a class="card-link" href="posts/notes/agents/overwrite-incident.html">
         <div class="card-body">
           <div class="card-meta">
             <span class="card-meta-left">
@@ -212,7 +214,7 @@
             
             
             <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/toy">toy</button>
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/agents">agents</button>
             </span>
             
           </div>
@@ -223,6 +225,8 @@
           <div class="card-tags">
             
             <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
+            
+            <button class="tag-chip" type="button" data-tag="bugfix">#bugfix</button>
             
           </div>
         </div>
@@ -264,7 +268,7 @@
       </a>
     </article>
     
-    <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-08-10">
+    <article class="card" data-tags="大模型 bugfix " data-folder="posts/notes/ml" data-date="2026-08-10">
       
       <a class="card-link" href="posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html">
         <div class="card-body">
@@ -287,6 +291,8 @@
           <div class="card-tags">
             
             <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
+            
+            <button class="tag-chip" type="button" data-tag="bugfix">#bugfix</button>
             
           </div>
         </div>
@@ -785,6 +791,43 @@
               
         
           
+          <li class="tree-folder is-open" data-path="posts/notes/agents">
+            <div class="tree-row" role="button" tabindex="0">
+              <span class="tree-toggle">▼</span>
+              <img class="tree-icon-img tree-icon-folder" src="img/pixel-folder.svg" alt="folder">
+              <span class="tree-name">agents</span>
+            </div>
+            <ul class="tree-children">
+              
+        
+          
+          <li class="tree-file" data-path="posts/notes/agents/dsh-tools">
+            <a class="tree-row" href="posts/notes/agents/dsh-tools.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
+              <span class="tree-name">DSH 上线之后我做的几个小工具</span>
+              <span class="tree-date">2026-08-14</span>
+            </a>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/notes/agents/overwrite-incident">
+            <a class="tree-row" href="posts/notes/agents/overwrite-incident.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
+              <span class="tree-name">DSH有可能覆盖丢失你自己改的文件，记得修一下</span>
+              <span class="tree-date">2026-08-14</span>
+            </a>
+          </li>
+          
+        
+      
+            </ul>
+          </li>
+          
+        
+          
           <li class="tree-folder" data-path="posts/notes/algo">
             <div class="tree-row" role="button" tabindex="0">
               <span class="tree-toggle">▼</span>
@@ -1091,17 +1134,6 @@
           
         
           
-          <li class="tree-file" data-path="posts/toy/dsh-tools">
-            <a class="tree-row" href="posts/toy/dsh-tools.html">
-              <span class="tree-toggle tree-toggle-empty"></span>
-              <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
-              <span class="tree-name">DSH 上线之后我做的几个小工具</span>
-              <span class="tree-date">2026-08-14</span>
-            </a>
-          </li>
-          
-        
-          
           <li class="tree-file" data-path="posts/toy/freshdan">
             <a class="tree-row" href="posts/toy/freshdan.html">
               <span class="tree-toggle tree-toggle-empty"></span>
@@ -1141,17 +1173,6 @@
               <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
               <span class="tree-name">做了一个叫notegotya的五线谱识谱练习玩具</span>
               <span class="tree-date">2026-05-16</span>
-            </a>
-          </li>
-          
-        
-          
-          <li class="tree-file" data-path="posts/toy/overwrite-incident">
-            <a class="tree-row" href="posts/toy/overwrite-incident.html">
-              <span class="tree-toggle tree-toggle-empty"></span>
-              <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
-              <span class="tree-name">DSH有可能覆盖丢失你自己改的文件，记得修一下</span>
-              <span class="tree-date">2026-08-14</span>
             </a>
           </li>
           
