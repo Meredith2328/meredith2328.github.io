@@ -9,7 +9,9 @@ hideInList: false
 
 写博客的时候遇到一件事：我在 Typora 里改好的文章，被 DSH 里的助手在另一个流程里整体重写覆盖了。工具当时提示过文件在外部被修改过，但助手没有停下来确认，直接按自己的版本把文件写了回去。
 
-> BUG概述：（版本为最新版 `v0.1.0-rc.6` ）
+相关讨论：[DeepSeek Harness Discussion #1236](https://github.com/deepseek-ai/deepseek-harness/discussions/1236)
+
+> BUG概述：（DSH版本为最新版 `v0.1.0-rc.6` ）
 >
 > - 它的 `write` 首先被 `Error: cannot write`挡了一下，
 >
