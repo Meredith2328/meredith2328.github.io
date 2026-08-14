@@ -58,12 +58,15 @@
       copyText((code || pre).textContent.replace(/\n$/, ""), btn);
     });
 
-    // language / file tag from the fence info (```python, ```rust title=train.py)
+    // language / file tag from the fence info (```python, ```rust title=train.py);
+    // shown as a trapezoid tab hanging above the block's top-left corner, so the
+    // wrapper reserves the overhang space via .has-lang
     var lang = pre.getAttribute("data-lang");
     if (lang) {
       var tag = document.createElement("span");
       tag.className = "code-lang";
       tag.textContent = lang;
+      wrap.classList.add("has-lang");
       wrap.insertBefore(tag, btn);
     }
 

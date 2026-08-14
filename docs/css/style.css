@@ -1733,16 +1733,21 @@ a:hover {
   margin: 0 0 1.2em;
 }
 
+/* a language-tagged block gets room for the tab that hangs above its top edge */
+.code-block.has-lang {
+  margin-top: 32px;
+}
+
 .code-block pre {
   margin: 0;
   /* reserve a slim top strip so the copy button sits inside the block
      without ever overlapping the code */
-  padding-top: 34px;
+  padding-top: 28px;
 }
 
 .code-copy {
   position: absolute;
-  top: 7px;
+  top: 4px;
   right: 7px;
   z-index: 2;
   font-family: var(--font-mono);
@@ -1780,15 +1785,26 @@ a:hover {
 }
 
 .code-lang {
+  /* trapezoid tab like a browser tab, hanging outside the block at the
+     top-left corner; the bottom (narrow) edge meets the block's top border */
   position: absolute;
-  top: 8px;
-  left: 10px;
-  z-index: 2;
+  top: -25px;
+  left: 0;
+  z-index: 3;
+  max-width: calc(100% - 8px);
+  padding: 6px 16px 7px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--text);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--paper);
+  background: var(--ink);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 9px 100%);
+  filter: drop-shadow(3px 3px 0 var(--shadow));
 }
 
 .code-block.is-long pre {
