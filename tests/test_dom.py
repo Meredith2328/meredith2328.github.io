@@ -423,17 +423,30 @@ def main() -> None:
         # code language labels + long block collapse
         page.goto(base + "/posts/notes/ml/TensorZero-6949.html", wait_until="networkidle")
         ok &= check("code lang labels", page.locator(".code-lang").count() >= 3)
+        ok &= check("lang tabs reserve top margin", page.locator(".code-block.has-lang").count() >= 3)
         page.goto(base + "/posts/notes/algo/algorithm-3.html", wait_until="networkidle")
         ok &= check("long code collapsible", page.locator(".code-block.is-long .code-more").count() >= 1)
         page.locator(".code-block.is-long .code-more").first.click()
         page.wait_for_timeout(200)
         ok &= check("long code expands", page.locator(".code-block.is-long.is-open").count() >= 1)
 
-        # image lightbox
+        # post images are wrapped in a loading placeholder; none stay "loading"
+        # once the page has settled
         page.goto(base + "/posts/courses/csapp/csapp-cachelab.html", wait_until="networkidle")
+        ok &= check("img loading wrappers present", page.locator(".post-body .img-loading").count() >= 1)
+        ok &= check("img loading hint cleared", page.locator(".post-body .img-loading.is-loading").count() == 0)
+
+        # image lightbox: opens, the enlarged image loads and its loading
+        # hint is removed again
         page.locator(".post-body img").first.click()
         page.wait_for_timeout(300)
         ok &= check("lightbox opens", page.locator(".lightbox").count() == 1)
+        big_loaded = page.evaluate(
+            "document.querySelector('.lightbox img')"
+            " ? document.querySelector('.lightbox img').naturalWidth > 0 : false"
+        )
+        ok &= check("lightbox image loaded", big_loaded)
+        ok &= check("lightbox hint cleared after load", page.locator(".lightbox-hint").count() == 0)
         page.keyboard.press("Escape")
         page.wait_for_timeout(200)
         ok &= check("lightbox closes on Esc", page.locator(".lightbox").count() == 0)
