@@ -5,7 +5,8 @@ tags:
 - 大模型
 published: true
 hideInList: false
-feature: null
+preview_image: notes-mup-stability.png
+feature: notes-mup-stability.png
 isTop: false
 
 ---
@@ -127,8 +128,6 @@ isTop: false
 ### μP：一个理论指导实践的典范
 
 理论社区里有一个著名的例子，叫做**最大更新参数化**（Maximal Update Parameterization，简称μP）。μP催生了一种叫**μTransfer**的技术：把某些超参数（比如学习率）从小模型"迁移"到更大的模型上。这项技术取得了突破性的成功，被广泛使用，现在已经融入了人们思考模型扩展的方式。
-
-![μP 的效果：标准实践（Standard Practice）下最优学习率随模型宽度漂移，而 μP（Our Work）下保持稳定](notes-mup-stability.png)
 
 ### 每个实践者都遇到过的问题
 
