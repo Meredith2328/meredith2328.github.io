@@ -182,37 +182,48 @@ class Solution:
         return res
 ```
 
-79 单词搜索
 
-退出条件，保存，选择，回溯。
 
-```
+[79. 单词搜索](https://leetcode.cn/problems/word-search/)
+
+对于单词搜索问题，我们需要以整个棋盘的每个点为起点，搜索所有可能的路径（如DFS）。
+
+为了剪枝不可行的路径（下述好几处提前返回都起到剪枝的作用），我们需要维护 `visited` 数组。我们利用相应位置的特殊字符来变相维护 `visited` 数组。但是，**由于节点需要重复使用，我们需要“回溯”：在标记 `visited` 之前保存原状态，用完之后恢复原状态。**
+
+这道题最有趣的是考虑复杂度。
+
+- 时间复杂度：$O(m \times n \times 3^L)$ ，其中 $m$ 和 $n$ 是二维网格 `board` 的行数和列数，$L$ 是 `word` 的长度。这是因为，我们需要以每个点为起点，而在搜索过程中由于剪枝，来的方向一定此时已经被标记为 `#` 了，所以实际上只有3个方向可选。这是一个很宽松的上界。
+- 空间复杂度：$O(L)$ ，因为我们省去了额外开 `visited` 数组，但是递归栈的深度取决于 `word` 的长度。
+
+```python
 class Solution:
     def exist(self, board: List[List[str]], word: str) -> bool:
+        DIR = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         m, n = len(board), len(board[0])
-        dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-        def backtrack(i, j, cur):
-            if cur == len(word):
-                return True
-            if i < 0 or i >= m or j < 0 or j >= n or board[i][j] != word[cur]:
+        
+        def dfs(x, y, cur):
+            if board[x][y] != word[cur]:
                 return False
-
-            tmp = board[i][j]
-            board[i][j] = '#'
-            found = 0
-            for dx, dy in dirs:
-                nx, ny = i + dx, j + dy
-                found += backtrack(nx, ny, cur + 1)
-            board[i][j] = tmp
-            return found != 0
-
+            if cur == len(word) - 1:
+                return True
+            tmp = board[x][y]                     # 这三行是visited数组的逻辑
+            board[x][y] = '#'                     # 最重要!
+            for dx, dy in DIR:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < m and 0 <= ny < n:
+                    if dfs(nx, ny, cur + 1):
+                        return True
+            board[x][y] = tmp                     # 一定要记得回溯 (前保存, 后恢复) 哦
+            return False
+        
         for i in range(m):
             for j in range(n):
-                if backtrack(i, j, 0):
+                if dfs(i, j, 0):
                     return True
         return False
 ```
+
+
 
 131 分割回文串
 
@@ -476,36 +487,34 @@ class Solution:
 
 ### 专题12 栈
 
-20 有效的括号
+[20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/)
 
-注意在使用下标前先做是否为空的判断，这个是容易漏掉的。
+这道题单纯括号匹配本身是容易想到的（栈），在此基础上要记得奇数时的剪枝、以及栈的判空。
 
-```
+> 为了把对应关系写得好写一些，我们往往使用正排/倒排的哈希表。
+
+时间复杂度为 $O(n)$ ，空间复杂度为 $O(n+|\Sigma|)$ ，其中 $|\Sigma|$ 是词汇表个数（如本题的 $|\Sigma|=6$ ）。
+
+```python
 class Solution:
     def isValid(self, s: str) -> bool:
-        stk = []
-        for c in s:
-            if c == '(' or c == '[' or c == '{':
-                stk.append(c)
-            elif c == ')':
-                if stk and stk[-1] == '(':
-                    stk.pop()
-                else:
-                    return False
-            elif c == ']':
-                if stk and stk[-1] == '[':
-                    stk.pop()
-                else:
-                    return False
-            elif c == '}':
-                if stk and stk[-1] == '{':
-                    stk.pop()
-                else:
-                    return False
-        if stk:
+        if len(s) % 2 == 1:
             return False
-        else:
-            return True
+        stk = []
+        pair = {
+            '(': ')',
+            '[': ']',
+            '{': '}'
+        }
+        for ch in s:
+            if ch in pair:
+                stk.append(ch)
+            else:
+                if stk and pair[stk[-1]] == ch:
+                    stk.pop()
+                else:
+                    return False
+        return not stk
 ```
 
 155 最小栈
@@ -1316,6 +1325,36 @@ class Solution:
         return dp[m][n]
 ```
 
+
+
+[312. 戳气球](https://leetcode.cn/problems/burst-balloons/)
+
+十分经典的一道题目，其关键是把戳气球问题，转化为**开区间 `(i, j)` 的遍历问题**。
+
+对于开区间 `(i, j)` ，`dp[i][j]` 表示这一段区间里戳气球能够得到的最大得分。
+
+拆成最优子问题，即以 $k \in (i, j)$ 为划分点，左右两段的最大得分、加上当前划分点对应的得分。
+
+> 区间遍历的写法：最外层遍历长度、内层循环遍历起始点。
+
+时间复杂度：$O(n^3)$ 。空间复杂度：$O(n^2)$ 。
+
+```python
+class Solution:
+    def maxCoins(self, nums: List[int]) -> int:
+        points = [1] + nums + [1]
+        n = len(points)
+        dp = [[0] * n for _ in range(n)]
+        for length in range(2, n): # 开区间 (i, j)
+            for i in range(0, n - length):
+                j = i + length
+                for k in range(i + 1, j):
+                    dp[i][j] = max(dp[i][j], points[i] * points[k] * points[j] + dp[i][k] + dp[k][j])
+        return dp[0][n - 1]
+```
+
+
+
 ### 专题17 技巧
 
 136 只出现一次的数字
@@ -1437,9 +1476,53 @@ class Solution:
             self.reverseNums(nums, 0, len(nums) - 1)
 ```
 
-287 寻找重复数
+[287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
 
-利用二分进行值域查找。重复数位于的区间性质是“个数比元素值大”。
+方法一：**原地哈希**。即利用数组的值作为索引，**映射**到数组自身。如果有两个不同的数组元素映射到相同的位置（我们可以通过负值判断），则该位置就是我们所求的重复数。
+
+既然要作为索引，我们所有使用和返回的值都应该是负值的绝对值。
+
+时间复杂度：$O(n)$ ，空间复杂度：$O(1)$ 。
+
+```python
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        n = len(nums)
+        for i in range(n):
+            absval = abs(nums[i])
+            if nums[absval] < 0:
+                return absval
+            nums[absval] = -nums[absval]
+        return -1
+```
+
+方法二：**快慢指针**。同样用映射的思想，我们可以把数组理解成链表，那么重复数就意味着**有两个指针在链表上映射到了同一个节点**，也即链表有**环**。从而我们只要：
+
+- 首先用快慢指针找到相遇点，
+- 然后用一个指针指向起点、另一个指针指向相遇点，两个指针速度相同（均为慢指针），
+- 它们再次相遇的位置就是环入口。
+
+时间复杂度：$O(n)$ ，空间复杂度：$O(1)$ 。
+
+```python
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        slow, fast = nums[0], nums[0]
+        while True:                  # 至少执行一次, 排除掉一开始相同的情况
+            slow = nums[slow]        # x = nums[x]相当于x = x.next, 反正是映射了一次
+            fast = nums[nums[fast]]
+            if slow == fast:
+                break
+        slow = nums[0]
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[fast]
+        return slow
+```
+
+另外还有一种方式是利用二分进行值域查找。重复数所位于的区间性质是“个数比元素值大”。
+
+时间复杂度：$O(n \log n)$ ，空间复杂度：$O(1)$ 。
 
 ```
 class Solution:

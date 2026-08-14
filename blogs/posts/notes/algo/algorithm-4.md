@@ -2094,43 +2094,62 @@ class Solution:
         return count == numCourses
 ```
 
-208 实现Trie (前缀树)
 
-```
+
+[208. 实现 Trie (前缀树)](https://leetcode.cn/problems/implement-trie-prefix-tree/)
+
+> Trie树把“**字符串存在**”和“**树上某个位置的节点存在**”一一对应起来了。
+
+脑补一下前缀树会发现它是一个十分有意思的东西：共用前缀的字符串一定共用前缀这一段路径。
+
+我们对每个字符串的操作都是通过遍历字符串完成的，所以每个节点可以通向的节点应该对应字符的所有情况（$|\Sigma|=26$）。
+
+因此，存在前缀就是存在相应的节点；存在字符串就是存在相应的节点且该节点可以作为字符串末尾。
+
+时间复杂度：`insert`、`search` 、`startswith` 、`_findNode` 均为 $O(L)$ 。
+
+空间复杂度：`insert` 为 $O(L)$ ，其余三个函数均为 $O(1)$ 。如果总共存储 $N$ 个字符串，则总复杂度上界为 $O(NL)$ 。
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
 class Trie:
 
     def __init__(self):
-        self.root = {}
+        self.root = TrieNode()
 
     def insert(self, word: str) -> None:
         node = self.root
         for ch in word:
-            if ch not in node:
-                node[ch] = {}
-            node = node[ch]
-        # 表示存在恰好停在这里的单词
-        node['$'] = True
+            if ch not in node.children:
+                node.children[ch] = TrieNode()
+            node = node.children[ch]
+        node.is_end = True
 
     def search(self, word: str) -> bool:
-        node = self._find_node(word)
-        return node is not None and '$' in node
+        node = self._findNode(word)
+        return node is not None and node.is_end
 
     def startsWith(self, prefix: str) -> bool:
-        return self._find_node(prefix) is not None
+        node = self._findNode(prefix)
+        return node is not None
 
-    def _find_node(self, prefix):
+    def _findNode(self, prefix: str) -> TrieNode:
         node = self.root
-        for ch in prefix:
-            if ch not in node:
+        for ch in prefix: # O(L)
+            if ch not in node.children:
                 return None
-            node = node[ch]
+            node = node.children[ch]
         return node
 
 
-        # Your Trie object will be instantiated and called as such:
-        # obj = Trie()
-        # obj.insert(word)
-        # param_2 = obj.search(word)
+# Your Trie object will be instantiated and called as such:
+# obj = Trie()
+# obj.insert(word)
+# param_2 = obj.search(word)
 # param_3 = obj.startsWith(prefix)
 ```
 

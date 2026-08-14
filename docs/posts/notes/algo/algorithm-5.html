@@ -94,7 +94,7 @@
     <h1 class="post-title">数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）</h1>
     <div class="post-meta">
       <time datetime="2026-03-02T00:00:00">2026-03-02</time>
-      <span class="post-stats">5200 字 · 约 12 分钟</span>
+      <span class="post-stats">6468 字 · 约 15 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -262,33 +262,39 @@
         backtrack([], 0, 0)
         return res
 </code></pre></div>
-<p>79 单词搜索</p>
-<p>退出条件，保存，选择，回溯。</p>
-<div class="highlight"><pre><span></span><code>class Solution:
-    def exist(self, board: List[List[str]], word: str) -&gt; bool:
-        m, n = len(board), len(board[0])
-        dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+<p><a href="https://leetcode.cn/problems/word-search/">79. 单词搜索</a></p>
+<p>对于单词搜索问题，我们需要以整个棋盘的每个点为起点，搜索所有可能的路径（如DFS）。</p>
+<p>为了剪枝不可行的路径（下述好几处提前返回都起到剪枝的作用），我们需要维护 <code>visited</code> 数组。我们利用相应位置的特殊字符来变相维护 <code>visited</code> 数组。但是，<strong>由于节点需要重复使用，我们需要“回溯”：在标记 <code>visited</code> 之前保存原状态，用完之后恢复原状态。</strong></p>
+<p>这道题最有趣的是考虑复杂度。</p>
+<ul>
+<li>时间复杂度：<span class="arithmatex">\(O(m \times n \times 3^L)\)</span> ，其中 <span class="arithmatex">\(m\)</span> 和 <span class="arithmatex">\(n\)</span> 是二维网格 <code>board</code> 的行数和列数，<span class="arithmatex">\(L\)</span> 是 <code>word</code> 的长度。这是因为，我们需要以每个点为起点，而在搜索过程中由于剪枝，来的方向一定此时已经被标记为 <code>#</code> 了，所以实际上只有3个方向可选。这是一个很宽松的上界。</li>
+<li>空间复杂度：<span class="arithmatex">\(O(L)\)</span> ，因为我们省去了额外开 <code>visited</code> 数组，但是递归栈的深度取决于 <code>word</code> 的长度。</li>
+</ul>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">DIR</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        def backtrack(i, j, cur):
-            if cur == len(word):
-                return True
-            if i &lt; 0 or i &gt;= m or j &lt; 0 or j &gt;= n or board[i][j] != word[cur]:
-                return False
+        <span class="k">def</span><span class="w"> </span><span class="nf">dfs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cur</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">!=</span> <span class="n">word</span><span class="p">[</span><span class="n">cur</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">cur</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span>                     <span class="c1"># 这三行是visited数组的逻辑</span>
+            <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'#'</span>                     <span class="c1"># 最重要!</span>
+            <span class="k">for</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="ow">in</span> <span class="n">DIR</span><span class="p">:</span>
+                <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">dy</span>
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">nx</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">ny</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">dfs</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">cur</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>                     <span class="c1"># 一定要记得回溯 (前保存, 后恢复) 哦</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
-            tmp = board[i][j]
-            board[i][j] = '#'
-            found = 0
-            for dx, dy in dirs:
-                nx, ny = i + dx, j + dy
-                found += backtrack(nx, ny, cur + 1)
-            board[i][j] = tmp
-            return found != 0
-
-        for i in range(m):
-            for j in range(n):
-                if backtrack(i, j, 0):
-                    return True
-        return False
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">dfs</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
 </code></pre></div>
 <p>131 分割回文串</p>
 <div class="highlight"><pre><span></span><code>class Solution:
@@ -499,33 +505,31 @@
         return 0
 </code></pre></div>
 </div><div class="post-chapter" data-ch="4" data-title="专题12 栈"><h3 id="专题12-栈">专题12 栈</h3>
-<p>20 有效的括号</p>
-<p>注意在使用下标前先做是否为空的判断，这个是容易漏掉的。</p>
-<div class="highlight"><pre><span></span><code>class Solution:
-    def isValid(self, s: str) -&gt; bool:
-        stk = []
-        for c in s:
-            if c == '(' or c == '[' or c == '{':
-                stk.append(c)
-            elif c == ')':
-                if stk and stk[-1] == '(':
-                    stk.pop()
-                else:
-                    return False
-            elif c == ']':
-                if stk and stk[-1] == '[':
-                    stk.pop()
-                else:
-                    return False
-            elif c == '}':
-                if stk and stk[-1] == '{':
-                    stk.pop()
-                else:
-                    return False
-        if stk:
-            return False
-        else:
-            return True
+<p><a href="https://leetcode.cn/problems/valid-parentheses/">20. 有效的括号</a></p>
+<p>这道题单纯括号匹配本身是容易想到的（栈），在此基础上要记得奇数时的剪枝、以及栈的判空。</p>
+<blockquote>
+<p>为了把对应关系写得好写一些，我们往往使用正排/倒排的哈希表。</p>
+</blockquote>
+<p>时间复杂度为 <span class="arithmatex">\(O(n)\)</span> ，空间复杂度为 <span class="arithmatex">\(O(n+|\Sigma|)\)</span> ，其中 <span class="arithmatex">\(|\Sigma|\)</span> 是词汇表个数（如本题的 <span class="arithmatex">\(|\Sigma|=6\)</span> ）。</p>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isValid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">stk</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">'('</span><span class="p">:</span> <span class="s1">')'</span><span class="p">,</span>
+            <span class="s1">'['</span><span class="p">:</span> <span class="s1">']'</span><span class="p">,</span>
+            <span class="s1">'{'</span><span class="p">:</span> <span class="s1">'}'</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">:</span>
+                <span class="n">stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">stk</span> <span class="ow">and</span> <span class="n">pair</span><span class="p">[</span><span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">==</span> <span class="n">ch</span><span class="p">:</span>
+                    <span class="n">stk</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="n">stk</span>
 </code></pre></div>
 <p>155 最小栈</p>
 <p>如果要有额外的功能，则添加额外的数据结构。</p>
@@ -1167,6 +1171,26 @@
 
         return dp[m][n]
 </code></pre></div>
+<p><a href="https://leetcode.cn/problems/burst-balloons/">312. 戳气球</a></p>
+<p>十分经典的一道题目，其关键是把戳气球问题，转化为<strong>开区间 <code>(i, j)</code> 的遍历问题</strong>。</p>
+<p>对于开区间 <code>(i, j)</code> ，<code>dp[i][j]</code> 表示这一段区间里戳气球能够得到的最大得分。</p>
+<p>拆成最优子问题，即以 <span class="arithmatex">\(k \in (i, j)\)</span> 为划分点，左右两段的最大得分、加上当前划分点对应的得分。</p>
+<blockquote>
+<p>区间遍历的写法：最外层遍历长度、内层循环遍历起始点。</p>
+</blockquote>
+<p>时间复杂度：<span class="arithmatex">\(O(n^3)\)</span> 。空间复杂度：<span class="arithmatex">\(O(n^2)\)</span> 。</p>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maxCoins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">nums</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span> <span class="c1"># 开区间 (i, j)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">length</span><span class="p">):</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">length</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">points</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">dp</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="9" data-title="专题17 技巧"><h3 id="专题17-技巧">专题17 技巧</h3>
 <p>136 只出现一次的数字</p>
 <p>把出现偶数次的用异或消除掉。</p>
@@ -1260,8 +1284,43 @@
         if not exist:
             self.reverseNums(nums, 0, len(nums) - 1)
 </code></pre></div>
-<p>287 寻找重复数</p>
-<p>利用二分进行值域查找。重复数位于的区间性质是“个数比元素值大”。</p>
+<p><a href="https://leetcode.cn/problems/find-the-duplicate-number/">287. 寻找重复数</a></p>
+<p>方法一：<strong>原地哈希</strong>。即利用数组的值作为索引，<strong>映射</strong>到数组自身。如果有两个不同的数组元素映射到相同的位置（我们可以通过负值判断），则该位置就是我们所求的重复数。</p>
+<p>既然要作为索引，我们所有使用和返回的值都应该是负值的绝对值。</p>
+<p>时间复杂度：<span class="arithmatex">\(O(n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findDuplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">absval</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">absval</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">absval</span>
+            <span class="n">nums</span><span class="p">[</span><span class="n">absval</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">nums</span><span class="p">[</span><span class="n">absval</span><span class="p">]</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</code></pre></div>
+<p>方法二：<strong>快慢指针</strong>。同样用映射的思想，我们可以把数组理解成链表，那么重复数就意味着<strong>有两个指针在链表上映射到了同一个节点</strong>，也即链表有<strong>环</strong>。从而我们只要：</p>
+<ul>
+<li>首先用快慢指针找到相遇点，</li>
+<li>然后用一个指针指向起点、另一个指针指向相遇点，两个指针速度相同（均为慢指针），</li>
+<li>它们再次相遇的位置就是环入口。</li>
+</ul>
+<p>时间复杂度：<span class="arithmatex">\(O(n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findDuplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">slow</span><span class="p">,</span> <span class="n">fast</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>                  <span class="c1"># 至少执行一次, 排除掉一开始相同的情况</span>
+            <span class="n">slow</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">slow</span><span class="p">]</span>        <span class="c1"># x = nums[x]相当于x = x.next, 反正是映射了一次</span>
+            <span class="n">fast</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">nums</span><span class="p">[</span><span class="n">fast</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">slow</span> <span class="o">==</span> <span class="n">fast</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">slow</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">slow</span> <span class="o">!=</span> <span class="n">fast</span><span class="p">:</span>
+            <span class="n">slow</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">slow</span><span class="p">]</span>
+            <span class="n">fast</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">fast</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">slow</span>
+</code></pre></div>
+<p>另外还有一种方式是利用二分进行值域查找。重复数所位于的区间性质是“个数比元素值大”。</p>
+<p>时间复杂度：<span class="arithmatex">\(O(n \log n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
 <div class="highlight"><pre><span></span><code>class Solution:
     def findDuplicate(self, nums: List[int]) -&gt; int:
         # eg. [1, 2, 2, 3, 4]

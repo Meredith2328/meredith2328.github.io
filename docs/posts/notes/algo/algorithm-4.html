@@ -94,7 +94,7 @@
     <h1 class="post-title">数据结构与算法 · 04 · LeetCode HOT 100 in Python（前50）</h1>
     <div class="post-meta">
       <time datetime="2026-03-02T00:00:00">2026-03-02</time>
-      <span class="post-stats">5871 字 · 约 14 分钟</span>
+      <span class="post-stats">6252 字 · 约 14 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -1844,42 +1844,55 @@ class Solution:
                     <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbour</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">count</span> <span class="o">==</span> <span class="n">numCourses</span>
 </code></pre></div>
-<p>208 实现Trie (前缀树)</p>
-<div class="highlight"><pre><span></span><code>class Trie:
+<p><a href="https://leetcode.cn/problems/implement-trie-prefix-tree/">208. 实现 Trie (前缀树)</a></p>
+<blockquote>
+<p>Trie树把“<strong>字符串存在</strong>”和“<strong>树上某个位置的节点存在</strong>”一一对应起来了。</p>
+</blockquote>
+<p>脑补一下前缀树会发现它是一个十分有意思的东西：共用前缀的字符串一定共用前缀这一段路径。</p>
+<p>我们对每个字符串的操作都是通过遍历字符串完成的，所以每个节点可以通向的节点应该对应字符的所有情况（<span class="arithmatex">\(|\Sigma|=26\)</span>）。</p>
+<p>因此，存在前缀就是存在相应的节点；存在字符串就是存在相应的节点且该节点可以作为字符串末尾。</p>
+<p>时间复杂度：<code>insert</code>、<code>search</code> 、<code>startswith</code> 、<code>_findNode</code> 均为 <span class="arithmatex">\(O(L)\)</span> 。</p>
+<p>空间复杂度：<code>insert</code> 为 <span class="arithmatex">\(O(L)\)</span> ，其余三个函数均为 <span class="arithmatex">\(O(1)\)</span> 。如果总共存储 <span class="arithmatex">\(N\)</span> 个字符串，则总复杂度上界为 <span class="arithmatex">\(O(NL)\)</span> 。</p>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TrieNode</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_end</span> <span class="o">=</span> <span class="kc">False</span>
 
-    def __init__(self):
-        self.root = {}
+<span class="k">class</span><span class="w"> </span><span class="nc">Trie</span><span class="p">:</span>
 
-    def insert(self, word: str) -&gt; None:
-        node = self.root
-        for ch in word:
-            if ch not in node:
-                node[ch] = {}
-            node = node[ch]
-        # 表示存在恰好停在这里的单词
-        node['$'] = True
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">TrieNode</span><span class="p">()</span>
 
-    def search(self, word: str) -&gt; bool:
-        node = self._find_node(word)
-        return node is not None and '$' in node
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">word</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">TrieNode</span><span class="p">()</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">is_end</span> <span class="o">=</span> <span class="kc">True</span>
 
-    def startsWith(self, prefix: str) -&gt; bool:
-        return self._find_node(prefix) is not None
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_findNode</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">is_end</span>
 
-    def _find_node(self, prefix):
-        node = self.root
-        for ch in prefix:
-            if ch not in node:
-                return None
-            node = node[ch]
-        return node
+    <span class="k">def</span><span class="w"> </span><span class="nf">startsWith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_findNode</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_findNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrieNode</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">:</span> <span class="c1"># O(L)</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">node</span>
 
 
-        # Your Trie object will be instantiated and called as such:
-        # obj = Trie()
-        # obj.insert(word)
-        # param_2 = obj.search(word)
-# param_3 = obj.startsWith(prefix)
+<span class="c1"># Your Trie object will be instantiated and called as such:</span>
+<span class="c1"># obj = Trie()</span>
+<span class="c1"># obj.insert(word)</span>
+<span class="c1"># param_2 = obj.search(word)</span>
+<span class="c1"># param_3 = obj.startsWith(prefix)</span>
 </code></pre></div>
 </div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-3.html" title="上一篇">← 03 模板整理</a><a class="post-rel-link" href="algorithm-5.html" title="下一篇">05 HOT 100（后 50） →</a></div></aside>
   </div>
