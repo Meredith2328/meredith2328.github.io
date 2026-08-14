@@ -1862,6 +1862,54 @@ a:hover {
   }
 }
 
+/* ---------- post image loading placeholder ---------- */
+
+/* while an image has not loaded yet, the browser collapses the <img> to a
+   tiny 4px dot; wrap it so we can show an explicit "loading…" hint instead */
+.post-body .img-loading {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.2em auto;
+  border: var(--border);
+  background: var(--panel);
+}
+
+.post-body .img-loading.is-loading {
+  min-width: 240px;
+  min-height: 160px;
+}
+
+.post-body .img-loading.is-loading::before {
+  content: "图片正在加载中...";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--mute);
+}
+
+/* hide the collapsing 4px dot; the image fades in once it has loaded */
+.post-body .img-loading.is-loading img {
+  opacity: 0;
+}
+
+.post-body .img-loading img {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: 0;
+  border: none;
+  background: none;
+  transition: opacity 0.25s ease;
+}
+
 /* ---------- image lightbox ---------- */
 
 .lightbox {
@@ -1881,6 +1929,13 @@ a:hover {
   max-height: 94vh;
   background: var(--paper);
   box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+.lightbox-hint {
+  position: absolute;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ---------- random post dice ---------- */
