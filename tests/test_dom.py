@@ -372,9 +372,13 @@ def main() -> None:
         ok &= check("mobile TOC toggle visible", page.locator(".toc-toggle").is_visible())
         ok &= check("mobile TOC panel hidden by default",
                     page.locator("#post-toc.is-open").count() == 0)
+        ok &= check("mobile TOC arrow points left when closed",
+                    page.locator(".toc-toggle").inner_text() == "◀")
         page.click(".toc-toggle")
         page.wait_for_timeout(450)
         ok &= check("mobile TOC panel opens", page.locator("#post-toc.is-open").count() == 1)
+        ok &= check("mobile TOC arrow points right when open",
+                    page.locator(".toc-toggle").inner_text() == "▶")
         page.click(".toc-toggle")
         page.wait_for_timeout(450)
         ok &= check("mobile TOC panel closes again", page.locator("#post-toc.is-open").count() == 0)

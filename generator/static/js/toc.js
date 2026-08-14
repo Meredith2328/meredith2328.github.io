@@ -46,19 +46,22 @@
   var links = toc.querySelectorAll("a");
 
   // narrow screens hide the side TOC; provide a floating toggle button on the
-  // right edge that slides the TOC panel out / tucks it back in
+  // right edge that slides the TOC panel out / tucks it back in. The arrow
+  // points left while closed (panel slides in from the right) and right while
+  // open (click to tuck it back)
   var toggle = document.createElement("button");
   toggle.type = "button";
   toggle.className = "toc-toggle";
   toggle.setAttribute("aria-label", "打开目录");
   toggle.setAttribute("aria-expanded", "false");
   toggle.title = "目录";
-  toggle.textContent = "☰";
+  toggle.textContent = "◀";
   document.body.appendChild(toggle);
 
   function setTocOpen(open) {
     toc.classList.toggle("is-open", open);
     toggle.classList.toggle("is-active", open);
+    toggle.textContent = open ? "▶" : "◀";
     toggle.setAttribute("aria-label", open ? "收起目录" : "打开目录");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
   }
