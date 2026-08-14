@@ -366,6 +366,27 @@ def main() -> None:
         ok &= check("TOC second click reaches first section",
                     dist2 < 180, f"dist {dist2}")
 
+        # narrow screens: a floating toggle button slides the TOC panel out/in
+        page.set_viewport_size({"width": 390, "height": 844})
+        page.wait_for_timeout(300)
+        ok &= check("mobile TOC toggle visible", page.locator(".toc-toggle").is_visible())
+        ok &= check("mobile TOC panel hidden by default",
+                    page.locator("#post-toc.is-open").count() == 0)
+        page.click(".toc-toggle")
+        page.wait_for_timeout(450)
+        ok &= check("mobile TOC panel opens", page.locator("#post-toc.is-open").count() == 1)
+        page.click(".toc-toggle")
+        page.wait_for_timeout(450)
+        ok &= check("mobile TOC panel closes again", page.locator("#post-toc.is-open").count() == 0)
+        page.click(".toc-toggle")
+        page.wait_for_timeout(450)
+        page.locator("#post-toc a").first.click()
+        page.wait_for_timeout(600)
+        ok &= check("mobile TOC collapses after jumping",
+                    page.locator("#post-toc.is-open").count() == 0)
+        page.set_viewport_size({"width": 1440, "height": 1000})
+        page.wait_for_timeout(200)
+
         # prev/next post navigation (card order, wraps at the ends)
         page.goto(base + "/posts/notes/ml/trl-1.9.2-grpo-ref-adapter-silent-noop.html",
                   wait_until="networkidle")

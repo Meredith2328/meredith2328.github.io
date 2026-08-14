@@ -45,6 +45,32 @@
 
   var links = toc.querySelectorAll("a");
 
+  // narrow screens hide the side TOC; provide a floating toggle button on the
+  // right edge that slides the TOC panel out / tucks it back in
+  var toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "toc-toggle";
+  toggle.setAttribute("aria-label", "打开目录");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.title = "目录";
+  toggle.textContent = "☰";
+  document.body.appendChild(toggle);
+
+  function setTocOpen(open) {
+    toc.classList.toggle("is-open", open);
+    toggle.classList.toggle("is-active", open);
+    toggle.setAttribute("aria-label", open ? "收起目录" : "打开目录");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  toggle.addEventListener("click", function () {
+    setTocOpen(!toc.classList.contains("is-open"));
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") setTocOpen(false);
+  });
+
   // hover "#" anchor links on every heading (deep-linkable section anchors)
   body.querySelectorAll("h1, h2, h3, h4").forEach(function (h) {
     if (!h.id) return;
@@ -86,9 +112,13 @@
     var h = document.getElementById(a.getAttribute("href").slice(1));
     if (!h) return;
     if (window.pilogPager && window.pilogPager.jumpToHeading) {
-      if (window.pilogPager.jumpToHeading(h)) return;
+      if (window.pilogPager.jumpToHeading(h)) {
+        setTocOpen(false); // mobile panel: tuck back in after jumping
+        return;
+      }
     }
     scrollToHeading(h);
+    setTocOpen(false);
   });
 
   // scroll-spy: highlight the last visible heading above 35% of the viewport

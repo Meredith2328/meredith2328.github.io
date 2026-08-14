@@ -1669,6 +1669,41 @@ a:hover {
   padding-left: 14px;
 }
 
+/* floating toggle button for the narrow-screen TOC panel (hidden on desktop) */
+.toc-toggle {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 51;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--paper);
+  border: var(--border);
+  box-shadow: 3px 3px 0 0 var(--shadow);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toc-toggle:hover,
+.toc-toggle.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.toc-toggle:active {
+  transform: translateY(-50%) translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 var(--shadow);
+}
+
 /* ---------- prev / next post navigation ---------- */
 
 .post-nav {
@@ -2513,8 +2548,44 @@ a:hover {
 /* ---------- responsive ---------- */
 
 @media (max-width: 1280px) {
+  /* the side TOC becomes a slide-out panel behind the floating toggle button:
+     tucked off-screen to the right by default, .is-open slides it in */
   .post-toc {
-    display: none;
+    position: fixed;
+    right: 56px;
+    top: 50%;
+    width: 220px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 10px 10px 12px;
+    background: var(--paper);
+    border: var(--border);
+    box-shadow: 4px 4px 0 0 var(--shadow);
+    transform: translate(calc(100% + 28px), -50%);
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0.22s ease;
+    z-index: 50;
+  }
+
+  .post-toc.is-open {
+    transform: translate(0, -50%);
+    visibility: visible;
+  }
+
+  .post-toc::before {
+    content: "目录";
+    display: block;
+    margin: 0 0 8px 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--hairline);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+  }
+
+  .toc-toggle {
+    display: flex;
   }
 }
 
