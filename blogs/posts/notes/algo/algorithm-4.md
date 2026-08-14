@@ -1070,7 +1070,7 @@ class Solution:
 
 对于第一层，我们的答案是：每次从头部取出一个节点插入尾部。
 
-> 方便记忆小tips：
+> `def reverse` 适用的方便记忆小tips：
 >
 > head和tail从来不会被改变。所以我们需要front和cur作为循环使用的变量。
 >

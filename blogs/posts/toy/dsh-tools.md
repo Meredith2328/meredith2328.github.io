@@ -7,7 +7,7 @@ published: true
 hideInList: false
 ---
 
-DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手的东西，整理一下放在这里。
+DSH 上线之后陆陆续续折腾了几个小工具：**便签**、**新会话按钮内可切换模式**、**Alt+Space最小化或唤起窗口**。都是自己用着顺手的东西，整理一下放在这里。
 
 顺便整理了我对DSH的“四种模式”的简单理解。
 
@@ -18,6 +18,8 @@ DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手�
 [github.com/Meredith2328/dsh-sticky-note](https://github.com/Meredith2328/dsh-sticky-note)
 
 > **类似微软原生的便签功能的DSH集成版，支持一些Markdown语法，并且可以快速发送给DSH。**
+
+![示意图：便签面板（点子/感想/TODO，Markdown 预览、自动保存、一键发送）](posts/migrated/post-images/dsh-sticky-note.png)
 
 是输入框工具栏左边的一个便签按钮，打开是一个可以拉伸的小面板。
 
@@ -34,7 +36,7 @@ DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手�
 
 [github.com/Meredith2328/dsh-sidebar-mode](https://github.com/Meredith2328/dsh-sidebar-mode)
 
-**把默认的四种模式切换塞进「新会话」按钮里，新会话创建更方便。**
+> **把默认的四种模式切换塞进「新会话」按钮里，新会话创建更方便。**
 
 ![示意图：新会话按钮内嵌预设标签，点击弹出预设菜单](posts/migrated/post-images/dsh-sidebar-mode.png)
 
@@ -46,7 +48,7 @@ DSH 上线之后陆陆续续折腾了几个小工具，都是自己用着顺手�
 
 [github.com/Meredith2328/dsh-hotkey](https://github.com/Meredith2328/dsh-hotkey)
 
-**Alt+Space** 一键唤起 / 最小化 DeepSeek Harness 的窗口。
+> **Alt+Space** 一键唤起 / 最小化 DeepSeek Harness 的窗口。
 
 找不到窗口就自动打开 DSH 地址。
 
