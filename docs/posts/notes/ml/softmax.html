@@ -309,102 +309,102 @@ m_i^{(j+1)}
 <p>接下来联系到实际的代码实现，特别是softmax和log-sum-exp的PyTorch实现及其与交叉熵损失和FlashAttention的关系。</p>
 <p>标准的数值稳定softmax应该为：
 总之就是<strong>首先需要计算一个最大值</strong>，然后计算减去最大值后的softmax。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<pre class="highlight" data-lang="python"><code class="language-python">import torch
 
-<span class="k">def</span><span class="w"> </span><span class="nf">softmax_stable</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    logits: [..., n]</span>
-<span class="sd">    return: [..., n] 概率分布</span>
-<span class="sd">    """</span>
-    <span class="c1"># 减去最大值防止溢出</span>
-    <span class="n">max_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">exp_logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logits</span> <span class="o">-</span> <span class="n">max_val</span><span class="p">)</span>
-    <span class="n">sum_exp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">exp_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exp_logits</span> <span class="o">/</span> <span class="n">sum_exp</span>
+def softmax_stable(logits, dim=-1):
+    """
+    logits: [..., n]
+    return: [..., n] 概率分布
+    """
+    # 减去最大值防止溢出
+    max_val = torch.max(logits, dim=dim, keepdim=True)[0]
+    exp_logits = torch.exp(logits - max_val)
+    sum_exp = torch.sum(exp_logits, dim=dim, keepdim=True)
+    return exp_logits / sum_exp
 
-<span class="c1"># PyTorch 内置版本（推荐，数值更稳定）</span>
-<span class="c1"># attn_weights = torch.softmax(scores, dim=-1)</span>
-</code></pre></div>
+# PyTorch 内置版本（推荐，数值更稳定）
+# attn_weights = torch.softmax(scores, dim=-1)
+</code></pre>
 <p>而交叉熵损失则为：</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cross_entropy_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    logits: [batch_size, num_classes] 原始输出（未经过 softmax）</span>
-<span class="sd">    labels: [batch_size] 真实类别索引 (0 ~ num_classes-1)</span>
-<span class="sd">    """</span>
-    <span class="c1"># 先算 log_softmax（数值稳定）</span>
-    <span class="n">max_val</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">exp_logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logits</span> <span class="o">-</span> <span class="n">max_val</span><span class="p">)</span>
-    <span class="n">sum_exp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">exp_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">log_probs</span> <span class="o">=</span> <span class="n">logits</span> <span class="o">-</span> <span class="n">max_val</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sum_exp</span><span class="p">)</span>  <span class="c1"># log(softmax)</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def cross_entropy_loss(logits, labels):
+    """
+    logits: [batch_size, num_classes] 原始输出（未经过 softmax）
+    labels: [batch_size] 真实类别索引 (0 ~ num_classes-1)
+    """
+    # 先算 log_softmax（数值稳定）
+    max_val = torch.max(logits, dim=1, keepdim=True)[0]
+    exp_logits = torch.exp(logits - max_val)
+    sum_exp = torch.sum(exp_logits, dim=1, keepdim=True)
+    log_probs = logits - max_val - torch.log(sum_exp)  # log(softmax)
 
-    <span class="c1"># 取出正确类别的 log 概率</span>
-    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">correct_log_probs</span> <span class="o">=</span> <span class="n">log_probs</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">),</span> <span class="n">labels</span><span class="p">]</span>
+    # 取出正确类别的 log 概率
+    batch_size = logits.shape[0]
+    correct_log_probs = log_probs[range(batch_size), labels]
 
-    <span class="k">return</span> <span class="o">-</span><span class="n">correct_log_probs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    return -correct_log_probs.mean()
 
-<span class="c1"># PyTorch 内置版本（推荐，数值更稳定）</span>
-<span class="c1"># loss_fn = torch.nn.CrossEntropyLoss()  # 内部自动做 log_softmax + NLLLoss</span>
-</code></pre></div>
+# PyTorch 内置版本（推荐，数值更稳定）
+# loss_fn = torch.nn.CrossEntropyLoss()  # 内部自动做 log_softmax + NLLLoss
+</code></pre>
 <p>在线Softmax的核心实现则为：
 其中 <span class="arithmatex">\(B_r\)</span> 是行row的块大小（即 <span class="arithmatex">\(Q\)</span> 的块大小，因为是 <span class="arithmatex">\(QK^T\)</span> ），
 <span class="arithmatex">\(B_c\)</span> 是列column的块大小。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">flash_attention_online_softmax</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">B_r</span><span class="p">,</span> <span class="n">B_c</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    B_r: Q 的块大小，B_c: K/V 的块大小</span>
-<span class="sd">    Q, K, V: [n, d] 假设 batch=1, heads=1 简化</span>
-<span class="sd">    """</span>
-    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">O</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>  <span class="c1"># 输出累加器</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="c1"># 指数和统计量</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">'inf'</span><span class="p">))</span>  <span class="c1"># 最大值统计量</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def flash_attention_online_softmax(Q, K, V, B_r, B_c):
+    """
+    B_r: Q 的块大小，B_c: K/V 的块大小
+    Q, K, V: [n, d] 假设 batch=1, heads=1 简化
+    """
+    n, d = Q.shape
+    O = torch.zeros_like(Q)  # 输出累加器
+    l = torch.zeros(n, 1)    # 指数和统计量
+    m = torch.full((n, 1), -float('inf'))  # 最大值统计量
 
-    <span class="c1"># 外层循环：遍历 KV 块</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">B_c</span><span class="p">):</span>
-        <span class="n">Kj</span> <span class="o">=</span> <span class="n">K</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="n">B_c</span><span class="p">]</span>  <span class="c1"># [B_c, d]</span>
-        <span class="n">Vj</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">j</span><span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="n">B_c</span><span class="p">]</span>  <span class="c1"># [B_c, d]</span>
+    # 外层循环：遍历 KV 块
+    for j in range(0, n, B_c):
+        Kj = K[j:j+B_c]  # [B_c, d]
+        Vj = V[j:j+B_c]  # [B_c, d]
 
-        <span class="c1"># 内层循环：遍历 Q 块</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">B_r</span><span class="p">):</span>
-            <span class="n">Qi</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span>  <span class="c1"># [B_r, d]</span>
-            <span class="n">Oi</span> <span class="o">=</span> <span class="n">O</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span>  <span class="c1"># [B_r, d]</span>
-            <span class="n">mi</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span>  <span class="c1"># [B_r, 1]</span>
-            <span class="n">li</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span>  <span class="c1"># [B_r, 1]</span>
+        # 内层循环：遍历 Q 块
+        for i in range(0, n, B_r):
+            Qi = Q[i:i+B_r]  # [B_r, d]
+            Oi = O[i:i+B_r]  # [B_r, d]
+            mi = m[i:i+B_r]  # [B_r, 1]
+            li = l[i:i+B_r]  # [B_r, 1]
 
-            <span class="c1"># 计算当前块的得分矩阵 [B_r, B_c]</span>
-            <span class="n">Sij</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Qi</span><span class="p">,</span> <span class="n">Kj</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">d</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+            # 计算当前块的得分矩阵 [B_r, B_c]
+            Sij = torch.matmul(Qi, Kj.T) / (d ** 0.5)
 
-            <span class="c1"># 当前块的最大值（每行）</span>
-            <span class="n">mij_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sij</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># [B_r, 1]</span>
+            # 当前块的最大值（每行）
+            mij_new = torch.max(Sij, dim=1, keepdim=True)[0]  # [B_r, 1]
 
-            <span class="c1"># 当前块的指数和（以块内最大值归一化）</span>
-            <span class="n">Pij</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Sij</span> <span class="o">-</span> <span class="n">mij_new</span><span class="p">)</span>  <span class="c1"># [B_r, B_c]</span>
-            <span class="n">lij_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Pij</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># [B_r, 1]</span>
+            # 当前块的指数和（以块内最大值归一化）
+            Pij = torch.exp(Sij - mij_new)  # [B_r, B_c]
+            lij_new = torch.sum(Pij, dim=1, keepdim=True)  # [B_r, 1]
 
-            <span class="c1"># 当前块的加权输出（块内）</span>
-            <span class="n">Oij_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">Pij</span><span class="p">,</span> <span class="n">Vj</span><span class="p">)</span>  <span class="c1"># [B_r, d]</span>
+            # 当前块的加权输出（块内）
+            Oij_new = torch.matmul(Pij, Vj)  # [B_r, d]
 
-            <span class="c1"># ========== 在线 softmax 合并 ==========</span>
-            <span class="c1"># 更新全局最大值</span>
-            <span class="n">m_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">mi</span><span class="p">,</span> <span class="n">mij_new</span><span class="p">)</span>  <span class="c1"># [B_r, 1]</span>
+            # ========== 在线 softmax 合并 ==========
+            # 更新全局最大值
+            m_new = torch.maximum(mi, mij_new)  # [B_r, 1]
 
-            <span class="c1"># 缩放旧统计量</span>
-            <span class="n">scale_old</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mi</span> <span class="o">-</span> <span class="n">m_new</span><span class="p">)</span>   <span class="c1"># [B_r, 1]</span>
-            <span class="n">scale_new</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mij_new</span> <span class="o">-</span> <span class="n">m_new</span><span class="p">)</span>  <span class="c1"># [B_r, 1]</span>
+            # 缩放旧统计量
+            scale_old = torch.exp(mi - m_new)   # [B_r, 1]
+            scale_new = torch.exp(mij_new - m_new)  # [B_r, 1]
 
-            <span class="c1"># 更新指数和</span>
-            <span class="n">l_new</span> <span class="o">=</span> <span class="n">scale_old</span> <span class="o">*</span> <span class="n">li</span> <span class="o">+</span> <span class="n">scale_new</span> <span class="o">*</span> <span class="n">lij_new</span>  <span class="c1"># [B_r, 1]</span>
+            # 更新指数和
+            l_new = scale_old * li + scale_new * lij_new  # [B_r, 1]
 
-            <span class="c1"># 更新输出（关键：旧的输出需要按比例缩放）</span>
-            <span class="n">O_new</span> <span class="o">=</span> <span class="p">(</span><span class="n">scale_old</span> <span class="o">*</span> <span class="n">Oi</span> <span class="o">*</span> <span class="n">li</span> <span class="o">+</span> <span class="n">scale_new</span> <span class="o">*</span> <span class="n">Oij_new</span><span class="p">)</span> <span class="o">/</span> <span class="n">l_new</span>
+            # 更新输出（关键：旧的输出需要按比例缩放）
+            O_new = (scale_old * Oi * li + scale_new * Oij_new) / l_new
 
-            <span class="c1"># 写回</span>
-            <span class="n">O</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span> <span class="o">=</span> <span class="n">O_new</span>
-            <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_new</span>
-            <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">B_r</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_new</span>
+            # 写回
+            O[i:i+B_r] = O_new
+            m[i:i+B_r] = m_new
+            l[i:i+B_r] = l_new
 
-    <span class="k">return</span> <span class="n">O</span>
-</code></pre></div>
+    return O
+</code></pre>
 <h2 id="手推小例子">手推小例子</h2>
 <hr/>
 <ol>
@@ -412,12 +412,12 @@ m_i^{(j+1)}
 </ol>
 <p>给定 <code>logits = [2.0, 1.0, 0.1]</code>，写出数值稳定的 softmax 计算过程。</p>
 <p>解：</p>
-<div class="highlight"><pre><span></span><code>max = 2.0
+<pre class="highlight"><code>max = 2.0
 logits - max = [0.0, -1.0, -1.9]
 exp = [e^0, e^{-1}, e^{-1.9}] = [1.0000, 0.3679, 0.1496]
 sum_exp = 1.5175
 softmax = [1/1.5175, 0.3679/1.5175, 0.1496/1.5175] = [0.6590, 0.2424, 0.0986]
-</code></pre></div>
+</code></pre>
 <p>验证和 = <code>1.0000</code></p>
 <p>答：<code>p = [0.6590, 0.2424, 0.0986]</code></p>
 <hr/>
@@ -426,17 +426,17 @@ softmax = [1/1.5175, 0.3679/1.5175, 0.1496/1.5175] = [0.6590, 0.2424, 0.0986]
 </ol>
 <p>设模型输出 <code>logits = [2.0, 1.0, 0.1]</code>，真实标签为类别 <code>0</code> ，计算交叉熵损失。</p>
 <p>解：</p>
-<div class="highlight"><pre><span></span><code>softmax 结果 p = [0.6590, 0.2424, 0.0986]
+<pre class="highlight"><code>softmax 结果 p = [0.6590, 0.2424, 0.0986]
 正确类别的概率 p_c = 0.6590
 L = -log(p_c) = -log(0.6590) = 0.4170
-</code></pre></div>
+</code></pre>
 <p>答：<code>L = 0.4170</code></p>
 <hr/>
 <ol start="3">
 <li>标准 Attention 中的 Softmax</li>
 </ol>
 <p>已知 Q, K, V 如下（n=3, d=2），计算 Attention 输出。</p>
-<div class="highlight"><pre><span></span><code>Q = [[1.0, 0.5],
+<pre class="highlight"><code>Q = [[1.0, 0.5],
      [0.5, 1.0],
      [0.0, 1.0]]
 
@@ -449,9 +449,9 @@ V = [[0.5, 1.0],
      [0.2, 0.7]]
 
 sqrt(d) = sqrt(2) = 1.4142
-</code></pre></div>
+</code></pre>
 <p>第一步：计算 <code>S = QK^T / sqrt(d)</code></p>
-<div class="highlight"><pre><span></span><code>QK^T = 
+<pre class="highlight"><code>QK^T = 
 行0·K^T: [1.0*0.8+0.5*0.6=1.1, 1.0*0.3+0.5*0.9=0.75, 1.0*1.0+0.5*0.2=1.1]
 行1·K^T: [0.5*0.8+1.0*0.6=1.0, 0.5*0.3+1.0*0.9=1.05, 0.5*1.0+1.0*0.2=0.7]
 行2·K^T: [0.0*0.8+1.0*0.6=0.6, 0.0*0.3+1.0*0.9=0.9, 0.0*1.0+1.0*0.2=0.2]
@@ -460,39 +460,39 @@ S = 除以 1.4142：
 行0: [1.1/1.4142=0.7778, 0.75/1.4142=0.5303, 1.1/1.4142=0.7778]
 行1: [1.0/1.4142=0.7071, 1.05/1.4142=0.7425, 0.7/1.4142=0.4950]
 行2: [0.6/1.4142=0.4243, 0.9/1.4142=0.6364, 0.2/1.4142=0.1414]
-</code></pre></div>
+</code></pre>
 <p>第二步：每行 softmax</p>
-<div class="highlight"><pre><span></span><code>行0: max=0.7778, 减后=[0, -0.2475, 0], exp=[1, 0.7808, 1], sum=2.7808, p=[0.3596, 0.2808, 0.3596]
+<pre class="highlight"><code>行0: max=0.7778, 减后=[0, -0.2475, 0], exp=[1, 0.7808, 1], sum=2.7808, p=[0.3596, 0.2808, 0.3596]
 行1: max=0.7425, 减后=[-0.0354, 0, -0.2475], exp=[0.9652, 1, 0.7808], sum=2.7460, p=[0.3515, 0.3642, 0.2843]
 行2: max=0.6364, 减后=[-0.2121, 0, -0.4950], exp=[0.8088, 1, 0.6098], sum=2.4186, p=[0.3344, 0.4135, 0.2521]
-</code></pre></div>
+</code></pre>
 <p>第三步：O = P × V</p>
-<div class="highlight"><pre><span></span><code>O[0] = 0.3596×[0.5,1.0] + 0.2808×[0.8,0.3] + 0.3596×[0.2,0.7]
+<pre class="highlight"><code>O[0] = 0.3596×[0.5,1.0] + 0.2808×[0.8,0.3] + 0.3596×[0.2,0.7]
      = [0.1798,0.3596] + [0.2246,0.0842] + [0.0719,0.2517] = [0.4763, 0.6955]
 O[1] = 0.3515×[0.5,1.0] + 0.3642×[0.8,0.3] + 0.2843×[0.2,0.7]
      = [0.1758,0.3515] + [0.2914,0.1093] + [0.0569,0.1990] = [0.5241, 0.6598]
 O[2] = 0.3344×[0.5,1.0] + 0.4135×[0.8,0.3] + 0.2521×[0.2,0.7]
      = [0.1672,0.3344] + [0.3308,0.1241] + [0.0504,0.1765] = [0.5484, 0.6350]
-</code></pre></div>
+</code></pre>
 <p>答：<code>O = [[0.4763, 0.6955], [0.5241, 0.6598], [0.5484, 0.6350]]</code></p>
 <hr/>
 <ol start="4">
 <li>在线 Softmax 合并（一个 query，两个块）</li>
 </ol>
-<div class="highlight"><pre><span></span><code>完整 scores = [2.0, 1.5, 3.0, 0.5]
+<pre class="highlight"><code>完整 scores = [2.0, 1.5, 3.0, 0.5]
 V = [[1.0, 0.0], [0.5, 0.5], [0.0, 1.0], [0.8, 0.2]]
-</code></pre></div>
+</code></pre>
 <p>(1) 标准方法（全局 softmax）</p>
-<div class="highlight"><pre><span></span><code>max = 3.0
+<pre class="highlight"><code>max = 3.0
 exp(减max后) = [e^{-1}, e^{-1.5}, e^{0}, e^{-2.5}] = [0.3679, 0.2231, 1.0000, 0.0821]
 sum_exp = 1.6731
 probs = [0.2199, 0.1334, 0.5977, 0.0491]
 output = 0.2199×[1,0] + 0.1334×[0.5,0.5] + 0.5977×[0,1] + 0.0491×[0.8,0.2]
       = [0.2199,0] + [0.0667,0.0667] + [0,0.5977] + [0.0393,0.0098]
       = [0.3259, 0.6742]
-</code></pre></div>
+</code></pre>
 <p>(2) 在线方法</p>
-<div class="highlight"><pre><span></span><code>初始化：m = -∞, l = 0, o = [0,0]
+<pre class="highlight"><code>初始化：m = -∞, l = 0, o = [0,0]
 
 块1：s=[2.0,1.5], v=[[1,0],[0.5,0.5]]
 m1=2.0, exp(减2)=[1,0.6065], l1=1.6065
@@ -513,7 +513,7 @@ o = (0.3679×[0.8112,0.1887]×1.6065 + 1×[0.0607,0.9393]×1.0821) / 1.6731
   = (0.3679×[1.3030,0.3031] + [0.0657,1.0165]) / 1.6731
   = ([0.4793,0.1115] + [0.0657,1.0165]) / 1.6731
   = [0.5450, 1.1280] / 1.6731 = [0.3257, 0.6742]
-</code></pre></div>
+</code></pre>
 <p>答：在线方法得到 <code>[0.3257, 0.6742]</code>，与标准方法的 <code>[0.3259, 0.6742]</code> 一致（误差 &lt; 1e-4）。</p>
 <aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="nanovllm.html">FlashAttention 与 PagedAttention</a><a class="post-rel-link" href="minitorch.html">minitorch</a></div></aside>
   </div>

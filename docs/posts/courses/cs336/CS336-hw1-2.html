@@ -134,7 +134,7 @@
 而为了保证实现的正确性，在原来的windows环境下利用gpt撰写了 <code>test_tokenizer_windows.py</code> 用于替换。
 成功通过了所有测试。</p>
 <p>在实际的训练过程中大约有如下的日志：</p>
-<div class="highlight"><pre><span></span><code>============================================================
+<pre class="highlight"><code>============================================================
 Step 1/3: train BPE tokenizer
 BPE training configuration:
   input_path: data/TinyStoriesV2-GPT4-train.txt
@@ -205,7 +205,7 @@ Count pass done: lines=15,600,057, tokens=540,796,778, elapsed=320.67s
 [write] lines=40,000 tokens_written=1,378,058/540,796,778 rate=1,005,091 tok/s
 ...
 [write] lines=150,000 tokens_written=5,191,898/5,461,210 rate=179,838 tok/s Write pass done: output=data/tinystories_val.bin, elapsed=29.08s Metadata written: data/tinystories_val.bin.meta.json ============================================================
-</code></pre></div>
+</code></pre>
 <h2 id="training-loop-generating-text">Training loop / Generating text</h2>
 <blockquote>
 <p>我们要做什么？</p>
@@ -230,48 +230,48 @@ DataLoader把它变成batch流，
 <li>看到 <code>x₂, x₃</code>，预测 <code>x₄</code></li>
 <li>看到 <code>x₂, x₃, x₄</code>，预测 <code>x₅</code></li>
 </ul>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_batch</span><span class="p">(</span>
-    <span class="n">dataset</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">context_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    从数据集采样batch</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def get_batch(
+    dataset: np.ndarray,
+    batch_size: int,
+    context_length: int,
+    device: str
+) -&gt; Tuple[torch.Tensor, torch.Tensor]:
+    """
+    从数据集采样batch
 
-<span class="sd">    Args:</span>
-<span class="sd">        dataset: 1D numpy数组，包含所有token IDs</span>
-<span class="sd">        batch_size: 批次大小 B</span>
-<span class="sd">        context_length: 上下文长度 m</span>
-<span class="sd">        device: PyTorch设备字符串</span>
+    Args:
+        dataset: 1D numpy数组，包含所有token IDs
+        batch_size: 批次大小 B
+        context_length: 上下文长度 m
+        device: PyTorch设备字符串
 
-<span class="sd">    Returns:</span>
-<span class="sd">        (inputs, targets): 两个形状为 (batch_size, context_length) 的张量</span>
-<span class="sd">    """</span>
-    <span class="n">dataset_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">context_length</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">context_length</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    Returns:
+        (inputs, targets): 两个形状为 (batch_size, context_length) 的张量
+    """
+    dataset_len = len(dataset)
+    inputs = torch.empty(batch_size, context_length, dtype=torch.long)
+    targets = torch.empty(batch_size, context_length, dtype=torch.long)
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
-        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dataset_len</span><span class="o">-</span><span class="n">context_length</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="n">input_seq</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span> <span class="n">start_idx</span><span class="o">+</span><span class="n">context_length</span><span class="p">]</span>
-        <span class="n">input_target</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">start_idx</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">start_idx</span><span class="o">+</span><span class="n">context_length</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    for i in range(batch_size):
+        start_idx = torch.randint(0, dataset_len-context_length, (1, )).item()
+        input_seq = dataset[start_idx: start_idx+context_length]
+        input_target = dataset[start_idx+1: start_idx+context_length+1]
 
-        <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">input_seq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
-        <span class="n">targets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">input_target</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+        inputs[i] = torch.tensor(input_seq, dtype=torch.long)
+        targets[i] = torch.tensor(input_target, dtype=torch.long)
 
-    <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-</code></pre></div>
+    inputs = inputs.to(device=device)
+    targets = targets.to(device=device)
+    return (inputs, targets)
+</code></pre>
 <h2 id="experiments">Experiments</h2>
 <blockquote>
 <p>我们要做什么？<br/>一个小的数据集（TinyStories）的反复训练，四处模块作用的消融实验，然后是一个更大的数据集的训练。</p>
 </blockquote>
 <p>7.1 How to Run Experiments and Deliverables
 确认wanDB等日志系统成功接入。</p>
-<div class="highlight"><pre><span></span><code>uv sync --upgrade-package wandb
-</code></pre></div>
+<pre class="highlight"><code>uv sync --upgrade-package wandb
+</code></pre>
 <p>7.2 TinyStories
 给定初始参数，尝试在TinyStories训练，并寻找下述参数的好的初始值。
 learning rate, learning rate warmup, other AdamW hyperparameters (β1, β2, ϵ), and weight decay.
@@ -289,24 +289,24 @@ learning rate, learning rate warmup, other AdamW hyperparameters (β1, β2, ϵ),
 <p>√完成了训练循环的最小化测试。
 √在5090环境中配置了cs336和minitorch两个环境，并正在上传数据，用于训练。
 √启动第一个默认训练，tokenize正常，但默认的pytorch版本在5090有点小问题。需要改到2.7.1。</p>
-<div class="highlight"><pre><span></span><code>--skip-bpe 用于跳过tokenizer训练,
+<pre class="highlight"><code>--skip-bpe 用于跳过tokenizer训练,
 --skip-tokenize 用于跳过将tinystories从txt转为bin的过程.
-</code></pre></div>
+</code></pre>
 <blockquote>
 <p>我当前做了什么？</p>
 </blockquote>
 <p>√正在准备minitorch和cs336的数据。
 √跑起来cs336的第一次模型训练。</p>
 <p>训练指令如下：（我提前跑过bpe和数据转二进制了，所以skip）</p>
-<div class="highlight"><pre><span></span><code>bash scripts/run_tinystories_train.sh --use-wandb --skip-bpe --skip-tokenize
-</code></pre></div>
+<pre class="highlight"><code>bash scripts/run_tinystories_train.sh --use-wandb --skip-bpe --skip-tokenize
+</code></pre>
 <p>第一次模型训练大致如下。</p>
 <ul>
 <li>检查一下，文档要求的<strong>token budget</strong>是 <code>327,680,000</code> ，符合我们的 <code>batch size * context_length * steps = 64 * 256 * 20000</code> 。这个budget大约是题目所示的参数量（17M）的20倍，符合Chinchilla定律。</li>
 <li>检查一下，发现<strong>模型大小</strong>大约是22M，这与文档中提到的约17M有所差别。（简单思考一下，应该是LM head和embedding层没有共享权重（测试要求），那么按照估算公式，差个 <code>Vd = 10000 * 512</code> 刚好是5M。完美！）</li>
 <li>检查一下，<strong>learning rate的变化</strong>是先急剧上升到 <code>6e-4</code> ，然后先缓、再快、再缓地下降到 <code>6e-5</code> 。这符合cosine学习率调度的想法：最开始lr急剧上升而不是直接设置为 <code>6e-4</code> 是因为一开始模型随机初始化、对数据分布没有什么了解，如果贸然采取大学习率，可能使得它陷入不稳定的初始状态；再之后保持一段时间的大学习率，快速探索搜索空间，使得模型快速收敛；再快速转到小学习率，在最优解附近稳定且精细地探索。</li>
 </ul>
-<div class="highlight"><pre><span></span><code>============================================================
+<pre class="highlight"><code>============================================================
 Step 3/3: train model
 train_bin: data/tinystories_train.bin
 val_bin: data/tinystories_val.bin
@@ -404,20 +404,20 @@ Tokenized data:
   data/tinystories_val.bin
 Checkpoints:
   runs/tinystories_base
-</code></pre></div>
+</code></pre>
 <p>再看看图表，发现loss按照幂律（Scaling Law）下降得很健康，lr也是很合理的cosine，先快后慢半个周期。
 我在5090的分词器训练大约11分钟，不包含分词器在内模型训练大约运行了22分钟，整体符合文档中30-40分钟的预期。</p>
 <h3 id="更多次实验">更多次实验</h3>
 <p>白天的目标是给minitorch改造出一套pytorch+transformers的运行脚本，现代一点，训练。
 继续，cs336的各参数的sweep。</p>
 <h4 id="sweep-learning-rate">sweep: learning rate</h4>
-<div class="highlight"><pre data-lang="bash"><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>scripts/lr_sweep.sh<span class="w"> </span>--use-wandb<span class="w"> </span>--train-data<span class="w"> </span>data/tinystories_train.bin<span class="w"> </span>--val-data<span class="w"> </span>data/tinystories_val.bin
-</code></pre></div>
+<pre class="highlight" data-lang="bash"><code class="language-bash">uv run scripts/lr_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.bin
+</code></pre>
 <p>实际训练花了两个小时（每次20分钟）。图像真的很漂亮。</p>
 <p>普遍来说，learning rate偏大时，loss会下降得快一些，绝对数值也会更小。</p>
 <h4 id="sweep-batch-size">sweep: batch size</h4>
-<div class="highlight"><pre data-lang="bash"><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>scripts/batch_sweep.sh<span class="w"> </span>--use-wandb<span class="w"> </span>--train-data<span class="w"> </span>data/tinystories_train.bin<span class="w"> </span>--val-data<span class="w"> </span>data/tinystories_val.bin<span class="w"> </span>--batch-sizes<span class="w"> </span><span class="m">128</span>,64,32,16,8,1
-</code></pre></div>
+<pre class="highlight" data-lang="bash"><code class="language-bash">uv run scripts/batch_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.bin --batch-sizes 128,64,32,16,8,1
+</code></pre>
 <p>在经历了bs=1存了过多的中间态checkpoint、爆了硬盘之后，痛定思痛添加了一个只保留最近三个以及最好的checkpoint的功能，并且强化了断点续训。</p>
 <p>我发现，对于bs=1这样太小的情况下， <code>tok/s</code> 会很小（大约1.5w tok/s左右？），只有在bs足够大（如64、128）时才能充分提升 <code>tok/s</code> （稳定在26w tok/s）。因此，如果要训练更快一些，似乎应该在支持的情况下充分扩大batch size。</p>
 <p>猜测是因为瓶颈不同（时间原因，未用profiler测试）：
