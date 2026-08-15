@@ -260,39 +260,21 @@ a:hover {
   background: var(--panel);
 }
 
-/* pixel moon / sun built from box-shadow dots */
+/* moon (light mode) / sun (dark mode) icons, same stroke style as social icons */
 .theme-icon {
-  width: 4px;
-  height: 4px;
-  display: inline-block;
+  display: none;
 }
 
 .theme-icon-moon {
   color: var(--ink);
-  box-shadow:
-    8px -4px 0 0, 12px -4px 0 0, 16px -4px 0 0,
-    4px 0 0 0, 8px 0 0 0, 20px 0 0 0,
-    0 4px 0 0, 20px 4px 0 0,
-    0 8px 0 0, 20px 8px 0 0,
-    4px 12px 0 0, 20px 12px 0 0,
-    8px 16px 0 0, 12px 16px 0 0, 16px 16px 0 0;
 }
 
 .theme-icon-sun {
   color: var(--highlight);
-  box-shadow:
-    8px 0 0 0, 12px 0 0 0, 16px 0 0 0,
-    4px 4px 0 0, 12px 4px 0 0, 20px 4px 0 0,
-    0 8px 0 0, 8px 8px 0 0, 16px 8px 0 0, 24px 8px 0 0,
-    0 12px 0 0, 12px 12px 0 0, 24px 12px 0 0,
-    4px 16px 0 0, 12px 16px 0 0, 20px 16px 0 0,
-    8px 20px 0 0, 12px 20px 0 0, 16px 20px 0 0;
 }
 
-html[data-theme="light"] .theme-icon-moon { display: inline-block; }
-html[data-theme="light"] .theme-icon-sun { display: none; }
-html[data-theme="dark"] .theme-icon-moon { display: none; }
-html[data-theme="dark"] .theme-icon-sun { display: inline-block; }
+html[data-theme="light"] .theme-icon-moon { display: block; }
+html[data-theme="dark"] .theme-icon-sun { display: block; }
 
 /* ---------- search ---------- */
 
