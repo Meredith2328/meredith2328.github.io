@@ -33,6 +33,32 @@
   var defs = document.createElementNS(NS, "defs");
   svg.appendChild(defs);
 
+  /* node / link colors follow the site theme */
+  function themePal() {
+    var dark = document.documentElement.dataset.theme === "dark";
+    return dark
+      ? {
+          ink: "#e4e6e9",
+          text: "#b4b8bd",
+          mute: "#82868b",
+          raise: "#2a2c31",
+          dir: "#3d4045",
+          hlBg: "#40361a",
+          hlBorder: "#fdd663",
+          accent: "#7cabf5"
+        }
+      : {
+          ink: "#3c4043",
+          text: "#5f6368",
+          mute: "#9aa0a6",
+          raise: "#ffffff",
+          dir: "#e8eaed",
+          hlBg: "#fff8e1",
+          hlBorder: "#fbbc04",
+          accent: "#1a73e8"
+        };
+  }
+
   function marker(id, color, dashed) {
     var m = document.createElementNS(NS, "marker");
     m.setAttribute("id", id);
@@ -48,8 +74,8 @@
     m.appendChild(path);
     defs.appendChild(m);
   }
-  marker("arrow-solid", "#9aa0a6", false);
-  marker("arrow-ref", "#1a73e8", true);
+  marker("arrow-solid", themePal().mute, false);
+  marker("arrow-ref", themePal().accent, true);
 
   var viewport = document.createElementNS(NS, "g");
   svg.appendChild(viewport);
@@ -325,7 +351,7 @@
           r.setAttribute("y", y * cell);
           r.setAttribute("width", cell);
           r.setAttribute("height", cell);
-          r.setAttribute("fill", "#3c4043");
+          r.setAttribute("fill", themePal().ink);
           g.appendChild(r);
         }
       }
@@ -346,8 +372,8 @@
     text.setAttribute("font-size", n.type === "root" ? 19 : 18);
 
     if (n.type === "root") {
-      rect.setAttribute("fill", "#ffffff");
-      rect.setAttribute("stroke", "#3c4043");
+      rect.setAttribute("fill", themePal().raise);
+      rect.setAttribute("stroke", themePal().ink);
       var icon = dinoIcon(2);
       icon.setAttribute("transform", "translate(" + (-n.w / 2 + 8) + "," + (-DINO_ROWS.length + 2) + ")");
       g.appendChild(icon);
@@ -356,31 +382,31 @@
       text.setAttribute("y", 5);
       text.setAttribute("text-anchor", "start");
       text.setAttribute("font-weight", "700");
-      text.setAttribute("fill", "#3c4043");
+      text.setAttribute("fill", themePal().ink);
     } else if (n.type === "dir") {
-      rect.setAttribute("fill", "#e8eaed");
-      rect.setAttribute("stroke", "#5f6368");
+      rect.setAttribute("fill", themePal().dir);
+      rect.setAttribute("stroke", themePal().text);
       var count = dirCounts[n.id] ? " (" + dirCounts[n.id] + ")" : "";
       var marker = collapsed[n.id] ? "▸ " : "▾ ";
       text.textContent = marker + n.label + count;
       text.setAttribute("x", 0);
       text.setAttribute("y", 5);
       text.setAttribute("text-anchor", "middle");
-      text.setAttribute("fill", "#5f6368");
+      text.setAttribute("fill", themePal().text);
     } else {
       if (n.highlight) {
-        rect.setAttribute("fill", "#fff8e1");
-        rect.setAttribute("stroke", "#fbbc04");
+        rect.setAttribute("fill", themePal().hlBg);
+        rect.setAttribute("stroke", themePal().hlBorder);
         rect.setAttribute("stroke-width", "3");
       } else {
-        rect.setAttribute("fill", "#ffffff");
-        rect.setAttribute("stroke", "#3c4043");
+        rect.setAttribute("fill", themePal().raise);
+        rect.setAttribute("stroke", themePal().ink);
       }
       text.textContent = n.label;
       text.setAttribute("x", 0);
       text.setAttribute("y", 5);
       text.setAttribute("text-anchor", "middle");
-      text.setAttribute("fill", "#3c4043");
+      text.setAttribute("fill", themePal().ink);
     }
     g.appendChild(rect);
     g.appendChild(text);
@@ -1182,9 +1208,9 @@
       rect.setAttribute("width", size);
       rect.setAttribute("height", size);
       if (i === 0) {
-        rect.setAttribute("fill", "#1a73e8");
+        rect.setAttribute("fill", themePal().accent);
       } else {
-        rect.setAttribute("fill", i % 3 === 0 ? "#5f6368" : "#3c4043");
+        rect.setAttribute("fill", i % 3 === 0 ? themePal().text : themePal().ink);
       }
       snakeGroup.appendChild(rect);
       if (i === 0 && body[1]) {
@@ -1197,7 +1223,7 @@
         eye.setAttribute("y", ey);
         eye.setAttribute("width", 3);
         eye.setAttribute("height", 3);
-        eye.setAttribute("fill", "#ffffff");
+        eye.setAttribute("fill", themePal().raise);
         snakeGroup.appendChild(eye);
       }
     }
@@ -1280,6 +1306,18 @@
     },
     highlightFolder: function (folder) {
       highlightFolder(folder);
+    },
+    refresh: function () {
+      if (!this.started) return;
+      var pal = themePal();
+      ["arrow-solid", "arrow-ref"].forEach(function (id) {
+        var m = defs.querySelector("#" + id + " path");
+        if (m) {
+          m.setAttribute("fill", id === "arrow-ref" ? pal.accent : pal.mute);
+        }
+      });
+      render();
+      if (snakeCfg.enabled) drawSnake();
     }
   };
 

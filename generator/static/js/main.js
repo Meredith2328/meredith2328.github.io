@@ -1,7 +1,69 @@
 /* pilog — view switching, file tree, multi-condition filters, nav dispatch,
-   dino widget */
+   dino widget, theme toggle */
 (function () {
   "use strict";
+
+  /* ---------- theme (light / dark) ---------- */
+
+  var THEME_KEY = "pilog.theme";
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    // sync the giscus comment iframe if present
+    var frame = document.querySelector("iframe.giscus-frame");
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: theme } } },
+        "https://giscus.app"
+      );
+    }
+  }
+
+  var themeToggle = document.getElementById("theme-toggle");
+  if (themeToggle) {
+    themeToggle.addEventListener("click", function () {
+      var next =
+        document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      applyTheme(next);
+      if (window.pilogGraph) window.pilogGraph.refresh();
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch (e) {
+        /* storage unavailable: theme still applies until reload */
+      }
+    });
+  }
+
+  var themeMedia = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
+  if (themeMedia && themeMedia.addEventListener) {
+    themeMedia.addEventListener("change", function (e) {
+      var saved = null;
+      try {
+        saved = localStorage.getItem(THEME_KEY);
+      } catch (err) { /* ignore */ }
+      if (saved !== "light" && saved !== "dark" && e.matches) {
+        applyTheme("dark");
+      }
+    });
+  }
+
+  // giscus mounts its iframe asynchronously; sync the theme the moment it
+  // appears so a manual toggle is reflected even before the user switches again
+  if (window.MutationObserver) {
+    var themeObserver = new MutationObserver(function (muts) {
+      var frame = document.querySelector("iframe.giscus-frame");
+      if (frame) {
+        applyTheme(document.documentElement.dataset.theme);
+        themeObserver.disconnect();
+      }
+    });
+    themeObserver.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+  }
 
   /* shared smooth scroll: rAF-based so consecutive calls always restart from
      the current position (native scrollTo({behavior:'smooth'}) can get stuck

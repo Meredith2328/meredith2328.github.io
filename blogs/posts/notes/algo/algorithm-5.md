@@ -343,6 +343,21 @@ class Solution:
 
 ### 专题11 二分查找
 
+> 二分有一个令人头疼的问题叫做边界条件。这里一次性讲清楚。
+>
+> 如果要找的元素一定在区间里，可以使用**闭区间**： `left = 0` ，`right = n - 1` ，循环条件是 `left <= right` 。
+>
+> 如果要找的元素可能不存在，可以使用**左闭右开区间**：`left = 0` ，`right = n` ，循环条件是 `left < right` 。
+>
+> 我个人喜欢使用左闭右开的写法，十分统一干净~~并且符合 [Dijkstra的论述](https://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD831.html)~~ 。
+
+| 写法         | 搜索区间        | 循环条件        | left 更新        | right 更新        | 返回值        | 典型场景   |
+| :----------- | :-------------- | :-------------- | :--------------- | :---------------- | :------------ | :--------- |
+| **左闭右闭** | `[left, right]` | `left <= right` | `left = mid + 1` | `right = mid - 1` | `mid` 或 `-1` | 找确切值   |
+| **左闭右开** | `[left, right)` | `left < right`  | `left = mid + 1` | `right = mid`     | `left`        | 找插入位置 |
+
+
+
 35 搜索插入位置
 
 bisect的两个函数分别叫bisect_left和bisect_right。
@@ -387,33 +402,43 @@ class Solution:
         return [l, r]
 ```
 
-33 搜索旋转排序数组
 
-这个需要判断出左边一段有序还是右边一段有序。
 
-因为找到有序的段之后，就可以通过和区间两个端点比较，确定target是否在这一段有序区间内。
+[33. 搜索旋转排序数组](https://leetcode.cn/problems/search-in-rotated-sorted-array/)
 
-```
+这是一道二分的变式，关键在于首先找到有序的那一半区间，然后判断看 `target` 是否在有序的这一半区间。否则就在另一半。
+
+**我们只敢在有序区间上用 `nums[left] <= target < nums[mid]` 这种条件判断！**
+
+然后关于各种边界条件怎么记忆：
+
+- 我使用的是左闭右开写法，所以初始化和循环条件如下。注意 `right` 不能用于数组访问，要用 `right - 1` 哦。
+- 优先判断 `nums[mid] == target` ，之后 `mid` 一定会从区间里排除，所以对应地给 `target` 条件里面用到 `nums[mid]` 的都写成小于号，而另外半边使用小于等于。
+
+时间复杂度：$O(\log n)$ ，空间复杂度：$O(1)$
+
+```python
 class Solution:
     def search(self, nums: List[int], target: int) -> int:
-        l, r = 0, len(nums) - 1
-        while l <= r:
-            mid = (l + r) // 2
+        left, right = 0, len(nums)
+        while left < right:
+            mid = (left + right) // 2
             if nums[mid] == target:
                 return mid
-            if nums[l] <= nums[mid]:
-                # 这一段有序, 则可以通过和两个端点比较确定target是否在这一段内
-                if nums[l] <= target < nums[mid]:
-                    r = mid - 1
+            if nums[left] <= nums[mid]: # 为了用下述条件判断target, 我们必须先找到有序区间
+                if nums[left] <= target < nums[mid]:      # mid已排除
+                    right = mid                           # mid已排除
                 else:
-                    l = mid + 1
+                    left = mid + 1                        # mid已排除
             else:
-                if nums[mid] < target <= nums[r]:
-                    l = mid + 1
+                if nums[mid] < target <= nums[right - 1]: # mid已排除
+                    left = mid + 1                        # mid已排除
                 else:
-                    r = mid - 1
+                    right = mid                           # mid已排除
         return -1
 ```
+
+
 
 153 寻找旋转排序数组中的最小值
 
@@ -780,19 +805,26 @@ class MedianFinder:
 
 复杂一些，现在还想得不那么明白。慢慢品味。
 
-121 买卖股票的最佳时机
 
-```
+
+[121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)
+
+“最佳时机”的直觉是在最低点买入，在之后的最高点卖出。
+
+因此对于每个我们正在遍历的价格，**维护其之前的历史最低点**，**计算出在当前卖出的利润**，从而遍历获得最佳利润。
+
+```python
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        # 当前卖出时能获得的最大利润, 应该是当前价格减去历史最低价格.
-        min_price = prices[0]
+        lowest = float('inf')
         res = 0
         for price in prices:
-            res = max(res, price - min_price)
-            min_price = min(min_price, price)
+            lowest = min(lowest, price)
+            res = max(res, price - lowest)
         return res
 ```
+
+
 
 55 跳跃游戏
 
@@ -883,6 +915,68 @@ class Solution:
 动态规划的本质就是填表格查表格。
 
 某个问题可以由一些子问题的值得到，所以查子问题的表格，然后填入该问题的表格。
+
+
+
+[300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
+
+**解法二**：贪心+二分查找
+
+维护一个递增的数组 `tails` ，其中 `tails[i]` 表示长度为 `i+1` 的递增子序列的最小末尾值。
+
+则维护方式是：每次来一个新的数，都**在 `tails` 数组中找到第一个大于等于它的数**。如果存在，则覆盖。
+
+> 以输入序列 [0, 8, 4, 12, 2] 为例：
+>
+> - 第一步插入 0，d = [0]；
+> - 第二步插入 8，d = [0, 8]；
+> - 第三步插入 4，d = [0, 4]；
+> - 第四步插入 12，d = [0, 4, 12]；
+> - 第五步插入 2，d = [0, 2, 12]。
+
+时间复杂度：$O(n \log n)$ ，空间复杂度：$O(n)$
+
+```python
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        tails = [] # 递增的, tails[i]表示长度为i+1的递增子序列的最小末尾值
+        for num in nums:
+            left, right = 0, len(tails)
+            while left < right:
+                mid = (left + right) // 2
+                if tails[mid] < num: # 二分目的: 在tails中找到第一个>=num的值
+                    left = mid + 1
+                else:
+                    right = mid
+
+            if left == len(tails):
+                tails.append(num)
+            else:
+                tails[left] = num
+        return len(tails)
+```
+
+**解法一**：动态规划
+
+当前位置的最长递增子序列长度可以由它之前的所有位置转移得到。
+
+**注意每个位置的递增子序列长度不小于1**。
+
+时间复杂度：$O(n^2)$ ，空间复杂度：$O(n)$
+
+```python
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        dp = [1] * (n + 10)
+        for i, num in enumerate(nums):
+            for j in range(i):
+                if num > nums[j]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+        return max(dp)
+```
+
+
 
 70 爬楼梯
 

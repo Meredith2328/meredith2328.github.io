@@ -2,6 +2,18 @@
 <html lang="{{ site.language or 'zh-CN' }}">
 <head>
   <meta charset="utf-8">
+  <script>
+    /* apply the saved theme before first paint to avoid a light flash */
+    (function () {
+      try {
+        var t = localStorage.getItem("pilog.theme");
+        if (t !== "light" && t !== "dark") {
+          t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) { /* default light */ }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>{% block title %}{{ page_title }}{% endblock %}{% if page_title and page_title != site.title %} · {{ site.title }}{% endif %}</title>
@@ -48,6 +60,11 @@
                 title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
+
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换夜间模式">
+        <span class="theme-icon theme-icon-moon" aria-hidden="true"></span>
+        <span class="theme-icon theme-icon-sun" aria-hidden="true"></span>
+      </button>
 
       <div class="socials">
         {% for key, value in socials.items() %}

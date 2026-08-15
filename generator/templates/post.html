@@ -63,6 +63,21 @@
   {% if giscus and giscus.enabled and giscus.repo %}
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
+    <script>
+      /* make giscus start in the active theme (dark/light) instead of always
+         light, so the comment area does not flash white for dark users */
+      (function () {
+        var want = document.documentElement.dataset.theme;
+        if (want !== "dark" && want !== "light") return;
+        var obs = new MutationObserver(function () {
+          var s = document.querySelector('script[src*="giscus.app"]');
+          if (!s) return;
+          s.setAttribute("data-theme", want);
+          obs.disconnect();
+        });
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    </script>
     <script src="https://giscus.app/client.js"
       data-repo="{{ giscus.repo }}"
       data-repo-id="{{ giscus.repo_id }}"

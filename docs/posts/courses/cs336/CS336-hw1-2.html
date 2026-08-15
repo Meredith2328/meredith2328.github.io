@@ -2,6 +2,18 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
+  <script>
+    /* apply the saved theme before first paint to avoid a light flash */
+    (function () {
+      try {
+        var t = localStorage.getItem("pilog.theme");
+        if (t !== "light" && t !== "dark") {
+          t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) { /* default light */ }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>CS336 · Assignment 1 · 后半段：实验 · 10PI&#39;S BLOG丨十派的玩具箱</title>
@@ -52,6 +64,11 @@
                 title="全文搜索：在整篇正文中查找" aria-pressed="false">全文</button>
         <div class="search-results" id="search-results" hidden></div>
       </div>
+
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换夜间模式">
+        <span class="theme-icon theme-icon-moon" aria-hidden="true"></span>
+        <span class="theme-icon theme-icon-sun" aria-hidden="true"></span>
+      </button>
 
       <div class="socials">
         
@@ -424,6 +441,21 @@ bs较大时瓶颈在GPU的算力。</p>
   
   <section class="post-comments">
     <h2 class="comments-title">评论</h2>
+    <script>
+      /* make giscus start in the active theme (dark/light) instead of always
+         light, so the comment area does not flash white for dark users */
+      (function () {
+        var want = document.documentElement.dataset.theme;
+        if (want !== "dark" && want !== "light") return;
+        var obs = new MutationObserver(function () {
+          var s = document.querySelector('script[src*="giscus.app"]');
+          if (!s) return;
+          s.setAttribute("data-theme", want);
+          obs.disconnect();
+        });
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+      })();
+    </script>
     <script src="https://giscus.app/client.js"
       data-repo="Meredith2328/pilog"
       data-repo-id="R_kgDOTpY2UA"
