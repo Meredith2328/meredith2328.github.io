@@ -120,7 +120,7 @@
     <h1 class="post-title">数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）</h1>
     <div class="post-meta">
       <time datetime="2026-03-02T00:00:00">2026-03-02</time>
-      <span class="post-stats">13581 字 · 约 31 分钟</span>
+      <span class="post-stats">13662 字 · 约 31 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -496,6 +496,7 @@
 <p>ps. <code>left</code> 和 <code>right</code> 初始化构成的<strong>范围是有含义的</strong>。这道题我们是要在下标 <code>0</code> 到 <code>n-1</code> 范围内搜索。如果以后搜索的是个数，可能就是最少个数和最多个数了。一定要仔细想清楚这里的范围，不要闭着眼睛乱写。</p>
 </blockquote>
 <p>时间复杂度：<span class="arithmatex">\(O(\log n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span></p>
+<div class="algoviz" data-module="lc74-搜索二维矩阵-v2" data-title="74 搜索二维矩阵 · 步骤可视化"></div>
 <pre class="highlight" data-lang="python"><code class="language-python">class Solution:
     def searchRange(self, nums: List[int], target: int) -&gt; List[int]:
         def find_boundary(is_left: bool):
