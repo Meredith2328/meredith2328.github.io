@@ -639,12 +639,26 @@
     });
   }
 
+  function mountModule(el, mod, opts) {
+    /* mount a module OBJECT directly (user-pasted / imported), bypassing
+     * script loading. mod must satisfy the module format (run, code, ...). */
+    if (el.classList.contains("algoviz-init")) return;
+    el.classList.add("algoviz-init");
+    if (!mod || typeof mod.run !== "function") return;
+    var cls = "algoviz " + themeClass(el, opts);
+    el.className = el.className ? el.className + " " + cls : cls;
+    el.style.position = el.style.position || "relative";
+    mounted.push(el);
+    buildPlayer(el, mod, opts || {});
+  }
+
   global.AlgoViz = {
     mount: mount,
     mountAll: mountAll,
+    mountModule: mountModule,
     loadModule: loadModule,
     views: RENDERERS,
-    version: "0.1.0"
+    version: "0.2.0"
   };
 
   // keep mounted players in sync with the page theme (e.g. blog dark toggle)
