@@ -372,12 +372,13 @@
       SPEEDS.map(function (s) { return h("option", { value: String(s), text: s + "x", selected: s === 1 ? "" : null }); }));
     var stepLabel = h("span", { class: "algoviz-step-label", text: "Step 0 / 0" });
     var editBtn = h("button", { class: "algoviz-btn", text: "✎ Edit Testcase", title: "编辑测试用例" });
+    var collapseBtn = h("button", { class: "algoviz-btn", text: "收起 ▲", title: "收起播放器（保留进度）" });
     var slider = h("input", { class: "algoviz-progress", type: "range", min: "0", max: "0", value: "0" });
 
     var header = h("div", { class: "algoviz-header" }, [
       h("div", { class: "algoviz-title", html: esc(mod.title || mod.id || "") + "<small>algoviz</small>" }),
       firstBtn, prevBtn, playBtn, nextBtn, lastBtn, speedSel,
-      slider, stepLabel, editBtn
+      slider, stepLabel, editBtn, collapseBtn
     ]);
 
     // --- code panel
@@ -524,6 +525,11 @@
     };
     slider.oninput = function () { pause(); goTo(parseInt(slider.value, 10)); };
     editBtn.onclick = function () { openModal(); };
+    collapseBtn.onclick = function () {
+      var collapsed = root.classList.toggle("algoviz-collapsed");
+      if (collapsed) pause();
+      collapseBtn.textContent = collapsed ? "展开 ▼" : "收起 ▲";
+    };
 
     root.tabIndex = 0;
     root.style.outline = "none";

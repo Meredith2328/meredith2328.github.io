@@ -58,6 +58,15 @@
   --av-purple: #b48cff;
 }
 
+/* ---------- collapse (keep state, hide panels) ---------- */
+.algoviz.algoviz-collapsed .algoviz-body,
+.algoviz.algoviz-collapsed .algoviz-msg {
+  display: none;
+}
+.algoviz.algoviz-collapsed {
+  box-shadow: 3px 3px 0 0 var(--av-shadow);
+}
+
 /* ---------- poster (before load) ---------- */
 .algoviz-poster {
   display: flex;
