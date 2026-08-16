@@ -1898,8 +1898,8 @@ html[data-theme="dark"] .theme-icon-sun { display: block; }
 }
 
 .code-lang {
-  /* trapezoid tab like a browser tab, hanging outside the block at the
-     top-left corner; the bottom (narrow) edge meets the block's top border */
+  /* trapezoid tab hanging outside the block at the top-left corner, flipped:
+     the bottom (wide) edge meets the block's top border */
   position: absolute;
   top: -25px;
   left: 0;
@@ -1916,7 +1916,7 @@ html[data-theme="dark"] .theme-icon-sun { display: block; }
   text-overflow: ellipsis;
   color: var(--paper);
   background: var(--ink);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 9px 100%);
+  clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 100%, 0 100%);
   filter: drop-shadow(3px 3px 0 var(--shadow));
 }
 
