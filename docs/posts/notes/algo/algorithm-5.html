@@ -17,11 +17,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50） · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题11 二分查找 专题">
+  <meta name="description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 专题11 二分查找 专题15 动态规划 专题16 多维动态规划 回溯模板：结束条件，遍历选择，做出选择。 回溯需要考虑当前start时可以">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）">
-  <meta property="og:description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题11 二分查找 专题">
+  <meta property="og:description" content="回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。 专题11 二分查找 专题15 动态规划 专题16 多维动态规划 回溯模板：结束条件，遍历选择，做出选择。 回溯需要考虑当前start时可以">
   <link rel="canonical" href="https://meredith2328.github.io/posts/notes/algo/algorithm-5.html">
   
   
@@ -120,7 +120,7 @@
     <h1 class="post-title">数据结构与算法 · 05 · LeetCode HOT 100 in Python（后50）</h1>
     <div class="post-meta">
       <time datetime="2026-03-02T00:00:00">2026-03-02</time>
-      <span class="post-stats">13662 字 · 约 31 分钟</span>
+      <span class="post-stats">15313 字 · 约 35 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95">#数据结构与算法</a>
       
@@ -148,9 +148,6 @@
   <div class="post-body markdown-body" data-chapters="9" data-per-page="1">
     <div class="post-chapter" data-ch="1"><p>回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。</p>
 <!-- more -->
-<p>大致目的是完整地、成体系地过，
-然后对关键点仔细地、反复地揣摩把握，
-最终目标是任意抽出一道、均能有很好的理解。</p>
 <p>专题10 回溯
 专题11 二分查找
 专题12 栈
@@ -384,7 +381,7 @@
 <p>发现之前有一道滑动窗口的题忘了做了。</p>
 <p>首先挨个元素推入最大堆。在最大堆中元素足够多时，将不在窗口的全部pop出来，则剩下的就是在窗口内、且值最大的元素。</p>
 <p>堆通过heapq包对heap数组进行处理，两个方法分别叫做heapq.heappush和heapq.heappop。</p>
-<div class="algoviz" data-module="lc239-滑动窗口最大值-v2" data-title="239 滑动窗口最大值 · 步骤可视化"></div>
+<div class="algoviz" data-module="lc239-滑动窗口最大值" data-title="239 滑动窗口最大值 · 步骤可视化"></div>
 <pre class="highlight"><code>class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -&gt; List[int]:
         # 最大堆, 所以存储 (-num, i)
@@ -406,7 +403,7 @@
 <p>每次加入新元素前，将队尾小于新元素的全部移除。（不可能成为最大值）</p>
 <p>加入后、添加res前，将队头不在窗口内的全部移除。</p>
 <p>（单调队列一般就是这种移除队尾的小元素的写法用法，然后因为这里有窗口的要求、还需要移除队头不在窗口内的元素。）</p>
-<div class="algoviz" data-module="lc239-滑动窗口最大值-v3" data-title="239 滑动窗口最大值 · 步骤可视化"></div>
+<div class="algoviz" data-module="lc239-滑动窗口最大值-v2" data-title="239 滑动窗口最大值 · 步骤可视化"></div>
 <pre class="highlight"><code>class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -&gt; List[int]:
         # 维护单调队列
@@ -717,39 +714,68 @@
             stk.append((i, temp))
         return res
 </code></pre>
-<p>84 柱状图中最大的矩形</p>
+<p><a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形</a></p>
 <p>这个单调栈问题如果有一些直观直觉，会好把握一点。</p>
 <p><img alt="" src="../../migrated/post-images/20260302113916.png"/></p>
-<p>例如图上 <code>[2,1,5,6,2,3]</code> 的情况，我们可以有直观直觉：两边很矮，然后中间连着有几个高的，这样会有比较大的矩形。</p>
-<p>单调栈正是为了实现这个直觉，比如中间连着的几个高的不再会用在以后的大矩形中（因为有右边的矮高度隔开）。</p>
-<p>而左边的矮的不会用在现在的大矩形中，而是用在以后的长条矩形中，所以作为左边界、在栈里面存着。</p>
-<p>如果高度为升序则直接存入，</p>
-<p>一旦有逆序则i即为右边界，</p>
-<p>通过弹出直到找到左边界（不再逆序）来确定面积。</p>
-<p>至于为什么是升序：<br/>
-首先一开始是宽度为1、高度为最高（单调栈栈顶），<br/>
-随着宽度扩大，高度只会慢慢变低，我们不能直接由宽度和高度同时变大或变小来确定面积肯定变大或变小，因此只遍历判断这些情况是效率最高的。<br/>
-就像2,1,5,6,2,3这样的情况中的面积应为1,5,6,2围出的10，右边界是通过6,2得到的逆序，左边界是通过1,2得到的不再逆序。<br/>
-在完成一次右边界判断后，右边界加入栈中，则5和6不再对以后的最大面积有意义，因此在这个过程中也是弹出的。</p>
-<div class="algoviz" data-module="lc84-柱状图中最大的矩形" data-title="84 柱状图中最大的矩形 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<p>直觉：我们考虑以当前柱子为高度的矩形，则它最多可以延伸到左右两边第一个低于它的柱子。</p>
+<p>这两个柱子确定了最大宽度，当前柱子确定高度。</p>
+<p>其他高度的矩形，当前柱子不关心。</p>
+<p>故使用一个单调递增栈，当遇到一个比栈顶更矮的柱子时，就意味着找到了<strong>栈顶柱子</strong>的右边界，可以立刻弹出并计算以其为高度的最大矩形。（此时栈顶和两侧矮柱子形成“<strong>低高低</strong>”关系，可以立即结算这个高柱子）</p>
+<p>为了解决边界问题，我们往两侧添加高度为0的“柱子”。</p>
+<blockquote>
+<p>这道题与<a href="https://leetcode.cn/problems/trapping-rain-water/">42. 接雨水</a>十分相似，二者可以说是有对偶关系：一个处理低高低这样“凸”的形状，一个处理高低高这样“凹”的形状。使用单调栈的解法，时空复杂度均为<span class="arithmatex">\(O(n)\)</span>。</p>
+<p>对于低高低（这道题），矩形宽度取决于两侧第一个低于当前矩形的高度，所以维护单调递增栈，栈顶即对应“当前矩形”。</p>
+<p>对于高低高（接雨水），雨水量取决于两侧第一个高于当前高度的更低者，所以维护单调递减栈，栈顶即对应“当前凹槽”。（虽然这个单调栈解法不是最优、空间复杂度不如双指针，但考虑到对称性，值得提一下）</p>
+<p>（更深刻地，它们结构特别像、所以都可以用单调栈。但是接雨水中的“最小者”这个关系可以传递，所以还可以用双指针；而柱状图中最大的矩形的“最近者”这个关系对应的宽度信息不可以传递，所以不可以用双指针）</p>
+</blockquote>
+<p>时间复杂度：<span class="arithmatex">\(O(n)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
+<p>（相比起来，暴力寻找两边第一个小于当前高度的解法，时间复杂度为<span class="arithmatex">\(O(n^2)\)</span>，空间复杂度为<span class="arithmatex">\(O(1)\)</span>）</p>
+<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
     def largestRectangleArea(self, heights: List[int]) -&gt; int:
         heights = [0] + heights + [0]
-        stack = []
-        # 如果高度为升序则直接存入
-        # 一旦有逆序即找到右边界
-        # 通过弹出直到找到左边界来确定面积
+        stk = [] # 存储索引, 单调递增栈
         max_area = 0
-
-        for i in range(len(heights)):
-            # 满足栈顶大于nums[i]时, i即为右边界
-            # 满足栈中指向的某个元素小于nums[i]时, 该元素即为左边界
-            while stack and heights[i] &lt; heights[stack[-1]]:
-                height = heights[stack.pop()]
-                width = i - stack[-1] - 1
+        for i, h in enumerate(heights):
+            # 结算栈顶高度, 并且同一个h有可能连续结算好多个!
+            while stk and heights[stk[-1]] &gt; h: # 关键: 我们找到的是**栈顶高度**的**两侧矮于它的高度**!
+                height = heights[stk.pop()]
+                width = i - stk[-1] - 1
                 max_area = max(max_area, height * width)
-            stack.append(i)
+            stk.append(i)
+        return max_area
+</code></pre>
+<p><a href="https://leetcode.cn/problems/maximal-rectangle/">85. 最大矩形</a></p>
+<p>这道题可以化归为<a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形</a>。关键是，我们如果以每一行为底，则它及上面的部分恰好构成一个“柱状图”。</p>
+<p>这个柱状图的巧妙之处在于，如果底当前列的元素为1，则高度是递推过来的；如果为0，则断开，高度为0。</p>
+<p><del>写一遍权当复习84了，默写着默写着发现自己84的 <code>while</code> 循环没想到，谢谢85</del></p>
+<p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
+<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
+    def maximalRectangle(self, matrix: List[List[str]]) -&gt; int:
+        if not matrix or not matrix[0]:
+            return 0
+        m, n = len(matrix), len(matrix[0])
+        heights = [0] * n
+        max_area = 0
+        for i in range(m):
+            # 重要: 对当前行进行条形图统计时, 如果遇到0, 则"断开"
+            for j in range(n):
+                if matrix[i][j] == '1':
+                    heights[j] += 1
+                else:
+                    heights[j] = 0
+            max_area = max(max_area, self.largestRectangleArea(heights))
+        return max_area
 
+    def largestRectangleArea(self, heights):
+        heights = [0] + heights + [0]
+        stk = []
+        max_area = 0
+        for i, h in enumerate(heights):
+            while stk and heights[stk[-1]] &gt; h:
+                height = heights[stk.pop()]
+                width = i - stk[-1] - 1
+                max_area = max(max_area, height * width)
+            stk.append(i)
         return max_area
 </code></pre>
 </div><div class="post-chapter" data-ch="5" data-title="专题13 堆"><h3 id="专题13-堆">专题13 堆</h3>
@@ -782,13 +808,22 @@ class Solution:
         return len(heap)
 </code></pre>
 <p>215 数组中的第K个最大元素</p>
+<p>解法一：<strong>最小堆</strong></p>
+<p>维护大小保持为 <span class="arithmatex">\(k\)</span> 个的最小堆，如果长度超出时把<strong>最小元素</strong>逐出，从而最后在堆中留下的就是前K个最大元素，其中最小的就是堆顶。</p>
+<p>时间复杂度：<span class="arithmatex">\(O(n \log k)\)</span>，空间复杂度：<span class="arithmatex">\(O(k)\)</span></p>
 <div class="algoviz" data-module="lc215-数组中的第k个最大元素" data-title="215 数组中的第K个最大元素 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
     def findKthLargest(self, nums: List[int], k: int) -&gt; int:
-        nums.sort()
-        return nums[-k]
+        heap = [] # 最小堆解法
+        for num in nums:
+            heapq.heappush(heap, num)
+            if len(heap) &gt; k:
+                heapq.heappop(heap)
+        return heap[0]
 </code></pre>
-<p>建堆是O(n)的，这事一眼看到还是有一点反直觉的。</p>
+<p>解法二：<strong>最大堆</strong></p>
+<p>对全部元素建堆（<span class="arithmatex">\(O(n)\)</span>），然后 <code>pop</code> <span class="arithmatex">\(k\)</span> 次（<span class="arithmatex">\(O(k \log n)\)</span>）。</p>
+<p>时间复杂度：<span class="arithmatex">\(O(n + k \log n)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
 <div class="algoviz" data-module="lc215-数组中的第k个最大元素-v2" data-title="215 数组中的第K个最大元素 · 步骤可视化"></div>
 <pre class="highlight"><code>class Solution:
     def findKthLargest(self, nums: List[int], k: int) -&gt; int:
@@ -1427,26 +1462,59 @@ class Solution:
                 dp[i][j] = dp[i - 1][j - 1] + 1 if text1[i - 1] == text2[j - 1] else max(dp[i - 1][j], dp[i][j - 1])
         return dp[m][n]
 </code></pre>
-<p>72 编辑距离</p>
-<p>不要被题目吓到。其实就是最长公共子序列那种感觉。题目的三种方式只是三种转移。</p>
-<div class="algoviz" data-module="lc72-编辑距离" data-title="72 编辑距离 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<p><a href="https://leetcode.cn/problems/edit-distance/">72. 编辑距离</a></p>
+<p>方法二：<strong>滚动数组优化空间</strong></p>
+<p>这玩意一口气依赖了三个元素（事实上是对角线形式的依赖），但是仍然可以用滚动数组优化空间复杂度。</p>
+<p>其关键是找到并维护好这些关系：</p>
+<ul>
+<li><strong>用一个 <code>prev</code> 变量存储 <code>[i - 1][j - 1]</code> 位置的元素。</strong></li>
+<li><code>dp[i][j - 1]</code> 元素当前的存储是 <code>dp[j - 1]</code> 。</li>
+<li><code>dp[i - 1][j]</code> 元素当前的存储是 <code>dp[j]</code> 。</li>
+</ul>
+<p>为了维护：</p>
+<p>在设置 <code>dp[j]</code> 的值之前，需要把 <code>dp[j]</code> 的值保存下来（相当于 <code>dp[i - 1][j - 1]</code>）。</p>
+<p>（想一下二维数组就好想了）<code>dp[i][0]</code> 直接保存给 <code>prev</code> ，再设置 <code>dp[i][0]</code> 的值为 <code>i</code> ；</p>
+<p>在循环中因为 <code>prev</code> 要使用，所以保存给 <code>tmp</code> ，等用完 <code>prev</code> 了再传给它。</p>
+<p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
+<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
     def minDistance(self, word1: str, word2: str) -&gt; int:
+        # 关键: 使用右边界, 所以需要多开一个, 而且判断时需要用-1
         m, n = len(word1), len(word2)
-        # 将word1[0:i]转化为word2[0:j]的最少操作数
+        # dp[i][j] 代表将word1[:i]转化成word2[:j]的最小操作数
+        dp = [j for j in range(n + 1)]
+
+        for i in range(1, m + 1):
+            prev = dp[0]
+            dp[0] = i # 用来存储当前行的dp初值
+            for j in range(1, n + 1):
+                tmp = dp[j]
+                if word1[i - 1] == word2[j - 1]:
+                    dp[j] = prev
+                else:
+                    dp[j] = 1 + min(dp[j], dp[j - 1], prev)
+                prev = tmp
+        return dp[n]
+</code></pre>
+<p>方法一：<strong>朴素动态规划</strong></p>
+<p>不要被题目吓到。其实就是最长公共子序列那种感觉。题目的三种方式只是三种转移。</p>
+<p>十分经典的题目，从CS61A的练习题里就出现过。</p>
+<p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span>，空间复杂度：<span class="arithmatex">\(O(mn)\)</span></p>
+<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
+    def minDistance(self, word1: str, word2: str) -&gt; int:
+        # 关键: 使用右边界, 所以需要多开一个, 而且判断时需要用-1
+        m, n = len(word1), len(word2)
+        # dp[i][j] 代表将word1[:i]转化成word2[:j]的最小操作数
         dp = [[0] * (n + 1) for _ in range(m + 1)]
         for i in range(m + 1):
             dp[i][0] = i
         for j in range(n + 1):
             dp[0][j] = j
-
         for i in range(1, m + 1):
             for j in range(1, n + 1):
                 if word1[i - 1] == word2[j - 1]:
                     dp[i][j] = dp[i - 1][j - 1]
                 else:
-                    dp[i][j] = min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]) + 1
-
+                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
         return dp[m][n]
 </code></pre>
 <p><a href="https://leetcode.cn/problems/burst-balloons/">312. 戳气球</a></p>
@@ -1457,7 +1525,6 @@ class Solution:
 <p>区间遍历的写法：最外层遍历长度、内层循环遍历起始点。</p>
 </blockquote>
 <p>时间复杂度：<span class="arithmatex">\(O(n^3)\)</span> 。空间复杂度：<span class="arithmatex">\(O(n^2)\)</span> 。</p>
-<div class="algoviz" data-module="lc72-编辑距离-v2" data-title="72 编辑距离 · 步骤可视化"></div>
 <pre class="highlight" data-lang="python"><code class="language-python">class Solution:
     def maxCoins(self, nums: List[int]) -&gt; int:
         points = [1] + nums + [1]
@@ -1623,6 +1690,17 @@ class Solution:
                 l = mid + 1
         return l
 </code></pre>
+<blockquote>
+<p>写到这里，突然有所感慨。</p>
+<p>HOT 100是我前后刷了三次往上的题单：</p>
+<ul>
+<li>第一遍是为了学Python、数据结构与算法。囫囵吞枣，只是对一小部分题目和书写结构留下一个模模糊糊的印象。像是抄了一遍书，为之后多多少少留下了一点熟悉感。</li>
+<li>第二遍则正儿八经地尝试去理解每一处细节。这一遍是按照LeetCode HOT 100的分类一类一类刷的。这一遍刷得很慢，完全是推着自己硬要写下去才能写得下去。一天可能看个几道就开始大脑过载，记下来的东西也不知道哪些是重点、哪些不是重点——仿佛这些笔记自己不会再看一样。事实也如此，这些笔记之后一次也没有看过。可是留下的熟悉感竟然要多一些。</li>
+<li>第三遍就是出于实习面试的功利目的，需要快、需要熟，那么不就只能背了！这一遍是随机从HOT 100抽的（当然重点抽了Hard和Medium）。这时候已经认真完整学过王道的数据结构体系、学过算法导论的体系、还学过一遍洛谷基础篇的体系，似乎那些东西拿到手边都能看懂，只是随便给我一个题，我还是不敢写。不敢写、不敢写，万事万物就卡在一个不敢上面。反正结果上，随便抽一道、能如同“渐进式披露”一般摸个大概出来，也许有些细节还是得调一下、补一下、不一定能一遍AC。但至少现在抽一道题过来，至少是敢动笔了，也多多少少记得DFS、BFS、回溯、单调栈什么的，大概是什么样子。</li>
+<li>也许有些关口总是要有什么推一把的吧。人的可塑性还是太好了——我一个完全不会钢琴的、以前也只打过2k和4k的玩家，打打osu!打多了，也能打点新手入门7k谱了。<strong>人的无限性总是被世界的有限性给约束住</strong>，然后或许会因此以为人是有限的——</li>
+<li>于是，下一首乐曲即将奏响。</li>
+</ul>
+</blockquote>
 </div><aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="algorithm-4.html" title="上一篇">← 04 HOT 100（前 50）</a></div></aside>
   </div>
 
@@ -1725,7 +1803,7 @@ class Solution:
 <script src="../../../js/pager.js" defer></script>
 
 <script src="../../../js/toc.js" defer></script>
-<script src="../../../js/code-copy.js" defer></script>
+<script src="../../../js/code-copy.js?v=2" defer></script>
 <script src="../../../js/img-loading.js" defer></script>
 <script src="../../../js/lightbox.js" defer></script>
 
@@ -1735,6 +1813,7 @@ class Solution:
 <link rel="stylesheet" href="../../../algoviz-player/algoviz.css">
 <script src="../../../algoviz-player/algoviz.js" defer
         onload="AlgoViz.mountAll(document, {base: '../../../algoviz-player/'})"></script>
+
 
 
 </body>

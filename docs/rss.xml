@@ -9,10 +9,10 @@
     <generator>pilog</generator>
       <item>
         <title>一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</title>
-        <link>https://meredith2328.github.io/posts/notes/agents/coding-agent-anatomy.html</link>
-        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/coding-agent-anatomy.html</guid>
+        <link>https://meredith2328.github.io/posts/notes/agents/coding-agent.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/coding-agent.html</guid>
         <pubDate>Mon, 17 Aug 2026 00:00:00 -0000</pubDate>
-        <description>之前想自己写一个 mini coding agent，于是把 pi（&lt;code&gt;@earendil-works/pi-coding-agent&lt;/code&gt;）的源码和它留在本机的真实会话数据（&lt;code&gt;~/.pi/agent/sessions/&lt;/code&gt; 下的 &lt;code&gt;sessions.jsonl&lt;/code&gt;）翻了一遍。这篇把两样东西合在一起：用源码结构讲架构，用会话数据讲这架机器实际转起来是什么样子。文中的会话片段都取自真实运行记录，路径、ID、仓库名做了泛化，结构原样保留。 &amp;lt;!-- more…</description>
+        <description>希望了解最小化的coding agent是什么样的。于是整理了 pi（&lt;code&gt;@earendil-works/pi-coding-agent&lt;/code&gt;）的源码和它留在本机的真实会话数据（&lt;code&gt;~/.pi/agent/sessions/&lt;/code&gt; 下的 &lt;code&gt;sessions.jsonl&lt;/code&gt;）。这篇把两样东西合在一起：用源码结构讲架构，用会话数据讲这架机器实际转起来是什么样子。文中的会话片段都取自真实运行记录，路径、ID、仓库名做了泛化，结构原样保留。 &amp;lt;!-- more…</description>
       </item>
       <item>
         <title>DSH有可能覆盖丢失你自己改的文件，记得修一下</title>
@@ -159,7 +159,7 @@
         <link>https://meredith2328.github.io/posts/notes/algo/algorithm-5.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/algo/algorithm-5.html</guid>
         <pubDate>Mon, 02 Mar 2026 00:00:00 -0000</pubDate>
-        <description>回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。  大致目的是完整地、成体系地过， 然后对关键点仔细地、反复地揣摩把握， 最终目标是任意抽出一道、均能有很好的理解。 专题10 回溯 专题11 二分查找 专题12 栈 专题13 堆 专题14 贪心 专题15 动态规划 专题16 多维动态规划 专题17 技巧 46 全排列 回溯模板：结束条件，遍历选择，做出选择。 &amp;lt;div class="algoviz" data-module="lc46-全排列"…</description>
+        <description>回溯、二分查找、栈、堆、贪心、动态规划、多维动态规划、技巧。  专题10 回溯 专题11 二分查找 专题12 栈 专题13 堆 专题14 贪心 专题15 动态规划 专题16 多维动态规划 专题17 技巧 46 全排列 回溯模板：结束条件，遍历选择，做出选择。  78…</description>
       </item>
       <item>
         <title>贴贴棋（reverseChess）介绍</title>

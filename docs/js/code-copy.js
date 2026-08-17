@@ -43,6 +43,9 @@
   }
 
   body.querySelectorAll("pre").forEach(function (pre) {
+    // pre's inside interactive embeds (archviz diagrams etc.) manage their
+    // own presentation — no copy button / language tab / collapse wrapper
+    if (pre.closest(".archviz")) return;
     var wrap = document.createElement("div");
     wrap.className = "code-block";
     var btn = document.createElement("button");
