@@ -8,6 +8,13 @@
     <language>zh-CN</language>
     <generator>pilog</generator>
       <item>
+        <title>一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</title>
+        <link>https://meredith2328.github.io/posts/notes/agents/coding-agent-anatomy.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/coding-agent-anatomy.html</guid>
+        <pubDate>Mon, 17 Aug 2026 00:00:00 -0000</pubDate>
+        <description>之前想自己写一个 mini coding agent，于是把 pi（&lt;code&gt;@earendil-works/pi-coding-agent&lt;/code&gt;）的源码和它留在本机的真实会话数据（&lt;code&gt;~/.pi/agent/sessions/&lt;/code&gt; 下的 &lt;code&gt;sessions.jsonl&lt;/code&gt;）翻了一遍。这篇把两样东西合在一起：用源码结构讲架构，用会话数据讲这架机器实际转起来是什么样子。文中的会话片段都取自真实运行记录，路径、ID、仓库名做了泛化，结构原样保留。 &amp;lt;!-- more…</description>
+      </item>
+      <item>
         <title>DSH有可能覆盖丢失你自己改的文件，记得修一下</title>
         <link>https://meredith2328.github.io/posts/notes/agents/dsh-overwrite-incident.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/dsh-overwrite-incident.html</guid>
@@ -215,7 +222,7 @@
         <link>https://meredith2328.github.io/posts/toy/10pi.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/10pi.html</guid>
         <pubDate>Fri, 30 Aug 2024 00:00:00 -0000</pubDate>
-        <description>顾名思义，玩具箱就应该是玩具箱。 知识笔记、工具笔记、写出的小玩意儿，都是玩具。 有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。 任何批评和建议均会受到最热烈的欢迎： Issues /…</description>
+        <description>顾名思义，玩具箱就应该是玩具箱。 知识笔记、工具笔记、写出的小玩意儿，都是玩具。 有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。 任何批评和建议均会受到最热烈的欢迎： Issues / pipipi2328@gmail.com 主要集中于深度学习常用的工具。 结合 pi 的架构与真实会话数据（sessions.jsonl），把消息模型、主循环、Provider…</description>
       </item>
       <item>
         <title>freshdan 新生wiki项目</title>

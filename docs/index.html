@@ -119,15 +119,17 @@
     
     <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
     
-    <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
+    <button class="tag-chip" type="button" data-tag="项目">#项目</button>
     
-    <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
+    <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
     
     <button class="filter-more" id="filter-more" type="button">更多标签 ▾</button>
   </div>
   <div class="filter-more-panel" id="filter-more-panel" hidden>
     <input id="filter-more-search" type="search" placeholder="搜索标签…">
     <div class="filter-more-list" id="filter-more-list">
+      
+      <button class="tag-chip" type="button" data-tag="Agent">#Agent</button>
       
       <button class="tag-chip" type="button" data-tag="bugfix">#bugfix</button>
       
@@ -182,11 +184,43 @@
           </div>
           <h3 class="card-title">十派的玩具箱有哪些内容？</h3>
           
-          <div class="card-preview">顾名思义，玩具箱就应该是玩具箱。 知识笔记、工具笔记、写出的小玩意儿，都是玩具。 有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。 任何批评和建议均会受到最热烈的欢迎： Issues /…</div>
+          <div class="card-preview">顾名思义，玩具箱就应该是玩具箱。 知识笔记、工具笔记、写出的小玩意儿，都是玩具。 有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。 任何批评和建议均会受到最热烈的欢迎： Issues / pipipi2328@gmail.com 主要集中于深度学习常用的工具。 结合 pi 的架构与真实会话数据（sessions.jsonl），把消息模型、主循环、Provider…</div>
           
           <div class="card-tags">
             
             <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
+    
+    <article class="card" data-tags="Agent 项目 " data-folder="posts/notes/agents" data-date="2026-08-17">
+      
+      <a class="card-link" href="posts/notes/agents/coding-agent-anatomy.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-meta-left">
+              <time datetime="2026-08-17">2026-08-17</time>
+              
+            </span>
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/agents">agents</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</h3>
+          
+          <div class="card-preview">之前想自己写一个 mini coding agent，于是把 pi（<code>@earendil-works/pi-coding-agent</code>）的源码和它留在本机的真实会话数据（<code>~/.pi/agent/sessions/</code> 下的 <code>sessions.jsonl</code>）翻了一遍。这篇把两样东西合在一起：用源码结构讲架构，用会话数据讲这架机器实际转起来是什么样子。文中的会话片段都取自真实运行记录，路径、ID、仓库名做了泛化，结构原样保留。 &lt;!-- more…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="Agent">#Agent</button>
+            
+            <button class="tag-chip" type="button" data-tag="项目">#项目</button>
             
           </div>
         </div>
@@ -516,36 +550,6 @@
       </a>
     </article>
     
-    <article class="card" data-tags="翻译 " data-folder="posts/reference" data-date="2026-03-25">
-      
-      <a class="card-link" href="posts/reference/fudan-mlsys-cn.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-meta-left">
-              <time datetime="2026-03-25">2026-03-25</time>
-              
-            </span>
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/reference">reference</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">给机器学习系统课程做了一下中文翻译</h3>
-          
-          <div class="card-preview">在线阅读： MLSys 中文翻译 搞到网页上方便阅读。  原网页链接： MLSys 课程名称：复旦大学2025-2026春机器学习系统课程（尚笠老师）</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
-            
-          </div>
-        </div>
-        
-      </a>
-    </article>
-    
   </div>
 
   
@@ -825,6 +829,17 @@
             </div>
             <ul class="tree-children">
               
+        
+          
+          <li class="tree-file" data-path="posts/notes/agents/coding-agent-anatomy">
+            <a class="tree-row" href="posts/notes/agents/coding-agent-anatomy.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="img/pixel-file.svg" alt="file">
+              <span class="tree-name">一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</span>
+              <span class="tree-date">2026-08-17</span>
+            </a>
+          </li>
+          
         
           
           <li class="tree-file" data-path="posts/notes/agents/dsh-overwrite-incident">

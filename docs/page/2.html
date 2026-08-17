@@ -119,15 +119,17 @@
     
     <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
     
-    <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
+    <button class="tag-chip" type="button" data-tag="项目">#项目</button>
     
-    <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
+    <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
     
     <button class="filter-more" id="filter-more" type="button">更多标签 ▾</button>
   </div>
   <div class="filter-more-panel" id="filter-more-panel" hidden>
     <input id="filter-more-search" type="search" placeholder="搜索标签…">
     <div class="filter-more-list" id="filter-more-list">
+      
+      <button class="tag-chip" type="button" data-tag="Agent">#Agent</button>
       
       <button class="tag-chip" type="button" data-tag="bugfix">#bugfix</button>
       
@@ -161,6 +163,36 @@
   </div>
 
   <div class="card-grid" id="card-grid">
+    
+    <article class="card" data-tags="翻译 " data-folder="posts/reference" data-date="2026-03-25">
+      
+      <a class="card-link" href="../posts/reference/fudan-mlsys-cn.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-meta-left">
+              <time datetime="2026-03-25">2026-03-25</time>
+              
+            </span>
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/reference">reference</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">给机器学习系统课程做了一下中文翻译</h3>
+          
+          <div class="card-preview">在线阅读： MLSys 中文翻译 搞到网页上方便阅读。  原网页链接： MLSys 课程名称：复旦大学2025-2026春机器学习系统课程（尚笠老师）</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="翻译">#翻译</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
     
     <article class="card" data-tags="大模型 " data-folder="posts/notes/ml" data-date="2026-03-14">
       
@@ -522,36 +554,6 @@
       </a>
     </article>
     
-    <article class="card" data-tags="工具 " data-folder="posts/notes/tools" data-date="2026-02-09">
-      
-      <a class="card-link" href="../posts/notes/tools/einops.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-meta-left">
-              <time datetime="2026-02-09">2026-02-09</time>
-              
-            </span>
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/tools">tools</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">用einops包替换掉PyTorch的大部分矩阵变换函数</h3>
-          
-          <div class="card-preview">只是 <code>rearrange</code> ，<code>reduce</code> ， <code>repeat</code> 和 <code>einsum</code> 这四个函数而已。 但真的很好用。  爱因斯坦求和标记：Einops tutorial, part 1: basics - Einops <code>rearrange</code> 函数：以更可读的方式重排、合并或拆分维度。 在这种计算机视觉的上下文里还挺合适的，分别是batch channel height…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="工具">#工具</button>
-            
-          </div>
-        </div>
-        
-      </a>
-    </article>
-    
   </div>
 
   
@@ -831,6 +833,17 @@
             </div>
             <ul class="tree-children">
               
+        
+          
+          <li class="tree-file" data-path="posts/notes/agents/coding-agent-anatomy">
+            <a class="tree-row" href="../posts/notes/agents/coding-agent-anatomy.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</span>
+              <span class="tree-date">2026-08-17</span>
+            </a>
+          </li>
+          
         
           
           <li class="tree-file" data-path="posts/notes/agents/dsh-overwrite-incident">
