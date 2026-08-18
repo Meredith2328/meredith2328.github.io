@@ -166,7 +166,7 @@
         <link>https://meredith2328.github.io/posts/toy/reverseChess.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/reverseChess.html</guid>
         <pubDate>Thu, 26 Feb 2026 00:00:00 -0000</pubDate>
-        <description>在线游玩：贴贴棋  贴贴棋是一个10x10的黑白棋变体小游戏，纯HTML（JavaScript）。最主要的规则如下：   （&lt;strong&gt;复制&lt;/strong&gt;）如果走到的地方周围三面为空（不考虑移动前的位置，因为总是为空，下同），则任取一面置黑色。 ；  （&lt;strong&gt;同化&lt;/strong&gt;）如果一面有白棋、两面为空，则将白棋和任意一面空的同时置为黑色。 ；  （&lt;strong&gt;保留&lt;/strong&gt;）如果两面有白棋、一面为空，则啥也不做。 ；  4.…</description>
+        <description>贴贴棋是一个黑白棋变体小游戏, 通过“贴贴”来削弱对方、增强己方。</description>
       </item>
       <item>
         <title>用einops包替换掉PyTorch的大部分矩阵变换函数</title>
@@ -229,7 +229,7 @@
         <link>https://meredith2328.github.io/posts/toy/freshdan.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/freshdan.html</guid>
         <pubDate>Mon, 26 Aug 2024 00:00:00 -0000</pubDate>
-        <description>已发布至 freshdan  假期内跟 @Jingyijun 老师聊天时画了这个饼，和 @CodingMizore 激烈交流、以及参考了 @Cameudis…</description>
+        <description>已发布至 freshdan, 希望能给复旦新生一些微小的帮助！</description>
       </item>
       <item>
         <title>CSAPP · Shelllab</title>
@@ -271,7 +271,7 @@
         <link>https://meredith2328.github.io/posts/toy/friends.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/friends.html</guid>
         <pubDate>Tue, 30 Apr 2024 00:00:00 -0000</pubDate>
-        <description>TLP's Blog 星间纪行 - 不著名星际贡献者不完全记录 Xia's Blog</description>
+        <description>遇到的每一个鲜活的家伙都弥足珍贵</description>
       </item>
       <item>
         <title>为什么神乐光很萌？</title>
@@ -327,7 +327,7 @@
         <link>https://meredith2328.github.io/posts/toy/zi-she.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/zi-she.html</guid>
         <pubDate>Sat, 13 Aug 2022 00:00:00 -0000</pubDate>
-        <description>人设绝赞完善中！  ⋯⋯ 等等等等（以下省略一万字以上） 按照ACG顺序介绍，这一部分是一边听 &lt;strong&gt;&lt;em&gt;向着无尽之灰/限りなく灰色へ&lt;/em&gt;&lt;/strong&gt; 一边写的。 bilibili：十派的追番列表 大约是2020年10月开始相对较大规模地看番剧，该属性持续至今。 看番列表中“日常番”类型相对较多。 几乎没有接触过战斗番等类型，欢迎推荐。 相比于“追番”更喜欢“补番”，所以会把一部分番点了红心之…</description>
+        <description>人设绝赞完善中！</description>
       </item>
   </channel>
 </rss>

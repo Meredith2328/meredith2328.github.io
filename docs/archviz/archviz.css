@@ -357,3 +357,77 @@
   .av-flow { grid-template-columns: minmax(0, 1fr) 34px; }
   .av-rail { margin-right: 2px; }
 }
+
+/* ============================================================
+   layered state-machine diagram (archviz-layers2)
+   ============================================================ */
+.av2 { display: grid; grid-template-columns: minmax(0, 1fr) 148px; gap: 10px; }
+.av2-main { min-width: 0; }
+
+.av2-lane { margin-bottom: 10px; }
+.av2-lane-head {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--ink); margin-bottom: 6px;
+}
+.av2-lane-tag {
+  border: 1.5px solid var(--ink); padding: 1px 7px;
+  background: var(--panel); letter-spacing: 0.06em;
+}
+.av2-lane-sub { font-weight: 400; color: var(--mute); font-size: 10.5px; }
+
+.av2-node {
+  border: 2px solid var(--ink); background: var(--paper);
+  padding: 8px 11px; max-width: 560px;
+  transition: opacity 0.25s, box-shadow 0.25s;
+}
+.av2-node .av-name { font-size: 13px; }
+.av2-node.is-dim { opacity: 0.22; }
+.av2-node.is-focus { box-shadow: 4px 4px 0 0 var(--accent-soft), 4px 4px 0 2px var(--accent); }
+
+.av2-down { /* connector between lanes */ }
+.av2-down .av-down { margin-left: 24px; }
+
+/* layer rail: vertical stack of layer filter buttons */
+.av2-rail {
+  display: flex; flex-direction: column; gap: 8px; align-items: stretch;
+  border-left: 1px dashed var(--hairline); padding-left: 10px;
+}
+.av2-rail-title {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; color: var(--mute);
+}
+.av2-lbtn {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  border: 2px solid var(--ink); background: var(--raise); color: var(--ink);
+  padding: 5px 8px; cursor: pointer; text-align: left;
+  box-shadow: 2px 2px 0 0 var(--shadow);
+}
+.av2-lbtn.is-on { background: var(--ink); color: var(--paper); }
+.av2-lbtn:hover { background: var(--accent-soft); }
+.av2-lbtn.is-on:hover { background: var(--ink); }
+
+/* evolution (purpose) diagram */
+.av3-stages { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.av3-tab {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  border: 2px solid var(--ink); background: var(--raise); color: var(--ink);
+  padding: 4px 10px; cursor: pointer; box-shadow: 2px 2px 0 0 var(--shadow);
+}
+.av3-tab.is-on { background: var(--ink); color: var(--paper); }
+.av3-pane { display: none; }
+.av3-pane.is-on { display: block; }
+.av3-delta {
+  border: 2px dashed var(--sync-green);
+  background: var(--raise);
+}
+.av3-delta > .av-name::after {
+  content: "＋新增";
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  color: var(--sync-green); border: 1.5px solid var(--sync-green);
+  padding: 0 5px; margin-left: 8px; white-space: nowrap;
+}
+.av3-note {
+  font-size: 12.5px; color: var(--text); line-height: 1.65;
+  margin: 8px 0 2px;
+}
