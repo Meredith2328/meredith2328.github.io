@@ -120,7 +120,7 @@
     <h1 class="post-title">一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</h1>
     <div class="post-meta">
       <time datetime="2026-08-17T00:00:00">2026-08-17</time>
-      <span class="post-stats">42237 字 · 约 94 分钟</span>
+      <span class="post-stats">42594 字 · 约 95 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=Agent">#Agent</a>
       
@@ -332,7 +332,7 @@
 <div class="av2-node" data-av2-layer="agent">
 <div class="av-name">prompt() / steer() / followUp() / abort()</div>
 <div class="av-sub">对外 API。prompt 拒绝并发（activeRun 检查）；steer/followUp 只入队不打断</div>
-<details class="av-fold"><summary>代码<span class="av-loc">[agent.ts:346-385](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L346-L385)</span></summary><div class="av-fold-body"><pre>async prompt(input, images) {
+<details class="av-fold"><summary>代码<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L346-L385">agent.ts:346-385</a></summary><div class="av-fold-body"><pre>async prompt(input, images) {
     if (this.activeRun) {
         throw new Error("Agent is already processing a prompt. " +
             "Use steer() or followUp() to queue messages...");
@@ -356,15 +356,15 @@ async continue() {
     await this.runContinuation();
 }
 steer(message) { this.steeringQueue.enqueue(message); }
-followUp(message) { this.followUpQueue.enqueue(message); }</pre><code>skipInitialSteeringPoll</code>（[agent.ts:442](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L442) / [agent.ts:470-476](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L470-L476)）防同一条 steering 被注入两遍。</div></details>
+followUp(message) { this.followUpQueue.enqueue(message); }</pre><code>skipInitialSteeringPoll</code>（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L442">agent.ts:442</a> / <a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L470-L476">agent.ts:470-476</a>）防同一条 steering 被注入两遍。</div></details>
 </div>
 <div class="av2-conn">
 <div class="av2-conn-arrows">↓<br/>↑</div>
-<div class="av2-conn-body"><b>调用</b>：runPromptMessages → runWithLifecycle(signal) → <b>await</b> runAgentLoop(...)（[agent.ts:405-419](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L405-L419)）｜<b>返回</b>：newMessages[]，异常经 handleRunFailure（[agent.ts:507-507](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L507)）转成合成的 agent_end 事件</div>
+<div class="av2-conn-body"><b>调用</b>：runPromptMessages → runWithLifecycle(signal) → <b>await</b> runAgentLoop(...)（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L405-L419">agent.ts:405-419</a>）｜<b>返回</b>：newMessages[]，异常经 handleRunFailure（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L507">agent.ts:507-507</a>）转成合成的 agent_end 事件</div>
 </div>
 <div class="av2-node" data-av2-layer="agent">
 <div class="av-name">createLoopConfig：把 Agent 的队列变成循环的钩子</div>
-<div class="av-sub">steering/followUp 队列的 drain 函数在这里注入循环（[agent.ts:441-480](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L441-L480)）</div>
+<div class="av-sub">steering/followUp 队列的 drain 函数在这里注入循环（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L441-L480">agent.ts:441-480</a>）</div>
 </div>
 </div>
 <div class="av2-conn up">
@@ -372,7 +372,7 @@ followUp(message) { this.followUpQueue.enqueue(message); }</pre><code>skipInitia
 <div class="av2-conn-body"><b>事件流（唯一向上的通道）</b>：processEvents 把 agent_start / turn_start / message_* / tool_execution_* / turn_end / agent_end 逐个 emit 给 AgentSession 的订阅者（外层再转发给扩展和 TUI）。事件与调用同一条 emit 链，顺序即发生顺序。</div>
 </div>
 <div class="av2-lane">
-<div class="av2-lane-head"><span class="av2-lane-tag">L2 Turn 循环层</span><span class="av2-lane-sub">[agent-loop.ts:163-278](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L163-L278) runLoop：双层 while，一个 turn = 一次 LLM 调用 + 一个工具批次</span></div>
+<div class="av2-lane-head"><span class="av2-lane-tag">L2 Turn 循环层</span><span class="av2-lane-sub"><a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L163-L278">agent-loop.ts:163-278</a> runLoop：双层 while，一个 turn = 一次 LLM 调用 + 一个工具批次</span></div>
 <div class="av2-node" data-av2-layer="turn">
 <div class="av-name">外层 while(true)：follow-up 续跑<span class="av-loc">:85, :163-170</span></div>
 <div class="av-sub">内层停下后捞 follow-up 队列，有 → continue 回内层；没有 → break，唯一的正常出口 emit agent_end（:172）</div>
@@ -384,7 +384,7 @@ followUp(message) { this.followUpQueue.enqueue(message); }</pre><code>skipInitia
 <div class="av2-node" data-av2-layer="turn">
 <div class="av-name">内层循环体：turn 的完整生命周期<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L174-L261">:174-261</a></div>
 <div class="av-sub">turn_start → 注入 pending steering → 流式回复 → stopReason 分支 → 工具批次 → turn_end → prepareNextTurn / shouldStopAfterTurn → 捞 steering → 下一圈</div>
-<details class="av-fold"><summary>内层循环原文（省略号处见源码）<span class="av-loc">[agent-loop.ts:174-261](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L174-L261)</span></summary><div class="av-fold-body"><pre>while (hasMoreToolCalls || pendingMessages.length &gt; 0) {
+<details class="av-fold"><summary>内层循环原文（省略号处见源码）<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L174-L261">agent-loop.ts:174-261</a></summary><div class="av-fold-body"><pre>while (hasMoreToolCalls || pendingMessages.length &gt; 0) {
     if (!firstTurn) { await emit({ type: "turn_start" }); }
     else { firstTurn = false; }
     if (pendingMessages.length &gt; 0) {          // :96 注入 steering
@@ -435,7 +435,7 @@ followUp(message) { this.followUpQueue.enqueue(message); }</pre><code>skipInitia
 <div class="av2-node" data-av2-layer="msg">
 <div class="av-name">streamAssistantResponse：AgentMessage → Message 的翻译边界<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L281-L379">:281-379</a></div>
 <div class="av-sub">调 LLM 前三步变换 + 每次调用现解析 API key（过期 token 靠这个续命）</div>
-<details class="av-fold"><summary>翻译边界的四步<span class="av-loc">[agent-loop.ts:281-379](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L281-L379)</span></summary><div class="av-fold-body"><pre>let messages = context.messages;
+<details class="av-fold"><summary>翻译边界的四步<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L281-L379">agent-loop.ts:281-379</a></summary><div class="av-fold-body"><pre>let messages = context.messages;
 if (config.transformContext) {                    // :181 可选变换
     messages = await config.transformContext(
         messages, signal);        // AgentMessage[] → AgentMessage[]
@@ -463,11 +463,11 @@ const response = await streamFunction(
 <div class="av2-conn-body"><b>调用</b>：stopReason 含 toolCall 时 await executeToolCalls(context, message, ...)（:123）｜<b>返回</b>：{ messages: 按原始顺序的 ToolResultMessage[], terminate: 全体投票结果 }——shouldTerminateToolBatch（:377-379）要求<b>全部</b>工具结果声明 terminate===true 才终止</div>
 </div>
 <div class="av2-lane">
-<div class="av2-lane-head"><span class="av2-lane-tag">L4 Tool 执行层</span><span class="av2-lane-sub">[agent-loop.ts:381-792](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L381-L792)：一个工具批次的完整流水线</span></div>
+<div class="av2-lane-head"><span class="av2-lane-tag">L4 Tool 执行层</span><span class="av2-lane-sub"><a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L381-L792">agent-loop.ts:381-792</a>：一个工具批次的完整流水线</span></div>
 <div class="av2-node" data-av2-layer="tool">
 <div class="av-name">策略分岔：默认并行，显式才串行<span class="av-loc">:287-294</span></div>
 <div class="av-sub">config.toolExecution === "sequential" 或批次里有 sequential 工具 → 串行；否则并行</div>
-<details class="av-fold"><summary>分岔原文<span class="av-loc">[agent-loop.ts:411-426](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L411-L426)</span></summary><div class="av-fold-body"><pre>const hasSequentialToolCall = toolCalls.some((tc) =&gt;
+<details class="av-fold"><summary>分岔原文<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L411-L426">agent-loop.ts:411-426</a></summary><div class="av-fold-body"><pre>const hasSequentialToolCall = toolCalls.some((tc) =&gt;
     currentContext.tools?.find((t) =&gt; t.name === tc.name)
         ?.executionMode === "sequential");
 if (config.toolExecution === "sequential" || hasSequentialToolCall) {
@@ -482,7 +482,7 @@ return executeToolCallsParallel(...);</pre></div></details>
 <div class="av2-node" data-av2-layer="tool">
 <div class="av-name">并行路径：thunk 数组 + Promise.all<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L489-L580">:489-580</a></div>
 <div class="av-sub">准备循环里同步结果直接收、可执行的包成惰性 thunk（:355-360）；同时点火后按 toolCall 原始顺序生成 toolResult</div>
-<details class="av-fold"><summary>并行执行原文<span class="av-loc">[agent-loop.ts:544-558](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L544-L558)</span></summary><div class="av-fold-body"><pre>const orderedFinalizedCalls = await Promise.all(
+<details class="av-fold"><summary>并行执行原文<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L544-L558">agent-loop.ts:544-558</a></summary><div class="av-fold-body"><pre>const orderedFinalizedCalls = await Promise.all(
     finalizedCalls.map((entry) =&gt;
         typeof entry === "function" ? entry() : Promise.resolve(entry)));
 const messages = [];
@@ -599,7 +599,7 @@ if (toolCalls.length &gt; 0) {
 <div class="av-layers">
 <div class="av-layer l-core">
 <div class="av-l-head"><span class="av-l-name">error / aborted 分支<span class="av-loc">:108-111</span></span><span class="av-badge">＋新增</span></div>
-<div class="av-l-desc">turn_end（带空 toolResults）+ agent_end 立即返回。重试不在这层做——外层 agent-session 的 _prepareRetry（[agent-session.ts:764 区段](https://github.com/earendil-works/pi/blob/v0.84.0/packages/coding-agent/src/core/agent-session.ts)）决定要不要 continue() 重来。</div>
+<div class="av-l-desc">turn_end（带空 toolResults）+ agent_end 立即返回。重试不在这层做——外层 agent-session 的 _prepareRetry（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/coding-agent/src/core/agent-session.ts">agent-session.ts:764 区段</a>）决定要不要 continue() 重来。</div>
 </div>
 <div class="av-l-arrow"><span class="av-alabel">stopReason</span></div>
 <div class="av-layer l-infra">
@@ -625,7 +625,7 @@ if (toolCalls.length &gt; 0) {
 </div>
 <div class="av-l-arrow"><span class="av-alabel">循环抛异常</span></div>
 <div class="av-layer l-bus">
-<div class="av-l-head"><span class="av-l-name">handleRunFailure：合成 agent_end<span class="av-loc">[agent.ts:482-505](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L482-L505)</span></span><span class="av-badge">＋新增</span></div>
+<div class="av-l-head"><span class="av-l-name">handleRunFailure：合成 agent_end<a class="av-loc" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L482-L505">agent.ts:482-505</a></span><span class="av-badge">＋新增</span></div>
 <div class="av-l-desc">runWithLifecycle 的 catch：循环本身崩了也要 emit 配对的 agent_end（内含错误消息），订阅者永远看到完整的开始/结束对。</div>
 </div>
 <div class="av-l-arrow"><span class="av-alabel">每个 await 点</span></div>
@@ -641,7 +641,7 @@ if (toolCalls.length &gt; 0) {
 <div class="av-layer l-bus">
 <div class="av-l-head"><span class="av-l-name">steering：turn 间隙插话<span class="av-loc">:83, :96-104, :160</span></span><span class="av-badge">＋新增</span></div>
 <div class="av-l-desc">循环开头捞一次（用户等待时打的字不丢）；每个 turn 结束再捞一次（:160），下个 turn 开头作为 user 消息注入。不打断正在跑的工具批次。</div>
-<details class="av-fold"><summary>steering 的完整路径</summary><div class="av-fold-body">入队：AgentSession._queueSteer（[agent-session.ts:1016 区段](https://github.com/earendil-works/pi/blob/v0.84.0/packages/coding-agent/src/core/agent-session.ts)）→ agent.steer()（[agent.ts:283](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L283)）→ steeringQueue。消费：createLoopConfig 的 getSteeringMessages（[agent.ts:470-476](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L470-L476)）→ runLoop [:168](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L168)/[:258](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L258) → [:182-190](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L182-L190) 注入。UI 侧 _steeringMessages 数组跟踪未送达消息，message_start 确认送达后移除（agent-session.js）。continue() 在 assistant 结尾时优先 drain 队列（[agent.ts:363-383](https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L363-L383)）。</div></details>
+<details class="av-fold"><summary>steering 的完整路径</summary><div class="av-fold-body">入队：AgentSession._queueSteer（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/coding-agent/src/core/agent-session.ts">agent-session.ts:1016 区段</a>）→ agent.steer()（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L283">agent.ts:283</a>）→ steeringQueue。消费：createLoopConfig 的 getSteeringMessages（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L470-L476">agent.ts:470-476</a>）→ runLoop <a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L168">:168</a>/<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L258">:258</a> → <a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L182-L190">:182-190</a> 注入。UI 侧 _steeringMessages 数组跟踪未送达消息，message_start 确认送达后移除（agent-session.js）。continue() 在 assistant 结尾时优先 drain 队列（<a class="av-link" href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent.ts#L363-L383">agent.ts:363-383</a>）。</div></details>
 </div>
 <div class="av-l-arrow"><span class="av-alabel">turn_end 之后</span></div>
 <div class="av-layer l-core">
