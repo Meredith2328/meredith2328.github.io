@@ -1304,6 +1304,30 @@
           setLoading(true, "图谱加载失败，请刷新重试");
         });
     },
+    reload: function () {
+      var self = this;
+      setLoading(true, "刷新图谱…");
+      return fetch(dataRoot + "data/graph.json")
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          data = d;
+          hidden = {};
+          collapsed = {};
+          build();
+          warmup(320);
+          render();
+          updateStats();
+          fitView();
+          if (snakeCfg.enabled) {
+            snakeDirty = true;
+            if (rafId == null) rafId = requestAnimationFrame(loop);
+          }
+          setLoading(false);
+        })
+        .catch(function () {
+          setLoading(false);
+        });
+    },
     highlightFolder: function (folder) {
       highlightFolder(folder);
     },
