@@ -467,3 +467,6 @@
 
 /* wide-pane helper for big evolution stages */
 .av3-pane { overflow-x: auto; }
+
+a.av-loc { text-decoration: none; cursor: pointer; }
+a.av-loc:hover { background: var(--accent); color: var(--paper); }
