@@ -431,3 +431,39 @@
   font-size: 12.5px; color: var(--text); line-height: 1.65;
   margin: 8px 0 2px;
 }
+
+/* explicit inter-layer connector strip: what flows down (call+return)
+   and what flows up (events) */
+.av2-conn {
+  display: grid; grid-template-columns: 18px 1fr; gap: 6px;
+  margin: 6px 0 6px 24px; max-width: 640px;
+}
+.av2-conn-arrows {
+  display: flex; flex-direction: column; justify-content: center;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--accent); line-height: 1.5;
+}
+.av2-conn-body {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 5px 10px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text);
+  line-height: 1.65;
+}
+.av2-conn-body b { color: var(--ink); }
+.av2-conn.up .av2-conn-arrows { color: var(--sync-green); }
+.av2-conn.up .av2-conn-body { border-left-color: var(--sync-green); }
+
+/* source location badge (file:lines) on nodes */
+.av-loc {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  color: var(--accent); border: 1px solid var(--accent);
+  padding: 0 5px; white-space: nowrap;
+}
+.av-fold-body .av-loc { margin-left: 6px; }
+
+/* circled-digit stage refs render small in CJK fonts; bump them */
+.av-ref { font-size: 1.25em; font-weight: 700; line-height: 1; }
+
+/* wide-pane helper for big evolution stages */
+.av3-pane { overflow-x: auto; }
