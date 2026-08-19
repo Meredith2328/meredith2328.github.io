@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc4-寻找两个正序数组的中位数"] = {
+  global.AlgoVizModules["lc4-两数组的中位数"] = {
     title: "4 寻找两个正序数组的中位数 · 二分切割",
     language: "python",
     code: [

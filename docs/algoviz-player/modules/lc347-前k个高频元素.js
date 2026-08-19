@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc347-前k个高频元素-v2"] = {
+  global.AlgoVizModules["lc347-前k个高频元素"] = {
     title: "347 前K个高频元素 · 堆",
     language: "python",
     code: [

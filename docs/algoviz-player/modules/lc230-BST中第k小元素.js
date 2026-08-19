@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc230-二叉搜索树中第k小的元素"] = {
+  global.AlgoVizModules["lc230-BST中第k小元素"] = {
     title: "230 二叉搜索树中第K小的元素 · 中序遍历",
     language: "python",
     code: [

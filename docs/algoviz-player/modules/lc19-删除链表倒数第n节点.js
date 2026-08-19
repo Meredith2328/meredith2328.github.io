@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc19-删除链表的倒数第n个节点"] = {
+  global.AlgoVizModules["lc19-删除链表倒数第n节点"] = {
     title: "19 删除链表的倒数第n个节点 · 双指针",
     language: "python",
     code: [

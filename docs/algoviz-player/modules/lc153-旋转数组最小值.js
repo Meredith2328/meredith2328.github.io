@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc153-寻找旋转排序数组中的最小值"] = {
+  global.AlgoVizModules["lc153-旋转数组最小值"] = {
     title: "153 寻找旋转排序数组中的最小值 · 二分",
     language: "python",
     code: [

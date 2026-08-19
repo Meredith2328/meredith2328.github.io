@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc215-数组中的第k个最大元素-v2"] = {
+  global.AlgoVizModules["lc215-数组中第k大元素-v2"] = {
     title: "215 数组中的第K个最大元素 · 堆",
     language: "python",
     code: [

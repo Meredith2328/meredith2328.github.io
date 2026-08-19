@@ -1,7 +1,7 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc34-在排序数组中查找元素的第一个和最后一个位置"] = {
+  global.AlgoVizModules["lc34-排序数组首尾位置"] = {
     title: "34 在排序数组中查找元素的第一个和最后一个位置 · 二分查找",
     language: "python",
     code: [
