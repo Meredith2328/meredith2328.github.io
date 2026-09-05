@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2023-07-17T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -148,57 +157,57 @@
 <code>make_keeper(5)</code>返回一个这样的函数，它的循环变量<code>i</code>从1到5递增，如果<code>cond(i)</code>，则打印<code>i</code>。
 根据这个抽象，我们发现我们并不需要知道<code>cond</code>函数的具体细节，只是“用”就好了。因此，我们先描述出符合上述要求的函数，再把该函数的函数名（函数指针）作为外层函数的返回值即可。
 完成函数编写之后，将已有例子代入考虑执行过程，发现是合理的。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_keeper</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns a function that takes one parameter cond and prints</span>
-<span class="sd">    out all integers 1..i..n where calling cond(i) returns True.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def make_keeper(n):
+    """Returns a function that takes one parameter cond and prints
+    out all integers 1..i..n where calling cond(i) returns True.
 
-<span class="sd">    &gt;&gt;&gt; def is_even(x): # Even numbers have remainder 0 when divided by 2.</span>
-<span class="sd">    ...     return x % 2 == 0</span>
-<span class="sd">    &gt;&gt;&gt; make_keeper(5)(is_even)</span>
-<span class="sd">    2</span>
-<span class="sd">    4</span>
-<span class="sd">    &gt;&gt;&gt; make_keeper(5)(lambda x: True)</span>
-<span class="sd">    1</span>
-<span class="sd">    2</span>
-<span class="sd">    3</span>
-<span class="sd">    4</span>
-<span class="sd">    5</span>
-<span class="sd">    &gt;&gt;&gt; make_keeper(5)(lambda x: False)  # Nothing is printed</span>
-<span class="sd">    """</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">printer</span><span class="p">(</span><span class="n">cond</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">cond</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">printer</span>
-</code></pre></div>
+    &gt;&gt;&gt; def is_even(x): # Even numbers have remainder 0 when divided by 2.
+    ...     return x % 2 == 0
+    &gt;&gt;&gt; make_keeper(5)(is_even)
+    2
+    4
+    &gt;&gt;&gt; make_keeper(5)(lambda x: True)
+    1
+    2
+    3
+    4
+    5
+    &gt;&gt;&gt; make_keeper(5)(lambda x: False)  # Nothing is printed
+    """
+    "*** YOUR CODE HERE ***"
+    def printer(cond):
+        for i in range(1, n + 1):
+            if cond(i):
+                print(i)
+    return printer
+</code></pre>
 <p>额外一点话：
 这道题体现出了Python中的函数名可以作为返回值、函数参数。
 Higher Order Function/高阶函数看起来很有趣。我们返回的函数作用域以内实际上可以用到内外作用域的两个变量，但我们把这两个变量拆分给两个函数分别构造。</p>
 <h2 id="q5-digit-finder">Q5: Digit Finder</h2>
 <p>先简化问题：我们不考虑<code>lambda</code>表达式，怎样构造符合题目条件的函数，将其函数名返回？</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_digit</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns a function that returns the kth digit of x.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def find_digit(k):
+    """Returns a function that returns the kth digit of x.
 
-<span class="sd">    &gt;&gt;&gt; find_digit(2)(3456)</span>
-<span class="sd">    5</span>
-<span class="sd">    &gt;&gt;&gt; find_digit(2)(5678)</span>
-<span class="sd">    7</span>
-<span class="sd">    &gt;&gt;&gt; find_digit(1)(10)</span>
-<span class="sd">    0</span>
-<span class="sd">    &gt;&gt;&gt; find_digit(4)(789)</span>
-<span class="sd">    0</span>
-<span class="sd">    """</span>
-    <span class="k">assert</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
+    &gt;&gt;&gt; find_digit(2)(3456)
+    5
+    &gt;&gt;&gt; find_digit(2)(5678)
+    7
+    &gt;&gt;&gt; find_digit(1)(10)
+    0
+    &gt;&gt;&gt; find_digit(4)(789)
+    0
+    """
+    assert k &gt; 0
+    "*** YOUR CODE HERE ***"
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_kth_digit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">%</span> <span class="mi">10</span>
-    <span class="k">return</span> <span class="n">get_kth_digit</span>
-</code></pre></div>
+    def get_kth_digit(x):
+        return (x // (pow(10, k - 1))) % 10
+    return get_kth_digit
+</code></pre>
 <p>之后再根据题目将其写为<code>lambda</code>表达式，是很自然的。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">%</span> <span class="mi">10</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">return lambda x : (x // (pow(10, k - 1))) % 10
+</code></pre>
 <h2 id="q6-match-maker">Q6: Match Maker</h2>
 <p>依旧将循环拆分，通过迭代抽象来完成题目目标。
 我个人的习惯是先不看题目给出的函数结构、试着自己做一下。
@@ -208,32 +217,32 @@ Higher Order Function/高阶函数看起来很有趣。我们返回的函数作�
 判断这两位是否相同，如不相同，返回<code>False</code>，否则令<code>x //= 10</code>，重新执行上一步，除非较高位即<code>x // (pow(10, 2)) % 10</code>为0，跳出循环，返回<code>True</code>。
 再把距离换为<code>k</code>即可。
 对照题目模板，恰好匹配，塔诺西。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">match_k</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns a function that checks if digits k apart match.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def match_k(k):
+    """Returns a function that checks if digits k apart match.
 
-<span class="sd">    &gt;&gt;&gt; match_k(2)(1010)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; match_k(2)(2010)</span>
-<span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; match_k(1)(1010)</span>
-<span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; match_k(1)(1)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; match_k(1)(2111111111111111)</span>
-<span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; match_k(3)(123123)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; match_k(2)(123123)</span>
-<span class="sd">    False</span>
-<span class="sd">    """</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">while</span> <span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="n">k</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="n">k</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="n">x</span> <span class="o">//=</span> <span class="mi">10</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="n">check</span>
-</code></pre></div>
+    &gt;&gt;&gt; match_k(2)(1010)
+    True
+    &gt;&gt;&gt; match_k(2)(2010)
+    False
+    &gt;&gt;&gt; match_k(1)(1010)
+    False
+    &gt;&gt;&gt; match_k(1)(1)
+    True
+    &gt;&gt;&gt; match_k(1)(2111111111111111)
+    False
+    &gt;&gt;&gt; match_k(3)(123123)
+    True
+    &gt;&gt;&gt; match_k(2)(123123)
+    False
+    """
+    def check(x):
+        while x // (10 ** k) &gt; 0:
+            if (x % 10) != (x // (10 ** k) % 10):
+                return False
+            x //= 10
+        return True
+    return check
+</code></pre>
 <h2 id="总结">总结</h2>
 <p>上一次disc用到的那些思想的含金量还在增加！</p>
 <p>Remember the problem-solving approach from last discussion; it works just as well for implementing higher-order functions.</p>

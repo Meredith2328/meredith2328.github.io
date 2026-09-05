@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/posts/migrated/post-images/20251215125004.png">
   <meta property="article:published_time" content="2026-01-05T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -211,14 +220,14 @@ Lec17 近似算法可以√</p>
 <p>找到<code>a[i]</code>应该放置的位置，给它腾出空间，将它放置于此.</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>// 设数组长度为n, 下标从0到n-1.
+<pre class="highlight"><code>// 设数组长度为n, 下标从0到n-1.
 
 for i = 1 to n - 1: // 已有序的元素数量
     x = a[i] // 待排序元素
     找到位置j &lt;= i, 使得a[j] &lt;= x &lt; a[j + 1]
     将a[j + 1]到a[i]向后移动.
     a[j + 1] = x
-</code></pre></div>
+</code></pre>
 <h3 id="归并排序">归并排序</h3>
 <p>直觉：我们可以设置两个指针，将两个有序段合并成一个有序段。每次合并是 <span class="arithmatex">\(O(n)\)</span> 的。
 与此同时，<strong>为了减少合并次数</strong>，我们可以将数组二分，合并次数是 <span class="arithmatex">\(O(\log n)\)</span> 。</p>
@@ -233,7 +242,7 @@ for i = 1 to n - 1: // 已有序的元素数量
 伪代码：</p>
 </li>
 </ul>
-<div class="highlight"><pre><span></span><code>MergeSort(A, l, r):
+<pre class="highlight"><code>MergeSort(A, l, r):
     if (l == r) return;
     mid = (l + r) / 2;
     MergeSort(l, mid); MergeSort(mid + 1, r);
@@ -248,7 +257,7 @@ Merge(A, l, mid, mid + 1, r) {
     }
     // 将B拷贝回A
 }
-</code></pre></div>
+</code></pre>
 <ul>
 <li>循环不变量：递归和循环都要考虑不变量。<ul>
 <li><strong>在本次递归前，两个子数组一定有序</strong>。从而我们只要各自从前往后遍历取更小的元素添加到新的数组后面，新的数组一定仍然是有序的，而不会因为子数组不是有序出现破坏新数组有序的情况。这一循环不变量还意味着，我们应该把子函数调用写在合并过程前面，从而先排长度更短的数组。</li>
@@ -272,7 +281,7 @@ Merge(A, l, mid, mid + 1, r) {
 <li>关键：通过判断，<strong>只执行左半或右半子函数</strong>，或者修改循环边界点。
 伪代码：</li>
 </ul>
-<div class="highlight"><pre><span></span><code>// 假如A是升序的, 我们要找到元素x所在的位置.
+<pre class="highlight"><code>// 假如A是升序的, 我们要找到元素x所在的位置.
 
 BSEARCH(A, l, r, x) {
     if (l &gt; r) return -1; // 区间长度小于1, 注意l==r时闭区间长度为1
@@ -282,7 +291,7 @@ BSEARCH(A, l, r, x) {
     else if (A[mid] &lt; x) return BSEARCH(A, mid + 1, r, x);
     else return BSEARCH(A, l, mid - 1, x);
 }
-</code></pre></div>
+</code></pre>
 <ul>
 <li>循环不变量：递归前后<strong>待查找元素一定位于当前待判断的区间</strong>、或可以通过判断当前区间来确定待查找元素不存在。我们先</li>
 <li>描述：因为是有序序列，我们通过判断当前元素、可以确定当前元素及左边或右边都满足某一性质。</li>
@@ -334,7 +343,7 @@ BSEARCH(A, l, r, x) {
 <li><strong>先解决小的矩阵，再解决大的矩阵。所以递归调用写在把矩阵组合起来的前面</strong>。</li>
 </ul>
 <p>伪代码：</p>
-<div class="highlight"><pre><span></span><code>MatrixMultiply(A, B, n):
+<pre class="highlight"><code>MatrixMultiply(A, B, n):
     if n == 1:
         return A[0][0] * B[0][0]
 
@@ -349,7 +358,7 @@ BSEARCH(A, l, r, x) {
 
     将C11, C12, C21, C22组合成 n×n 矩阵C
     return C
-</code></pre></div>
+</code></pre>
 <p>循环不变量：</p>
 <ul>
 <li>每次迭代前，先进行划分，四个子块未完成计算。迭代后，<strong>四个子块均完成计算，可以直接合并成为结果块。</strong> 返回的矩阵大小和两个输入矩阵大小相等。</li>
@@ -409,7 +418,7 @@ BSEARCH(A, l, r, x) {
 <li>一定要注意是<strong>自底向上</strong>建立，见下述循环不变量的讨论。</li>
 </ul>
 <p>伪代码：</p>
-<div class="highlight"><pre><span></span><code>BUILD_MAXHEAP(A, n) {
+<pre class="highlight"><code>BUILD_MAXHEAP(A, n) {
     for i from n/2 to 1 {
         HEAPIFY(A, n, i);
     }
@@ -424,7 +433,7 @@ HEAPIFY(A, n, i) {
     if (A[i] &lt; A[max_child]) swap(A[i], A[max_child]);
     else return;
 }
-</code></pre></div>
+</code></pre>
 <ul>
 <li>循环不变量：<ul>
 <li>对于维护操作，当前元素之上的元素链一定与它组成了递减序列，而当前元素之下尚未维护。在每次交换后，递减序列长度+1。也可以从另一个角度认识：当前元素的父元素一定满足父大于子的性质，而在完成一次交换之后，交换前的位置也满足父大于子的性质。</li>

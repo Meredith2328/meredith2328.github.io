@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2023-08-30T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -138,241 +147,241 @@
     <h2 id="q1-is-bst">Q1: Is BST</h2>
 <p>左子树的所有节点的值都小于等于父节点的值，
 右子树的所有节点的值都大于父节点的值。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_bst</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Returns True if the Tree t has the structure of a valid BST.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def is_bst(t):
+    """Returns True if the Tree t has the structure of a valid BST.
 
-<span class="sd">    &gt;&gt;&gt; t1 = Tree(6, [Tree(2, [Tree(1), Tree(4)]), Tree(7, [Tree(7), Tree(8)])])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t1)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; t2 = Tree(8, [Tree(2, [Tree(9), Tree(1)]), Tree(3, [Tree(6)]), Tree(5)])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t2)</span>
-<span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; t3 = Tree(6, [Tree(2, [Tree(4), Tree(1)]), Tree(7, [Tree(7), Tree(8)])])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t3)</span>
-<span class="sd">    False</span>
-<span class="sd">    &gt;&gt;&gt; t4 = Tree(1, [Tree(2, [Tree(3, [Tree(4)])])])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t4)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; t5 = Tree(1, [Tree(0, [Tree(-1, [Tree(-2)])])])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t5)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; t6 = Tree(1, [Tree(4, [Tree(2, [Tree(3)])])])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t6)</span>
-<span class="sd">    True</span>
-<span class="sd">    &gt;&gt;&gt; t7 = Tree(2, [Tree(1, [Tree(5)]), Tree(4)])</span>
-<span class="sd">    &gt;&gt;&gt; is_bst(t7)</span>
-<span class="sd">    False</span>
-<span class="sd">    """</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">bst_max</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">label</span>
-        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="nb">max</span><span class="p">([</span><span class="n">bst_max</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">]))</span>
+    &gt;&gt;&gt; t1 = Tree(6, [Tree(2, [Tree(1), Tree(4)]), Tree(7, [Tree(7), Tree(8)])])
+    &gt;&gt;&gt; is_bst(t1)
+    True
+    &gt;&gt;&gt; t2 = Tree(8, [Tree(2, [Tree(9), Tree(1)]), Tree(3, [Tree(6)]), Tree(5)])
+    &gt;&gt;&gt; is_bst(t2)
+    False
+    &gt;&gt;&gt; t3 = Tree(6, [Tree(2, [Tree(4), Tree(1)]), Tree(7, [Tree(7), Tree(8)])])
+    &gt;&gt;&gt; is_bst(t3)
+    False
+    &gt;&gt;&gt; t4 = Tree(1, [Tree(2, [Tree(3, [Tree(4)])])])
+    &gt;&gt;&gt; is_bst(t4)
+    True
+    &gt;&gt;&gt; t5 = Tree(1, [Tree(0, [Tree(-1, [Tree(-2)])])])
+    &gt;&gt;&gt; is_bst(t5)
+    True
+    &gt;&gt;&gt; t6 = Tree(1, [Tree(4, [Tree(2, [Tree(3)])])])
+    &gt;&gt;&gt; is_bst(t6)
+    True
+    &gt;&gt;&gt; t7 = Tree(2, [Tree(1, [Tree(5)]), Tree(4)])
+    &gt;&gt;&gt; is_bst(t7)
+    False
+    """
+    "*** YOUR CODE HERE ***"
+    def bst_max(t):
+        if t.is_leaf():
+            return t.label
+        return max(t.label, max([bst_max(b) for b in t.branches]))
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">bst_min</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">label</span>
-        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="n">bst_min</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">]))</span>
+    def bst_min(t):
+        if t.is_leaf():
+            return t.label
+        return min(t.label, min([bst_min(b) for b in t.branches]))
 
-    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">():</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">branch</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">is_bst</span><span class="p">(</span><span class="n">branch</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">else</span><span class="p">:</span> <span class="c1"># len(t.branches) == 2</span>
-        <span class="n">l</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span>
-        <span class="k">if</span> <span class="n">bst_max</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="o">.</span><span class="n">label</span> <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">label</span> <span class="o">&lt;</span> <span class="n">bst_min</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_bst</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_bst</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-</code></pre></div>
+    if t.is_leaf():
+        return True
+    if len(t.branches) &gt; 2:
+        return False
+    elif len(t.branches) == 1:
+        branch = t.branches[0]
+        if is_bst(branch):
+            return True
+        else:
+            return False
+    else: # len(t.branches) == 2
+        l, r = t.branches
+        if bst_max(l) &lt;= t.label and t.label &lt; bst_min(r) and is_bst(l) and is_bst(r):
+            return True
+        else:
+            return False
+</code></pre>
 <h2 id="q2-prune-small">Q2: Prune Small</h2>
 <p>Solution 1</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prune_small</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Prune the tree mutatively, keeping only the n branches</span>
-<span class="sd">    of each node with the smallest labels.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def prune_small(t, n):
+    """Prune the tree mutatively, keeping only the n branches
+    of each node with the smallest labels.
 
-<span class="sd">    &gt;&gt;&gt; t1 = Tree(6)</span>
-<span class="sd">    &gt;&gt;&gt; prune_small(t1, 2)</span>
-<span class="sd">    &gt;&gt;&gt; t1</span>
-<span class="sd">    Tree(6)</span>
-<span class="sd">    &gt;&gt;&gt; t2 = Tree(6, [Tree(3), Tree(4)])</span>
-<span class="sd">    &gt;&gt;&gt; prune_small(t2, 1)</span>
-<span class="sd">    &gt;&gt;&gt; t2</span>
-<span class="sd">    Tree(6, [Tree(3)])</span>
-<span class="sd">    &gt;&gt;&gt; t3 = Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2), Tree(3)]), Tree(5, [Tree(3), Tree(4)])])</span>
-<span class="sd">    &gt;&gt;&gt; prune_small(t3, 2)</span>
-<span class="sd">    &gt;&gt;&gt; t3</span>
-<span class="sd">    Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">():</span>
-        <span class="k">return</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="n">t</span><span class="o">.</span><span class="n">branches</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span> <span class="c1"># Only n left</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">:</span>
-        <span class="n">prune_small</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-</code></pre></div>
+    &gt;&gt;&gt; t1 = Tree(6)
+    &gt;&gt;&gt; prune_small(t1, 2)
+    &gt;&gt;&gt; t1
+    Tree(6)
+    &gt;&gt;&gt; t2 = Tree(6, [Tree(3), Tree(4)])
+    &gt;&gt;&gt; prune_small(t2, 1)
+    &gt;&gt;&gt; t2
+    Tree(6, [Tree(3)])
+    &gt;&gt;&gt; t3 = Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2), Tree(3)]), Tree(5, [Tree(3), Tree(4)])])
+    &gt;&gt;&gt; prune_small(t3, 2)
+    &gt;&gt;&gt; t3
+    Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])
+    """
+    if t.is_leaf():
+        return
+    if len(t.branches) &gt; n:
+        t.branches = [t.branches[i] for i in range(n)] # Only n left
+    for b in t.branches:
+        prune_small(b, n)
+</code></pre>
 <p>Solution 2</p>
-<div class="highlight"><pre data-lang="python"><span></span><code>    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="n">largest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-        <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">largest</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">branches</span><span class="p">:</span>
-        <span class="n">prune_small</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">    while len(t.branches) &gt; n:
+        largest = max(t.branches, key=lambda x: x.label)
+        t.branches.remove(largest)
+    for b in t.branches:
+        prune_small(b, n)
+</code></pre>
 <h2 id="q3-sum-two-ways">Q3: Sum Two Ways</h2>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sum_rec</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Returns the sum of the elements in s.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def sum_rec(s):
+    """
+    Returns the sum of the elements in s.
 
-<span class="sd">    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))</span>
-<span class="sd">    &gt;&gt;&gt; sum_rec(a)</span>
-<span class="sd">    14</span>
-<span class="sd">    &gt;&gt;&gt; sum_rec(Link.empty)</span>
-<span class="sd">    0</span>
-<span class="sd">    """</span>
-    <span class="c1"># Use a recursive call to sum_rec</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">first</span> <span class="o">+</span> <span class="n">sum_rec</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">rest</span><span class="p">)</span>
+    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))
+    &gt;&gt;&gt; sum_rec(a)
+    14
+    &gt;&gt;&gt; sum_rec(Link.empty)
+    0
+    """
+    # Use a recursive call to sum_rec
+    "*** YOUR CODE HERE ***"
+    if s is Link.empty:
+        return 0
+    return s.first + sum_rec(s.rest)
 
-<span class="k">def</span><span class="w"> </span><span class="nf">sum_iter</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Returns the sum of the elements in s.</span>
+def sum_iter(s):
+    """
+    Returns the sum of the elements in s.
 
-<span class="sd">    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))</span>
-<span class="sd">    &gt;&gt;&gt; sum_iter(a)</span>
-<span class="sd">    14</span>
-<span class="sd">    &gt;&gt;&gt; sum_iter(Link.empty)</span>
-<span class="sd">    0</span>
-<span class="sd">    """</span>
-    <span class="c1"># Don't call sum_rec or sum_iter</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">s</span>
-    <span class="k">while</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-        <span class="nb">sum</span> <span class="o">+=</span> <span class="n">p</span><span class="o">.</span><span class="n">first</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">rest</span>
-    <span class="k">return</span> <span class="nb">sum</span>
-</code></pre></div>
+    &gt;&gt;&gt; a = Link(1, Link(6, Link(7)))
+    &gt;&gt;&gt; sum_iter(a)
+    14
+    &gt;&gt;&gt; sum_iter(Link.empty)
+    0
+    """
+    # Don't call sum_rec or sum_iter
+    "*** YOUR CODE HERE ***"
+    sum = 0
+    p = s
+    while p is not Link.empty:
+        sum += p.first
+        p = p.rest
+    return sum
+</code></pre>
 <h2 id="q4-overlap">Q4: Overlap</h2>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">overlap</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""For increasing s and t, count the numbers that appear in both.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def overlap(s, t):
+    """For increasing s and t, count the numbers that appear in both.
 
-<span class="sd">    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))</span>
-<span class="sd">    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))</span>
-<span class="sd">    &gt;&gt;&gt; overlap(a, b)  # 3 and 7</span>
-<span class="sd">    2</span>
-<span class="sd">    &gt;&gt;&gt; overlap(a.rest, b)  # just 7</span>
-<span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))</span>
-<span class="sd">    3</span>
-<span class="sd">    """</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span> <span class="ow">or</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">first</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">overlap</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">rest</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">rest</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">first</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">overlap</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">rest</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">overlap</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">rest</span><span class="p">)</span>
+    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))
+    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))
+    &gt;&gt;&gt; overlap(a, b)  # 3 and 7
+    2
+    &gt;&gt;&gt; overlap(a.rest, b)  # just 7
+    1
+    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))
+    3
+    """
+    "*** YOUR CODE HERE ***"
+    if s is Link.empty or t is Link.empty:
+        return 0
+    if s.first == t.first:
+        return 1 + overlap(s.rest, t.rest)
+    elif s.first &lt; t.first:
+        return overlap(s.rest, t)
+    else:
+        return overlap(s, t.rest)
 
-<span class="k">def</span><span class="w"> </span><span class="nf">overlap_iterative</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""For increasing s and t, count the numbers that appear in both.</span>
+def overlap_iterative(s, t):
+    """For increasing s and t, count the numbers that appear in both.
 
-<span class="sd">    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))</span>
-<span class="sd">    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))</span>
-<span class="sd">    &gt;&gt;&gt; overlap(a, b)  # 3 and 7</span>
-<span class="sd">    2</span>
-<span class="sd">    &gt;&gt;&gt; overlap(a.rest, b)  # just 7</span>
-<span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))</span>
-<span class="sd">    3</span>
-<span class="sd">    """</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span> <span class="ow">and</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">first</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">s</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">rest</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">rest</span>
-        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">first</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">rest</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">rest</span>
-    <span class="k">return</span> <span class="n">count</span>
-</code></pre></div>
+    &gt;&gt;&gt; a = Link(3, Link(4, Link(6, Link(7, Link(9, Link(10))))))
+    &gt;&gt;&gt; b = Link(1, Link(3, Link(5, Link(7, Link(8)))))
+    &gt;&gt;&gt; overlap(a, b)  # 3 and 7
+    2
+    &gt;&gt;&gt; overlap(a.rest, b)  # just 7
+    1
+    &gt;&gt;&gt; overlap(Link(0, a), Link(0, b))
+    3
+    """
+    "*** YOUR CODE HERE ***"
+    count = 0
+    while (s is not Link.empty and t is not Link.empty):
+        if s.first == t.first:
+            count += 1
+            s, t = s.rest, t.rest
+        elif s.first &lt; t.first:
+            s = s.rest
+        else:
+            t = t.rest
+    return count
+</code></pre>
 <h2 id="q5-duplicate-link">Q5: Duplicate Link</h2>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">duplicate_link</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Mutates s so that each element equal to val is followed by another val.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def duplicate_link(s, val):
+    """Mutates s so that each element equal to val is followed by another val.
 
-<span class="sd">    &gt;&gt;&gt; x = Link(5, Link(4, Link(5)))</span>
-<span class="sd">    &gt;&gt;&gt; duplicate_link(x, 5)</span>
-<span class="sd">    &gt;&gt;&gt; x</span>
-<span class="sd">    Link(5, Link(5, Link(4, Link(5, Link(5)))))</span>
-<span class="sd">    &gt;&gt;&gt; y = Link(2, Link(4, Link(6, Link(8))))</span>
-<span class="sd">    &gt;&gt;&gt; duplicate_link(y, 10)</span>
-<span class="sd">    &gt;&gt;&gt; y</span>
-<span class="sd">    Link(2, Link(4, Link(6, Link(8))))</span>
-<span class="sd">    &gt;&gt;&gt; z = Link(1, Link(2, (Link(2, Link(3)))))</span>
-<span class="sd">    &gt;&gt;&gt; duplicate_link(z, 2) # ensures that back to back links with val are both duplicated</span>
-<span class="sd">    &gt;&gt;&gt; z</span>
-<span class="sd">    Link(1, Link(2, Link(2, Link(2, Link(2, Link(3))))))</span>
-<span class="sd">    """</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">s</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">first</span> <span class="o">==</span> <span class="n">val</span><span class="p">:</span>
-            <span class="n">p</span><span class="o">.</span><span class="n">rest</span> <span class="o">=</span> <span class="n">Link</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">rest</span><span class="p">)</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">rest</span><span class="o">.</span><span class="n">rest</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">rest</span>
-</code></pre></div>
+    &gt;&gt;&gt; x = Link(5, Link(4, Link(5)))
+    &gt;&gt;&gt; duplicate_link(x, 5)
+    &gt;&gt;&gt; x
+    Link(5, Link(5, Link(4, Link(5, Link(5)))))
+    &gt;&gt;&gt; y = Link(2, Link(4, Link(6, Link(8))))
+    &gt;&gt;&gt; duplicate_link(y, 10)
+    &gt;&gt;&gt; y
+    Link(2, Link(4, Link(6, Link(8))))
+    &gt;&gt;&gt; z = Link(1, Link(2, (Link(2, Link(3)))))
+    &gt;&gt;&gt; duplicate_link(z, 2) # ensures that back to back links with val are both duplicated
+    &gt;&gt;&gt; z
+    Link(1, Link(2, Link(2, Link(2, Link(2, Link(3))))))
+    """
+    "*** YOUR CODE HERE ***"
+    p = s
+    while (p is not Link.empty):
+        if p.first == val:
+            p.rest = Link(val, p.rest)
+            p = p.rest.rest
+        else:
+            p = p.rest
+</code></pre>
 <h2 id="q6-decimal-expansion">Q6: Decimal Expansion</h2>
 <p>Hint写得很清楚，摘抄一下。</p>
 <p><strong>Hint: Approach</strong>
 Place the division pattern from the example above in a <code>while</code> statement:</p>
-<div class="highlight"><pre><span></span><code>&gt;&gt;&gt; q, r = 10 * n // d, 10 * n % d
+<pre class="highlight"><code>&gt;&gt;&gt; q, r = 10 * n // d, 10 * n % d
 &gt;&gt;&gt; tail.rest = Link(q)
 &gt;&gt;&gt; tail = tail.rest
 &gt;&gt;&gt; n = r
-</code></pre></div>
+</code></pre>
 <p>While constructing the decimal expansion, store the <code>tail</code> for each <code>n</code> in a dictionary keyed by <code>n</code>. When some <code>n</code> appears a second time, instead of constructing a new <code>Link</code>, set its original link as the rest of the previous link. That will form a cycle of the appropriate length.</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Return a linked list with a cycle containing the digits of n/d.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def divide(n, d):
+    """Return a linked list with a cycle containing the digits of n/d.
 
-<span class="sd">    &gt;&gt;&gt; display(divide(5, 6))</span>
-<span class="sd">    0.8333333333...</span>
-<span class="sd">    &gt;&gt;&gt; display(divide(2, 7))</span>
-<span class="sd">    0.2857142857...</span>
-<span class="sd">    &gt;&gt;&gt; display(divide(1, 2500))</span>
-<span class="sd">    0.0004000000...</span>
-<span class="sd">    &gt;&gt;&gt; display(divide(3, 11))</span>
-<span class="sd">    0.2727272727...</span>
-<span class="sd">    &gt;&gt;&gt; display(divide(3, 99))</span>
-<span class="sd">    0.0303030303...</span>
-<span class="sd">    &gt;&gt;&gt; display(divide(2, 31), 50)</span>
-<span class="sd">    0.06451612903225806451612903225806451612903225806451...</span>
-<span class="sd">    """</span>
-    <span class="k">assert</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">d</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">Link</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># The zero before the decimal point</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="n">tail_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">tail</span> <span class="o">=</span> <span class="n">result</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tail_dict</span><span class="p">):</span>
-        <span class="n">q</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">n</span> <span class="o">//</span> <span class="n">d</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">n</span> <span class="o">%</span> <span class="n">d</span> <span class="c1"># eg. 8, 2</span>
-        <span class="n">tail</span><span class="o">.</span><span class="n">rest</span> <span class="o">=</span> <span class="n">Link</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-        <span class="n">tail</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="n">rest</span>
-        <span class="n">tail_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">tail</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">r</span>
-    <span class="n">tail</span><span class="o">.</span><span class="n">rest</span> <span class="o">=</span> <span class="n">tail_dict</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">result</span>
-</code></pre></div>
+    &gt;&gt;&gt; display(divide(5, 6))
+    0.8333333333...
+    &gt;&gt;&gt; display(divide(2, 7))
+    0.2857142857...
+    &gt;&gt;&gt; display(divide(1, 2500))
+    0.0004000000...
+    &gt;&gt;&gt; display(divide(3, 11))
+    0.2727272727...
+    &gt;&gt;&gt; display(divide(3, 99))
+    0.0303030303...
+    &gt;&gt;&gt; display(divide(2, 31), 50)
+    0.06451612903225806451612903225806451612903225806451...
+    """
+    assert n &gt; 0 and n &lt; d
+    result = Link(0)  # The zero before the decimal point
+    "*** YOUR CODE HERE ***"
+    tail_dict = {}
+    tail = result
+    while (n not in tail_dict):
+        q, r = 10 * n // d, 10 * n % d # eg. 8, 2
+        tail.rest = Link(q)
+        tail = tail.rest
+        tail_dict[n] = tail
+        n = r
+    tail.rest = tail_dict[n]
+    return result
+</code></pre>
 <h2 id="hw05q6-store-digits">HW05Q6: Store Digits</h2>
 <p>（懒得再开一个HW05页了，这一道题比较经典，顺手标记一下）
 经典老题，把整数的每一位作为链表的节点值构造链表。
@@ -380,33 +389,33 @@ Place the division pattern from the example above in a <code>while</code> stat
 以<code>2345</code>举例，构造<code>2345</code>时是在已知<code>234</code>而非<code>345</code>的构造的情况下。
 因此我们要做的就是在<code>234</code>构造的末尾加上一个<code>5</code>（先遍历到末尾节点、再添加），
 而非在<code>345</code>的开头加上一个<code>2</code>（直接构造 <code>Link(2, 345的Link)</code>。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">store_digits</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Stores the digits of a positive number n in a linked list.</span>
+<pre class="highlight" data-lang="python"><code class="language-python">def store_digits(n):
+    """Stores the digits of a positive number n in a linked list.
 
-<span class="sd">    &gt;&gt;&gt; s = store_digits(1)</span>
-<span class="sd">    &gt;&gt;&gt; s</span>
-<span class="sd">    Link(1)</span>
-<span class="sd">    &gt;&gt;&gt; store_digits(2345)</span>
-<span class="sd">    Link(2, Link(3, Link(4, Link(5))))</span>
-<span class="sd">    &gt;&gt;&gt; store_digits(876)</span>
-<span class="sd">    Link(8, Link(7, Link(6)))</span>
-<span class="sd">    &gt;&gt;&gt; store_digits(2450)</span>
-<span class="sd">    Link(2, Link(4, Link(5, Link(0))))</span>
-<span class="sd">    &gt;&gt;&gt; # a check for restricted functions</span>
-<span class="sd">    &gt;&gt;&gt; import inspect, re</span>
-<span class="sd">    &gt;&gt;&gt; cleaned = re.sub(r"#.*\\n", '', re.sub(r'"{3}[\s\S]*?"{3}', '', inspect.getsource(store_digits)))</span>
-<span class="sd">    &gt;&gt;&gt; print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None</span>
-<span class="sd">    """</span>
-    <span class="s2">"*** YOUR CODE HERE ***"</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Link</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="n">before</span> <span class="o">=</span> <span class="n">store_digits</span><span class="p">(</span><span class="n">n</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">before</span>
-    <span class="k">while</span> <span class="n">p</span><span class="o">.</span><span class="n">rest</span> <span class="o">!=</span> <span class="n">Link</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">rest</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">rest</span> <span class="o">=</span> <span class="n">Link</span><span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">before</span>
-</code></pre></div>
+    &gt;&gt;&gt; s = store_digits(1)
+    &gt;&gt;&gt; s
+    Link(1)
+    &gt;&gt;&gt; store_digits(2345)
+    Link(2, Link(3, Link(4, Link(5))))
+    &gt;&gt;&gt; store_digits(876)
+    Link(8, Link(7, Link(6)))
+    &gt;&gt;&gt; store_digits(2450)
+    Link(2, Link(4, Link(5, Link(0))))
+    &gt;&gt;&gt; # a check for restricted functions
+    &gt;&gt;&gt; import inspect, re
+    &gt;&gt;&gt; cleaned = re.sub(r"#.*\\n", '', re.sub(r'"{3}[\s\S]*?"{3}', '', inspect.getsource(store_digits)))
+    &gt;&gt;&gt; print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
+    """
+    "*** YOUR CODE HERE ***"
+    if n &lt; 10:
+        return Link(n)
+    before = store_digits(n // 10)
+    p = before
+    while p.rest != Link.empty:
+        p = p.rest
+    p.rest = Link(n % 10)
+    return before
+</code></pre>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="cs61a-disc05.html" title="上一篇">← Disc 05 迭代、时空复杂度</a></div></aside>
   </div>
 

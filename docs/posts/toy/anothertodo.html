@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/posts/toy/assets/anothertodo-tui.png">
   <meta property="article:published_time" content="2026-09-05T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../favicon.png">
   <link rel="apple-touch-icon" href="../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../rss.xml">
@@ -158,7 +167,7 @@
 <p>完整输入语法、查询示例和平台安装方式可从 <a href="https://github.com/Meredith2328/anothertodo#readme">README</a> 开始看。</p>
 <h2 id="架构-让两个界面只做各自该做的事">架构：让两个界面只做各自该做的事</h2>
 <p>项目使用 TypeScript / Node.js，结构刻意保持直接：</p>
-<div class="highlight"><pre data-lang="text"><span></span><code>CLI / Ink TUI
+<pre class="highlight" data-lang="text"><code class="language-text">CLI / Ink TUI
       │
 ApplicationService        ← 所有写操作的唯一入口
       │
@@ -167,7 +176,7 @@ core（解析、查询、排序、议程）  ← 纯函数，不做 IO
 storage / reminders / sync
       │
 ~/.atd/*.jsonl + config.toml
-</code></pre></div>
+</code></pre>
 <p>一行输入先在 <a href="https://github.com/Meredith2328/anothertodo/blob/main/src/core/parse.ts"><code>core/parse.ts</code></a> 中被解析成结构化字段；CLI 与 TUI 都只调用 <a href="https://github.com/Meredith2328/anothertodo/blob/main/src/app/service.ts"><code>ApplicationService</code></a>，不直接改任务。这样“完成重复任务后派生下一次”“编辑时清掉某个字段”一类规则只写一次，也不会因界面不同而分叉。</p>
 <p>数据层以 <a href="https://github.com/Meredith2328/anothertodo/blob/main/src/contracts.ts"><code>contracts.ts</code></a> 的 Zod schema 为契约。写入采用文件锁、写入后 <code>fsync</code> 与原子替换；归档有事务日志，提醒通过租约认领避免多个 watcher 重复投递。这些设计并不抢戏，但让这个看似很小的工具在多个进程、意外中断和跨设备同步时仍能守住数据。</p>
 <p>如果你也偏好“数据在自己手里、界面尽量少打扰”的待办方式，可以直接从 <a href="https://github.com/Meredith2328/anothertodo">项目仓库</a> 获取源码或安装包。</p>

@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2026-08-10T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -153,25 +162,25 @@
 <p>我在 Kaggle 放了一个公开的复现 notebook，用来最小复现这个问题。CPU 就能跑，两三分钟出结果：</p>
 <p><a href="https://www.kaggle.com/code/meredith10pi/trl-1-9-2-ref-adapter-silent-no-op-repro">TRL 1.9.2 ref adapter silent no-op repro</a></p>
 <p>核心代码其实就这几行：</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>   <span class="c1"># is_trainable=False</span>
-<span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="n">GRPOConfig</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">...</span><span class="p">),</span>   <span class="c1"># beta != 0 触发 bug 路径</span>
-    <span class="n">reward_funcs</span><span class="o">=</span><span class="p">[</span><span class="n">reward_fn</span><span class="p">],</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">train</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">model = PeftModel.from_pretrained(base, sft_adapter)   # is_trainable=False
+trainer = GRPOTrainer(
+    model=model,
+    args=GRPOConfig(beta=0.01, ...),   # beta != 0 触发 bug 路径
+    reward_funcs=[reward_fn],
+    train_dataset=train,
+)
+trainer.train()
+</code></pre>
 <p>跑完之后，注意看这几个输出：</p>
-<div class="highlight"><pre data-lang="text"><span></span><code>trainable params right after trainer init: 0        # ← 已经不对劲了
+<pre class="highlight" data-lang="text"><code class="language-text">trainable params right after trainer init: 0        # ← 已经不对劲了
 optimizer param count (captured at creation): 0     # ← 实锤：优化器是空的
 last log line: {'loss': -0.26, 'grad_norm': 0.001, 'reward': 0.625}   # ← 但指标活得很好
 saved == initial: True                              # ← 什么都没训
-</code></pre></div>
+</code></pre>
 <p>对照实验只改一个参数——加载时传 <code>is_trainable=True</code>：</p>
-<div class="highlight"><pre data-lang="text"><span></span><code>optimizer param count (captured at creation): 12
+<pre class="highlight" data-lang="text"><code class="language-text">optimizer param count (captured at creation): 12
 saved == initial: False
-</code></pre></div>
+</code></pre>
 <p>同样的脚本、同样的数据、同样的奖励函数，只是 <code>inference_mode</code> 不一样，结果就从“白跑一趟”变成“真的在训”。这个对照基本把根因锁死了。</p>
 <h2 id="根因-三步">根因（三步）</h2>
 <p>拆开看其实不复杂：</p>
@@ -184,13 +193,13 @@ saved == initial: False
 <h2 id="怎么修">怎么修</h2>
 <p>两个办法都能让训练真正发生，选一个就行：</p>
 <p><strong>最快的办法</strong>：如果省事想直接用，加载时传 <code>is_trainable=True</code>，一行搞定。类似 <a href="https://github.com/huggingface/trl/issues/3031">#3031</a> 。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">,</span> <span class="n">is_trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">model = PeftModel.from_pretrained(base, sft_adapter, is_trainable=True)
+</code></pre>
 <p><strong>更稳的办法</strong>：把预热权重合进基座，再新建一个干净的 LoRA。这样做参考策略的语义也更干净——它就是那个真正的 SFT 模型。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">warm</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">sft_adapter</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">warm</span><span class="o">.</span><span class="n">merge_and_unload</span><span class="p">()</span>
-<span class="n">trainer</span> <span class="o">=</span> <span class="n">GRPOTrainer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">peft_config</span><span class="o">=</span><span class="n">LoraConfig</span><span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="o">...</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">warm = PeftModel.from_pretrained(base, sft_adapter)
+model = warm.merge_and_unload()
+trainer = GRPOTrainer(model=model, peft_config=LoraConfig(...), ...)
+</code></pre>
 <p>我们在自己的项目里用的是第二种，并且把检查固化进了训练脚本：每次训练结束都打印保存权重和初始权重的 md5，一致就直接报警。这个习惯后来救了我们好几次。</p>
 <h2 id="is_trainable-true-能解决什么-不能解决什么"><code>is_trainable=True</code> 能解决什么、不能解决什么</h2>
 <p>两个修法都验证有效，但它们的边界不一样。把话说清楚，免得有人以为传个参数就一劳永逸。</p>

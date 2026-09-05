@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/31abc74ea940.jpg">
   <meta property="article:published_time" content="2026-03-12T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -177,8 +186,8 @@
 <p><strong>参数量</strong>如果按 <a href="https://meredith2328.github.io/post/LLMestimate/">以前推导过的参数量估算公式</a> 来，则有：（假设embedding层和LM Head参数共享，<span class="arithmatex">\(d_{ff}=4d\)</span> ，RMS Norm的参数量忽略不计）</p>
 <div class="arithmatex">\[P=12Nd^2+Vd\]</div>
 <p>用上面的记号就是：</p>
-<div class="highlight"><pre><span></span><code>P=12LD^2+VD
-</code></pre></div>
+<pre class="highlight"><code>P=12LD^2+VD
+</code></pre>
 <h3 id="激活值">激活值</h3>
 <p>激活值指某层的输出值，激活量指某层的输出值的数量。
 （但其实实际语境中分得没有这么清，可以从上下文判断指的是数量还是值）</p>
@@ -196,7 +205,7 @@
 </ul>
 <p>其余同理，慢慢算一下。
 我们按照题目要求细细算一下一个Transformer Block的激活值：</p>
-<div class="highlight"><pre><span></span><code>A_block
+<pre class="highlight"><code>A_block
 ## RMS Norm 1
 = (BTD) 
 ## MHA
@@ -212,39 +221,39 @@
 + (4BTD)   # SiLU
 + (BTD)    # W2
 = 16BTD + 2BHT^2
-</code></pre></div>
+</code></pre>
 <p>因此，<strong>全模型激活</strong>应该为：</p>
-<div class="highlight"><pre><span></span><code>A
+<pre class="highlight"><code>A
 = L(16BTD + 2BHT^2)  # L layers of A_block
 + BTD                # final RMSNorm
 + BTV                # output embedding
 + BTV                # CrossEntropyLoss
 = L(16BTD + 2BHT^2) + BTD + 2BTV
-</code></pre></div>
+</code></pre>
 <p>考虑到 <code>BTD &lt;&lt; LBTD</code> ，可以略微简化为</p>
-<div class="highlight"><pre><span></span><code>A = L(16BTD + 2BHT^2) + 2BTV
-</code></pre></div>
+<pre class="highlight"><code>A = L(16BTD + 2BHT^2) + 2BTV
+</code></pre>
 <h3 id="peak-memory">peak memory</h3>
 <p><strong>梯度</strong>等于参数量。</p>
-<div class="highlight"><pre><span></span><code>G = P
-</code></pre></div>
+<pre class="highlight"><code>G = P
+</code></pre>
 <p>根据附录A里的实现，AdamW优化器每个参数都有两个同形状的张量 <code>m</code> 和 <code>v</code> ，外加一个可以忽略的标量 <code>step</code> 。所以AdamW优化器状态：</p>
-<div class="highlight"><pre><span></span><code>O = 2P
-</code></pre></div>
+<pre class="highlight"><code>O = 2P
+</code></pre>
 <p>再代入每个元素4 Bytes，有：（单位为Bytes）</p>
-<div class="highlight"><pre><span></span><code>M_params = 4P
+<pre class="highlight"><code>M_params = 4P
 M_acts   = 4A
 M_grads  = 4P
 M_opt    = 8P
-</code></pre></div>
+</code></pre>
 <p>故peak memory应为：</p>
-<div class="highlight"><pre><span></span><code>M_total = M_params + M_acts + M_grads + M_opt
+<pre class="highlight"><code>M_total = M_params + M_acts + M_grads + M_opt
         = 16P + 4A
 # P = 12LD^2+VD
 # A = L(16BTD + 2BHT^2) + BTD + 2BTV
         = 16(12LD^2+VD) + 4(L(16BTD + 2BHT^2) + 2BTV)
         = 192LD^2 + 16VD + 64LBTD + 8LBHT^2 + 8BTV
-</code></pre></div>
+</code></pre>
 <p>注意， <code>M_total = 16P + 4A</code> 这个整体系数4是来自于FP32每个元素4 Bytes的前提假设的。
 因此我们可以很方便地去估算别的：比如FP16等等。</p>
 <h3 id="如果会提前释放-不同时保存所有激活值">如果会提前释放，不同时保存所有激活值？</h3>
@@ -275,20 +284,20 @@ Example (d=2048, N=24, L=1024, B=8, h=16, V=50k):</p>
 <h2 id="b-对于gpt-2-xl-shaped-model-回答-a-在80gb内存的前提下-最大可用的batch-size是多少">(b) 对于GPT-2 XL-shaped model，回答(a)。在80GB内存的前提下，最大可用的batch size是多少？</h2>
 <h3 id="gpt2-xl代入计算">GPT2-XL代入计算</h3>
 <p><a href="https://huggingface.co/openai-community/gpt2-xl">GPT2-XL</a></p>
-<div class="highlight"><pre><span></span><code>GPT2-XL
+<pre class="highlight"><code>GPT2-XL
 V = vocab_size: 50257
 T = context_length: 1024
 L = num_layers: 48
 D = d_models: 1600
 H = num_heads: 25
 D_ff = 4D
-</code></pre></div>
+</code></pre>
 <p>代入(a)得到的 <code>M_total = 16P + 4A = 192LD^2 + 16VD + 64LBTD + 8LBHT^2 + 8BTV</code> 有：</p>
-<div class="highlight"><pre><span></span><code>M_total = 192 * 48 * 1600 * 1600 + 16 * 50257 * 1600 + 64 * 48 * B * 1024 * 1600 + 8 * 48 * B * 25 * 1024 * 1024 + 8 * B * 1024 * 50257
+<pre class="highlight"><code>M_total = 192 * 48 * 1600 * 1600 + 16 * 50257 * 1600 + 64 * 48 * B * 1024 * 1600 + 8 * 48 * B * 25 * 1024 * 1024 + 8 * B * 1024 * 50257
         = 23592960000 + 1286579200 + 5033164800B + 10066329600B + 411705344B
         = 24 879 539 200 + 15 511 199 744B
         ≈ (24.88 + 15.51 batch_size) GB
-</code></pre></div>
+</code></pre>
 <p>即最终的结论：（单位为GB）</p>
 <div class="arithmatex">\[M_{total}(batch\_size)=24.88+15.51 \times batch\_size\]</div>
 <p>这么看来，在80GB内存的前提下，最大可用的batch_size不超过 (80-24.88)/15.51≈3.55 。在单卡条件下，最大的batch_size为3。</p>
@@ -298,7 +307,7 @@ D_ff = 4D
 </blockquote>
 <p>GPT2-XL的实机验证有心无力。我的5090显卡显存为32GB，而上述峰值内存即使 <code>batch_size = 1</code> 也要40GB。
 因此换用以下GPT2家族其他模型的参数，重新计算一下并实际跑一下看看：</p>
-<div class="highlight"><pre><span></span><code>vocab_size = 50257
+<pre class="highlight"><code>vocab_size = 50257
 d_ff = 4 \times d_model
 context length = 1024
 
@@ -306,10 +315,10 @@ GPT-2 small  (12 layers, 768  d_model, 12 heads)
 GPT-2 medium (24 layers, 1024 d_model, 16 heads)
 GPT-2 large  (36 layers, 1280 d_model, 20 heads)
 GPT-2 XL     (48 layers, 1600 d_model, 25 heads)
-</code></pre></div>
+</code></pre>
 <p>实际验证结果如下（代码、详细结果及说明见附录B）。
 发现PyTorch运行的内存峰值比我们算的要高效不少。在已经显式禁用梯度检查点（gradient checkpointing）的情况下，仍然比我们计算的值节省了4.20-2.47=1.73 GB，这对于GPT2-small这样一个峰值显存为3~4GB的模型是很好的。</p>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla P100-PCIE-16GB
 Total GPU memory: 17.06 GB
 ============================================================
@@ -321,71 +330,71 @@ SMALL    123.5M   2.47       4.20       41.2%
 MEDIUM   353.5M   6.17       10.90      43.4% 
 LARGE    772.1M   12.56      21.83      42.5% 
 ============================================================
-</code></pre></div>
+</code></pre>
 <h2 id="c-运行adamw的一个step需要多少的flops">(c) 运行AdamW的一个step需要多少的FLOPs？</h2>
 <p>先根据附录A中的AdamW代码实现，详细地数AdamW一次优化器更新需要的FLOPs，后面再加上前向和后向的FLOPs，得到一个step完整的FLOPs。</p>
 <p>一阶矩更新：3FLOPs/元素（ <code>m &lt;- beta1 * m + (1 - beta1) * g</code> ）</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta1</span><span class="p">)</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta1</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">state['m'].mul_(beta1).add_(grad, alpha=1 - beta1)
+</code></pre>
 <p>对每个元素， <code>beta1 * m</code> ， <code>(1 - beta1) * g</code> 和这两项相加共计三次运算。
 ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次计算，但并不是每次元素运算都需要重新计算。因此，这里不需要计入。后续偏差修正、step_size同理。</p>
 <p>二阶矩更新：4FLOPs/元素（ <code>v &lt;- beta2 * v + (1 - beta2) * g * g</code> ）</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta2</span><span class="p">)</span><span class="o">.</span><span class="n">addcmul_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta2</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">state['v'].mul_(beta2).addcmul_(grad, grad, value=1 - beta2)
+</code></pre>
 <p><code>beta2 * v</code> ， <code>g * g</code> ，再乘 <code>1 - beta2</code> ，再加起来。</p>
 <p>分母构造：2FLOPs/元素 （ <code>denom &lt;- sqrt(v) + eps</code> ）</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">denom</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">denom = state['v'].sqrt().add_(eps)
+</code></pre>
 <p><code>sqrt(v)</code> ，<code>+ eps</code> 。</p>
 <p>参数Adam更新：3FLOPs/元素 （ <code>p &lt;- p + (-step_size) * m / denom</code> ）</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">addcdiv_</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">denom</span><span class="p">,</span> <span class="n">value</span><span class="o">=-</span><span class="n">step_size</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">p.data.addcdiv_(state['m'], denom, value=-step_size)
+</code></pre>
 <p><code>m / denom</code> ，加上 <code>-step_size</code> ，加上 <code>p</code> 。</p>
 <p>解耦权重衰减：2FLOPs/元素（ <code>p &lt;- p + (-lr * weight_decay) * p</code> ）</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="n">lr</span> <span class="o">*</span> <span class="n">weight_decay</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">p.data.add_(p.data, alpha=-lr * weight_decay)
+</code></pre>
 <p><code>(-lr * weight_decay) * p</code> ， 加上 <code>p</code> 。注意 <code>-lr</code> 和 <code>weight_decay</code> 是标量。</p>
 <p>总之，有运行AdamW一次优化器更新需要14 FLOPs。</p>
-<div class="highlight"><pre><span></span><code>F_AdamW_step ≈ 14P
-</code></pre></div>
+<pre class="highlight"><code>F_AdamW_step ≈ 14P
+</code></pre>
 <p>注意，一个step前向的过程包括了前向和后向所包含的各种矩阵乘法（见下），再加上这里提到的优化器更新的过程。前者随着 <code>B</code> 、 <code>L</code> 、 <code>D</code> 等因素增长，而后者只与 <code>P</code> 线性相关。训练时只要 <code>B</code> 和 <code>T</code> 不是特别小，矩阵乘的 FLOPs 会远大于 AdamW 更新。</p>
 <p>如果完整加起来，应该为</p>
-<div class="highlight"><pre><span></span><code>F_step ≈ 3F_fwd + F_AdamW_step
-</code></pre></div>
+<pre class="highlight"><code>F_step ≈ 3F_fwd + F_AdamW_step
+</code></pre>
 <p>其中 <code>3F_fwd</code> 是因为 backward 约等于 forward 的 2 倍，<code>14P</code> 是优化器更新本身。实际里 <code>14P</code> 相比 <code>3F_fwd</code> 很小，通常可忽略。</p>
 <p>精确推导 <code>F_fwd</code>（ <a href="https://meredith2328.github.io/post/LLMestimate/#%E6%80%8E%E4%B9%88%E4%BC%B0%E7%AE%97llm%E7%9A%84%E8%AE%AD%E7%BB%83flops">怎么估算LLM的参数量和FLOPs？推一推、测一测 | 十派的玩具箱</a> ）的话，有</p>
-<div class="highlight"><pre><span></span><code>F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
-</code></pre></div>
+<pre class="highlight"><code>F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
+</code></pre>
 <p>（当然 <code>3F_fwd</code> 也可以使用经验公式 <code>6 × 参数量 × 训练 token 数</code> 进行近似。）</p>
 <h2 id="d-在单台nvidia-a100-gpu上训练gpt-2-xl需要多少天">(d) 在单台NVIDIA A100 GPU上训练GPT-2 XL需要多少天？</h2>
 <blockquote>
 <p>本部分数值是GPT算的，本人没有核对。</p>
 </blockquote>
 <p>先算 GPT-2 XL、B = 1024 的 forward FLOPs：</p>
-<div class="highlight"><pre><span></span><code>F_fwd(step)
+<pre class="highlight"><code>F_fwd(step)
 = 1024 * (48 * (24 * 1024 * 1600^2 + 4 * 1024^2 * 1600) + 2 * 1024 * 50257 * 1600)
 = 3590864450355200
 = 3.5908644503552e15
-</code></pre></div>
+</code></pre>
 <p>训练一步：</p>
-<div class="highlight"><pre><span></span><code>F_train(step)
+<pre class="highlight"><code>F_train(step)
 ≈ 3 * F_fwd(step)
 = 1.07725933510656e16 FLOPs
-</code></pre></div>
+</code></pre>
 <p>A100 的 float32 峰值是 19.5e12 FLOP/s。<br/>
 50% MFU 下的有效吞吐：</p>
-<div class="highlight"><pre><span></span><code>0.5 * 19.5e12 = 9.75e12 FLOP/s
-</code></pre></div>
+<pre class="highlight"><code>0.5 * 19.5e12 = 9.75e12 FLOP/s
+</code></pre>
 <p>400K steps 的总时间：</p>
-<div class="highlight"><pre><span></span><code>time
+<pre class="highlight"><code>time
 = 400000 * 1.07725933510656e16 / 9.75e12
 = 4.4195e8 s
 ≈ 5115 days
 ≈ 14.0 years
-</code></pre></div>
+</code></pre>
 <p>所以答案是：大约 5115 天，约 14 年。</p>
 <p>利用Python进行验证：</p>
-<div class="highlight"><pre><span></span><code>&gt;&gt;&gt; 1024 * (48 * (24 * 1024 * 1600 * 1600 + 4 * 1024 * 1024 * 1600) + 2 * 1024 * 50257 * 1600)
+<pre class="highlight"><code>&gt;&gt;&gt; 1024 * (48 * (24 * 1024 * 1600 * 1600 + 4 * 1024 * 1024 * 1600) + 2 * 1024 * 50257 * 1600)
 3590864450355200
 &gt;&gt;&gt; a = 1024 * (48 * (24 * 1024 * 1600 * 1600 + 4 * 1024 * 1024 * 1600) + 2 * 1024 * 50257 * 1600)
 &gt;&gt;&gt; 3 * a
@@ -394,68 +403,68 @@ ps. 1 - beta1是整个参数张量各个元素共用的，虽然也需要一次�
 441952547.7360246
 &gt;&gt;&gt; 3 * a * 400000 / 9.75e12 / 3600 / 24
 5115.191524722507
-</code></pre></div>
+</code></pre>
 <h2 id="附录a-adamw代码实现">附录A: AdamW代码实现</h2>
 <p><img alt="" src="../../migrated/post-images/20260311191813.png"/></p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AdamW</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">):</span>
+<pre class="highlight" data-lang="python"><code class="language-python">class AdamW(torch.optim.Optimizer):
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
-        <span class="n">defaults</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">weight_decay</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
+    def __init__(self, params, lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.01):
+        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay)
+        super().__init__(params, defaults)
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">closure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">closure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">closure</span><span class="p">()</span>
+    def step(self, closure=None):
+        loss = None
+        if closure is not None:
+            loss = closure()
 
-        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_groups</span><span class="p">:</span>
-            <span class="n">beta1</span><span class="p">,</span> <span class="n">beta2</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'betas'</span><span class="p">]</span>
-            <span class="n">lr</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'lr'</span><span class="p">]</span>
-            <span class="n">eps</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'eps'</span><span class="p">]</span>
-            <span class="n">weight_decay</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="s1">'weight_decay'</span><span class="p">]</span>
+        for group in self.param_groups:
+            beta1, beta2 = group['betas']
+            lr = group['lr']
+            eps = group['eps']
+            weight_decay = group['weight_decay']
 
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s1">'params'</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
+            for p in group['params']:
+                if p.grad is None:
+                    continue
 
-                <span class="n">grad</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span>
+                grad = p.grad.data
 
-                <span class="c1"># 初始化状态</span>
-                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">'step'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># 一阶矩</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># 二阶矩</span>
+                # 初始化状态
+                state = self.state[p]
+                if len(state) == 0:
+                    state['step'] = 0
+                    state['m'] = torch.zeros_like(p.data)  # 一阶矩
+                    state['v'] = torch.zeros_like(p.data)  # 二阶矩
 
-                <span class="c1"># 更新步数</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">'step'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">t</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">'step'</span><span class="p">]</span>
+                # 更新步数
+                state['step'] += 1
+                t = state['step']
 
-                <span class="c1"># 更新矩估计</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta1</span><span class="p">)</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta1</span><span class="p">)</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">mul_</span><span class="p">(</span><span class="n">beta2</span><span class="p">)</span><span class="o">.</span><span class="n">addcmul_</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">beta2</span><span class="p">)</span>
+                # 更新矩估计
+                state['m'].mul_(beta1).add_(grad, alpha=1 - beta1)
+                state['v'].mul_(beta2).addcmul_(grad, grad, value=1 - beta2)
 
-                <span class="c1"># 偏差修正</span>
-                <span class="n">bias_correction1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">beta1</span> <span class="o">**</span> <span class="n">t</span>
-                <span class="n">bias_correction2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">beta2</span> <span class="o">**</span> <span class="n">t</span>
+                # 偏差修正
+                bias_correction1 = 1 - beta1 ** t
+                bias_correction2 = 1 - beta2 ** t
 
-                <span class="c1"># Adam更新</span>
-                <span class="n">denom</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">'v'</span><span class="p">]</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
-                <span class="n">step_size</span> <span class="o">=</span> <span class="n">lr</span> <span class="o">*</span> <span class="p">(</span><span class="n">bias_correction2</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">bias_correction1</span>
-                <span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">addcdiv_</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">'m'</span><span class="p">],</span> <span class="n">denom</span><span class="p">,</span> <span class="n">value</span><span class="o">=-</span><span class="n">step_size</span><span class="p">)</span>
+                # Adam更新
+                denom = state['v'].sqrt().add_(eps)
+                step_size = lr * (bias_correction2 ** 0.5) / bias_correction1
+                p.data.addcdiv_(state['m'], denom, value=-step_size)
 
-                <span class="c1"># 权重衰减（解耦）</span>
-                <span class="k">if</span> <span class="n">weight_decay</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="n">lr</span> <span class="o">*</span> <span class="n">weight_decay</span><span class="p">)</span>
+                # 权重衰减（解耦）
+                if weight_decay != 0:
+                    p.data.add_(p.data, alpha=-lr * weight_decay)
 
-        <span class="k">return</span> <span class="n">loss</span>
-</code></pre></div>
+        return loss
+</code></pre>
 <h2 id="附录b-peak-memory验证程序与结果">附录B: peak memory验证程序与结果</h2>
 <p>通过以下实验验证，发现对于GPT-2 SMALL/MEDIUM/LARGE，实际的内存占用均为我们预估值的41-43%左右，这个比例非常稳定（无论设备、模型大小），可能来自于各种各样的工程优化，可以直接作为修正系数，初步显示我们的预估公式的可用性。
 按理说，实际值一定是比我们的预估值小的，因为降低内存占用是很关键的工程需求，一定会有各种各样的优化（PyTorch、CUDA、操作系统、硬盘等等），同时内存占用也可能受到各种难以仔细分析的因素的影响。我们能够获得一个大致稳定的估算公式，应该已经还可以了。</p>
 <hr/>
 <p>以下是来自colab的三次Tesla T4验证结果。</p>
-<div class="highlight"><pre><span></span><code>Using device: cuda 
+<pre class="highlight"><code>Using device: cuda 
 GPU: Tesla T4 
 Total GPU memory: 15.64 GB
 ============================================================
@@ -465,8 +474,8 @@ Model    Params   Actual(GB) Pred(GB)   Error
 SMALL    123.5M   8.99       4.20       114.0% 
 MEDIUM   353.5M   6.23       10.90      42.8% 
 LARGE    772.1M   12.60      21.83      42.3% ============================================================
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Using device: cuda 
+</code></pre>
+<pre class="highlight"><code>Using device: cuda 
 GPU: Tesla T4 
 Total GPU memory: 15.64 GB
 ============================================================ 
@@ -476,8 +485,8 @@ Model    Params   Actual(GB) Pred(GB)   Error
 SMALL    123.5M   2.48       4.20       40.9% 
 MEDIUM   353.5M   6.20       10.90      43.2% 
 LARGE    772.1M   12.60      21.83      42.3% ============================================================
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Using device: cuda 
+</code></pre>
+<pre class="highlight"><code>Using device: cuda 
 GPU: Tesla T4 
 Total GPU memory: 15.64 GB
 ============================================================ 
@@ -487,10 +496,10 @@ Model    Params   Actual(GB) Pred(GB)   Error
 SMALL    123.5M   9.01       4.20       114.5% 
 MEDIUM   353.5M   6.22       10.90      42.9% 
 LARGE    772.1M   12.60      21.83      42.3% ============================================================
-</code></pre></div>
+</code></pre>
 <hr/>
 <p>以下是来自Kaggle的三次Tesla P100验证结果。</p>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla P100-PCIE-16GB
 Total GPU memory: 17.06 GB
 ============================================================
@@ -502,8 +511,8 @@ SMALL    123.5M   2.47       4.20       41.2%
 MEDIUM   353.5M   6.17       10.90      43.4% 
 LARGE    772.1M   12.56      21.83      42.5% 
 ============================================================
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+</code></pre>
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla P100-PCIE-16GB
 Total GPU memory: 17.06 GB
 ============================================================
@@ -515,8 +524,8 @@ SMALL    123.5M   2.47       4.20       41.2%
 MEDIUM   353.5M   6.17       10.90      43.4% 
 LARGE    772.1M   12.56      21.83      42.5% 
 ============================================================
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+</code></pre>
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla P100-PCIE-16GB
 Total GPU memory: 17.06 GB
 
@@ -529,10 +538,10 @@ SMALL    123.5M   8.97       4.20       113.6%
 MEDIUM   353.5M   6.22       10.90      42.9% 
 LARGE    772.1M   12.56      21.83      42.4% 
 ============================================================
-</code></pre></div>
+</code></pre>
 <hr/>
 <p>以下是来自Kaggle的三次Tesla T4验证结果。</p>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla T4
 Total GPU memory: 15.64 GB
 ============================================================
@@ -544,8 +553,8 @@ SMALL    123.5M   2.47       4.20       41.2%
 MEDIUM   353.5M   6.17       10.90      43.4% 
 LARGE    772.1M   12.56      21.83      42.5% 
 ============================================================
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+</code></pre>
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla T4
 Total GPU memory: 15.64 GB
 ============================================================
@@ -557,8 +566,8 @@ SMALL    123.5M   8.99       4.20       114.2%
 MEDIUM   353.5M   6.20       10.90      43.1% 
 LARGE    772.1M   12.57      21.83      42.4% 
 ============================================================
-</code></pre></div>
-<div class="highlight"><pre><span></span><code>Using device: cuda
+</code></pre>
+<pre class="highlight"><code>Using device: cuda
 GPU: Tesla T4
 Total GPU memory: 15.64 GB
 ============================================================
@@ -570,7 +579,7 @@ SMALL    123.5M   8.99       4.20       114.1%
 MEDIUM   353.5M   6.20       10.90      43.1% 
 LARGE    772.1M   12.56      21.83      42.4% 
 ============================================================
-</code></pre></div>
+</code></pre>
 <hr/>
 <p>关于异常值（GPT-2 SMALL的 <code>Actual 8.99GB</code> ）：</p>
 <p>我发现SMALL的这个有一定规律性。我固定了GPU（Tesla T4，Total GPU memory: 15.64 GB），在启动机器之后，利用连续的cell运行完全相同的代码三次。第一次运行时权重从网上下载，此时运行分配的SMALL是2.47GB，连着第二次运行时SMALL稳定飙升到8.99GB，第三次也是8.99GB左右。</p>
@@ -580,101 +589,101 @@ LARGE    772.1M   12.56      21.83      42.4%
 <hr/>
 <p>验证代码如下。
 最关键的是</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="n">model</span><span class="o">.</span><span class="n">gradient_checkpointing_disable</span><span class="p">()</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</code></pre></div>
+<pre class="highlight" data-lang="python"><code class="language-python">model.gradient_checkpointing_disable()
+model = model.to(device)
+</code></pre>
 <p>这两行代码。后者移入GPU中分配内存并进行训练，前者GPT说是如果不关闭则可能在运行过程中不会完全保留激活值、而是实时清理。</p>
-<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<pre class="highlight" data-lang="python"><code class="language-python">from transformers import GPT2LMHeadModel
+import torch
 
-<span class="c1"># ==================== 配置开关 ====================</span>
-<span class="n">RUN_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'small'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>   <span class="c1"># gpt2</span>
-    <span class="s1">'medium'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># gpt2-medium</span>
-    <span class="s1">'large'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>   <span class="c1"># gpt2-large</span>
-    <span class="s1">'xl'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>      <span class="c1"># gpt2-xl</span>
-<span class="p">}</span>
-<span class="c1"># =================================================</span>
+# ==================== 配置开关 ====================
+RUN_CONFIG = {
+    'small': True,   # gpt2
+    'medium': True,  # gpt2-medium
+    'large': True,   # gpt2-large
+    'xl': False,      # gpt2-xl
+}
+# =================================================
 
-<span class="n">MODEL_CONFIGS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'small'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'gpt2'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">'D'</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span> <span class="s1">'H'</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
-    <span class="s1">'medium'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'gpt2-medium'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="s1">'D'</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="s1">'H'</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span>
-    <span class="s1">'large'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'gpt2-large'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="s1">'D'</span><span class="p">:</span> <span class="mi">1280</span><span class="p">,</span> <span class="s1">'H'</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
-    <span class="s1">'xl'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'name'</span><span class="p">:</span> <span class="s1">'gpt2-xl'</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span> <span class="s1">'D'</span><span class="p">:</span> <span class="mi">1600</span><span class="p">,</span> <span class="s1">'H'</span><span class="p">:</span> <span class="mi">25</span><span class="p">},</span>
-<span class="p">}</span>
+MODEL_CONFIGS = {
+    'small': {'name': 'gpt2', 'L': 12, 'D': 768, 'H': 12},
+    'medium': {'name': 'gpt2-medium', 'L': 24, 'D': 1024, 'H': 16},
+    'large': {'name': 'gpt2-large', 'L': 36, 'D': 1280, 'H': 20},
+    'xl': {'name': 'gpt2-xl', 'L': 48, 'D': 1600, 'H': 25},
+}
 
-<span class="n">V</span> <span class="o">=</span> <span class="mi">50257</span>
-<span class="n">T</span> <span class="o">=</span> <span class="mi">1024</span>
-<span class="n">B</span> <span class="o">=</span> <span class="mi">1</span>
+V = 50257
+T = 1024
+B = 1
 
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">'cuda'</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">'cpu'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">'cuda'</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"GPU: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total GPU memory: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"\nUsing device: {device}")
+if device.type == 'cuda':
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"Total GPU memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+print("\n" + "=" * 80)
 
-<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+results = []
 
-<span class="k">for</span> <span class="n">model_key</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">MODEL_CONFIGS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">RUN_CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_key</span><span class="p">):</span>
-        <span class="k">continue</span>
+for model_key, config in MODEL_CONFIGS.items():
+    if not RUN_CONFIG.get(model_key):
+        continue
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Validating </span><span class="si">{</span><span class="n">model_key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+    print(f"\nValidating {model_key.upper()}...")
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="c1"># Load model</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">'name'</span><span class="p">])</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">gradient_checkpointing_disable</span><span class="p">()</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    try:
+        # Load model
+        model = GPT2LMHeadModel.from_pretrained(config['name'])
+        model.gradient_checkpointing_disable()
+        model = model.to(device)
 
-        <span class="c1"># Prepare input</span>
-        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">input_ids</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        # Prepare input
+        input_ids = torch.randint(0, V, (B, T)).to(device)
+        labels = input_ids.clone()
 
-        <span class="c1"># Reset stats</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">reset_peak_memory_stats</span><span class="p">()</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+        # Reset stats
+        torch.cuda.reset_peak_memory_stats()
+        torch.cuda.empty_cache()
 
-        <span class="c1"># Forward + backward</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-        <span class="n">outputs</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        # Forward + backward
+        outputs = model(input_ids, labels=labels)
+        outputs.loss.backward()
 
-        <span class="c1"># Peak memory</span>
-        <span class="n">peak_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">max_memory_allocated</span><span class="p">()</span> <span class="o">/</span> <span class="mf">1e9</span>
+        # Peak memory
+        peak_memory = torch.cuda.max_memory_allocated() / 1e9
 
-        <span class="c1"># Formula prediction (FP32 only)</span>
-        <span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">'L'</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">'D'</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s1">'H'</span><span class="p">]</span>
-        <span class="n">P</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">L</span> <span class="o">*</span> <span class="n">D</span> <span class="o">*</span> <span class="n">D</span> <span class="o">+</span> <span class="n">V</span> <span class="o">*</span> <span class="n">D</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">D</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="n">H</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">B</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">V</span>
-        <span class="c1"># TODO: 9</span>
-        <span class="n">pred</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span> <span class="o">*</span> <span class="n">P</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">A</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
+        # Formula prediction (FP32 only)
+        L, D, H = config['L'], config['D'], config['H']
+        P = 12 * L * D * D + V * D
+        A = L * (16 * B * T * D + 2 * B * H * T * T) + 2 * B * T * V
+        # TODO: 9
+        pred = (16 * P + 4 * A) / 1e9
 
-        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s1">'model'</span><span class="p">:</span> <span class="n">model_key</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
-            <span class="s1">'params'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">P</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">M"</span><span class="p">,</span>
-            <span class="s1">'actual'</span><span class="p">:</span> <span class="n">peak_memory</span><span class="p">,</span>
-            <span class="s1">'pred'</span><span class="p">:</span> <span class="n">pred</span><span class="p">,</span>
-            <span class="s1">'error'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">peak_memory</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">pred</span><span class="p">)</span><span class="o">/</span><span class="n">pred</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%"</span>
-        <span class="p">})</span>
+        results.append({
+            'model': model_key.upper(),
+            'params': f"{P/1e6:.1f}M",
+            'actual': peak_memory,
+            'pred': pred,
+            'error': f"{abs(peak_memory - pred)/pred*100:.1f}%"
+        })
 
-        <span class="k">del</span> <span class="n">model</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+        del model
+        torch.cuda.empty_cache()
 
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    except Exception as e:
+        print(f"  Error: {e}")
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Validation Results (FP32)"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Model'</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Params'</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Actual(GB)'</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Pred(GB)'</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Error'</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+print("\n" + "=" * 60)
+print("Validation Results (FP32)")
+print("=" * 60)
+print(f"{'Model':&lt;8} {'Params':&lt;8} {'Actual(GB)':&lt;10} {'Pred(GB)':&lt;10} {'Error':&lt;6}")
+print("-" * 60)
 
-<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'params'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'actual'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;10.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'pred'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;10.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">'error'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+for r in results:
+    print(f"{r['model']:&lt;8} {r['params']:&lt;8} {r['actual']:&lt;10.2f} {r['pred']:&lt;10.2f} {r['error']:&lt;6}")
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-</code></pre></div>
+print("=" * 60)
+</code></pre>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="LLMestimate.html" title="上一篇">← 01 参数量与训练 FLOPs</a><a class="post-rel-link" href="mathqwen-0.6b-agentic-rl.html">实战：双卡 5090 训练 Qwen3-0.6B</a></div></aside>
   </div>
 

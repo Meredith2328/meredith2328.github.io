@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/assets/og-default.png">
   <meta property="article:published_time" content="2026-08-17T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -236,84 +245,84 @@
 <div class="av-foot">id/parentId 构成一棵树：从任意节点分叉复制，就得到"会话分支"。</div>
 </div>
 <p>先定义数据结构，因为它决定了后面所有东西的形态。pi 的会话文件是 append-only 的 JSONL，每发生一件事追加一行 JSON，永不改写前面的行。第一行是会话头：</p>
-<div class="highlight"><pre data-lang="json"><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"session"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-08-10T11:02:43.340Z"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"cwd"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;项目路径&gt;"</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="json"><code class="language-json">{
+  "type": "session",
+  "version": 3,
+  "id": "&lt;uuid&gt;",
+  "timestamp": "2026-08-10T11:02:43.340Z",
+  "cwd": "&lt;项目路径&gt;"
+}
+</code></pre>
 <p>之后每行是一条消息记录。消息分三种角色：<code>user</code>、<code>assistant</code>、<code>toolResult</code>。每条记录有 <code>id</code> 和 <code>parentId</code>，指向它前面那条消息——注意这不是简单的链表，而是树：从历史某一点分叉出多个分支，就得到了"会话分支"能力，<code>parentId</code> 就是分支的挂载点。 Assistant 消息的 <code>content</code> 是块（block）列表，一条消息可以同时装下思考、文字和多个工具调用。下面这条是我翻出来的真实记录（脱敏后），一次模型回复里带了一段 thinking、一段文字、三个并发的 read 调用：</p>
-<div class="highlight"><pre data-lang="json"><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"message"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"82d4737d"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"parentId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a1ec175e"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"role"</span><span class="p">:</span><span class="w"> </span><span class="s2">"assistant"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"content"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"thinking"</span><span class="p">,</span><span class="w"> </span><span class="nt">"thinking"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Let me read the full documentation and patch..."</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span><span class="w"> </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"I'll start by reading the full bug report and patch..."</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">,</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"call_f0ntdnyb"</span><span class="p">,</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"arguments"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;项目路径&gt;/docs/BUG_REPORT.md"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">,</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"call_8xzoc1ip"</span><span class="p">,</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"arguments"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;项目路径&gt;/docs/fix.patch"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">,</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"call_1sky8mqk"</span><span class="p">,</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"read"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"arguments"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;项目路径&gt;/repro/main.py"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"openai-completions"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"provider"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ollama-local"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"glm-5.2:cloud"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"usage"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"input"</span><span class="p">:</span><span class="w"> </span><span class="mi">9476</span><span class="p">,</span><span class="w"> </span><span class="nt">"output"</span><span class="p">:</span><span class="w"> </span><span class="mi">129</span><span class="p">,</span><span class="w"> </span><span class="nt">"totalTokens"</span><span class="p">:</span><span class="w"> </span><span class="mi">9605</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">"stopReason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toolUse"</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="json"><code class="language-json">{
+  "type": "message",
+  "id": "82d4737d",
+  "parentId": "a1ec175e",
+  "message": {
+    "role": "assistant",
+    "content": [
+      { "type": "thinking", "thinking": "Let me read the full documentation and patch..." },
+      { "type": "text", "text": "I'll start by reading the full bug report and patch..." },
+      { "type": "toolCall", "id": "call_f0ntdnyb", "name": "read",
+        "arguments": { "path": "&lt;项目路径&gt;/docs/BUG_REPORT.md" } },
+      { "type": "toolCall", "id": "call_8xzoc1ip", "name": "read",
+        "arguments": { "path": "&lt;项目路径&gt;/docs/fix.patch" } },
+      { "type": "toolCall", "id": "call_1sky8mqk", "name": "read",
+        "arguments": { "path": "&lt;项目路径&gt;/repro/main.py" } }
+    ],
+    "api": "openai-completions",
+    "provider": "ollama-local",
+    "model": "glm-5.2:cloud",
+    "usage": { "input": 9476, "output": 129, "totalTokens": 9605 },
+    "stopReason": "toolUse"
+  }
+}
+</code></pre>
 <p>值得注意的细节有三个。<code>stopReason</code> 是 <code>toolUse</code>，这是主循环判断"继续跑工具还是收尾输出"的依据；<code>usage</code> 记录了每轮的真实 token 消耗，会话文件顺手就是一份成本账本；三个 <code>toolCall</code> 共享同一个 <code>id</code> 前缀空间但各有独立 ID，因为每个调用都要各自对应一条结果。</p>
 <p>工具结果用 <code>toolCallId</code> 关联回调用方，并且带 <code>isError</code> 标记。真实的失败记录长这样：</p>
-<div class="highlight"><pre data-lang="json"><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"message"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5c06ba21"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"parentId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8b1c78e9"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"role"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toolResult"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"toolCallId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"call_q2hiox7w"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"toolName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bash"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"isError"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"content"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/usr/bin/bash: line 1: cd: &lt;路径&gt;: No such file or directory\n\nCommand exited with code 1"</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="json"><code class="language-json">{
+  "type": "message",
+  "id": "5c06ba21",
+  "parentId": "8b1c78e9",
+  "message": {
+    "role": "toolResult",
+    "toolCallId": "call_q2hiox7w",
+    "toolName": "bash",
+    "isError": true,
+    "content": [
+      { "type": "text",
+        "text": "/usr/bin/bash: line 1: cd: &lt;路径&gt;: No such file or directory\n\nCommand exited with code 1" }
+    ]
+  }
+}
+</code></pre>
 <p>这条记录本身就说明了一件事：<strong>工具失败不需要代码层面的特殊处理</strong>。报错信息作为普通的 toolResult 喂回给模型，模型下一轮自己看到 <code>isError: true</code> 和 stderr，自己纠正路径重试。整个会话恢复的实现就是逐行读回这个文件、重建消息数组，程序崩了文件里已有的部分仍然完整可用。这个鲁棒性是 append-only 换来的。</p>
 <p>我统计了本机全部会话的工具调用分布，一个有意思的观察：有一次 54 次 bash 的长会话，bash 占比压倒性多数；纯代码任务里 <code>read</code> 和 <code>bash</code> 是绝对主力，<code>edit</code>/<code>write</code> 反而稀少——因为大量轮次花在"读代码、跑命令、验证"上，真正落笔修改的时刻比想象中少。这印证了工具设计里"bash 是灵魂"的判断。</p>
 <h2 id="二-主循环-整个-agent-的心脏">二、主循环：整个 agent 的心脏</h2>
 <p>有了消息模型，主循环就是几十行的事。下面是我按同样结构写的教学版——它也是接下来读 pi 源码的对照基准，正文里那几条“教学版与真实实现的差异”都源于它：</p>
-<div class="highlight"><pre data-lang="typescript"><span></span><code><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">runLoop</span><span class="p">(</span><span class="nx">session</span><span class="o">:</span><span class="w"> </span><span class="kt">Session</span><span class="p">,</span><span class="w"> </span><span class="nx">provider</span><span class="o">:</span><span class="w"> </span><span class="kt">Provider</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">provider</span><span class="p">.</span><span class="nx">chat</span><span class="p">({</span>
-<span class="w">      </span><span class="nx">system</span><span class="o">:</span><span class="w"> </span><span class="kt">buildSystemPrompt</span><span class="p">(</span><span class="nx">session</span><span class="p">),</span>
-<span class="w">      </span><span class="nx">messages</span><span class="o">:</span><span class="w"> </span><span class="kt">session.messages</span><span class="p">,</span>
-<span class="w">      </span><span class="nx">tools</span><span class="o">:</span><span class="w"> </span><span class="kt">registry.schemas</span><span class="p">(),</span>
-<span class="w">    </span><span class="p">});</span>
+<pre class="highlight" data-lang="typescript"><code class="language-typescript">async function runLoop(session: Session, provider: Provider) {
+  while (true) {
+    const response = await provider.chat({
+      system: buildSystemPrompt(session),
+      messages: session.messages,
+      tools: registry.schemas(),
+    });
 
-<span class="w">    </span><span class="nx">session</span><span class="p">.</span><span class="nx">append</span><span class="p">({</span>
-<span class="w">      </span><span class="nx">role</span><span class="o">:</span><span class="w"> </span><span class="s2">"assistant"</span><span class="p">,</span>
-<span class="w">      </span><span class="nx">content</span><span class="o">:</span><span class="w"> </span><span class="kt">response.blocks</span><span class="p">,</span><span class="w">   </span><span class="c1">// thinking + text + toolCall</span>
-<span class="w">    </span><span class="p">});</span>
+    session.append({
+      role: "assistant",
+      content: response.blocks,   // thinking + text + toolCall
+    });
 
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">calls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">blocks</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">b</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">b</span><span class="p">.</span><span class="kr">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">);</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">calls</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w">   </span><span class="c1">// stopReason 不是 toolUse，本轮结束</span>
+    const calls = response.blocks.filter(b =&gt; b.type === "toolCall");
+    if (calls.length === 0) return;   // stopReason 不是 toolUse，本轮结束
 
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">calls</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">call</span><span class="w"> </span><span class="p">=&gt;</span>
-<span class="w">      </span><span class="nx">registry</span><span class="p">.</span><span class="nx">execute</span><span class="p">(</span><span class="nx">call</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span><span class="w"> </span><span class="nx">call</span><span class="p">.</span><span class="nx">arguments</span><span class="p">)</span>
-<span class="w">    </span><span class="p">));</span>
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">r</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">results</span><span class="p">)</span><span class="w"> </span><span class="nx">session</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="nx">r</span><span class="p">);</span><span class="w">   </span><span class="c1">// role: "toolResult"</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
+    const results = await Promise.all(calls.map(call =&gt;
+      registry.execute(call.name, call.arguments)
+    ));
+    for (const r of results) session.append(r);   // role: "toolResult"
+  }
+}
+</code></pre>
 <p>而 pi 的真实实现分布在三个包里：外层 <code>agent-session.js</code>（会话编排：重试、压缩、扩展事件转发）、中间的 <code>@earendil-works/pi-agent-core</code>（<code>agent.js</code> 的 Agent 类 + <code>agent-loop.js</code> 的循环引擎，两个文件合计不到一千行）、底层 <code>pi-ai</code>（协议适配与流式 HTTP）。下面两张图里的每段代码都标了行号并链到 GitHub 源码（pi monorepo 的 packages/agent/src/，版本 v0.84.0，与本机安装的编译产物逐行核对过），点击即可对照原文。</p>
 <p>先交代几个只有读代码才能确认的结构事实。</p>
 <p><strong>循环是双层的</strong>。外层 <code>while (true)</code>（agent-loop.js<a href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L170">:170</a>）只为一件事存在：内层停下后检查 follow-up 队列（<a href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L263">:263</a>），有就 <code>continue</code> 回内层，没有才 <code>break</code> 走到唯一的正常出口 <code>agent_end</code>（<a href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L278">:278</a>）。内层 <code>while (hasMoreToolCalls || pendingMessages.length &gt; 0)</code>（<a href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L174">:174</a>）才是主引擎——退出条件是"没有更多工具调用、也没有排队的 steering 消息"。<code>hasMoreToolCalls</code> 由工具批次结果的 <code>terminate</code> 标志驱动（<a href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L224">:224</a>），而 <code>terminate</code> 是全体投票：<code>shouldTerminateToolBatch</code>（<a href="https://github.com/earendil-works/pi/blob/v0.84.0/packages/agent/src/agent-loop.ts#L582-L584">:582-584</a>）要求这批工具结果<strong>全部</strong>声明 <code>terminate === true</code> 才终止整个 agent，一个没投就继续跑。</p>
@@ -704,87 +713,87 @@ async _handlePostAgentRun() {
 <div class="av-foot">①翻译边界与 key 解析是问答就有的必需品；②回环 + terminate 投票；③四种失败模式各有专属分支；④全部挂件就位后 agent-loop.js 548 行完整覆盖。阶段④最外层跳出 agent-loop.js，指向使用者（AgentSession）的善后循环。</div>
 </div>
 <p>朴素的同步实现能跑，但很快你会发现什么都做不了：想按 ESC 中断？想边生成边流式显示？想在模型跑工具的半路上插一句话？这些都需要把"发生了一件事"和"如何呈现这件事"解耦。pi 的解法是事件总线（<code>event-bus.js</code>）——它的实现朴素到只有几十行：直接包了一个 Node.js 的 <code>EventEmitter</code>，<code>emit</code> 同步分发，唯一加的料是把每个 handler 包进 try/catch，保证一个订阅者抛错不会炸掉整个进程：</p>
-<div class="highlight"><pre data-lang="javascript"><span></span><code><span class="nx">on</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">channel</span><span class="p">,</span><span class="w"> </span><span class="nx">handler</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">safeHandler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">await</span><span class="w"> </span><span class="nx">handler</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="sb">`Event handler error (</span><span class="si">${</span><span class="nx">channel</span><span class="si">}</span><span class="sb">):`</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="p">);</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">};</span>
-<span class="w">    </span><span class="nx">emitter</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">channel</span><span class="p">,</span><span class="w"> </span><span class="nx">safeHandler</span><span class="p">);</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">emitter</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="nx">channel</span><span class="p">,</span><span class="w"> </span><span class="nx">safeHandler</span><span class="p">);</span><span class="w">   </span><span class="c1">// 返回退订函数</span>
-<span class="p">},</span>
-</code></pre></div>
+<pre class="highlight" data-lang="javascript"><code class="language-javascript">on: (channel, handler) =&gt; {
+    const safeHandler = async (data) =&gt; {
+        try {
+            await handler(data);
+        } catch (err) {
+            console.error(`Event handler error (${channel}):`, err);
+        }
+    };
+    emitter.on(channel, safeHandler);
+    return () =&gt; emitter.off(channel, safeHandler);   // 返回退订函数
+},
+</code></pre>
 <p>事件名没有枚举约束，就是字符串 channel；但生命周期事件的命名是稳定的：<code>agent_start</code> →（<code>turn_start</code> → <code>message_start</code>/<code>message_update</code>/<code>message_end</code> → <code>tool_execution_start</code>/<code>tool_execution_end</code> → <code>turn_end</code>）× N → <code>agent_end</code> → <code>agent_settled</code>。TUI、日志、扩展系统全部订阅这一条流，所以同一个核心能配四种完全不同的前端（交互式 TUI、<code>pi -p</code> 脚本打印、RPC 进程集成、SDK 嵌入），核心一行不改。</p>
 <p>上一节那条真实的 bash 报错记录其实展示了同一个哲学——杀掉一个跑了一半的任务常常比让它带着错误信息跑完更贵，把纠错机会留给模型自己往往更划算。</p>
 <h2 id="三-provider-层-挡住模型-api-差异的墙">三、Provider 层：挡住模型 API 差异的墙</h2>
 <p>看上面 assistant 消息里的 <code>"api": "openai-completions", "provider": "ollama-local", "model": "glm-5.2:cloud"</code> 这几个字段——同一套统一消息格式，跑在 OpenAI 协议上、经由 ollama 代理接到云模型。这就是 Provider 层存在的意义：主循环只认统一格式，provider 负责"翻译出去"（统一格式 → 对方 API 请求）和"翻译回来"（流式响应 → 统一格式的 assistant 消息）。</p>
 <p>pi 的这层不在主包里，而是拆成了独立依赖 <code>@earendil-works/pi-ai</code>，内部再分三层：API 层（每个线上协议一个适配器模块，各自导出统一签名的 <code>stream</code>/<code>streamSimple</code>）、Provider 层（auth + baseUrl + 模型目录，把调用委托给 API 适配器）、Model 层（一个值对象决定自己走哪个适配器）。支持的协议列表本身就是一份业界现状清单：</p>
-<div class="highlight"><pre data-lang="typescript"><span></span><code><span class="k">export</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="nx">KnownApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"openai-completions"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"mistral-conversations"</span>
-<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="s2">"openai-responses"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"azure-openai-responses"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"openai-codex-responses"</span>
-<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="s2">"anthropic-messages"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"bedrock-converse-stream"</span>
-<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="s2">"google-generative-ai"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"google-vertex"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"pi-messages"</span><span class="p">;</span>
-</code></pre></div>
+<pre class="highlight" data-lang="typescript"><code class="language-typescript">export type KnownApi = "openai-completions" | "mistral-conversations"
+  | "openai-responses" | "azure-openai-responses" | "openai-codex-responses"
+  | "anthropic-messages" | "bedrock-converse-stream"
+  | "google-generative-ai" | "google-vertex" | "pi-messages";
+</code></pre>
 <p><code>stream()</code> 的签名是"同步返回一个事件流对象、内部异步推事件"——调用方拿到 <code>AssistantMessageEventStream</code> 就能立刻开始渲染，token 到一点拼一点。流上的事件协议是所有适配器共享的：先 <code>start</code>，再按 <code>contentIndex</code> 发块级的 <code>text_start</code>/<code>text_delta</code>/<code>text_end</code>、<code>thinking_*</code>、<code>toolcall_*</code>，终态只能是 <code>done</code> 或 <code>error</code>。这个协议就是 TUI 能逐字渲染、又不必关心底下是哪家模型的原因。</p>
 <p>统一消息格式本身（<code>pi-ai/types.d.ts</code>，节选）长这样，注意 <code>thinkingSignature</code> 这种字段——它存 Anthropic 的加密思考签名，回放历史时必须原样带回，否则 API 会拒绝：</p>
-<div class="highlight"><pre data-lang="typescript"><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">ThinkingContent</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">"thinking"</span><span class="p">;</span><span class="w"> </span><span class="nx">thinking</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">thinkingSignature?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">redacted?</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">ToolCall</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">;</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">arguments</span><span class="o">:</span><span class="w"> </span><span class="kt">Record</span><span class="o">&lt;</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span><span class="w"> </span><span class="nx">thoughtSignature?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">export</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="nx">AssistantMessage</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">role</span><span class="o">:</span><span class="w"> </span><span class="s2">"assistant"</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">content</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">TextContent</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nx">ThinkingContent</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nx">ToolCall</span><span class="p">)[];</span>
-<span class="w">  </span><span class="nx">api</span><span class="o">:</span><span class="w"> </span><span class="kt">Api</span><span class="p">;</span><span class="w"> </span><span class="nx">provider</span><span class="o">:</span><span class="w"> </span><span class="kt">ProviderId</span><span class="p">;</span><span class="w"> </span><span class="nx">model</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">usage</span><span class="o">:</span><span class="w"> </span><span class="kt">Usage</span><span class="p">;</span><span class="w"> </span><span class="nx">stopReason</span><span class="o">:</span><span class="w"> </span><span class="kt">StopReason</span><span class="p">;</span><span class="w"> </span><span class="nx">timestamp</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">export</span><span class="w"> </span><span class="kr">type</span><span class="w"> </span><span class="nx">StopReason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"pending"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"stop"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"length"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"toolUse"</span>
-<span class="w">                       </span><span class="o">|</span><span class="w"> </span><span class="s2">"error"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"aborted"</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">"deferred"</span><span class="p">;</span>
-</code></pre></div>
+<pre class="highlight" data-lang="typescript"><code class="language-typescript">export interface ThinkingContent {
+  type: "thinking"; thinking: string;
+  thinkingSignature?: string; redacted?: boolean;
+}
+export interface ToolCall {
+  type: "toolCall"; id: string; name: string;
+  arguments: Record&lt;string, any&gt;; thoughtSignature?: string;
+}
+export interface AssistantMessage {
+  role: "assistant";
+  content: (TextContent | ThinkingContent | ToolCall)[];
+  api: Api; provider: ProviderId; model: string;
+  usage: Usage; stopReason: StopReason; timestamp: number;
+}
+export type StopReason = "pending" | "stop" | "length" | "toolUse"
+                       | "error" | "aborted" | "deferred";
+</code></pre>
 <p>往下看两个主流协议各自怎么适配的，这两段是理解"翻译层到底在翻什么"的关键。</p>
 <p><strong>OpenAI chat.completions 方向</strong>。请求组装时工具定义转成 <code>{type: "function", function: {name, description, parameters, strict}}</code> 数组，<code>strict</code> 字段只在对方支持时才带（"Some reject unknown fields"——pi 源码里的原注释，兼容性防御无处不在）。流式回来时最难的是 <code>delta.tool_calls</code> 的聚合：OpenAI 把一次工具调用拆成多个增量片段发过来，pi 用"index 优先、id 兜底"的双重索引把它们拼回块：</p>
-<div class="highlight"><pre data-lang="javascript"><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">toolCallBlocksByIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">();</span><span class="w">  </span><span class="c1">// key: toolCall.index</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">toolCallBlocksById</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Map</span><span class="p">();</span><span class="w">   </span><span class="c1">// key: toolCall.id</span>
+<pre class="highlight" data-lang="javascript"><code class="language-javascript">const toolCallBlocksByIndex = new Map();  // key: toolCall.index
+const toolCallBlocksById   = new Map();   // key: toolCall.id
 
-<span class="kd">let</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">streamIndex</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">undefined</span>
-<span class="w">    </span><span class="o">?</span><span class="w"> </span><span class="nx">toolCallBlocksByIndex</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">streamIndex</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">undefined</span><span class="p">;</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">block</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">toolCall</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">toolCallBlocksById</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">toolCall</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">block</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="nx">toolCall</span><span class="p">.</span><span class="nx">id</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">,</span>
-<span class="w">                        </span><span class="nx">arguments</span><span class="o">:</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="nx">partialArgs</span><span class="o">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nx">streamIndex</span><span class="w"> </span><span class="p">};</span>
-<span class="w">              </span><span class="nx">blocks</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">block</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+let block = streamIndex !== undefined
+    ? toolCallBlocksByIndex.get(streamIndex) : undefined;
+if (!block &amp;&amp; toolCall.id) block = toolCallBlocksById.get(toolCall.id);
+if (!block) { block = { type: "toolCall", id: toolCall.id || "", name,
+                        arguments: {}, partialArgs: "", streamIndex };
+              blocks.push(block); }
 
-<span class="c1">// 参数是流式 JSON 片段，边拼边做增量解析</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">toolCall</span><span class="p">.</span><span class="kd">function</span><span class="o">?</span><span class="p">.</span><span class="nx">arguments</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">block</span><span class="p">.</span><span class="nx">partialArgs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">block</span><span class="p">.</span><span class="nx">partialArgs</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">toolCall</span><span class="p">.</span><span class="kd">function</span><span class="p">.</span><span class="nx">arguments</span><span class="p">;</span>
-<span class="w">    </span><span class="nx">block</span><span class="p">.</span><span class="nx">arguments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parseStreamingJson</span><span class="p">(</span><span class="nx">block</span><span class="p">.</span><span class="nx">partialArgs</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
+// 参数是流式 JSON 片段，边拼边做增量解析
+if (toolCall.function?.arguments) {
+    block.partialArgs = (block.partialArgs ?? "") + toolCall.function.arguments;
+    block.arguments = parseStreamingJson(block.partialArgs);
+}
+</code></pre>
 <p>为什么需要双重索引：不是所有实现都老老实实填 <code>index</code>，有些代理只给 <code>id</code>，有些只给 <code>index</code>。块结束时 <code>finishBlock</code> 会做最终解析并 <code>delete block.partialArgs</code>——会话文件里只留干净的 <code>arguments</code>，流式期间的脚手架字段全部拆掉。</p>
 <p><strong>Anthropic Messages 方向</strong>。映射规则里最有代表性的是 tool_result：pi 内部每条工具结果是独立的 <code>role: "toolResult"</code> 消息，而 Anthropic 协议要求工具结果必须作为 <code>user</code> 角色消息里的 content block 出现，所以适配器要把连续的 toolResult 合并成一条 user 消息：</p>
-<div class="highlight"><pre data-lang="javascript"><span></span><code><span class="c1">// 内部: [assistant(tool_use), toolResult, toolResult]</span>
-<span class="c1">// 协议: [assistant(content: [tool_use × 2]),</span>
-<span class="c1">//        user(content: [{type:"tool_result", tool_use_id, content, is_error} × 2])]</span>
-</code></pre></div>
+<pre class="highlight" data-lang="javascript"><code class="language-javascript">// 内部: [assistant(tool_use), toolResult, toolResult]
+// 协议: [assistant(content: [tool_use × 2]),
+//        user(content: [{type:"tool_result", tool_use_id, content, is_error} × 2])]
+</code></pre>
 <p>还有一类映射是缓存打点。Anthropic 的 prompt caching 靠在消息里插 <code>cache_control</code> 标记，pi 的打点位置是精心选的：system prompt 第一块、最后一个工具定义、最后一条 user 消息的最后一个 block——正好是"稳定前缀"的三个端点。而 OpenAI 方向不用手动打点，靠 <code>prompt_cache_key</code>（会话 ID）让服务端自动关联缓存。thinking 块的映射还有个细节：没有 signature 的 thinking（比如中断后的残块）会被降级成普通 text，因为 Anthropic 拒绝无签名的 thinking 回放。</p>
 <p>模型注册表是这层的另一半（<code>pi-ai/providers/data/*.json</code>，35 家厂商，自动生成）。每条登记长这样，主循环靠 <code>contextWindow</code> 决定何时压缩，靠 <code>cost</code> 五元组算钱：</p>
-<div class="highlight"><pre data-lang="json"><span></span><code><span class="nt">"claude-haiku-4-5"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"claude-haiku-4-5"</span><span class="p">,</span><span class="w"> </span><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"anthropic-messages"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"provider"</span><span class="p">:</span><span class="w"> </span><span class="s2">"anthropic"</span><span class="p">,</span><span class="w"> </span><span class="nt">"baseUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.anthropic.com"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"reasoning"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"input"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"text"</span><span class="p">,</span><span class="w"> </span><span class="s2">"image"</span><span class="p">],</span>
-<span class="w">  </span><span class="nt">"cost"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"input"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"output"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="nt">"cacheRead"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="nt">"cacheWrite"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.25</span><span class="w"> </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">"contextWindow"</span><span class="p">:</span><span class="w"> </span><span class="mi">200000</span><span class="p">,</span><span class="w"> </span><span class="nt">"maxTokens"</span><span class="p">:</span><span class="w"> </span><span class="mi">64000</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="json"><code class="language-json">"claude-haiku-4-5": {
+  "id": "claude-haiku-4-5", "api": "anthropic-messages",
+  "provider": "anthropic", "baseUrl": "https://api.anthropic.com",
+  "reasoning": true, "input": ["text", "image"],
+  "cost": { "input": 1, "output": 5, "cacheRead": 0.1, "cacheWrite": 1.25 },
+  "contextWindow": 200000, "maxTokens": 64000
+}
+</code></pre>
 <p>个性差异不写死在代码里，而是塞进每个模型的 <code>compat</code> 字段（20 多项开关：<code>supportsStore</code>、<code>maxTokensField</code> 用 <code>max_tokens</code> 还是 <code>max_completion_tokens</code>、thinking 格式十一种变体……），按 provider 名和 baseUrl 关键字自动探测。这是"支持得太泛会陷入兼容性泥潭"的一个解法：协议只有几种，怪癖全部数据化。</p>
 <p>最后是重试，pi 做了两层，参数都值得抄。HTTP 层（<code>provider-retry.js</code>，注释明说"镜像 OpenAI/Anthropic SDK 的 pinned 策略"）：408/409/429/5xx 和网络错误可重试，退避是 <code>min(0.5 × 2^n, 8)</code> 秒再乘 <code>(1 - random() × 0.25)</code> 的抖动（0.5s/1s/2s/4s/8s 封顶）；服务器通过 <code>Retry-After</code> 要求等超过 60 秒时直接失败上抛，不无限耗着。agent 层（<code>retryAssistantCall</code>）：对整条失败的 assistant 消息重试，默认 3 次、2s/4s/8s 退避，用两条大正则分类——配额类错误（<code>insufficient_quota</code>、<code>billing</code>、<code>available balance</code>……）绝不重试，过载类（<code>overloaded</code>、<code>429</code>、<code>stream ended before message_stop</code>……）重试。还有个实现细节：pi 显式传 <code>maxRetries: 0</code> 关掉官方 SDK 的内建重试，因为它自己的退避 sleep 能被 AbortSignal 打断，SDK 的不能——用户按 ESC 时重试等待必须立刻让路。</p>
 <h2 id="四-system-prompt-模型-是谁">四、System Prompt：模型"是谁"</h2>
 <p>pi 的 <code>system-prompt.js</code> 只有 109 行，拼装结构是固定的四段：基础指令（"You are an expert coding assistant operating inside pi, a coding agent harness..."）+ 工具清单（每个工具的 description 拼成 <code>- read: ...</code> 列表，没有 snippet 的自定义工具不列）+ 使用守则（"Be concise"、"Show file paths clearly"，以及条件性的"用 bash 做 ls/rg/find"——只在没装那三个专用工具时才出现）+ 一段"问 pi 自身用法时读哪个文档"的路由说明。</p>
 <p>项目级指令的注入格式是这样的（<code>resource-loader.js</code> 会按 <code>AGENTS.override.md &gt; AGENTS.md &gt; CLAUDE.md</code> 的优先级，从工作目录逐级向上收集）：</p>
-<div class="highlight"><pre data-lang="text"><span></span><code>&lt;project_context&gt;
+<pre class="highlight" data-lang="text"><code class="language-text">&lt;project_context&gt;
 
 Project-specific instructions and guidelines:
 
@@ -793,78 +802,78 @@ Project-specific instructions and guidelines:
 &lt;/project_instructions&gt;
 
 &lt;/project_context&gt;
-</code></pre></div>
+</code></pre>
 <p>给上下文块套上明确的 XML 边界是个务实的小技巧：模型更容易把它当成"参考资料"而不是"必须立刻执行的指令"，一定程度上抑制文件内容里的提示注入。skills 的注入同理，用 <code>&lt;available_skills&gt;&lt;skill&gt;&lt;name&gt;</code> 的结构列出名字和描述，模型需要时自己用 read 去加载全文——按需注入而不是全量塞进来。</p>
 <p>有意思的是 pi 在这里反而不搞模板系统：没有 <code>{{cwd}}</code> 占位符，工作目录就是一行纯字符串拼接 <code>prompt += "\nCurrent working directory: " + cwd.replace(/\\/g, "/")</code>（Windows 反斜杠归一化）。真正的缓存考量在 Provider 层解决（上一节的 <code>prompt_cache_key</code> 和 <code>cache_control</code> 打点），system prompt 只要内容确定就行。</p>
 <p>一个很实际的考量仍然成立：system prompt 和对话前缀逐字节稳定，才能命中 provider 的 prompt caching，长会话能省大笔费用和延迟。pi 的做法值得注意——它把"会变的东西"（项目上下文、skills 列表）都放在 prompt 尾部拼接，"不变的基础指令"始终在头部，缓存前缀的断裂面被压到最小。</p>
 <h2 id="五-工具层-四个工具就能干活">五、工具层：四个工具就能干活</h2>
 <p>pi 内置七个工具：<code>read</code>、<code>bash</code>、<code>edit</code>、<code>write</code>、<code>grep</code>、<code>find</code>、<code>ls</code>。真正不可或缺的是前四个，后三个是便利性优化（省 token、输出更结构化）。每个工具三件套：TypeBox 写的 JSON Schema（给模型）、执行函数（给循环）、description 文案（进 system prompt 的工具清单）。description 不是装饰，是运行时行为的一部分——工具描述里直接引用了截断常量，模型因此"知道"输出会被截到多长、该什么时候主动分段。</p>
 <p><strong>read 的截断与续读</strong>。常量在 <code>truncate.js</code> 里：<code>DEFAULT_MAX_LINES = 2000</code> 行、<code>DEFAULT_MAX_BYTES = 50 * 1024</code>（50KB），先到者为准。截断不是默默砍掉就完事，而是给模型一个可执行的下一步——这是工具设计里非常值得学的一笔：</p>
-<div class="highlight"><pre data-lang="javascript"><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">truncation</span><span class="p">.</span><span class="nx">truncatedBy</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">"lines"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">outputText</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="sb">`\n\n[Showing lines </span><span class="si">${</span><span class="nx">startLineDisplay</span><span class="si">}</span><span class="sb">-</span><span class="si">${</span><span class="nx">endLineDisplay</span><span class="si">}</span><span class="sb"> `</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="sb">`of </span><span class="si">${</span><span class="nx">totalFileLines</span><span class="si">}</span><span class="sb">. Use offset=</span><span class="si">${</span><span class="nx">nextOffset</span><span class="si">}</span><span class="sb"> to continue.]`</span><span class="p">;</span>
-<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">outputText</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="sb">`\n\n[Showing lines ... (</span><span class="si">${</span><span class="nx">formatSize</span><span class="p">(</span><span class="nx">DEFAULT_MAX_BYTES</span><span class="p">)</span><span class="si">}</span><span class="sb"> limit). `</span><span class="w"> </span><span class="o">+</span>
-<span class="w">        </span><span class="sb">`Use offset=</span><span class="si">${</span><span class="nx">nextOffset</span><span class="si">}</span><span class="sb"> to continue.]`</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="javascript"><code class="language-javascript">if (truncation.truncatedBy === "lines") {
+    outputText += `\n\n[Showing lines ${startLineDisplay}-${endLineDisplay} ` +
+        `of ${totalFileLines}. Use offset=${nextOffset} to continue.]`;
+} else {
+    outputText += `\n\n[Showing lines ... (${formatSize(DEFAULT_MAX_BYTES)} limit). ` +
+        `Use offset=${nextOffset} to continue.]`;
+}
+</code></pre>
 <p>更极端的边界也有兜底：单行就超过 50KB 时（比如 minified JS），read 会直接放弃并指路——"Use bash: sed -n '120p' file | head -c 51200"。工具没有说"失败了，你自己想办法"，而是每次拒绝都附带替代方案，模型循环才不会卡死。</p>
 <p><strong>bash 的超时与流式回传</strong>。超时参数是可选的（schema 里明写 "no default timeout"），实现是 <code>setTimeout</code> 到点杀整棵进程树——<code>spawn</code> 时用 <code>detached: true</code> 建独立进程组就是为了这一刻能连带子孙进程一起杀，而不是只杀外壳留下孤儿：</p>
-<div class="highlight"><pre data-lang="javascript"><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">timeoutMs</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">undefined</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">timeoutHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">setTimeout</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nx">timedOut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">child</span><span class="p">.</span><span class="nx">pid</span><span class="p">)</span><span class="w"> </span><span class="nx">killProcessTree</span><span class="p">(</span><span class="nx">child</span><span class="p">.</span><span class="nx">pid</span><span class="p">);</span>
-<span class="w">    </span><span class="p">},</span><span class="w"> </span><span class="nx">timeoutMs</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="c1">// 进程退出后检查 timedOut 标志</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">timedOut</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`timeout:</span><span class="si">${</span><span class="nx">timeout</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-</code></pre></div>
+<pre class="highlight" data-lang="javascript"><code class="language-javascript">if (timeoutMs !== undefined) {
+    timeoutHandle = setTimeout(() =&gt; {
+        timedOut = true;
+        if (child.pid) killProcessTree(child.pid);
+    }, timeoutMs);
+}
+// 进程退出后检查 timedOut 标志
+if (timedOut) throw new Error(`timeout:${timeout}`);
+</code></pre>
 <p>输出回传走 <code>OutputAccumulator</code> + 100ms 节流：stdout/stderr 的每个 data 块先进滚动缓冲区，凑够 100ms 才给 TUI 发一次快照（<code>BASH_UPDATE_THROTTLE_MS = 100</code>），超过 50KB 自动开始写临时文件、结束时把完整输出路径附在结果里。这里还有个容易忽略的细节——pi 用 <code>getShellConfig(options?.shellPath)</code> 决定用哪个 shell，我本机就在 <code>~/.pi/agent/settings.json</code> 里配了 <code>shellPath</code> 指向 Git Bash，Windows 默认 shell 跑不了多少正经命令，这个配置点是 Windows 用户的第一个必改项。</p>
 <p><strong>edit 的匹配与容错</strong>。参数 schema 的原文把约束写得明明白白：</p>
-<div class="highlight"><pre data-lang="typescript"><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">replaceEditSchema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Type</span><span class="p">.</span><span class="nb">Object</span><span class="p">({</span>
-<span class="w">    </span><span class="nx">oldText</span><span class="o">:</span><span class="w"> </span><span class="kt">Type.String</span><span class="p">({</span>
-<span class="w">        </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s2">"Exact text for one targeted replacement. It must be "</span><span class="w"> </span><span class="o">+</span>
-<span class="w">            </span><span class="s2">"unique in the original file and must not overlap with any other "</span><span class="w"> </span><span class="o">+</span>
-<span class="w">            </span><span class="s2">"edits[].oldText in the same call."</span><span class="p">,</span>
-<span class="w">    </span><span class="p">}),</span>
-<span class="w">    </span><span class="nx">newText</span><span class="o">:</span><span class="w"> </span><span class="kt">Type.String</span><span class="p">({</span><span class="w"> </span><span class="nx">description</span><span class="o">:</span><span class="w"> </span><span class="s2">"Replacement text for this targeted edit."</span><span class="w"> </span><span class="p">}),</span>
-<span class="p">});</span>
-</code></pre></div>
+<pre class="highlight" data-lang="typescript"><code class="language-typescript">const replaceEditSchema = Type.Object({
+    oldText: Type.String({
+        description: "Exact text for one targeted replacement. It must be " +
+            "unique in the original file and must not overlap with any other " +
+            "edits[].oldText in the same call.",
+    }),
+    newText: Type.String({ description: "Replacement text for this targeted edit." }),
+});
+</code></pre>
 <p><code>edits</code> 数组一次可以带多组替换，但都对着"原始文件"匹配而不是增量应用——两处改动挨得近就要求合并成一条。还有一个专门伺候模型的预处理函数，它处理的是真实世界里模型不守规矩的情况（源码注释点名了 Opus 4.6 和 GLM-5.1）：</p>
-<div class="highlight"><pre data-lang="typescript"><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">prepareEditArguments</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">input</span><span class="p">;</span>
-<span class="w">    </span><span class="c1">// Some models (Opus 4.6, GLM-5.1) send edits as a JSON string instead of an array</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">args</span><span class="p">.</span><span class="nx">edits</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">"string"</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kd">const</span><span class="w"> </span><span class="nx">parsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">edits</span><span class="p">);</span>
-<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">parsed</span><span class="p">))</span><span class="w"> </span><span class="nx">args</span><span class="p">.</span><span class="nx">edits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parsed</span><span class="p">;</span>
-<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="c1">// 旧格式 top-level oldText/newText 兼容</span>
-<span class="w">    </span><span class="p">...</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="typescript"><code class="language-typescript">function prepareEditArguments(input) {
+    const args = input;
+    // Some models (Opus 4.6, GLM-5.1) send edits as a JSON string instead of an array
+    if (typeof args.edits === "string") {
+        try {
+            const parsed = JSON.parse(args.edits);
+            if (Array.isArray(parsed)) args.edits = parsed;
+        } catch { }
+    }
+    // 旧格式 top-level oldText/newText 兼容
+    ...
+}
+</code></pre>
 <p>要澄清一个流传很广的说法：<strong>pi 并没有实现"必须先 read 才能 edit"的强校验</strong>。<code>edit.js</code> 的执行路径就是 access 检查 → 读文件 → <code>applyEditsToNormalizedContent</code> 应用编辑 → 写回，全程没有查询"这个文件之前 read 过没有"的状态（某些别的 agent 比如 ZCode 有这个机制，但 pi 选择靠 oldText 必须逐字符命中的约束本身来兜底——没读过文件就编不出唯一的 oldText）。它有的是另一个保护：<code>withFileMutationQueue(absolutePath, ...)</code> 把同一文件的并发变更串行化，防止两个工具调用交错写坏文件。</p>
 <p><code>edit</code> 的参数格式本身是个经典权衡。行号定位省 token 但模型数行号经常数错；精确字符串替换多花一点 token 换高得多的成功率。下面是真实会话里的一次 edit 调用（脱敏，节选），它在改一个第三方库的 bug，<code>newText</code> 里那段英文注释是模型在解释自己为什么这么改（PEFT 的 <code>inference_mode</code> 继承问题会导致优化器为空、训练静默失效）——工具调用的参数本身就是推理过程的载体：</p>
-<div class="highlight"><pre data-lang="json"><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"toolCall"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"call_drb9ajpd"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"edit"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"arguments"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;site-packages&gt;/trainer/grpo_trainer.py"</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">"edits"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">"oldText"</span><span class="p">:</span><span class="w"> </span><span class="s2">"                model.add_adapter(\"ref\", default_config)\n"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"newText"</span><span class="p">:</span><span class="w"> </span><span class="s2">"                model.add_adapter(\"ref\", default_config)\n                for name, param in model.named_parameters():\n                    ...\n"</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="json"><code class="language-json">{
+  "type": "toolCall",
+  "id": "call_drb9ajpd",
+  "name": "edit",
+  "arguments": {
+    "path": "&lt;site-packages&gt;/trainer/grpo_trainer.py",
+    "edits": [
+      {
+        "oldText": "                model.add_adapter(\"ref\", default_config)\n",
+        "newText": "                model.add_adapter(\"ref\", default_config)\n                for name, param in model.named_parameters():\n                    ...\n"
+      }
+    ]
+  }
+}
+</code></pre>
 <h2 id="六-会话管理-持久化-恢复与压缩">六、会话管理：持久化、恢复与压缩</h2>
 <p>append-only JSONL 带来的能力链前面说过：持久化 → 恢复 → 分支（<code>parentId</code> 树从某点复制出新文件，<code>/fork</code> 出的会话头还会带 <code>parentSession</code> 字段指向源文件）。真正难的是压缩（compaction）。</p>
 <p>pi 的自动触发条件是一个具体的公式：<code>contextTokens &gt; contextWindow - reserveTokens</code>，其中 <code>reserveTokens</code> 默认 <strong>16384</strong>（给模型回复预留的空间），<code>keepRecentTokens</code> 默认 <strong>20000</strong>（最近一段不动、只压缩更早的部分）。压缩发生时会话文件里追加一个 <code>CompactionEntry</code>，老消息不从文件里删——它们只是"不再发给 LLM"：</p>
-<div class="highlight"><pre data-lang="text"><span></span><code>压缩前：
+<pre class="highlight" data-lang="text"><code class="language-text">压缩前：
   entry:  0     1     2     3      4     5     6      7      8     9
         ┌─────┬─────┬─────┬─────┬──────┬─────┬─────┬──────┬──────┬─────┐
         │ hdr │ usr │ ass │ tool │ usr │ ass │ tool │ tool │ ass │ tool│
@@ -874,17 +883,17 @@ Project-specific instructions and guidelines:
 
 压缩后：末尾追加一个 cmp 条目；下次加载时 LLM 看到
         系统提示 + summary + 从 firstKeptEntryId 开始的消息
-</code></pre></div>
+</code></pre>
 <p><code>CompactionEntry</code> 的结构（<code>session-manager.ts</code>）：</p>
-<div class="highlight"><pre data-lang="typescript"><span></span><code><span class="kd">interface</span><span class="w"> </span><span class="nx">CompactionEntry</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">"compaction"</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">parentId</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w"> </span><span class="nx">timestamp</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">summary</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">firstKeptEntryId</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span><span class="w">   </span><span class="c1">// 保留消息的起点</span>
-<span class="w">  </span><span class="nx">tokensBefore</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="p">;</span><span class="w">       </span><span class="c1">// 被替换掉的压缩前上下文量</span>
-<span class="w">  </span><span class="nx">usage?</span><span class="o">:</span><span class="w"> </span><span class="kt">Usage</span><span class="p">;</span><span class="w">              </span><span class="c1">// 生成摘要这次调用的开销</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="typescript"><code class="language-typescript">interface CompactionEntry {
+  type: "compaction";
+  id: string; parentId: string; timestamp: number;
+  summary: string;
+  firstKeptEntryId: string;   // 保留消息的起点
+  tokensBefore: number;       // 被替换掉的压缩前上下文量
+  usage?: Usage;              // 生成摘要这次调用的开销
+}
+</code></pre>
 <p>摘要不是"把对话总结一下"这么随意，pi 用一个结构化模板约束输出（Goal / Constraints / Progress 的 Done/In Progress/Blocked / Key Decisions / Next Steps / Critical Context），末尾还强制带上两个机器可读的清单：<code>&lt;read-files&gt;</code>（读过的文件路径）和 <code>&lt;modified-files&gt;</code>（改过的文件）——这两个清单会跨多次压缩累积传递，是模型在丢失细节后仍能"知道去哪里找"的生命线。生成摘要前，对话先被 <code>serializeConversation()</code> 拍平成 <code>[User]: ...</code> / <code>[Assistant tool calls]: read(path="foo.ts")</code> 的文本，其中工具结果截到 2000 字符。</p>
 <p>重复压缩的边界处理很见功力：第二次压缩的摘要范围从<strong>上一次的 <code>firstKeptEntryId</code></strong> 开始算，而不是从上一个压缩条目开始——这样上次幸存下来的消息这次也会被纳入摘要，不会出现"既没被摘要、又没被保留"的幽灵区间。</p>
 <p>除了阈值触发的 compaction，还有手动 <code>/compact [instructions]</code>（可以给摘要加聚焦指令，<code>enabled: false</code> 也照样能用），以及一套独立的分支摘要机制：<code>/tree</code> 导航到另一条分支时，pi 会提议把"你正在离开的那条分支"（从旧叶子回到共同祖先的路径）总结成 <code>BranchSummaryEntry</code> 追加到新位置——三段式（找共同祖先 → 沿路径收集 → 按 token 预算从最新优先纳入）和 compaction 同构，等于把"压缩"复用成了"换脑子"。</p>
@@ -892,16 +901,16 @@ Project-specific instructions and guidelines:
 <h2 id="七-权限与安全-信任要分层">七、权限与安全：信任要分层</h2>
 <p>先说一个会颠覆直觉的事实：<strong>pi 没有内置的 permissions/allow 规则系统，也没有沙箱</strong>（settings.json 里根本不存在 <code>permissions.allow</code> 这类字段，官方 security.md 明说 "It is not a sandbox"）。它的安全模型比传闻的简单得多，也诚实得多——两条防线，各管一段。</p>
 <p>第一条是<strong>目录信任</strong>（<code>trust-manager.js</code>）。存储文件 <code>~/.pi/agent/trust.json</code> 的结构简单到极致：<code>{ "规范化绝对路径": true | false }</code>，值只允许布尔。查找不是 glob 也不是前缀匹配，而是从当前目录<strong>逐级向上找最近的已登记祖先</strong>：</p>
-<div class="highlight"><pre data-lang="javascript"><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">currentDir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">normalizeCwd</span><span class="p">(</span><span class="nx">cwd</span><span class="p">);</span>
-<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">data</span><span class="p">[</span><span class="nx">currentDir</span><span class="p">];</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">value</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="nx">currentDir</span><span class="p">,</span><span class="w"> </span><span class="nx">decision</span><span class="o">:</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="p">};</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">parentDir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">dirname</span><span class="p">(</span><span class="nx">currentDir</span><span class="p">);</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">parentDir</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">currentDir</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-<span class="w">    </span><span class="nx">currentDir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parentDir</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
+<pre class="highlight" data-lang="javascript"><code class="language-javascript">let currentDir = normalizeCwd(cwd);
+while (true) {
+    const value = data[currentDir];
+    if (value === true || value === false)
+        return { path: currentDir, decision: value };
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) return null;
+    currentDir = parentDir;
+}
+</code></pre>
 <p>这个设计防的是一个具体攻击面：恶意仓库在 <code>.pi/</code> 下塞 settings、extensions、skills、SYSTEM.md，在仓库里放嘱托型的 AGENTS.md——不信任的目录里这些资源一概不加载。多进程并发写 trust.json 用 <code>proper-lockfile</code> 文件锁串行化。值得注意的边界：<strong>AGENTS.md 这类 context 文件不受信任门控、总是加载</strong>——因为它们只是作为"参考资料"进上下文，真正的执行通道（工具）在另一道防线上。</p>
 <p>第二条是<strong>工具确认，但它整个外包给了扩展系统</strong>。<code>agent.beforeToolCall</code> 钩子在每次工具执行前触发，若任何扩展注册了 <code>tool_call</code> handler，就发出 <code>{type: "tool_call", toolName, toolCallId, input}</code> 事件；扩展返回 <code>{ block: true, reason: "..." }</code> 可以拦截，还可以原地改写 <code>event.input</code> 实现参数纠正。弹窗能力由 UI API 的 <code>ui.confirm(title, message)</code> 提供，官方示例 <code>permission-gate.ts</code> 演示的就是"拦危险命令 + 弹确认"的完整实现。换句话说，pi 核心只提供拦截点，确认策略（哪些命令要问、记住哪些答案）全部是扩展的事——这和它"功能不进核心"的一贯哲学完全一致。</p>
 <p>第三条算半个：<strong>输出防护靠截断而非过滤</strong>。read/bash 的 2000 行 / 50KB 截断保护的是上下文不被撑爆；对提示注入（read 的文件内容里藏着"忽略之前的指令"），pi 的缓解就是上一节说的 XML 边界包裹 + 工具调用对用户完全可见。它不假装能防住，把最终监督权留给屏幕前的人。真要硬隔离，文档指路给 OS 级方案（容器、micro-VM）。</p>
@@ -911,7 +920,7 @@ Project-specific instructions and guidelines:
 <p>对一个 mini agent，我的建议是照抄这个分层：核心只做"循环 + 消息 + provider + 基础工具 + 事件"，subagent、计划模式想清楚接口留好，先不实现。</p>
 <h2 id="最小可行版本的骨架">最小可行版本的骨架</h2>
 <p>收敛成可以动手的目录结构（对照 pi 的 <code>dist/core</code> 模块名，方便阅读它的源码）：</p>
-<div class="highlight"><pre data-lang="text"><span></span><code>miniagent/
+<pre class="highlight" data-lang="text"><code class="language-text">miniagent/
 ├── src/
 │   ├── index.ts          # 入口：解析参数，创建 AgentSession
 │   ├── loop.ts           # 主循环（agent-session 的最简版）
@@ -927,7 +936,7 @@ Project-specific instructions and guidelines:
 │   ├── events.ts         # 事件总线
 │   └── ui.ts             # 订阅事件渲染终端（可先退化为 console.log）
 └── AGENTS.md
-</code></pre></div>
+</code></pre>
 <p>主循环五十行以内，剩下的工作量都在重试策略、输出截断、缓存友好、权限收敛这些不起眼的设施上。这也印证了一句话：coding agent 的"最小核心"一个下午能写完，耐用的 agent 是由细节垒出来的。</p>
 <h2 id="最后收拢几组关键权衡">最后收拢几组关键权衡</h2>
 <p>数据格式选 append-only 还是可变结构，pi 选前者换鲁棒性；edit 选行号还是字符串匹配，选后者换正确率；功能放核心还是放扩展，pi 一律往外推，保持核心可信可审计；bash 的通用性和风险是一体两面，靠分层信任调和；compaction 换续航但丢细节，只能靠更好的摘要缓解。这些权衡没有标准答案，但 pi 的参考答案是一致自洽的：<strong>核心永远选简单、耐用、可解释的那个选项，把复杂性留给边缘的扩展层</strong>。这也是参考 pi 学 mini agent 最该带走的一条设计原则。</p>

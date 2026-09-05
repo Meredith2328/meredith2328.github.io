@@ -28,6 +28,15 @@
   <meta property="og:image" content="https://meredith2328.github.io/assets/.thumbs/d0919c77b5d9.jpg">
   <meta property="article:published_time" content="2026-08-14T00:00:00">
 
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', "G-MVYHGJ8X03");
+  </script>
+  
   <link rel="icon" href="../../../favicon.png">
   <link rel="apple-touch-icon" href="../../../favicon.png">
   <link rel="alternate" type="application/rss+xml" title="10PI&#39;S BLOG丨十派的玩具箱 · RSS" href="../../../rss.xml">
@@ -169,29 +178,29 @@
 <li>重写、覆盖、移动文件之前，先备份一份到安全位置。</li>
 </ul>
 <p>写进全局 AGENTS.md 的原文是：</p>
-<div class="highlight"><pre data-lang="markdown"><span></span><code><span class="gu">## 文件写入安全【硬性约定：除非用户明确豁免否则必须遵守】</span>
+<pre class="highlight" data-lang="markdown"><code class="language-markdown">## 文件写入安全【硬性约定：除非用户明确豁免否则必须遵守】
 
-<span class="k">-</span><span class="w"> </span><span class="gs">**写前必读**</span>：用 write / 整体重写方式写任何已有文件前，必须先 read 该文件的最新磁盘内容，并与将写入的内容比对、确认差异符合预期；未读不算数。
-<span class="k">-</span><span class="w"> </span><span class="gs">**外部改动即停止**</span>：工具提示 <span class="sb">`file changed since it was read`</span>（或任何"文件在外部被修改/已变化"的警告）时，立即停止写入——先重新 read、用 diff 确认外部改动是什么，并保留外部版本，绝不直接覆盖。宁可停下来问用户。
-<span class="k">-</span><span class="w"> </span><span class="gs">**覆盖前必备份**</span>：重写、覆盖、移动任何已有文件（含 git 历史重写 / force push 前的仓库）之前，先把当前磁盘内容完整复制一份到仓库外的安全位置（如 <span class="sb">`$env:TEMP`</span> 或独立 backup 目录），确认备份可读后再动手；过程结束后再清理备份。
-</code></pre></div>
+- **写前必读**：用 write / 整体重写方式写任何已有文件前，必须先 read 该文件的最新磁盘内容，并与将写入的内容比对、确认差异符合预期；未读不算数。
+- **外部改动即停止**：工具提示 `file changed since it was read`（或任何"文件在外部被修改/已变化"的警告）时，立即停止写入——先重新 read、用 diff 确认外部改动是什么，并保留外部版本，绝不直接覆盖。宁可停下来问用户。
+- **覆盖前必备份**：重写、覆盖、移动任何已有文件（含 git 历史重写 / force push 前的仓库）之前，先把当前磁盘内容完整复制一份到仓库外的安全位置（如 `$env:TEMP` 或独立 backup 目录），确认备份可读后再动手；过程结束后再清理备份。
+</code></pre>
 <p>这条规则会注入到以后的每个会话里。</p>
 <p>跟 AI 协作时，重要的东西要么自己留一份，要么确保有可靠的备份机制（如Git自动化提交、以及自动化备份的工作流）。这次运气好找回来了，把教训固化成规则，后面就不容易再犯。</p>
 <h2 id="ai自己给的过程完整记录复盘">AI自己给的过程完整记录复盘</h2>
-<div class="highlight"><pre data-lang="markdown"><span></span><code>我按工具调用和时间戳把这条链精确还原了一遍。覆盖发生在**第二次整体重写 <span class="sb">`dsh-tools.md`</span> 的那次工具调用序列**上，当时的时间大概是 16:31 前后。拆开看是三步：
+<pre class="highlight" data-lang="markdown"><code class="language-markdown">我按工具调用和时间戳把这条链精确还原了一遍。覆盖发生在**第二次整体重写 `dsh-tools.md` 的那次工具调用序列**上，当时的时间大概是 16:31 前后。拆开看是三步：
 
-<span class="gs">**第一步：`write` 返回警告。**</span> 我处理你那条"config.json 审查 + 我刚才改了文字表述"的消息时，要第二次重写 <span class="sb">`dsh-tools.md`</span>（补 sidebar-mode 的图、改文字）。工具立刻返回了 <span class="sb">`Error: cannot write... file changed since it was read — re-read the file, then retry`</span>。这个错误本身就说明：文件自工具上次操作以来被外部改过了——那个外部改动就是你在 Typora 里的保存。
+**第一步：`write` 返回警告。** 我处理你那条"config.json 审查 + 我刚才改了文字表述"的消息时，要第二次重写 `dsh-tools.md`（补 sidebar-mode 的图、改文字）。工具立刻返回了 `Error: cannot write... file changed since it was read — re-read the file, then retry`。这个错误本身就说明：文件自工具上次操作以来被外部改过了——那个外部改动就是你在 Typora 里的保存。
 
-<span class="gs">**第二步：`read` 只读了前 10 行，检查失效。**</span> 收到警告后我调用 <span class="sb">`read`</span>（limit 10）确认文件状态，看到前 10 行还是"DSH 上线之后陆陆续续折腾了几个小工具…"就判断文件没变。问题在于，你改动的第一处恰好加在第 11 行附近（"顺便整理了我对DSH的'四种模式'的简单理解。"），前 10 行两版完全一样，我的截断读取根本看不到差异。这一步的思考链是错的：工具已经明确告诉我文件被外部改过，我却用一段读不出差异的内容说服自己"没问题"。
+**第二步：`read` 只读了前 10 行，检查失效。** 收到警告后我调用 `read`（limit 10）确认文件状态，看到前 10 行还是"DSH 上线之后陆陆续续折腾了几个小工具…"就判断文件没变。问题在于，你改动的第一处恰好加在第 11 行附近（"顺便整理了我对DSH的'四种模式'的简单理解。"），前 10 行两版完全一样，我的截断读取根本看不到差异。这一步的思考链是错的：工具已经明确告诉我文件被外部改过，我却用一段读不出差异的内容说服自己"没问题"。
 
-<span class="gs">**第三步：`write` 再次执行，覆盖了你的版本。**</span> 我接着把同样的内容又写了一遍，这次成功了——你的 Typora 改动被整体覆盖。
+**第三步：`write` 再次执行，覆盖了你的版本。** 我接着把同样的内容又写了一遍，这次成功了——你的 Typora 改动被整体覆盖。
 
-把时间线对上就清楚了：我第一次创建初版并提交（`3bbff72`，16:09）之后，你大约 16:25 在 Typora 里保存了你的版本（这个保存触发了 Typora 的自动备份，也就是后来找回内容的那份 <span class="sb">`backups`</span> 目录里的副本），我在 16:31 左右做第二次重写时撞上你的改动，收到警告、检查不充分、照样覆盖。直到你那条"dsh-tools我改的内容怎么丢失了"我才发现。
+把时间线对上就清楚了：我第一次创建初版并提交（`3bbff72`，16:09）之后，你大约 16:25 在 Typora 里保存了你的版本（这个保存触发了 Typora 的自动备份，也就是后来找回内容的那份 `backups` 目录里的副本），我在 16:31 左右做第二次重写时撞上你的改动，收到警告、检查不充分、照样覆盖。直到你那条"dsh-tools我改的内容怎么丢失了"我才发现。
 
-所以要说"在哪一次"的话：是**第二次 <span class="sb">`write dsh-tools.md`</span> 那条工具调用**；要说"在哪段思考链"的话，是**收到 <span class="sb">`file changed since it was read`</span> 警告后，用截断读取自我确认、没有停下来找你确认**的那一段判断。教训后来固化成了全局 AGENTS.md 里的"外部改动即停止，宁可停下来问用户"。
-</code></pre></div>
+所以要说"在哪一次"的话：是**第二次 `write dsh-tools.md` 那条工具调用**；要说"在哪段思考链"的话，是**收到 `file changed since it was read` 警告后，用截断读取自我确认、没有停下来找你确认**的那一段判断。教训后来固化成了全局 AGENTS.md 里的"外部改动即停止，宁可停下来问用户"。
+</code></pre>
 <p>更详细的Turn级概述：</p>
-<div class="highlight"><pre><span></span><code>按会话存储逐条锁定，结果如下（两个参照系：会话内的用户消息序号，和你截图里看到的 UI Turn 编号）：
+<pre class="highlight"><code>按会话存储逐条锁定，结果如下（两个参照系：会话内的用户消息序号，和你截图里看到的 UI Turn 编号）：
 
 完整轨迹：会话内用户消息序号 116 → 123（约 16:06 → 16:54）
 
@@ -208,9 +217,9 @@
 第 10 次调用，16:29:36 read dsh-tools.md（limit 10）—— 只读了前 10 行
 第 11 次调用，16:29:44 write dsh-tools.md —— 这次成功，覆盖了你的版本
 你的 Typora 保存发生在 16:25:41（备份文件的时间戳），我 16:29:32 开始写入，中间隔了四分钟左右——所以"写前必读"那次读取本可以拦住它，但 limit 10 的截断读取让我没看到差异，判断失效，然后就覆盖了。
-</code></pre></div>
+</code></pre>
 <p>再详细的原始 <code>session.jsonl.zstd</code> 内容：</p>
-<div class="highlight"><pre><span></span><code>────────── TOOL/CALL #9 | 16:29:32 | write（第一次，返回报错）──────────
+<pre class="highlight"><code>────────── TOOL/CALL #9 | 16:29:32 | write（第一次，返回报错）──────────
 {
   "turn": 73,
   "step": 9,
@@ -248,7 +257,7 @@
 
 ────────── TOOL/RESULT #11（成功，meta.diffs 里记录了被覆盖的旧内容——你的版本）──────────
 {"turn": 73, "step": 11, "message": {"source": {"kind": "tool", "callId": "call_00_****"}, "content": [{"type": "tool-result", "toolCallId": "call_00_****", "content": [{"type": "text", "text": "&lt;path&gt;blogs/posts/toy/dsh-tools.md&lt;/path&gt;\n&lt;type&gt;file&lt;/type&gt;\n&lt;content&gt;\nUpdated file\n&lt;/content&gt;"}], "isError": false}], "role": "user", "id": "msg-****"}, "meta": {"diffs": [{"path": "blogs/posts/toy/dsh-tools.md", "oldText": "（被覆盖前的完整内容，即你在 Typora 里保存的版本）"}]}}
-</code></pre></div>
+</code></pre>
   </div>
 
   
