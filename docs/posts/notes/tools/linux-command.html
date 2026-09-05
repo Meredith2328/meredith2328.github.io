@@ -145,7 +145,7 @@
 <p>用于查看磁盘空间。使用场景比如训模型会保存很多中间文件，可以这样看看需要清理哪些。</p>
 <p>使用效果：
 比如 <code>fuse-overlayfs</code> 是这个实例本身的存储， <code>shared-nvme</code> 是它的外接可持久化存储，使用率分别为 <code>50%</code> 和 <code>40%</code> 。</p>
-<pre class="highlight"><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# df
+<div class="highlight"><pre><span></span><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# df
 Filesystem              1K-blocks        Used  Available Use% Mounted on
 fuse-overlayfs           31457280    15468244   15989036  50% /
 /dev/sda3               931347132    85832692  845514440  10% /base
@@ -163,32 +163,32 @@ tmpfs                    62914560         112   62914448   1% /dev/shm
 JuiceFS:shared-juice3   104857600    41665660   63191940  40% /root/shared-nvme
 overlay                 931347132    85832692  845514440  10% /run/init
 tmpfs                   105646232       57136  105589096   1% /run/nvidia-persistenced/socket
-</code></pre>
+</code></pre></div>
 <p>至于要看哪几个文件最大，可以和 <code>ncdu</code> 这样的工具搭配使用。</p>
 <h2 id="grep">grep</h2>
 <p>查找关键词，关键词可以写正则。
 通常和其他指令通过管道搭配使用，简单的用法、强大的功能。</p>
 <p>使用效果：</p>
-<pre class="highlight"><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# df | grep /dev
+<div class="highlight"><pre><span></span><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# df | grep /dev
 /dev/sda3               931347132    85849780  845497352  10% /base
 tmpfs                       65536           0      65536   0% /dev
 tmpfs                       65536           0      65536   0% /dev/tty
 tmpfs                   528231156           0  528231156   0% /sys/devices/virtual/powercap
 /dev/xvdb               308521792    15468280  277308488   6% /etc/hosts
 tmpfs                    62914560         112   62914448   1% /dev/shm
-</code></pre>
+</code></pre></div>
 <p>也可以加 <code>-i</code> 参数用于忽略大小写。</p>
 <h2 id="ps">ps</h2>
 <p><code>ps aux</code> 用于查看当前用户的进程。
 但是输出往往很冗长。我只关心我运行的实验，怎么做？
 答案很方便：管道加grep！</p>
-<pre class="highlight"><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# ps aux | grep uv
+<div class="highlight"><pre><span></span><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# ps aux | grep uv
 root        7482  0.0  0.0 232328 36616 pts/0    Sl+  11:02   0:00 uv run scripts/batch_sweep.sh --use-wandb --train-data data/tinystories_train.bin --val-data data/tinystories_val.b
 root        7512  0.0  0.0 232332 36100 pts/0    Sl+  11:02   0:00 uv run python -m cs336_basics.train --train-data data/tinystories_train.bin --data-dtype uint16 --vocab-size 10000 
 root        8012  0.0  0.0   3960  1976 pts/1    S+   11:27   0:00 grep --color=auto uv
-</code></pre>
+</code></pre></div>
 <p>作为对比，以下是原始输出。信息量比较大，不便于我们立即锁定自己需要的东西。</p>
-<pre class="highlight"><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# ps aux
+<div class="highlight"><pre><span></span><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# ps aux
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 root         189  0.0  0.0   1128     4 ?        S    08:24   0:00 catatonit -P
 root         468  0.0  0.0  11868 10472 ?        Ss   08:24   0:00 /usr/bin/fuse-overlayfs -o lowerdir=/pcs/image_storage/overlay/l/FYLFLVKOA36HFQA3YPVYA4TOPN:/pcs/image_storage/over
@@ -212,13 +212,13 @@ root        7782  0.0  0.0  12164  9020 ?        Ss   11:09   0:00 sshd-session:
 root        7784  0.0  0.0  12424  6496 ?        S    11:09   0:00 sshd-session: root@notty
 root        7785  0.2  0.0   2844  2048 ?        Ss   11:09   0:02 /base/mambaforge/libexec/sftp-server
 root        8008  0.0  0.0   8468  4276 pts/1    R+   11:27   0:00 ps aux
-</code></pre>
+</code></pre></div>
 <h2 id="nvidia-smi">nvidia-smi</h2>
 <p>仅适用于使用nvidia显卡的设备。
 可以查看GPU情况，包括CUDA版本、有几个设备和设备的使用率等。</p>
 <p>使用效果：
 这里是单卡5090，CUDA版本为12.8，因此需要安装2.7.1等PyTorch版本。</p>
-<pre class="highlight"><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# nvidia-smi
+<div class="highlight"><pre><span></span><code>(cs336) root@p-4e088649b993-ackcs-00gjgdno:~# nvidia-smi
 Tue Mar 10 11:18:13 2026       
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 570.172.08             Driver Version: 570.172.08     CUDA Version: 12.8     |
@@ -239,21 +239,21 @@ Tue Mar 10 11:18:13 2026
 |=========================================================================================|
 |    0   N/A  N/A            7515      C   ...-nvme/cs336/.venv/bin/python3       1104MiB |
 +-----------------------------------------------------------------------------------------+
-</code></pre>
+</code></pre></div>
 <h2 id="v-vv-vvv">-v -vv -vvv</h2>
 <p>严格来说这个不是指令，而是一个常见的命令参数。但好用。
 有许多工具默认状态给你提供的信息是很有限的，比如 <code>pip</code> 。如果加了 <code>-v</code> ，它就会给你提供更多的信息；<code>-vv</code> 更多更多……
 比如你怀疑某个指令是不是卡在网络连接问题上了、又没有信息，就可以加这个参数看看。</p>
 <p>使用效果（不加参数）：</p>
-<pre class="highlight"><code>(pymc) PS C:\Users\10pi&gt; pip install einops
+<div class="highlight"><pre><span></span><code>(pymc) PS C:\Users\10pi&gt; pip install einops
 Collecting einops
   Using cached einops-0.8.1-py3-none-any.whl.metadata (13 kB)
 Using cached einops-0.8.1-py3-none-any.whl (64 kB)
 Installing collected packages: einops
 Successfully installed einops-0.8.1
-</code></pre>
+</code></pre></div>
 <p>使用效果（<code>-v</code>）：</p>
-<pre class="highlight"><code>(pymc) PS C:\Users\10pi&gt; pip install -v einops
+<div class="highlight"><pre><span></span><code>(pymc) PS C:\Users\10pi&gt; pip install -v einops
 Using pip 24.3.1 from C:\Software\Miniconda\envs\pymc\lib\site-packages\pip (python 3.8)
   Link requires a different Python (3.8.0 not in: '&gt;=3.9'): https://files.pythonhosted.org/packages/2a/09/f8d8f8f31e4483c10a906437b4ce31bdf3d6d417b73fe33f1a8b59e34228/einops-0.8.2-py3-none-any.whl (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.9)
   Link requires a different Python (3.8.0 not in: '&gt;=3.9'): https://files.pythonhosted.org/packages/2c/77/850bef8d72ffb9219f0b1aac23fbc1bf7d038ee6ea666f331fa273031aa2/einops-0.8.2.tar.gz (from https://pypi.org/simple/einops/) (requires-python:&gt;=3.9)
@@ -263,9 +263,9 @@ Collecting einops
 Using cached einops-0.8.1-py3-none-any.whl (64 kB)
 Installing collected packages: einops
 Successfully installed einops-0.8.1
-</code></pre>
+</code></pre></div>
 <p>使用效果（<code>-vv</code>）：（我省略了一部分内容）</p>
-<pre class="highlight"><code>(pymc) PS C:\Users\10pi&gt; pip install einops -vv
+<div class="highlight"><pre><span></span><code>(pymc) PS C:\Users\10pi&gt; pip install einops -vv
 Using pip 24.3.1 from C:\Software\Miniconda\envs\pymc\lib\site-packages\pip (python 3.8)
 Non-user install because site-packages writeable
 Disabling truststore because Python version isn't 3.10+
@@ -318,7 +318,7 @@ Remote version of pip: 25.0.1
 Local version of pip:  24.3.1
 Was pip installed by pip? False
 Removed build tracker: 'C:\\Users\\10pi\\AppData\\Local\\Temp\\pip-build-tracker-hni59twj'
-</code></pre>
+</code></pre></div>
 <p><code>-vvv</code> 就不说了。肯定更多。</p>
 <aside class="post-rel is-related"><span class="post-rel-label">相关文章</span><div class="post-rel-items"><a class="post-rel-link" href="../../courses/csapp/csapp-shelllab.html">Shelllab</a></div></aside>
   </div>

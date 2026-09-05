@@ -160,7 +160,7 @@
 <p>46 全排列</p>
 <p>回溯模板：结束条件，遍历选择，做出选择。</p>
 <div class="algoviz" data-module="lc46-全排列" data-title="46 全排列 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def permute(self, nums: List[int]) -&gt; List[List[int]]:
         res = []
 
@@ -180,11 +180,11 @@
 
         backtrack([], [False] * len(nums))
         return res
-</code></pre>
+</code></pre></div>
 <p>78 子集</p>
 <p>回溯需要考虑当前start时可以做哪些选择。</p>
 <div class="algoviz" data-module="lc78-子集" data-title="78 子集 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def subsets(self, nums: List[int]) -&gt; List[List[int]]:
         res = []
         def backtrack(start, path):
@@ -196,11 +196,11 @@
 
         backtrack(0, [])
         return res
-</code></pre>
+</code></pre></div>
 <p>17 电话号码的字母组合</p>
 <p>回溯需要考虑当前位置可以做出哪些选择。</p>
 <div class="algoviz" data-module="lc17-电话号码的字母组合" data-title="17 电话号码的字母组合 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def letterCombinations(self, digits: str) -&gt; List[str]:
         adict = {'2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl', '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'}
         res = []
@@ -216,12 +216,12 @@
 
         backtrack([], 0)
         return res
-</code></pre>
+</code></pre></div>
 <p>39 组合总和</p>
 <p>（集合中元素可以重复使用，不同位置元素不同）</p>
 <p>重复使用通过传入相同的i实现。</p>
 <div class="algoviz" data-module="lc39-组合总和" data-title="39 组合总和 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def combinationSum(self, candidates: List[int], target: int) -&gt; List[List[int]]:
         res = []
 
@@ -240,12 +240,12 @@
         candidates.sort() # 排序优化剪枝
         backtrack([], target, 0)
         return res
-</code></pre>
+</code></pre></div>
 <p>变式：组合总和II</p>
 <p>（集合中每个元素只能重复使用一次，不同位置可能有相同元素）</p>
 <p>关键：只能使用一次通过传入i+1实现，不同位置可能有相同元素通过排序后连续元素剪枝实现。</p>
 <div class="algoviz" data-module="lc39-组合总和-v2" data-title="39 组合总和 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def combinationSum2(self, candidates: List[int], target: int) -&gt; List[List[int]]:
         res = []
         def backtrack(path, start, remaining):
@@ -265,11 +265,11 @@
         candidates.sort()
         backtrack([], 0, target)
         return res
-</code></pre>
+</code></pre></div>
 <p>22 括号生成</p>
 <p>回溯选择：如果左括号数量不到n，则可以加左括号；如果右括号数量少于左括号（当然也不到n），则可以加右括号。</p>
 <div class="algoviz" data-module="lc22-括号生成" data-title="22 括号生成 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def generateParenthesis(self, n: int) -&gt; List[str]:
         res = []
 
@@ -290,7 +290,7 @@
 
         backtrack([], 0, 0)
         return res
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/word-search/">79. 单词搜索</a></p>
 <p>对于单词搜索问题，我们需要以整个棋盘的每个点为起点，搜索所有可能的路径（如DFS）。</p>
 <p>为了剪枝不可行的路径（下述好几处提前返回都起到剪枝的作用），我们需要维护 <code>visited</code> 数组。我们利用相应位置的特殊字符来变相维护 <code>visited</code> 数组。但是，<strong>由于节点需要重复使用，我们需要“回溯”：在标记 <code>visited</code> 之前保存原状态，用完之后恢复原状态。</strong></p>
@@ -299,35 +299,35 @@
 <li>时间复杂度：<span class="arithmatex">\(O(m \times n \times 3^L)\)</span> ，其中 <span class="arithmatex">\(m\)</span> 和 <span class="arithmatex">\(n\)</span> 是二维网格 <code>board</code> 的行数和列数，<span class="arithmatex">\(L\)</span> 是 <code>word</code> 的长度。这是因为，我们需要以每个点为起点，而在搜索过程中由于剪枝，来的方向一定此时已经被标记为 <code>#</code> 了，所以实际上只有3个方向可选。这是一个很宽松的上界。</li>
 <li>空间复杂度：<span class="arithmatex">\(O(L)\)</span> ，因为我们省去了额外开 <code>visited</code> 数组，但是递归栈的深度取决于 <code>word</code> 的长度。</li>
 </ul>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def exist(self, board: List[List[str]], word: str) -&gt; bool:
-        DIR = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        m, n = len(board), len(board[0])
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">DIR</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        def dfs(x, y, cur):
-            if board[x][y] != word[cur]:
-                return False
-            if cur == len(word) - 1:
-                return True
-            tmp = board[x][y]                     # 这三行是visited数组的逻辑
-            board[x][y] = '#'                     # 最重要!
-            for dx, dy in DIR:
-                nx, ny = x + dx, y + dy
-                if 0 &lt;= nx &lt; m and 0 &lt;= ny &lt; n:
-                    if dfs(nx, ny, cur + 1):
-                        return True
-            board[x][y] = tmp                     # 一定要记得回溯 (前保存, 后恢复) 哦
-            return False
+        <span class="k">def</span><span class="w"> </span><span class="nf">dfs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cur</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">!=</span> <span class="n">word</span><span class="p">[</span><span class="n">cur</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">cur</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span>                     <span class="c1"># 这三行是visited数组的逻辑</span>
+            <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'#'</span>                     <span class="c1"># 最重要!</span>
+            <span class="k">for</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="ow">in</span> <span class="n">DIR</span><span class="p">:</span>
+                <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">dy</span>
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">nx</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">ny</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">dfs</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">cur</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">board</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>                     <span class="c1"># 一定要记得回溯 (前保存, 后恢复) 哦</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
-        for i in range(m):
-            for j in range(n):
-                if dfs(i, j, 0):
-                    return True
-        return False
-</code></pre>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">dfs</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div>
 <p>131 分割回文串</p>
 <div class="algoviz" data-module="lc131-分割回文串" data-title="131 分割回文串 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def partition(self, s: str) -&gt; List[List[str]]:
         res = []
         def backtrack(start, path):
@@ -342,13 +342,13 @@
                     path.pop()
         backtrack(0, [])
         return res
-</code></pre>
+</code></pre></div>
 <p>51 N皇后</p>
 <p>仍然是回溯的结束条件、遍历选择空间、做出选择的三步走。</p>
 <p>对于N皇后问题，为了简化，我们用回溯函数代表处理特定行（此时排除掉了各行重复的问题），然后对于该函数，遍历所有列作为可能的选择，通过cols、diag1和diag2三个集合作为排除选择的条件。</p>
 <p>N皇后的行条件自动保证，列条件有n个（通过col是否存在确定），主对角线有2n-1个（row - col的取值范围是从-(n-1)到(n-1)），副对角线有2n-1个（row + col的取值范围是从2到2n）。通过set是否存在即可。</p>
 <div class="algoviz" data-module="lc51-n皇后" data-title="51 N皇后 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def solveNQueens(self, n: int) -&gt; List[List[str]]:
         res = []
         board = [['.'] * n for _ in range(n)]
@@ -376,13 +376,13 @@
 
         backtrack(0)
         return res
-</code></pre>
+</code></pre></div>
 <p>239 滑动窗口最大值</p>
 <p>发现之前有一道滑动窗口的题忘了做了。</p>
 <p>首先挨个元素推入最大堆。在最大堆中元素足够多时，将不在窗口的全部pop出来，则剩下的就是在窗口内、且值最大的元素。</p>
 <p>堆通过heapq包对heap数组进行处理，两个方法分别叫做heapq.heappush和heapq.heappop。</p>
 <div class="algoviz" data-module="lc239-滑动窗口最大值" data-title="239 滑动窗口最大值 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -&gt; List[int]:
         # 最大堆, 所以存储 (-num, i)
         # 堆顶是heap[0]
@@ -397,14 +397,14 @@
                     heapq.heappop(heap)
                 result.append(-heap[0][0])
         return result
-</code></pre>
+</code></pre></div>
 <p>更好的做法是维护一个单调队列：</p>
 <p><strong>目标是：队头始终是窗口内的最大元素。</strong></p>
 <p>每次加入新元素前，将队尾小于新元素的全部移除。（不可能成为最大值）</p>
 <p>加入后、添加res前，将队头不在窗口内的全部移除。</p>
 <p>（单调队列一般就是这种移除队尾的小元素的写法用法，然后因为这里有窗口的要求、还需要移除队头不在窗口内的元素。）</p>
 <div class="algoviz" data-module="lc239-滑动窗口最大值-v2" data-title="239 滑动窗口最大值 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def maxSlidingWindow(self, nums: List[int], k: int) -&gt; List[int]:
         # 维护单调队列
         # 每次都首先移除队尾比它小的元素, 然后再加入, 这样就会使得队列始终是单调递减的
@@ -422,7 +422,7 @@
             if i &gt;= k - 1:
                 res.append(q[0][1])
         return res
-</code></pre>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="3" data-title="专题11 二分查找"><h3 id="专题11-二分查找">专题11 二分查找</h3>
 <blockquote>
 <p>二分有一个令人头疼的问题叫做边界条件。这里一次性讲清楚。</p>
@@ -468,15 +468,15 @@
 <p>它们的特点是，你把新元素插入到它返回的位置，数组仍然保持有序。</p>
 <p>如果元素已存在，则left返回已存在元素的第一个位置，right返回已存在元素的最后一个位置的下一个位置。</p>
 <div class="algoviz" data-module="lc35-搜索插入位置" data-title="35 搜索插入位置 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def searchInsert(self, nums: List[int], target: int) -&gt; int:
         return bisect.bisect_left(nums, target)
-</code></pre>
+</code></pre></div>
 <p>74 搜索二维矩阵</p>
 <p>用二分查找的话就是对每行搜索一下。</p>
 <p>需要注意的是，很有可能返回的下标为n（未找到，且待寻找元素比该行都要大），所以顺手加个条件。</p>
 <div class="algoviz" data-module="lc74-搜索二维矩阵" data-title="74 搜索二维矩阵 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def searchMatrix(self, matrix: List[List[int]], target: int) -&gt; bool:
         m, n = len(matrix), len(matrix[0])
         for i in range(m):
@@ -484,7 +484,7 @@
             if j &lt; n and matrix[i][j] == target:
                 return True
         return False
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/">34. 在排序数组中查找元素的第一个和最后一个位置</a></p>
 <p>我特别喜欢下面这个板子，因为它把找上、下界的方式用<strong>闭区间的二分查找</strong>写得特别清楚，完全不容易写错。</p>
 <blockquote>
@@ -494,26 +494,26 @@
 </blockquote>
 <p>时间复杂度：<span class="arithmatex">\(O(\log n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span></p>
 <div class="algoviz" data-module="lc74-搜索二维矩阵-v2" data-title="74 搜索二维矩阵 · 步骤可视化"></div>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def searchRange(self, nums: List[int], target: int) -&gt; List[int]:
-        def find_boundary(is_left: bool):
-            left, right = 0, len(nums) - 1
-            pos = -1 # 精华
-            while left &lt;= right:
-                mid = (left + right) // 2
-                if nums[mid] == target:
-                    pos = mid # 精华
-                    if is_left:
-                        right = mid - 1
-                    else:
-                        left = mid + 1
-                elif nums[mid] &lt; target:
-                    left = mid + 1
-                else:
-                    right = mid - 1
-            return pos
-        return [find_boundary(True), find_boundary(False)]
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">searchRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">find_boundary</span><span class="p">(</span><span class="n">is_left</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># 精华</span>
+            <span class="k">while</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="p">:</span>
+                <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+                    <span class="n">pos</span> <span class="o">=</span> <span class="n">mid</span> <span class="c1"># 精华</span>
+                    <span class="k">if</span> <span class="n">is_left</span><span class="p">:</span>
+                        <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span><span class="p">:</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">pos</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">find_boundary</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">find_boundary</span><span class="p">(</span><span class="kc">False</span><span class="p">)]</span>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/search-in-rotated-sorted-array/">33. 搜索旋转排序数组</a></p>
 <p>这是一道二分的变式，关键在于首先找到有序的那一半区间，然后判断看 <code>target</code> 是否在有序的这一半区间。否则就在另一半。</p>
 <p><strong>我们只敢在有序区间上用 <code>nums[left] &lt;= target &lt; nums[mid]</code> 这种条件判断！</strong></p>
@@ -523,29 +523,29 @@
 <li>我使用了我最喜欢的左闭右闭写法，所以到处都很干净。我喜欢这个板子。</li>
 </ul>
 <p>时间复杂度：<span class="arithmatex">\(O(\log n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def search(self, nums: List[int], target: int) -&gt; int:
-        left, right = 0, len(nums) - 1
-        while left &lt;= right:
-            mid = (left + right) // 2
-            if nums[mid] == target:
-                return mid
-            if nums[left] &lt;= nums[mid]: # 为了能用有序区间的条件判断, 我们需要先确定有序区间
-                if nums[left] &lt;= target &lt; nums[mid]:  # mid已排除
-                    right = mid - 1                   # mid已排除
-                else:
-                    left = mid + 1                    # mid已排除
-            else:
-                if nums[mid] &lt; target &lt;= nums[right]: # mid已排除
-                    left = mid + 1                    # mid已排除
-                else:
-                    right = mid - 1                   # mid已排除
-        return -1
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">target</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="p">:</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">mid</span>
+            <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]:</span> <span class="c1"># 为了能用有序区间的条件判断, 我们需要先确定有序区间</span>
+                <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">target</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]:</span>  <span class="c1"># mid已排除</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>                   <span class="c1"># mid已排除</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>                    <span class="c1"># mid已排除</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span> <span class="o">&lt;=</span> <span class="n">nums</span><span class="p">[</span><span class="n">right</span><span class="p">]:</span> <span class="c1"># mid已排除</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>                    <span class="c1"># mid已排除</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>                   <span class="c1"># mid已排除</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</code></pre></div>
 <p>153 寻找旋转排序数组中的最小值</p>
 <p>还是一样的道理，旋转排序数组通过判断哪半段区间是有序的，来解决问题。另外那一半无序的区间只需要通过移动端点逼近处理即可。</p>
 <div class="algoviz" data-module="lc153-寻找旋转排序数组中的最小值" data-title="153 寻找旋转排序数组中的最小值 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def findMin(self, nums: List[int]) -&gt; int:
         l, r = 0, len(nums) - 1
         minVal = nums[0]
@@ -562,7 +562,7 @@
                     minVal = min(minVal, nums[mid + 1])
                     r = mid - 1
         return minVal
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/median-of-two-sorted-arrays/">4. 寻找两个正序数组的中位数</a></p>
 <p>找到给两个数组切开的位置，使得切痕左边的两段数组整体值，小于等于切痕右边整体值。并且，这两个整体大小基本相同。</p>
 <p>实际是左边整体比右边整体多0个（偶数）或1个（奇数）元素，所以用了 <code>(m + n + 1) // 2</code> 这样的上取整写法。</p>
@@ -575,33 +575,33 @@
 <p>其余所有代码都是服务于这三行的。</p>
 <p>当然，还有中位数的返回方式：如果是奇数个，左边两段多出的那一个最大元素就是中位数；如果是偶数个，左边两段的最大元素和右边两段的最小元素的均值就是中位数。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(\log (\min \{m, n\}))\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -&gt; float:
-        if len(nums1) &gt; len(nums2):
-            nums1, nums2 = nums2, nums1
-        m, n = len(nums1), len(nums2)
-        total_left = (m + n + 1) // 2 # 左半比右半多一个元素
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findMedianSortedArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums1</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">nums2</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums2</span><span class="p">):</span>
+            <span class="n">nums1</span><span class="p">,</span> <span class="n">nums2</span> <span class="o">=</span> <span class="n">nums2</span><span class="p">,</span> <span class="n">nums1</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums2</span><span class="p">)</span>
+        <span class="n">total_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="c1"># 左半比右半多一个元素</span>
 
-        left, right = 0, m # 关键!
-        # 这里的i搜索的是"分割点左边的数量"而不是"下标", 所以不是闭着眼睛用0, m-1初始化, 而是0, m才正确!
-        while left &lt;= right:
-            i = (left + right) // 2  # 两行最关键的代码
-            j = total_left - i
-            nums1_left_max = float('-inf') if i == 0 else nums1[i - 1]
-            nums1_right_min = float('inf') if i == m else nums1[i]
-            nums2_left_max = float('-inf') if j == 0 else nums2[j - 1]
-            nums2_right_min = float('inf') if j == n else nums2[j]
-            if nums1_left_max &lt;= nums2_right_min and nums2_left_max &lt;= nums1_right_min:
-                if (m + n) % 2 == 1:
-                    return max(nums1_left_max, nums2_left_max)
-                else:
-                    return (max(nums1_left_max, nums2_left_max) + min(nums1_right_min, nums2_right_min)) / 2.0
-            elif nums1_left_max &gt; nums2_right_min:
-                right = i - 1
-            else:
-                left = i + 1
-        return -1
-</code></pre>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">m</span> <span class="c1"># 关键!</span>
+        <span class="c1"># 这里的i搜索的是"分割点左边的数量"而不是"下标", 所以不是闭着眼睛用0, m-1初始化, 而是0, m才正确!</span>
+        <span class="k">while</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>  <span class="c1"># 两行最关键的代码</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">total_left</span> <span class="o">-</span> <span class="n">i</span>
+            <span class="n">nums1_left_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'-inf'</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">nums1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">nums1_right_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'inf'</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">m</span> <span class="k">else</span> <span class="n">nums1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">nums2_left_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'-inf'</span><span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">nums2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">nums2_right_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'inf'</span><span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">n</span> <span class="k">else</span> <span class="n">nums2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">nums1_left_max</span> <span class="o">&lt;=</span> <span class="n">nums2_right_min</span> <span class="ow">and</span> <span class="n">nums2_left_max</span> <span class="o">&lt;=</span> <span class="n">nums1_right_min</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">nums1_left_max</span><span class="p">,</span> <span class="n">nums2_left_max</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nums1_left_max</span><span class="p">,</span> <span class="n">nums2_left_max</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">nums1_right_min</span><span class="p">,</span> <span class="n">nums2_right_min</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.0</span>
+            <span class="k">elif</span> <span class="n">nums1_left_max</span> <span class="o">&gt;</span> <span class="n">nums2_right_min</span><span class="p">:</span>
+                <span class="n">right</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="4" data-title="专题12 栈"><h3 id="专题12-栈">专题12 栈</h3>
 <p><a href="https://leetcode.cn/problems/valid-parentheses/">20. 有效的括号</a></p>
 <p>这道题单纯括号匹配本身是容易想到的（栈），在此基础上要记得奇数时的剪枝、以及栈的判空。</p>
@@ -609,30 +609,30 @@
 <p>为了把对应关系写得好写一些，我们往往使用正排/倒排的哈希表。</p>
 </blockquote>
 <p>时间复杂度为 <span class="arithmatex">\(O(n)\)</span> ，空间复杂度为 <span class="arithmatex">\(O(n+|\Sigma|)\)</span> ，其中 <span class="arithmatex">\(|\Sigma|\)</span> 是词汇表个数（如本题的 <span class="arithmatex">\(|\Sigma|=6\)</span> ）。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def isValid(self, s: str) -&gt; bool:
-        if len(s) % 2 == 1:
-            return False
-        stk = []
-        pair = {
-            '(': ')',
-            '[': ']',
-            '{': '}'
-        }
-        for ch in s:
-            if ch in pair:
-                stk.append(ch)
-            else:
-                if stk and pair[stk[-1]] == ch:
-                    stk.pop()
-                else:
-                    return False
-        return not stk
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isValid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">stk</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">'('</span><span class="p">:</span> <span class="s1">')'</span><span class="p">,</span>
+            <span class="s1">'['</span><span class="p">:</span> <span class="s1">']'</span><span class="p">,</span>
+            <span class="s1">'{'</span><span class="p">:</span> <span class="s1">'}'</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">:</span>
+                <span class="n">stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">stk</span> <span class="ow">and</span> <span class="n">pair</span><span class="p">[</span><span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">==</span> <span class="n">ch</span><span class="p">:</span>
+                    <span class="n">stk</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="n">stk</span>
+</code></pre></div>
 <p>155 最小栈</p>
 <p>如果要有额外的功能，则添加额外的数据结构。</p>
 <div class="algoviz" data-module="lc155-最小栈" data-title="155 最小栈 · 步骤可视化"></div>
-<pre class="highlight"><code>class MinStack:
+<div class="highlight"><pre><span></span><code>class MinStack:
 
     def __init__(self):
         # 两个结构各自实现栈和最小
@@ -662,7 +662,7 @@
         # obj.pop()
         # param_3 = obj.top()
 # param_4 = obj.getMin()
-</code></pre>
+</code></pre></div>
 <p>394 字符串解码</p>
 <p>首先不考虑递归的情况即可。考虑最简单的例子：</p>
 <p><code>3[a]2[b]</code></p>
@@ -675,7 +675,7 @@
 <p>再考虑递归的情况：</p>
 <p>每当读到 <code>]</code> 时，就可以把栈中存的前面某一段给拼进来。</p>
 <div class="algoviz" data-module="lc394-字符串解码" data-title="394 字符串解码 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def decodeString(self, s: str) -&gt; str:
         numStk = []
         strStk = []
@@ -699,11 +699,11 @@
                 curStr += c
 
         return curStr
-</code></pre>
+</code></pre></div>
 <p>739 每日温度</p>
 <p>当当前温度高于栈顶的一系列温度时，取出它们的下标，将相应下标位置置为下标差。</p>
 <div class="algoviz" data-module="lc739-每日温度" data-title="739 每日温度 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def dailyTemperatures(self, temperatures: List[int]) -&gt; List[int]:
         stk = []
         res = [0] * len(temperatures)
@@ -713,7 +713,7 @@
                 res[cur_i] = i - cur_i
             stk.append((i, temp))
         return res
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形</a></p>
 <p>这个单调栈问题如果有一些直观直觉，会好把握一点。</p>
 <p><img alt="" src="../../migrated/post-images/20260302113916.png"/></p>
@@ -730,54 +730,54 @@
 </blockquote>
 <p>时间复杂度：<span class="arithmatex">\(O(n)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
 <p>（相比起来，暴力寻找两边第一个小于当前高度的解法，时间复杂度为<span class="arithmatex">\(O(n^2)\)</span>，空间复杂度为<span class="arithmatex">\(O(1)\)</span>）</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def largestRectangleArea(self, heights: List[int]) -&gt; int:
-        heights = [0] + heights + [0]
-        stk = [] # 存储索引, 单调递增栈
-        max_area = 0
-        for i, h in enumerate(heights):
-            # 结算栈顶高度, 并且同一个h有可能连续结算好多个!
-            while stk and heights[stk[-1]] &gt; h: # 关键: 我们找到的是**栈顶高度**的**两侧矮于它的高度**!
-                height = heights[stk.pop()]
-                width = i - stk[-1] - 1
-                max_area = max(max_area, height * width)
-            stk.append(i)
-        return max_area
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">largestRectangleArea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">heights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">heights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">heights</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stk</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># 存储索引, 单调递增栈</span>
+        <span class="n">max_area</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">heights</span><span class="p">):</span>
+            <span class="c1"># 结算栈顶高度, 并且同一个h有可能连续结算好多个!</span>
+            <span class="k">while</span> <span class="n">stk</span> <span class="ow">and</span> <span class="n">heights</span><span class="p">[</span><span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">h</span><span class="p">:</span> <span class="c1"># 关键: 我们找到的是**栈顶高度**的**两侧矮于它的高度**!</span>
+                <span class="n">height</span> <span class="o">=</span> <span class="n">heights</span><span class="p">[</span><span class="n">stk</span><span class="o">.</span><span class="n">pop</span><span class="p">()]</span>
+                <span class="n">width</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">max_area</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_area</span><span class="p">,</span> <span class="n">height</span> <span class="o">*</span> <span class="n">width</span><span class="p">)</span>
+            <span class="n">stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_area</span>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/maximal-rectangle/">85. 最大矩形</a></p>
 <p>这道题可以化归为<a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形</a>。关键是，我们如果以每一行为底，则它及上面的部分恰好构成一个“柱状图”。</p>
 <p>这个柱状图的巧妙之处在于，如果底当前列的元素为1，则高度是递推过来的；如果为0，则断开，高度为0。</p>
 <p><del>写一遍权当复习84了，默写着默写着发现自己84的 <code>while</code> 循环没想到，谢谢85</del></p>
 <p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def maximalRectangle(self, matrix: List[List[str]]) -&gt; int:
-        if not matrix or not matrix[0]:
-            return 0
-        m, n = len(matrix), len(matrix[0])
-        heights = [0] * n
-        max_area = 0
-        for i in range(m):
-            # 重要: 对当前行进行条形图统计时, 如果遇到0, 则"断开"
-            for j in range(n):
-                if matrix[i][j] == '1':
-                    heights[j] += 1
-                else:
-                    heights[j] = 0
-            max_area = max(max_area, self.largestRectangleArea(heights))
-        return max_area
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maximalRectangle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matrix</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">heights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+        <span class="n">max_area</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="c1"># 重要: 对当前行进行条形图统计时, 如果遇到0, 则"断开"</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
+                    <span class="n">heights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">heights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_area</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_area</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">largestRectangleArea</span><span class="p">(</span><span class="n">heights</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">max_area</span>
 
-    def largestRectangleArea(self, heights):
-        heights = [0] + heights + [0]
-        stk = []
-        max_area = 0
-        for i, h in enumerate(heights):
-            while stk and heights[stk[-1]] &gt; h:
-                height = heights[stk.pop()]
-                width = i - stk[-1] - 1
-                max_area = max(max_area, height * width)
-            stk.append(i)
-        return max_area
-</code></pre>
+    <span class="k">def</span><span class="w"> </span><span class="nf">largestRectangleArea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">heights</span><span class="p">):</span>
+        <span class="n">heights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">heights</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stk</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">max_area</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">heights</span><span class="p">):</span>
+            <span class="k">while</span> <span class="n">stk</span> <span class="ow">and</span> <span class="n">heights</span><span class="p">[</span><span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">h</span><span class="p">:</span>
+                <span class="n">height</span> <span class="o">=</span> <span class="n">heights</span><span class="p">[</span><span class="n">stk</span><span class="o">.</span><span class="n">pop</span><span class="p">()]</span>
+                <span class="n">width</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">max_area</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_area</span><span class="p">,</span> <span class="n">height</span> <span class="o">*</span> <span class="n">width</span><span class="p">)</span>
+            <span class="n">stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_area</span>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="5" data-title="专题13 堆"><h3 id="专题13-堆">专题13 堆</h3>
 <p><a href="https://neetcode.io/problems/meeting-schedule-ii/question">253 会议室 II</a></p>
 <p>十分经典的会议安排问题，这次问你至少需要多少个会议室。</p>
@@ -787,66 +787,66 @@
 <blockquote>
 <p><a href="https://leetcode.cn/problems/meeting-rooms-ii/description/">安排最少的会议室</a> 按照开始时间排序，<a href="https://leetcode.cn/problems/non-overlapping-intervals/">安排最多的会议室</a> 按照结束时间排序。</p>
 </blockquote>
-<pre class="highlight" data-lang="python"><code class="language-python">"""
-Definition of Interval:
-class Interval(object):
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-"""
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="sd">"""</span>
+<span class="sd">Definition of Interval:</span>
+<span class="sd">class Interval(object):</span>
+<span class="sd">    def __init__(self, start, end):</span>
+<span class="sd">        self.start = start</span>
+<span class="sd">        self.end = end</span>
+<span class="sd">"""</span>
 
-class Solution:
-    def minMeetingRooms(self, intervals: List[Interval]) -&gt; int:
-        if not intervals:
-            return 0
-        intervals.sort(key=lambda x: x.start)
-        heap = [intervals[0].end] # heap存当前正在进行的会议的end
-        for i in range(1, len(intervals)):
-            if intervals[i].start &gt;= heap[0]:
-                heapq.heappop(heap)
-            heapq.heappush(heap, intervals[i].end)
-        return len(heap)
-</code></pre>
+<span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minMeetingRooms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Interval</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">intervals</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">intervals</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">heap</span> <span class="o">=</span> <span class="p">[</span><span class="n">intervals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">]</span> <span class="c1"># heap存当前正在进行的会议的end</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">intervals</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">heap</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">heap</span><span class="p">)</span>
+            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">heap</span><span class="p">,</span> <span class="n">intervals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">heap</span><span class="p">)</span>
+</code></pre></div>
 <p>215 数组中的第K个最大元素</p>
 <p>解法一：<strong>最小堆</strong></p>
 <p>维护大小保持为 <span class="arithmatex">\(k\)</span> 个的最小堆，如果长度超出时把<strong>最小元素</strong>逐出，从而最后在堆中留下的就是前K个最大元素，其中最小的就是堆顶。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n \log k)\)</span>，空间复杂度：<span class="arithmatex">\(O(k)\)</span></p>
 <div class="algoviz" data-module="lc215-数组中的第k个最大元素" data-title="215 数组中的第K个最大元素 · 步骤可视化"></div>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def findKthLargest(self, nums: List[int], k: int) -&gt; int:
-        heap = [] # 最小堆解法
-        for num in nums:
-            heapq.heappush(heap, num)
-            if len(heap) &gt; k:
-                heapq.heappop(heap)
-        return heap[0]
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findKthLargest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">heap</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># 最小堆解法</span>
+        <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">nums</span><span class="p">:</span>
+            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">heap</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">heap</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">k</span><span class="p">:</span>
+                <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">heap</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">heap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
 <p>解法二：<strong>最大堆</strong></p>
 <p>对全部元素建堆（<span class="arithmatex">\(O(n)\)</span>），然后 <code>pop</code> <span class="arithmatex">\(k\)</span> 次（<span class="arithmatex">\(O(k \log n)\)</span>）。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n + k \log n)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
 <div class="algoviz" data-module="lc215-数组中的第k个最大元素-v2" data-title="215 数组中的第K个最大元素 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def findKthLargest(self, nums: List[int], k: int) -&gt; int:
         nums = [-x for x in nums]
         heapq.heapify(nums)
         for i in range(k - 1):
             heapq.heappop(nums)
         return -heapq.heappop(nums)
-</code></pre>
+</code></pre></div>
 <p>347 前K个高频元素</p>
 <p>第一种方法当然是按照频率降序排序，然后取前k个。</p>
 <p>说起来以前对key的理解不够时不太能理解lambda函数。自从意识到key是任意的单参数函数、返回一个可比较的值之后，就很明确了。</p>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def topKFrequent(self, nums: List[int], k: int) -&gt; List[int]:
         freq = defaultdict(int)
         for num in nums:
             freq[num] += 1
         items = list(sorted(freq.items(), key = lambda x: -x[1]))
         return [x[0] for x in items[:k]]
-</code></pre>
+</code></pre></div>
 <p>当然也可以拿堆去做。</p>
 <div class="algoviz" data-module="lc347-前k个高频元素-v2" data-title="347 前K个高频元素 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def topKFrequent(self, nums: List[int], k: int) -&gt; List[int]:
         freq = defaultdict(int)
         for num in nums:
@@ -857,11 +857,11 @@ class Solution:
         for i in range(k):
             res.append(heapq.heappop(items)[1])
         return res
-</code></pre>
+</code></pre></div>
 <p>295 数据流的中位数</p>
 <p>方法是维护一个最大堆和一个最小堆，各一半大小，使得最大堆始终小于等于最小堆。则根据它们的堆顶即可计算得到中位数。</p>
 <p>注意由于python的heapq引起的语法麻烦：最大堆里面存放的是负值。</p>
-<pre class="highlight"><code>class MedianFinder:
+<div class="highlight"><pre><span></span><code>class MedianFinder:
 
     def __init__(self):
         self.small = [] # 最大堆, 存较小的元素, 存的都是负值
@@ -893,7 +893,7 @@ class Solution:
             # obj = MedianFinder()
             # obj.addNum(num)
 # param_2 = obj.findMedian()
-</code></pre>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="6" data-title="专题14 贪心"><h3 id="专题14-贪心">专题14 贪心</h3>
 <p>虽然同样称为贪心，但是这一套贪心的四道题和算法导论的四道题细究起来并不是一类。</p>
 <p>算法导论的贪心一般是“做显式的贪心选择”，通过替换/交换法进行贪心论证。例如活动选择问题，每次都选择结束时间最早的相容活动，这样的话可以给其他活动留出最多的时间、以整体选择最多的活动。</p>
@@ -906,21 +906,21 @@ class Solution:
 <p><a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/">121. 买卖股票的最佳时机</a></p>
 <p>“最佳时机”的直觉是在最低点买入，在之后的最高点卖出。</p>
 <p>因此对于每个我们正在遍历的价格，<strong>维护其之前的历史最低点</strong>，<strong>计算出在当前卖出的利润</strong>，从而遍历获得最佳利润。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def maxProfit(self, prices: List[int]) -&gt; int:
-        lowest = float('inf')
-        res = 0
-        for price in prices:
-            lowest = min(lowest, price)
-            res = max(res, price - lowest)
-        return res
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maxProfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">lowest</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'inf'</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">price</span> <span class="ow">in</span> <span class="n">prices</span><span class="p">:</span>
+            <span class="n">lowest</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lowest</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">price</span> <span class="o">-</span> <span class="n">lowest</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+</code></pre></div>
 <p>55 跳跃游戏</p>
 <p>遍历下标，维护一个当前最远可达下标。</p>
 <p>如果最远可达下标小于当前下标，则返回False，否则最远可达下标更新。</p>
 <p>感觉这两道题与其说是贪心，不如说是维护一个最值。</p>
 <div class="algoviz" data-module="lc55-跳跃游戏" data-title="55 跳跃游戏 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def canJump(self, nums: List[int]) -&gt; bool:
         maxReach = 0
         for i in range(len(nums)):
@@ -930,11 +930,11 @@ class Solution:
             if maxReach &gt;= len(nums) - 1:
                 return True
         return maxReach &gt;= len(nums) - 1
-</code></pre>
+</code></pre></div>
 <p>45 跳跃游戏 II</p>
 <p>写了一个不好的dp，维护从某个下标跳跃到最后一个下标的最小步数。</p>
 <div class="algoviz" data-module="lc45-跳跃游戏-ii" data-title="45 跳跃游戏 II · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def jump(self, nums: List[int]) -&gt; int:
         minStep = [float('inf')] * len(nums)
         minStep[-1] = 0
@@ -943,11 +943,11 @@ class Solution:
             for j in range(i + 1, min(len(nums), i + nums[i] + 1)):
                 minStep[i] = min(minStep[i], minStep[j] + 1)
         return minStep[0]
-</code></pre>
+</code></pre></div>
 <p>然后写了贪心。</p>
 <p>贪心策略是，cur_end维护当前jumps数能够跳到的最远位置。</p>
 <div class="algoviz" data-module="lc45-跳跃游戏-ii-v2" data-title="45 跳跃游戏 II · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def jump(self, nums: List[int]) -&gt; int:
         n = len(nums)
         if n == 1:
@@ -966,11 +966,11 @@ class Solution:
                 if cur_end &gt;= n - 1:
                     break
         return jumps
-</code></pre>
+</code></pre></div>
 <p>763 划分字母区间</p>
 <p>在遍历到每个字母时，更新当前字母的最远位置。如果当前位置已经达到最远位置，则划分成一段。</p>
 <div class="algoviz" data-module="lc763-划分字母区间" data-title="763 划分字母区间 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def partitionLabels(self, s: str) -&gt; List[int]:
         last_pos = {}
         for i, ch in enumerate(s):
@@ -984,7 +984,7 @@ class Solution:
                 res.append(end - start + 1)
                 start = i + 1
         return res
-</code></pre>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="7" data-title="专题15 动态规划"><h3 id="专题15-动态规划">专题15 动态规划</h3>
 <p>动态规划的本质就是填表格查表格。</p>
 <p>某个问题可以由一些子问题的值得到，所以查子问题的表格，然后填入该问题的表格。</p>
@@ -1003,41 +1003,41 @@ class Solution:
 </ul>
 </blockquote>
 <p>时间复杂度：<span class="arithmatex">\(O(n \log n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def lengthOfLIS(self, nums: List[int]) -&gt; int:
-        tails = [] # 递增的, tails[i]表示长度为i+1的递增子序列的最小末尾值
-        for num in nums:
-            left, right = 0, len(tails)
-            while left &lt; right:
-                mid = (left + right) // 2
-                if tails[mid] &lt; num: # 二分目的: 在tails中找到第一个&gt;=num的值
-                    left = mid + 1
-                else:
-                    right = mid
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lengthOfLIS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">tails</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># 递增的, tails[i]表示长度为i+1的递增子序列的最小末尾值</span>
+        <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">nums</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tails</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span><span class="p">:</span>
+                <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="n">tails</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">num</span><span class="p">:</span> <span class="c1"># 二分目的: 在tails中找到第一个&gt;=num的值</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span>
 
-            if left == len(tails):
-                tails.append(num)
-            else:
-                tails[left] = num
-        return len(tails)
-</code></pre>
+            <span class="k">if</span> <span class="n">left</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">tails</span><span class="p">):</span>
+                <span class="n">tails</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tails</span><span class="p">[</span><span class="n">left</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">tails</span><span class="p">)</span>
+</code></pre></div>
 <p><strong>解法一</strong>：动态规划</p>
 <p>当前位置的最长递增子序列长度可以由它之前的所有位置转移得到。</p>
 <p><strong>注意每个位置的递增子序列长度不小于1</strong>。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n^2)\)</span> ，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def lengthOfLIS(self, nums: List[int]) -&gt; int:
-        n = len(nums)
-        dp = [1] * (n + 10)
-        for i, num in enumerate(nums):
-            for j in range(i):
-                if num &gt; nums[j]:
-                    dp[i] = max(dp[i], dp[j] + 1)
-        return max(dp)
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lengthOfLIS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nums</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="n">nums</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span>
+</code></pre></div>
 <p>70 爬楼梯</p>
 <div class="algoviz" data-module="lc70-爬楼梯" data-title="70 爬楼梯 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def climbStairs(self, n: int) -&gt; int:
         # 问题的解由子问题的解组成.
         # a[n] = a[n - 1] + a[n - 2]
@@ -1045,10 +1045,10 @@ class Solution:
         for i in range(2, n + 1):
             a.append(a[i - 1] + a[i - 2])
         return a[n]
-</code></pre>
+</code></pre></div>
 <p>118 杨辉三角</p>
 <div class="algoviz" data-module="lc118-杨辉三角" data-title="118 杨辉三角 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def generate(self, numRows: int) -&gt; List[List[int]]:
         if numRows == 1:
             return 1
@@ -1062,10 +1062,10 @@ class Solution:
                 for j in range(1, i):
                     cur_list[i][j] = cur_list[i - 1][j - 1] + cur_list[i - 1][j]
             return cur_list
-</code></pre>
+</code></pre></div>
 <p>198 打家劫舍</p>
 <div class="algoviz" data-module="lc198-打家劫舍" data-title="198 打家劫舍 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def rob(self, nums: List[int]) -&gt; int:
         if len(nums) == 1:
             return nums[0]
@@ -1075,10 +1075,10 @@ class Solution:
         for i in range(2, len(nums)):
             dp[i] = max(dp[i - 2] + nums[i], dp[i - 1])
         return dp[len(nums) - 1]
-</code></pre>
+</code></pre></div>
 <p>由于只依赖于上两个状态，因此可以只用两个变量滚动，实现空间的简化。</p>
 <div class="algoviz" data-module="lc198-打家劫舍-v2" data-title="198 打家劫舍 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def rob(self, nums: List[int]) -&gt; int:
         if len(nums) == 1:
             return nums[0]
@@ -1090,11 +1090,11 @@ class Solution:
             prev2 = prev1
             prev1 = cur
         return prev1
-</code></pre>
+</code></pre></div>
 <p>279 完全平方数</p>
 <p>递推做法。</p>
 <div class="algoviz" data-module="lc279-完全平方数" data-title="279 完全平方数 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def numSquares(self, n: int) -&gt; int:
         dp = [float('inf')] * (n + 1)
         dp[0], dp[1] = 0, 1
@@ -1102,11 +1102,11 @@ class Solution:
             for j in range(1, int(sqrt(i)) + 1):
                 dp[i] = min(dp[i], dp[i - j * j] + 1)
         return dp[n]
-</code></pre>
+</code></pre></div>
 <p>以下是一个带cache的递归做法，奇慢，但是能过。</p>
 <p>这道题递归不如递推，因为从0到n的状态一定都需要计算（每个数至少可以减1*1），没有可以剪枝的状态。</p>
 <div class="algoviz" data-module="lc279-完全平方数-v2" data-title="279 完全平方数 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def numSquares(self, n: int) -&gt; int:
         if n == 0:
             return 0
@@ -1121,11 +1121,11 @@ class Solution:
             minCnt = min(minCnt, self.numSquares(n - i * i) + 1)
         self.numCache[n] = minCnt
         return minCnt
-</code></pre>
+</code></pre></div>
 <p>322 零钱兑换</p>
 <p>先来一个不带cache的递归，当然TLE过不了。</p>
 <div class="algoviz" data-module="lc322-零钱兑换" data-title="322 零钱兑换 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def coinChange(self, coins: List[int], amount: int) -&gt; int:
         if amount &lt; 0:
             return -1
@@ -1141,10 +1141,10 @@ class Solution:
             return -1
         else:
             return minCnt
-</code></pre>
+</code></pre></div>
 <p>接下来给这个递归加个cache就能过了，只是慢一点。</p>
 <div class="algoviz" data-module="lc322-零钱兑换-v2" data-title="322 零钱兑换 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def coinChange(self, coins: List[int], amount: int) -&gt; int:
         if amount &lt; 0:
             return -1
@@ -1168,9 +1168,9 @@ class Solution:
         else:
             self.coinCache[amount] = minCnt
             return minCnt
-</code></pre>
+</code></pre></div>
 <p>那么这样的递推比递归快多了。顺手加了个小剪枝。</p>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def coinChange(self, coins: List[int], amount: int) -&gt; int:
         if amount == 0:
             return 0
@@ -1187,12 +1187,12 @@ class Solution:
             return -1
         else:
             return coinCache[amount]
-</code></pre>
+</code></pre></div>
 <p>139 单词拆分</p>
 <p>这里转移的实体是字符串。同构的实体是结尾到下标i的字符串段，我们要看的是同构实体是否可以拆分。</p>
 <p>那么对于某个特定的同构实体，我们只需要遍历它所有可能的拆分点、看是否有拆分点前半部分是同构实体，后半部分在字典中即可。</p>
 <div class="algoviz" data-module="lc139-单词拆分" data-title="139 单词拆分 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -&gt; bool:
         # 对于字符串的dp, 要意识到字符串一般都是从左往右遍历下标.
         # 那么对于结尾为i(开)的字符串s[0..i],可以分割意味着存在分割点j, 使得dp[j]=True且s[j..i]在wordDict中.
@@ -1205,13 +1205,13 @@ class Solution:
                 if dp[j] and s[j:i] in wordDict:
                     dp[i] = True
         return dp[n]
-</code></pre>
+</code></pre></div>
 <p>总之dp可以念这样一句话：</p>
 <p>“对于特定同构实体，它可以由哪些同构实体转移得到”。</p>
 <p>152 乘积最大子数组</p>
 <p>到i的乘积最大值，可能由最大值、最小值或不选，三种情况转移得到。容易漏解。</p>
 <div class="algoviz" data-module="lc152-乘积最大子数组" data-title="152 乘积最大子数组 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def maxProduct(self, nums: List[int]) -&gt; int:
         # 到i的乘积最大值, 可能由**最大值或最小值**转移得到.
         res = nums[0]
@@ -1224,11 +1224,11 @@ class Solution:
             prev_max, prev_min = curr_max, curr_min
 
         return res
-</code></pre>
+</code></pre></div>
 <p>416 分割等和子集</p>
 <p>将分割等和子集，转化成在集合中选取一些元素，使得它们的和恰好等于总和的二分之一。这样的约束问题恰好是0-1背包的变种，可以设置dp为“前i个元素是否能够得到和为j”。</p>
 <div class="algoviz" data-module="lc416-分割等和子集" data-title="416 分割等和子集 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def canPartition(self, nums: List[int]) -&gt; bool:
         total = sum(nums)
         if total % 2:
@@ -1250,7 +1250,7 @@ class Solution:
                     dp[i][j] = dp[i - 1][j] or dp[i - 1][j - nums[i - 1]]
 
         return dp[n][target]
-</code></pre>
+</code></pre></div>
 <p>之后因为每一行的表格都只依赖于上一行的表格，再使用类似的二维背包转一维背包的空间优化，<strong>去掉行下标，然后列下标的遍历一定只能倒着来。</strong></p>
 <p>这个一维dp空间优化本质是因为，j - num使用的是“上一行”的状态（前i个由前i-1个决定），从大到小遍历j的话可以保证这样填入每处dp时使用的都是“上一行”的状态。</p>
 <p>而如果从小到大遍历，则j - num可能已经被更新为了“新一行”的状态，而“同一行”的状态互相转移（前i个由前i个决定）是混乱且不允许的。</p>
@@ -1261,7 +1261,7 @@ class Solution:
 <li>优化为一维01背包后，内层循环只能倒着遍历。</li>
 </ol>
 <div class="algoviz" data-module="lc2-优化为一维01背包后-内层循环只能倒着遍历" data-title="2 优化为一维01背包后，内层循环只能倒着遍历。 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def canPartition(self, nums: List[int]) -&gt; bool:
         total = sum(nums)
         if total % 2:
@@ -1284,7 +1284,7 @@ class Solution:
                 return True
 
         return dp[target]
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/longest-valid-parentheses/">32. 最长有效括号</a></p>
 <p>方法二：<strong>计数器</strong></p>
 <p>一段子串是有效括号串，当且仅当以下两个条件：</p>
@@ -1299,61 +1299,61 @@ class Solution:
 <p>所以可以从前往后遍历一遍、从后往前遍历一遍，各自使用计数器计数。</p>
 <p>记得在第二次遍历之前把计数器清空哦。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def longestValidParentheses(self, s: str) -&gt; int:
-        max_len = 0
-        left = right = 0 # 计数器
-        for ch in s:
-            if ch == '(':
-                left += 1
-            else:
-                right += 1
-            if left == right:
-                max_len = max(max_len, left * 2)
-            elif left &lt; right: # 不满足前缀条件
-                left = right = 0
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">longestValidParentheses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">max_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># 计数器</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">'('</span><span class="p">:</span>
+                <span class="n">left</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">right</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">:</span>
+                <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_len</span><span class="p">,</span> <span class="n">left</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="n">right</span><span class="p">:</span> <span class="c1"># 不满足前缀条件</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span>
 
-        left = right = 0 # 第二次遍历之前一定要重置!
-        for ch in reversed(s):
-            if ch == '(':
-                left += 1
-            else:
-                right += 1
-            if left == right:
-                max_len = max(max_len, left * 2)
-            elif left &gt; right: # 不满足后缀条件
-                left = right = 0
+        <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># 第二次遍历之前一定要重置!</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">'('</span><span class="p">:</span>
+                <span class="n">left</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">right</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">left</span> <span class="o">==</span> <span class="n">right</span><span class="p">:</span>
+                <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_len</span><span class="p">,</span> <span class="n">left</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">left</span> <span class="o">&gt;</span> <span class="n">right</span><span class="p">:</span> <span class="c1"># 不满足后缀条件</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span>
 
-        return max_len
-</code></pre>
+        <span class="k">return</span> <span class="n">max_len</span>
+</code></pre></div>
 <p>方法一：<strong>栈</strong></p>
 <p>栈里面存入最后一个未被匹配的括号位置。</p>
 <p>栈里面默认存入的 <code>-1</code> 是为了特殊情况，不能改成其他值。</p>
 <p>例如 <code>s = '()'</code> ，则此时应该返回的长度为2，因此 <code>i = 1</code> 时应将 <code>res</code> 更新为2，即此时 <code>1 - stk[-1] = 2</code> ，故 <code>stk[-1] = -1</code> 。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def longestValidParentheses(self, s: str) -&gt; int:
-        stk = [-1]
-        res = 0
-        for i, ch in enumerate(s):
-            if ch == '(':
-                stk.append(i)
-            else:
-                stk.pop()
-                if not stk:
-                    stk.append(i)
-                res = max(res, i - stk[-1])
-        return res
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">longestValidParentheses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">stk</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">'('</span><span class="p">:</span>
+                <span class="n">stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stk</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">stk</span><span class="p">:</span>
+                    <span class="n">stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="n">stk</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">res</span>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="8" data-title="专题16 多维动态规划"><h3 id="专题16-多维动态规划">专题16 多维动态规划</h3>
 <p><a href="https://leetcode.cn/problems/unique-paths/">62. 不同路径</a></p>
 <p>方法三：<strong>组合数</strong></p>
 <p>机器人总共需要走 <span class="arithmatex">\(m + n - 2\)</span> 步，其中 <span class="arithmatex">\(m - 1\)</span> 步往下走、<span class="arithmatex">\(n - 1\)</span> 步往右走。所以答案为组合数 <span class="arithmatex">\(C_{m+n-2}^{m-1}\)</span> 。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(\min \{m, n\})\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def uniquePaths(self, m: int, n: int) -&gt; int:
-        return math.comb(m + n - 2, min(m, n) - 1)
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniquePaths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">comb</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
 <p>方法二：<strong>滚动数组优化DP</strong></p>
 <p>由于 <code>dp[i][j] = dp[i - 1][j] + dp[i][j - 1]</code> 这一式子中<strong>第 <code>i</code> 行的值只与第 <code>i - 1</code> 行和第 <code>i</code> 行的值有关</strong>，符合条件，可以使用滚动数组优化空间复杂度到 <span class="arithmatex">\(O(n)\)</span> 。</p>
 <p>注意：<strong>滚动数组仅仅是优化了空间复杂度的技巧</strong>。而这道题的DP解法需要遍历所有位置这件事的时间复杂度是降不下来的。</p>
@@ -1369,34 +1369,34 @@ class Solution:
 <p>备注：</p>
 <p>如果第 <code>j</code> 列依赖第 <code>j + 1</code> 列，则内层循环需要改成从右往左遍历。如朴素背包问题。</p>
 </blockquote>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def uniquePaths(self, m: int, n: int) -&gt; int:
-        dp = [1] * n
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniquePaths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
 
-        for i in range(1, m):
-            for j in range(1, n):
-                dp[j] += dp[j - 1]
-        return dp[n - 1]
-</code></pre>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="n">dp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dp</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">dp</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+</code></pre></div>
 <p>方法一：<strong>朴素DP</strong></p>
 <p>首先，我们知道第0行和第0列都只有一条路径，所以这些位置初始化为1。</p>
 <p>然后有 <code>dp[i][j] = dp[i - 1][j] + dp[i][j - 1]</code> 。可以写出如下的优化前DP代码。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span> ，空间复杂度：<span class="arithmatex">\(O(mn)\)</span> 。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def uniquePaths(self, m: int, n: int) -&gt; int:
-        # 初始化第0行和第0列为全1
-        dp = [[1] * n] + [[0] * n for _ in range(m - 1)]
-        for i in range(1, m):
-            dp[i][0] = 1
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniquePaths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># 初始化第0行和第0列为全1</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-        for i in range(1, m):
-            for j in range(1, n):
-                dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
-        return dp[m - 1][n - 1]
-</code></pre>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">dp</span><span class="p">[</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+</code></pre></div>
 <p>64 最小路径和</p>
 <div class="algoviz" data-module="lc64-最小路径和" data-title="64 最小路径和 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def minPathSum(self, grid: List[List[int]]) -&gt; int:
         m, n = len(grid), len(grid[0])
         dp = [[float('inf')] * n for _ in range(m)]
@@ -1411,7 +1411,7 @@ class Solution:
                 # 下面右面二选一
                 dp[i][j] = min(dp[i + 1][j], dp[i][j + 1]) + grid[i][j]
         return dp[0][0]
-</code></pre>
+</code></pre></div>
 <p>5 最长回文子串</p>
 <p>很干净的子串遍历和自底向下填表格问题，值得记忆。</p>
 <p>记得像Dijkstra说的那样，左闭右开。</p>
@@ -1419,7 +1419,7 @@ class Solution:
 <p>(1) 我们使用的字符子串是 <code>s[i:i+length]</code>，所以有 i + length &lt;= n 得到内层 i &lt; n - length + 1。</p>
 <p>(2) 最大的子串应为 s[0:n]，此时i = 0，length = n，所以有外层 length &lt; n + 1。</p>
 <div class="algoviz" data-module="lc5-最长回文子串" data-title="5 最长回文子串 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def longestPalindrome(self, s: str) -&gt; str:
         n = len(s)
         if n == 1:
@@ -1447,11 +1447,11 @@ class Solution:
                         maxlen = length
                         start = i
         return s[start:start + maxlen]
-</code></pre>
+</code></pre></div>
 <p>1143 最长公共子序列</p>
 <p>皮一下，内层只写一行。</p>
 <p>除了转移逻辑，记得处理一下边界。这里字符串下标使用实际下标，但dp使用下标+1，处理边界。</p>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def longestCommonSubsequence(self, text1: str, text2: str) -&gt; int:
         # i是s1的结束位置, j是s2的结束位置
         m, n = len(text1), len(text2)
@@ -1461,7 +1461,7 @@ class Solution:
             for j in range(1, n + 1):
                 dp[i][j] = dp[i - 1][j - 1] + 1 if text1[i - 1] == text2[j - 1] else max(dp[i - 1][j], dp[i][j - 1])
         return dp[m][n]
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/edit-distance/">72. 编辑距离</a></p>
 <p>方法二：<strong>滚动数组优化空间</strong></p>
 <p>这玩意一口气依赖了三个元素（事实上是对角线形式的依赖），但是仍然可以用滚动数组优化空间复杂度。</p>
@@ -1476,47 +1476,47 @@ class Solution:
 <p>（想一下二维数组就好想了）<code>dp[i][0]</code> 直接保存给 <code>prev</code> ，再设置 <code>dp[i][0]</code> 的值为 <code>i</code> ；</p>
 <p>在循环中因为 <code>prev</code> 要使用，所以保存给 <code>tmp</code> ，等用完 <code>prev</code> 了再传给它。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span>，空间复杂度：<span class="arithmatex">\(O(n)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def minDistance(self, word1: str, word2: str) -&gt; int:
-        # 关键: 使用右边界, 所以需要多开一个, 而且判断时需要用-1
-        m, n = len(word1), len(word2)
-        # dp[i][j] 代表将word1[:i]转化成word2[:j]的最小操作数
-        dp = [j for j in range(n + 1)]
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">word2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># 关键: 使用右边界, 所以需要多开一个, 而且判断时需要用-1</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">word1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">word2</span><span class="p">)</span>
+        <span class="c1"># dp[i][j] 代表将word1[:i]转化成word2[:j]的最小操作数</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
 
-        for i in range(1, m + 1):
-            prev = dp[0]
-            dp[0] = i # 用来存储当前行的dp初值
-            for j in range(1, n + 1):
-                tmp = dp[j]
-                if word1[i - 1] == word2[j - 1]:
-                    dp[j] = prev
-                else:
-                    dp[j] = 1 + min(dp[j], dp[j - 1], prev)
-                prev = tmp
-        return dp[n]
-</code></pre>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="c1"># 用来存储当前行的dp初值</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">word1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">word2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">prev</span><span class="p">)</span>
+                <span class="n">prev</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="k">return</span> <span class="n">dp</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+</code></pre></div>
 <p>方法一：<strong>朴素动态规划</strong></p>
 <p>不要被题目吓到。其实就是最长公共子序列那种感觉。题目的三种方式只是三种转移。</p>
 <p>十分经典的题目，从CS61A的练习题里就出现过。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(mn)\)</span>，空间复杂度：<span class="arithmatex">\(O(mn)\)</span></p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def minDistance(self, word1: str, word2: str) -&gt; int:
-        # 关键: 使用右边界, 所以需要多开一个, 而且判断时需要用-1
-        m, n = len(word1), len(word2)
-        # dp[i][j] 代表将word1[:i]转化成word2[:j]的最小操作数
-        dp = [[0] * (n + 1) for _ in range(m + 1)]
-        for i in range(m + 1):
-            dp[i][0] = i
-        for j in range(n + 1):
-            dp[0][j] = j
-        for i in range(1, m + 1):
-            for j in range(1, n + 1):
-                if word1[i - 1] == word2[j - 1]:
-                    dp[i][j] = dp[i - 1][j - 1]
-                else:
-                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
-        return dp[m][n]
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">word2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># 关键: 使用右边界, 所以需要多开一个, 而且判断时需要用-1</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">word1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">word2</span><span class="p">)</span>
+        <span class="c1"># dp[i][j] 代表将word1[:i]转化成word2[:j]的最小操作数</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">word1</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">word2</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">dp</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">n</span><span class="p">]</span>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/burst-balloons/">312. 戳气球</a></p>
 <p>十分经典的一道题目，其关键是把戳气球问题，转化为<strong>开区间 <code>(i, j)</code> 的遍历问题</strong>。</p>
 <p>对于开区间 <code>(i, j)</code> ，<code>dp[i][j]</code> 表示这一段区间里戳气球能够得到的最大得分。</p>
@@ -1525,33 +1525,33 @@ class Solution:
 <p>区间遍历的写法：最外层遍历长度、内层循环遍历起始点。</p>
 </blockquote>
 <p>时间复杂度：<span class="arithmatex">\(O(n^3)\)</span> 。空间复杂度：<span class="arithmatex">\(O(n^2)\)</span> 。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def maxCoins(self, nums: List[int]) -&gt; int:
-        points = [1] + nums + [1]
-        n = len(points)
-        dp = [[0] * n for _ in range(n)]
-        for length in range(2, n): # 开区间 (i, j)
-            for i in range(0, n - length):
-                j = i + length
-                for k in range(i + 1, j):
-                    dp[i][j] = max(dp[i][j], points[i] * points[k] * points[j] + dp[i][k] + dp[k][j])
-        return dp[0][n - 1]
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maxCoins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">nums</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span> <span class="c1"># 开区间 (i, j)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">length</span><span class="p">):</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">length</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+                    <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">points</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">dp</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">dp</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+</code></pre></div>
 </div><div class="post-chapter" data-ch="9" data-title="专题17 技巧"><h3 id="专题17-技巧">专题17 技巧</h3>
 <p>136 只出现一次的数字</p>
 <p>把出现偶数次的用异或消除掉。</p>
 <div class="algoviz" data-module="lc136-只出现一次的数字" data-title="136 只出现一次的数字 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def singleNumber(self, nums: List[int]) -&gt; int:
         res = 0
         for num in nums:
             res ^= num
         return res
-</code></pre>
+</code></pre></div>
 <p>169 多数元素</p>
 <p>寻找众数的方法。通过投票，赞同当前提议则投正面票，反对当前提议则投负面票，最后留下的就是众数。</p>
 <div class="algoviz" data-module="lc169-多数元素" data-title="169 多数元素 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def majorityElement(self, nums: List[int]) -&gt; int:
         count = 0
         majority = -1
@@ -1564,7 +1564,7 @@ class Solution:
             else:
                 count -= 1
         return majority
-</code></pre>
+</code></pre></div>
 <p>75 颜色分类</p>
 <p>其实是中间指针用于扫描，把元素分配到左边指针和右边指针的动态空间的过程。</p>
 <p>关于cur指针是否移动，左右指针有所区别：</p>
@@ -1574,7 +1574,7 @@ class Solution:
 <p>如果交换到r指针，</p>
 <p>一开始：r指针指向的未处理，cur指针与它交换后，r指针指向的已处理，但是cur指针指向的元素没有处理。所以cur不移动。</p>
 <div class="algoviz" data-module="lc75-颜色分类" data-title="75 颜色分类 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def sortColors(self, nums: List[int]) -&gt; None:
         """
         Do not return anything, modify nums in-place instead.
@@ -1592,14 +1592,14 @@ class Solution:
                 # 注意！！这里cur不增加, 因为交换过来的数还没处理
             else:
                 cur += 1
-</code></pre>
+</code></pre></div>
 <p>31 下一个排列</p>
 <p>三步走：定位升序对，找最小元素，交换并翻转。</p>
 <p>定位升序对 <code>(nums[i], nums[i + 1])</code>，</p>
 <p>在 <code>i</code> 右侧找大于 <code>nums[i]</code> 的最小元素，</p>
 <p>交换 <code>nums[i]</code> 和最小元素后把 <code>i</code>右侧翻转。</p>
 <div class="algoviz" data-module="lc31-下一个排列" data-title="31 下一个排列 · 步骤可视化"></div>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def reverseNums(self, nums, i, j):
         while i &lt; j:
             nums[i], nums[j] = nums[j], nums[i]
@@ -1633,21 +1633,21 @@ class Solution:
 
         if not exist:
             self.reverseNums(nums, 0, len(nums) - 1)
-</code></pre>
+</code></pre></div>
 <p><a href="https://leetcode.cn/problems/find-the-duplicate-number/">287. 寻找重复数</a></p>
 <p>方法一：<strong>原地哈希</strong>。即利用数组的值作为索引，<strong>映射</strong>到数组自身。如果有两个不同的数组元素映射到相同的位置（我们可以通过负值判断），则该位置就是我们所求的重复数。</p>
 <p>既然要作为索引，我们所有使用和返回的值都应该是负值的绝对值。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def findDuplicate(self, nums: List[int]) -&gt; int:
-        n = len(nums)
-        for i in range(n):
-            absval = abs(nums[i])
-            if nums[absval] &lt; 0:
-                return absval
-            nums[absval] = -nums[absval]
-        return -1
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findDuplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">absval</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">nums</span><span class="p">[</span><span class="n">absval</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">absval</span>
+            <span class="n">nums</span><span class="p">[</span><span class="n">absval</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">nums</span><span class="p">[</span><span class="n">absval</span><span class="p">]</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</code></pre></div>
 <p>方法二：<strong>快慢指针</strong>。同样用映射的思想，我们可以把数组理解成链表，那么重复数就意味着<strong>有两个指针在链表上映射到了同一个节点</strong>，也即链表有<strong>环</strong>。从而我们只要：</p>
 <ul>
 <li>首先用快慢指针找到相遇点，</li>
@@ -1655,23 +1655,23 @@ class Solution:
 <li>它们再次相遇的位置就是环入口。</li>
 </ul>
 <p>时间复杂度：<span class="arithmatex">\(O(n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">class Solution:
-    def findDuplicate(self, nums: List[int]) -&gt; int:
-        slow, fast = nums[0], nums[0]
-        while True:                  # 至少执行一次, 排除掉一开始相同的情况
-            slow = nums[slow]        # x = nums[x]相当于x = x.next, 反正是映射了一次
-            fast = nums[nums[fast]]
-            if slow == fast:
-                break
-        slow = nums[0]
-        while slow != fast:
-            slow = nums[slow]
-            fast = nums[fast]
-        return slow
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Solution</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findDuplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">slow</span><span class="p">,</span> <span class="n">fast</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>                  <span class="c1"># 至少执行一次, 排除掉一开始相同的情况</span>
+            <span class="n">slow</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">slow</span><span class="p">]</span>        <span class="c1"># x = nums[x]相当于x = x.next, 反正是映射了一次</span>
+            <span class="n">fast</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">nums</span><span class="p">[</span><span class="n">fast</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">slow</span> <span class="o">==</span> <span class="n">fast</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">slow</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">slow</span> <span class="o">!=</span> <span class="n">fast</span><span class="p">:</span>
+            <span class="n">slow</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">slow</span><span class="p">]</span>
+            <span class="n">fast</span> <span class="o">=</span> <span class="n">nums</span><span class="p">[</span><span class="n">fast</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">slow</span>
+</code></pre></div>
 <p>另外还有一种方式是利用二分进行值域查找。重复数所位于的区间性质是“个数比元素值大”。</p>
 <p>时间复杂度：<span class="arithmatex">\(O(n \log n)\)</span> ，空间复杂度：<span class="arithmatex">\(O(1)\)</span> 。</p>
-<pre class="highlight"><code>class Solution:
+<div class="highlight"><pre><span></span><code>class Solution:
     def findDuplicate(self, nums: List[int]) -&gt; int:
         # eg. [1, 2, 2, 3, 4]
         # 如果某个值(如3), 小于等于它的个数比这个数本身要大, 则重复数位于这一段.
@@ -1689,7 +1689,7 @@ class Solution:
             else:
                 l = mid + 1
         return l
-</code></pre>
+</code></pre></div>
 <blockquote>
 <p>写到这里，突然有所感慨。</p>
 <p>HOT 100是我前后刷了三次往上的题单：</p>

@@ -8,6 +8,13 @@
     <language>zh-CN</language>
     <generator>pilog</generator>
       <item>
+        <title>AnotherTODO：把待办留在终端，也留在自己手里</title>
+        <link>https://meredith2328.github.io/posts/toy/anothertodo.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/anothertodo.html</guid>
+        <pubDate>Sat, 05 Sep 2026 00:00:00 -0000</pubDate>
+        <description>一个本地优先的终端待办工具：一行自然语言输入、TUI 管理、可靠提醒，以及把私有数据同步到自己的 Git 仓库。</description>
+      </item>
+      <item>
         <title>一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</title>
         <link>https://meredith2328.github.io/posts/notes/agents/coding-agent.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/notes/agents/coding-agent.html</guid>

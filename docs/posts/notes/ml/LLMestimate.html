@@ -148,18 +148,18 @@
 <p>edit time: 2026-03-05 17:03:20</p>
 </blockquote>
 <p>本文的LLM基于Transformer Decoder结构，以 <a href="https://huggingface.co/openai-community/gpt2-xl">GPT2-XL</a> 为例。它有以下超参数设置：</p>
-<pre class="highlight"><code>GPT2-XL
+<div class="highlight"><pre><span></span><code>GPT2-XL
 vocab_size: 50257
 context_length: 1024
 num_layers: 48
 d_models: 1600
 num_heads: 25
 d_ff: 6400
-</code></pre>
+</code></pre></div>
 <p>实测得到的可训练参数量为 <code>1,557,611,200</code> = 1.56B。</p>
 <h2 id="参数量实测结果">参数量实测结果</h2>
 <p>以下是使用HuggingFace Transformers库实际加载了GPT2 XL并统计可训练参数量的结果。代码见下述附录A。</p>
-<pre class="highlight"><code>==========================================================================
+<div class="highlight"><pre><span></span><code>==========================================================================
 总参数量                 params: 1,557,611,200
 单位换算                 1557.61M 参数 / 1.56B 参数
 ==========================================================================
@@ -174,7 +174,7 @@ LayerNorm 2              :      3,200 (0.00M)
 FFN Input (c_fc)         : 10,246,400 (10.25M)
 FFN Output (c_proj)      : 10,241,600 (10.24M)
 Layer 0 总计               : 30,740,800 (30.74M)
-</code></pre>
+</code></pre></div>
 <h2 id="最常用的参数量估算公式">最常用的参数量估算公式</h2>
 <p>可训练参数量的估算公式为：</p>
 <div class="arithmatex">\[12Nd^2+Vd\]</div>
@@ -333,10 +333,10 @@ FFN Output输入维度是 <span class="arithmatex">\(4d\)</span> 、输出维度
 <p>再考虑进来batch size（记为 <span class="arithmatex">\(b\)</span> ），有最终的公式：</p>
 <div class="arithmatex">\[FLOPs_{fwd}=N(24bnd^2+4bn^2d)+2bnVd\]</div>
 <p>或者用另一套符号：</p>
-<pre class="highlight"><code>L: layers          B: batch_size  V: vocab_size
+<div class="highlight"><pre><span></span><code>L: layers          B: batch_size  V: vocab_size
 T: context_length  D: d_model
 F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
-</code></pre>
+</code></pre></div>
 <div class="arithmatex">\[F_{fwd} ≈ L(24BTD^2 + 4BT^2D) + 2BTVD\]</div>
 <p>这就是比较精细估算的FLOPs公式。</p>
 <p>从而有了以下三条观察：</p>
@@ -384,7 +384,7 @@ F_fwd ≈ L(24BTD^2 + 4BT^2D) + 2BTVD
 <strong>随着模型大小的显著增大（<span class="arithmatex">\(d\)</span> 增大、<span class="arithmatex">\(N\)</span> 增大），Attention其余部分，FFN，LM Head将会占主导。</strong>
 <strong>而随着上下文增长（<span class="arithmatex">\(n\)</span> 增大，或者一般常用的字母是 <span class="arithmatex">\(L\)</span> ），超过 <span class="arithmatex">\(6d\)</span> 时，Attention的两个矩阵乘法将会占主导。</strong></p>
 <p>可以代入一些数据实际比较一下：</p>
-<pre class="highlight"><code>vocab_size = 50257
+<div class="highlight"><pre><span></span><code>vocab_size = 50257
 d_ff = 4 \times d_model
 
 GPT-2 small (12 layers, 768 d_model, 12 heads)
@@ -393,7 +393,7 @@ GPT-2 large (36 layers, 1280 d_model, 20 heads)
 GPT2-XL (48 layers, 1600 d_model, 25 heads)
 
 context length: from 1024 to 16,384
-</code></pre>
+</code></pre></div>
 <p>以下是结果（代码见附录B）。可见，
 显著增大 context length 之后，Attention两个乘法（红色部分）马上成为了所有模型的绝对主导。
 而在相同的context length情况下，随着模型增大，其余部分比Attention两个乘法增大得快一些（绿色占比上升，红色占比下降）。</p>
@@ -504,191 +504,191 @@ context length: from 1024 to 16,384
 </tbody>
 </table>
 <h2 id="附录a-参数量实测结果-使用的代码">附录A: “参数量实测结果”使用的代码</h2>
-<pre class="highlight" data-lang="python"><code class="language-python">from transformers import GPT2LMHeadModel
-import torch
-from collections import defaultdict
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPT2LMHeadModel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 
-# 加载模型
-print("正在加载 GPT-2 XL 模型...")
-model = GPT2LMHeadModel.from_pretrained('gpt2-xl')
-print("加载完成！\n")
+<span class="c1"># 加载模型</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"正在加载 GPT-2 XL 模型..."</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT2LMHeadModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">'gpt2-xl'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"加载完成！</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
-print("="*80)
-print("GPT-2 XL 按层参数量统计")
-print("="*80)
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"GPT-2 XL 按层参数量统计"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
 
-# 统计各层参数量
-layer_params = defaultdict(int)
-total_params = 0
+<span class="c1"># 统计各层参数量</span>
+<span class="n">layer_params</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">total_params</span> <span class="o">=</span> <span class="mi">0</span>
 
-# 按参数名分类统计
-for name, param in model.named_parameters():
-    params = param.numel()
-    total_params += params
+<span class="c1"># 按参数名分类统计</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+    <span class="n">total_params</span> <span class="o">+=</span> <span class="n">params</span>
 
-    # 解析层级
-    if name.startswith('transformer.h.'):
-        # 提取层号，格式如：transformer.h.0.attn.c_attn.weight
-        parts = name.split('.')
-        layer_num = parts[2]  # '0', '1', '2', ...
-        layer_name = f"Layer {layer_num}"
+    <span class="c1"># 解析层级</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'transformer.h.'</span><span class="p">):</span>
+        <span class="c1"># 提取层号，格式如：transformer.h.0.attn.c_attn.weight</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span>
+        <span class="n">layer_num</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># '0', '1', '2', ...</span>
+        <span class="n">layer_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Layer </span><span class="si">{</span><span class="n">layer_num</span><span class="si">}</span><span class="s2">"</span>
 
-        # 进一步细分是 attention 还是 mlp
-        if 'attn' in name:
-            if 'c_attn' in name:
-                sub_type = "  ├─ Attention QKV (c_attn)"
-            elif 'c_proj' in name:
-                sub_type = "  ├─ Attention Output (c_proj)"
-            else:
-                sub_type = "  ├─ Attention Other"
-        elif 'mlp' in name:
-            if 'c_fc' in name:
-                sub_type = "  ├─ FFN Input (c_fc)"
-            elif 'c_proj' in name:
-                sub_type = "  ├─ FFN Output (c_proj)"
-            else:
-                sub_type = "  ├─ FFN Other"
-        elif 'ln_' in name:
-            if 'ln_1' in name:
-                sub_type = "  ├─ LayerNorm 1 (pre-attention)"
-            elif 'ln_2' in name:
-                sub_type = "  ├─ LayerNorm 2 (pre-ffn)"
-            else:
-                sub_type = "  ├─ LayerNorm Other"
-        else:
-            sub_type = "  ├─ Other"
+        <span class="c1"># 进一步细分是 attention 还是 mlp</span>
+        <span class="k">if</span> <span class="s1">'attn'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">'c_attn'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ Attention QKV (c_attn)"</span>
+            <span class="k">elif</span> <span class="s1">'c_proj'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ Attention Output (c_proj)"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ Attention Other"</span>
+        <span class="k">elif</span> <span class="s1">'mlp'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">'c_fc'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ FFN Input (c_fc)"</span>
+            <span class="k">elif</span> <span class="s1">'c_proj'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ FFN Output (c_proj)"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ FFN Other"</span>
+        <span class="k">elif</span> <span class="s1">'ln_'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">'ln_1'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ LayerNorm 1 (pre-attention)"</span>
+            <span class="k">elif</span> <span class="s1">'ln_2'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ LayerNorm 2 (pre-ffn)"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ LayerNorm Other"</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sub_type</span> <span class="o">=</span> <span class="s2">"  ├─ Other"</span>
 
-        print(f"{layer_name:10s} {sub_type:35s} {name:40s} params: {params:10,d}")
-        layer_params[f"Layer {layer_num} Total"] += params
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">layer_name</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">sub_type</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">40s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">layer_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Layer </span><span class="si">{</span><span class="n">layer_num</span><span class="si">}</span><span class="s2"> Total"</span><span class="p">]</span> <span class="o">+=</span> <span class="n">params</span>
 
-    elif 'transformer.wte' in name:
-        print(f"{'Embedding':10s} {'  └─ Token Embedding':35s} {name:40s} params: {params:10,d}")
-        layer_params['Embedding'] += params
-    elif 'transformer.wpe' in name:
-        print(f"{'Embedding':10s} {'  └─ Position Embedding':35s} {name:40s} params: {params:10,d}")
-        layer_params['Embedding'] += params
-    elif 'transformer.ln_f' in name:
-        print(f"{'Final':10s} {'  └─ Final LayerNorm':35s} {name:40s} params: {params:10,d}")
-        layer_params['Final Norm'] += params
-    elif 'lm_head' in name:
-        print(f"{'LM Head':10s} {'  └─ Language Model Head':35s} {name:40s} params: {params:10,d}")
-        layer_params['LM Head'] += params
-    else:
-        print(f"{'Other':10s} {'  └─':35s} {name:40s} params: {params:10,d}")
-        layer_params['Other'] += params
+    <span class="k">elif</span> <span class="s1">'transformer.wte'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Embedding'</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'  └─ Token Embedding'</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">40s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">layer_params</span><span class="p">[</span><span class="s1">'Embedding'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">params</span>
+    <span class="k">elif</span> <span class="s1">'transformer.wpe'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Embedding'</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'  └─ Position Embedding'</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">40s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">layer_params</span><span class="p">[</span><span class="s1">'Embedding'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">params</span>
+    <span class="k">elif</span> <span class="s1">'transformer.ln_f'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Final'</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'  └─ Final LayerNorm'</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">40s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">layer_params</span><span class="p">[</span><span class="s1">'Final Norm'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">params</span>
+    <span class="k">elif</span> <span class="s1">'lm_head'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'LM Head'</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'  └─ Language Model Head'</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">40s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">layer_params</span><span class="p">[</span><span class="s1">'LM Head'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">params</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Other'</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'  └─'</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">40s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">layer_params</span><span class="p">[</span><span class="s1">'Other'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">params</span>
 
-print("\n" + "="*80)
-print("各层总参数汇总")
-print("="*80)
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"各层总参数汇总"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
 
-# 按层汇总
-for layer_name in sorted(layer_params.keys()):
-    params = layer_params[layer_name]
-    percentage = (params / total_params) * 100
-    print(f"{layer_name:20s} params: {params:12,d} ({params/1e6:.2f}M) {percentage:.1f}%")
+<span class="c1"># 按层汇总</span>
+<span class="k">for</span> <span class="n">layer_name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">layer_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">layer_params</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span>
+    <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">params</span> <span class="o">/</span> <span class="n">total_params</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">layer_name</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">12,d</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">params</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M) </span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
 
-print("\n" + "="*80)
-print(f"{'总参数量':20s} params: {total_params:12,d}")
-print(f"{'单位换算':20s} {total_params/1e6:.2f}M 参数 / {total_params/1e9:.2f}B 参数")
-print("="*80)
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'总参数量'</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> params: </span><span class="si">{</span><span class="n">total_params</span><span class="si">:</span><span class="s2">12,d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'单位换算'</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">total_params</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M 参数 / </span><span class="si">{</span><span class="n">total_params</span><span class="o">/</span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">B 参数"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
 
-# 验证单层参数量是否匹配理论计算
-print("\n" + "="*80)
-print("单层结构验证（以 Layer 0 为例）")
-print("="*80)
+<span class="c1"># 验证单层参数量是否匹配理论计算</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"单层结构验证（以 Layer 0 为例）"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
 
-# 计算第一层的详细结构
-layer_0_params = defaultdict(int)
-for name, param in model.named_parameters():
-    if name.startswith('transformer.h.0.'):
-        if 'attn.c_attn' in name:
-            layer_0_params['Attention QKV'] += param.numel()
-        elif 'attn.c_proj' in name:
-            layer_0_params['Attention Output'] += param.numel()
-        elif 'mlp.c_fc' in name:
-            layer_0_params['FFN Input (c_fc)'] += param.numel()
-        elif 'mlp.c_proj' in name:
-            layer_0_params['FFN Output (c_proj)'] += param.numel()
-        elif 'ln_1' in name:
-            layer_0_params['LayerNorm 1'] += param.numel()
-        elif 'ln_2' in name:
-            layer_0_params['LayerNorm 2'] += param.numel()
+<span class="c1"># 计算第一层的详细结构</span>
+<span class="n">layer_0_params</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'transformer.h.0.'</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">'attn.c_attn'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">layer_0_params</span><span class="p">[</span><span class="s1">'Attention QKV'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s1">'attn.c_proj'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">layer_0_params</span><span class="p">[</span><span class="s1">'Attention Output'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s1">'mlp.c_fc'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">layer_0_params</span><span class="p">[</span><span class="s1">'FFN Input (c_fc)'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s1">'mlp.c_proj'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">layer_0_params</span><span class="p">[</span><span class="s1">'FFN Output (c_proj)'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s1">'ln_1'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">layer_0_params</span><span class="p">[</span><span class="s1">'LayerNorm 1'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="s1">'ln_2'</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">layer_0_params</span><span class="p">[</span><span class="s1">'LayerNorm 2'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
 
-for comp, params in layer_0_params.items():
-    print(f"{comp:25s}: {params:10,d} ({params/1e6:.2f}M)")
+<span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">layer_0_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">comp</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">params</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">params</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M)"</span><span class="p">)</span>
 
-layer_0_total = sum(layer_0_params.values())
-print(f"{'Layer 0 总计':25s}: {layer_0_total:10,d} ({layer_0_total/1e6:.2f}M)")
+<span class="n">layer_0_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">layer_0_params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Layer 0 总计'</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">layer_0_total</span><span class="si">:</span><span class="s2">10,d</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">layer_0_total</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M)"</span><span class="p">)</span>
 
-# 验证是否与理论计算一致
-print(f"\n理论计算值: 30.72M")
-print(f"实际统计值: {layer_0_total/1e6:.2f}M")
-print(f"差异: {abs(30.72 - layer_0_total/1e6):.2f}M")
-</code></pre>
+<span class="c1"># 验证是否与理论计算一致</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">理论计算值: 30.72M"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"实际统计值: </span><span class="si">{</span><span class="n">layer_0_total</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"差异: </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="mf">30.72</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">layer_0_total</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M"</span><span class="p">)</span>
+</code></pre></div>
 <h2 id="附录b-维度d增大-vs-上下文长度n增大-flops瓶颈在哪里-使用的代码">附录B: “维度d增大 vs 上下文长度n增大，FLOPs瓶颈在哪里”使用的代码</h2>
-<pre class="highlight" data-lang="python"><code class="language-python">import numpy as np
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-# 模型配置
-models = [
-    {"name": "GPT-2 small", "N": 12, "d": 768},
-    {"name": "GPT-2 medium", "N": 24, "d": 1024},
-    {"name": "GPT-2 large", "N": 36, "d": 1280},
-    {"name": "GPT-2 XL", "N": 48, "d": 1600},
-]
+<span class="c1"># 模型配置</span>
+<span class="n">models</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"GPT-2 small"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">:</span> <span class="mi">768</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"GPT-2 medium"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">:</span> <span class="mi">1024</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"GPT-2 large"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">:</span> <span class="mi">1280</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"GPT-2 XL"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">:</span> <span class="mi">48</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">:</span> <span class="mi">1600</span><span class="p">},</span>
+<span class="p">]</span>
 
-# 固定参数
-vocab_size = 50257
-context_lengths = [1024, 16384]
+<span class="c1"># 固定参数</span>
+<span class="n">vocab_size</span> <span class="o">=</span> <span class="mi">50257</span>
+<span class="n">context_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">16384</span><span class="p">]</span>
 
-def calculate_flops(N, d, n, V):
-    """
-    计算FLOPs
-    A = 4Nn²d  (Attention的QK^T和Attention·V)
-    B = 2n(12Nd² + Vd)  (Attention其余部分 + FFN + LM Head)
-    """
-    # 计算A: 4Nn²d
-    A = 4 * N * (n ** 2) * d
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_flops</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    计算FLOPs</span>
+<span class="sd">    A = 4Nn²d  (Attention的QK^T和Attention·V)</span>
+<span class="sd">    B = 2n(12Nd² + Vd)  (Attention其余部分 + FFN + LM Head)</span>
+<span class="sd">    """</span>
+    <span class="c1"># 计算A: 4Nn²d</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span>
 
-    # 计算B: 2n(12Nd² + Vd)
-    B = 2 * n * (12 * N * (d ** 2) + V * d)
+    <span class="c1"># 计算B: 2n(12Nd² + Vd)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">d</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">V</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
 
-    total = A + B
+    <span class="n">total</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">B</span>
 
-    return {
-        "A": A,
-        "B": B,
-        "total": total,
-        "A_ratio": A / total * 100,
-        "B_ratio": B / total * 100
-    }
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"A"</span><span class="p">:</span> <span class="n">A</span><span class="p">,</span>
+        <span class="s2">"B"</span><span class="p">:</span> <span class="n">B</span><span class="p">,</span>
+        <span class="s2">"total"</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
+        <span class="s2">"A_ratio"</span><span class="p">:</span> <span class="n">A</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">"B_ratio"</span><span class="p">:</span> <span class="n">B</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="p">}</span>
 
-# 生成Markdown表格
-print("| 模型 | N | d | context length n | $4Nn^2d$ (A) | $2n(12Nd^2+Vd)$ (B) | 总FLOPs (A+B) | A占比 | B占比 |")
-print("|------|---|---|-------------------|--------------|---------------------|---------------|-------|-------|")
+<span class="c1"># 生成Markdown表格</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"| 模型 | N | d | context length n | $4Nn^2d$ (A) | $2n(12Nd^2+Vd)$ (B) | 总FLOPs (A+B) | A占比 | B占比 |"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"|------|---|---|-------------------|--------------|---------------------|---------------|-------|-------|"</span><span class="p">)</span>
 
-for model in models:
-    for n in context_lengths:
-        result = calculate_flops(model["N"], model["d"], n, vocab_size)
+<span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">context_lengths</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">calculate_flops</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">"N"</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s2">"d"</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
 
-        # 格式化数字为科学计数法
-        A_str = f"{result['A']:.2e}"
-        B_str = f"{result['B']:.2e}"
-        total_str = f"{result['total']:.2e}"
+        <span class="c1"># 格式化数字为科学计数法</span>
+        <span class="n">A_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'A'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">B_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'B'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">total_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'total'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span>
 
-        print(f"| {model['name']} | {model['N']} | {model['d']} | {n:,} | {A_str} | {B_str} | {total_str} | {result['A_ratio']:.1f}% | {result['B_ratio']:.1f}% |")
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"| </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'N'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'d'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">A_str</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">B_str</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">total_str</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'A_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% | </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'B_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% |"</span><span class="p">)</span>
 
-# 打印详细数值（可选）
-print("\n## 详细数值\n")
+<span class="c1"># 打印详细数值（可选）</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">## 详细数值</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
-for model in models:
-    for n in context_lengths:
-        result = calculate_flops(model["N"], model["d"], n, vocab_size)
-        print(f"\n{model['name']}, n={n}:")
-        print(f"  A = 4 × {model['N']} × {n}² × {model['d']} = {result['A']:.2e}")
-        print(f"  B = 2 × {n} × (12 × {model['N']} × {model['d']}² + {vocab_size} × {model['d']}) = {result['B']:.2e}")
-        print(f"  Total = {result['total']:.2e}")
-        print(f"  A占比 = {result['A_ratio']:.1f}%, B占比 = {result['B_ratio']:.1f}%")
-</code></pre>
+<span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">context_lengths</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">calculate_flops</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">"N"</span><span class="p">],</span> <span class="n">model</span><span class="p">[</span><span class="s2">"d"</span><span class="p">],</span> <span class="n">n</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">, n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  A = 4 × </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'N'</span><span class="p">]</span><span class="si">}</span><span class="s2"> × </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">² × </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'d'</span><span class="p">]</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'A'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  B = 2 × </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> × (12 × </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'N'</span><span class="p">]</span><span class="si">}</span><span class="s2"> × </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'d'</span><span class="p">]</span><span class="si">}</span><span class="s2">² + </span><span class="si">{</span><span class="n">vocab_size</span><span class="si">}</span><span class="s2"> × </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">'d'</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'B'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Total = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'total'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  A占比 = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'A_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, B占比 = </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">'B_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%"</span><span class="p">)</span>
+</code></pre></div>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="LLMestimate2.html" title="下一篇">02 内存和计算需求 →</a></div></aside>
   </div>
 

@@ -142,26 +142,26 @@
 <p>感谢DeepSeek v3.2提供了所有的代码使用例。<br/>edit time: 2026-03-09 13:48:37</p>
 </blockquote>
 <p>整合入训练循环的最小模板：</p>
-<pre class="highlight" data-lang="python"><code class="language-python">import wandb
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
 
-# 初始化
-wandb.init(project="my-project", config={
-    "param1": 0.1,
-    "param2": 100,
-})
+<span class="c1"># 初始化</span>
+<span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"my-project"</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">"param1"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="s2">"param2"</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+<span class="p">})</span>
 
-# 训练循环
-for epoch in range(10):
-    # 您的训练代码...
+<span class="c1"># 训练循环</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="c1"># 您的训练代码...</span>
 
-    # 记录指标
-    wandb.log({
-        "loss": 0.5,
-        "accuracy": 0.8,
-    })
+    <span class="c1"># 记录指标</span>
+    <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">({</span>
+        <span class="s2">"loss"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">"accuracy"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="p">})</span>
 
-wandb.finish()
-</code></pre>
+<span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+</code></pre></div>
 <h2 id="总结">总结</h2>
 <p>在W&amp;B quickstart中提到了两款产品，我们主要使用的是前者，用于记录acc、loss、运行环境和模型权重等日志信息，并且便于做简单的绘图。</p>
 <table>
@@ -214,7 +214,7 @@ import time</p>
     # 模拟一些指标
     loss = 1 / (epoch + 1) + random.random() * 0.1
     accuracy = epoch / 10 + random.random() * 0.05</p>
-<pre class="highlight" data-lang="python"><code># 3. 记录指标
+<div class="highlight"><pre data-lang="python"><span></span><code># 3. 记录指标
 wandb.log({
     "epoch": epoch,
     "loss": loss,
@@ -222,11 +222,11 @@ wandb.log({
 })
 
 time.sleep(1)  # 模拟训练时间
-</code></pre>
+</code></pre></div>
 <h2 id="4-结束run">4. 结束run</h2>
 <p>wandb.finish()
 print("实验完成！请查看wandb仪表板")</p>
-<pre class="highlight" data-lang="python"><code>发现它帮我在终端生成了直观的变化图和总结。
+<div class="highlight"><pre data-lang="python"><span></span><code>发现它帮我在终端生成了直观的变化图和总结。
 
 ![](posts/migrated/post-images/20260308214955.png)
 
@@ -307,7 +307,7 @@ wandb.log({
 })
 
 wandb.finish()
-</code></pre>
+</code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260308215748.png"/></p>
 <p>注意以下这个图表完全是借助 <code>wandb</code> 提供的接口绘制的。</p>
 <p><img alt="" src="../../migrated/post-images/20260308215916.png"/></p>
@@ -316,146 +316,146 @@ wandb.finish()
 但wandb的免费似乎只支持200GB的存储，需要注意。</p>
 <p>Huggingface Transformers甚至还要更加省事：
 连那些参数都不需要自己传了， <code>Trainer</code> 已经封装好了，只要 <code>report_to="wandb"</code> 就可以了。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">import wandb
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset
-import numpy as np
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-# 初始化wandb
-wandb.init(
-    project="colab-demo",
-    name="pytorch-example",
-    config={
-        "learning_rate": 0.01,
-        "batch_size": 32,
-        "epochs": 20,
-        "hidden_size": 128,
-        "optimizer": "Adam"
-    }
-)
+<span class="c1"># 初始化wandb</span>
+<span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
+    <span class="n">project</span><span class="o">=</span><span class="s2">"colab-demo"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"pytorch-example"</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"learning_rate"</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="s2">"batch_size"</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">"epochs"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="s2">"hidden_size"</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="s2">"optimizer"</span><span class="p">:</span> <span class="s2">"Adam"</span>
+    <span class="p">}</span>
+<span class="p">)</span>
 
-config = wandb.config
+<span class="n">config</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">config</span>
 
-# 生成简单的回归数据
-X = torch.randn(1000, 10)
-y = torch.randn(1000, 1) * 2 + 3 + torch.randn(1000, 1) * 0.1
+<span class="c1"># 生成简单的回归数据</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span>
 
-dataset = TensorDataset(X, y)
-dataloader = DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-# 定义简单的神经网络
-class SimpleNN(nn.Module):
-    def __init__(self, input_size=10, hidden_size=128, output_size=1):
-        super().__init__()
-        self.layer1 = nn.Linear(input_size, hidden_size)
-        self.layer2 = nn.Linear(hidden_size, hidden_size)
-        self.layer3 = nn.Linear(hidden_size, output_size)
-        self.relu = nn.ReLU()
+<span class="c1"># 定义简单的神经网络</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">output_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
 
-    def forward(self, x):
-        x = self.relu(self.layer1(x))
-        x = self.relu(self.layer2(x))
-        x = self.layer3(x)
-        return x
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
 
-model = SimpleNN(hidden_size=config.hidden_size)
-criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
+<span class="n">model</span> <span class="o">=</span> <span class="n">SimpleNN</span><span class="p">(</span><span class="n">hidden_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">)</span>
 
-# 训练循环
-for epoch in range(config.epochs):
-    total_loss = 0
-    for batch_x, batch_y in dataloader:
-        optimizer.zero_grad()
-        outputs = model(batch_x)
-        loss = criterion(outputs, batch_y)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
+<span class="c1"># 训练循环</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_y</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_x</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">batch_y</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-    avg_loss = total_loss / len(dataloader)
+    <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
 
-    # 记录训练损失
-    wandb.log({
-        "epoch": epoch,
-        "train_loss": avg_loss,
-        "learning_rate": optimizer.param_groups[0]['lr']
-    })
+    <span class="c1"># 记录训练损失</span>
+    <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">({</span>
+        <span class="s2">"epoch"</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
+        <span class="s2">"train_loss"</span><span class="p">:</span> <span class="n">avg_loss</span><span class="p">,</span>
+        <span class="s2">"learning_rate"</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'lr'</span><span class="p">]</span>
+    <span class="p">})</span>
 
-    # 可选：记录模型梯度直方图
-    if epoch % 5 == 0:
-        wandb.log({
-            "gradients": wandb.Histogram(
-                torch.cat([p.grad.view(-1) for p in model.parameters() if p.grad is not None])
-            )
-        })
+    <span class="c1"># 可选：记录模型梯度直方图</span>
+    <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">({</span>
+            <span class="s2">"gradients"</span><span class="p">:</span> <span class="n">wandb</span><span class="o">.</span><span class="n">Histogram</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="p">})</span>
 
-    print(f"Epoch {epoch+1}/{config.epochs}, Loss: {avg_loss:.4f}")
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s2">, Loss: </span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-# 保存模型
-torch.save(model.state_dict(), "model.pth")
-wandb.save("model.pth")  # 将模型文件保存到wandb
+<span class="c1"># 保存模型</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">"model.pth"</span><span class="p">)</span>
+<span class="n">wandb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">"model.pth"</span><span class="p">)</span>  <span class="c1"># 将模型文件保存到wandb</span>
 
-wandb.finish()
-</code></pre>
-<pre class="highlight" data-lang="python"><code class="language-python">import wandb
-from transformers import (
-    AutoTokenizer, 
-    AutoModelForSequenceClassification,
-    TrainingArguments, 
-    Trainer
-)
-from datasets import load_dataset
-import numpy as np
-from sklearn.metrics import accuracy_score
+<span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+</code></pre></div>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AutoTokenizer</span><span class="p">,</span> 
+    <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
+    <span class="n">TrainingArguments</span><span class="p">,</span> 
+    <span class="n">Trainer</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span>
 
-# 1. 初始化wandb（这里可以指定项目名和实验名）
-wandb.init(project="huggingface-colab-demo", name="automatic-logging-run")
+<span class="c1"># 1. 初始化wandb（这里可以指定项目名和实验名）</span>
+<span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"huggingface-colab-demo"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"automatic-logging-run"</span><span class="p">)</span>
 
-# 2. 准备数据
-dataset = load_dataset("imdb", split="train[:100]")  # 只取100条，让实验更快
-tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+<span class="c1"># 2. 准备数据</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">"imdb"</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">"train[:100]"</span><span class="p">)</span>  <span class="c1"># 只取100条，让实验更快</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"distilbert-base-uncased"</span><span class="p">)</span>
 
-def tokenize_function(examples):
-    return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+<span class="k">def</span><span class="w"> </span><span class="nf">tokenize_function</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">examples</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s2">"max_length"</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
 
-tokenized_dataset = dataset.map(tokenize_function, batched=True)
+<span class="n">tokenized_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize_function</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-# 3. 加载模型
-model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=2)
+<span class="c1"># 3. 加载模型</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"distilbert-base-uncased"</span><span class="p">,</span> <span class="n">num_labels</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-# 4. 配置TrainingArguments，关键就是 report_to="wandb"
-training_args = TrainingArguments(
-    output_dir="./results",
-    num_train_epochs=2,
-    per_device_train_batch_size=8,
-    logging_steps=10,              # 每10步记录一次日志
-    report_to="wandb",              # 👈 告诉Trainer用wandb记录
-    run_name="bert-imdb-quick-test", # 这次运行的名字
-)
+<span class="c1"># 4. 配置TrainingArguments，关键就是 report_to="wandb"</span>
+<span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">"./results"</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>              <span class="c1"># 每10步记录一次日志</span>
+    <span class="n">report_to</span><span class="o">=</span><span class="s2">"wandb"</span><span class="p">,</span>              <span class="c1"># 👈 告诉Trainer用wandb记录</span>
+    <span class="n">run_name</span><span class="o">=</span><span class="s2">"bert-imdb-quick-test"</span><span class="p">,</span> <span class="c1"># 这次运行的名字</span>
+<span class="p">)</span>
 
-# 5. 定义评估指标
-def compute_metrics(eval_pred):
-    predictions, labels = eval_pred
-    predictions = np.argmax(predictions, axis=1)
-    return {"accuracy": accuracy_score(labels, predictions)}
+<span class="c1"># 5. 定义评估指标</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
+    <span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">eval_pred</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)}</span>
 
-# 6. 创建Trainer并开始训练
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_dataset,
-    eval_dataset=tokenized_dataset,  # 简单起见，用训练集评估
-    compute_metrics=compute_metrics,
-)
+<span class="c1"># 6. 创建Trainer并开始训练</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">training_args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">tokenized_dataset</span><span class="p">,</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">tokenized_dataset</span><span class="p">,</span>  <span class="c1"># 简单起见，用训练集评估</span>
+    <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
+<span class="p">)</span>
 
-trainer.train()
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-# 7. 结束实验
-wandb.finish()
-</code></pre>
+<span class="c1"># 7. 结束实验</span>
+<span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+</code></pre></div>
 <p><img alt="" src="../../migrated/post-images/20260308220445.png"/></p>
 <h2 id="进阶使用-超参数搜索">进阶使用：超参数搜索</h2>
 <p>定义搜索空间后，wandb可用于超参数搜索。
@@ -465,103 +465,103 @@ wandb.finish()
 </blockquote>
 <p>之后我利用for循环串行运行了三次，wandb帮我测试的 <code>lr</code> 分别为 <code>2.213804440450783e-05</code> ，<code>1.6808858635707506e-05</code> ，<code>1.1746289104917436e-05</code> 。
 还定义了 <code>per_device_train_batch_size</code> 为 <code>8</code> 或 <code>16</code> ，实际跑了一次 <code>8</code> 、两次 <code>16</code> 。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">import wandb
-from transformers import (
-    AutoTokenizer, 
-    AutoModelForSequenceClassification,
-    TrainingArguments, 
-    Trainer
-)
-from datasets import load_dataset
-import numpy as np
-from sklearn.metrics import accuracy_score
-import time
-import random
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AutoTokenizer</span><span class="p">,</span> 
+    <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
+    <span class="n">TrainingArguments</span><span class="p">,</span> 
+    <span class="n">Trainer</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-# 设置随机种子避免冲突
-random.seed(int(time.time()))
+<span class="c1"># 设置随机种子避免冲突</span>
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
 
-sweep_config = {
-    "method": "random",
-    "metric": {"name": "eval_accuracy", "goal": "maximize"},
-    "parameters": {
-        "learning_rate": {
-            "distribution": "log_uniform_values",
-            "min": 1e-5,
-            "max": 1e-4
-        },
-        "per_device_train_batch_size": {"values": [8, 16]},
-        "num_train_epochs": {"values": [2]}
-    }
-}
+<span class="n">sweep_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"random"</span><span class="p">,</span>
+    <span class="s2">"metric"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"eval_accuracy"</span><span class="p">,</span> <span class="s2">"goal"</span><span class="p">:</span> <span class="s2">"maximize"</span><span class="p">},</span>
+    <span class="s2">"parameters"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"learning_rate"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"distribution"</span><span class="p">:</span> <span class="s2">"log_uniform_values"</span><span class="p">,</span>
+            <span class="s2">"min"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+            <span class="s2">"max"</span><span class="p">:</span> <span class="mf">1e-4</span>
+        <span class="p">},</span>
+        <span class="s2">"per_device_train_batch_size"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"values"</span><span class="p">:</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]},</span>
+        <span class="s2">"num_train_epochs"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"values"</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">]}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-def train():
-    # 每个run完全独立初始化
-    run = wandb.init(project="huggingface-colab-demo", reinit=True)
-    config = wandb.config
+<span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">():</span>
+    <span class="c1"># 每个run完全独立初始化</span>
+    <span class="n">run</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"huggingface-colab-demo"</span><span class="p">,</span> <span class="n">reinit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">config</span>
 
-    try:
-        print(f"开始训练 {run.id}")
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"开始训练 </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-        # 数据准备
-        dataset = load_dataset("imdb", split="train[:200]")
-        tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+        <span class="c1"># 数据准备</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">"imdb"</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">"train[:200]"</span><span class="p">)</span>
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">"distilbert-base-uncased"</span><span class="p">)</span>
 
-        def tokenize_function(examples):
-            return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+        <span class="k">def</span><span class="w"> </span><span class="nf">tokenize_function</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">examples</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s2">"max_length"</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
 
-        tokenized_dataset = dataset.map(tokenize_function, batched=True)
-        train_valid_split = tokenized_dataset.train_test_split(test_size=0.2, seed=42)
+        <span class="n">tokenized_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">tokenize_function</span><span class="p">,</span> <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">train_valid_split</span> <span class="o">=</span> <span class="n">tokenized_dataset</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 
-        model = AutoModelForSequenceClassification.from_pretrained(
-            "distilbert-base-uncased", 
-            num_labels=2
-        )
+        <span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="s2">"distilbert-base-uncased"</span><span class="p">,</span> 
+            <span class="n">num_labels</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">)</span>
 
-        training_args = TrainingArguments(
-            output_dir=f"./results/sweep_{run.id}",
-            num_train_epochs=config.num_train_epochs,
-            per_device_train_batch_size=config.per_device_train_batch_size,
-            learning_rate=config.learning_rate,
-            logging_steps=10,
-            eval_strategy="epoch",
-            save_strategy="no",
-            report_to="wandb",
-            run_name=f"sweep-{run.id}",
-        )
+        <span class="n">training_args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="sa">f</span><span class="s2">"./results/sweep_</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">num_train_epochs</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">num_train_epochs</span><span class="p">,</span>
+            <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">learning_rate</span><span class="p">,</span>
+            <span class="n">logging_steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">eval_strategy</span><span class="o">=</span><span class="s2">"epoch"</span><span class="p">,</span>
+            <span class="n">save_strategy</span><span class="o">=</span><span class="s2">"no"</span><span class="p">,</span>
+            <span class="n">report_to</span><span class="o">=</span><span class="s2">"wandb"</span><span class="p">,</span>
+            <span class="n">run_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"sweep-</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        def compute_metrics(eval_pred):
-            predictions, labels = eval_pred
-            predictions = np.argmax(predictions, axis=1)
-            return {"accuracy": accuracy_score(labels, predictions)}
+        <span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
+            <span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">eval_pred</span>
+            <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)}</span>
 
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=train_valid_split["train"],
-            eval_dataset=train_valid_split["test"],
-            compute_metrics=compute_metrics,
-        )
+        <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">training_args</span><span class="p">,</span>
+            <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_valid_split</span><span class="p">[</span><span class="s2">"train"</span><span class="p">],</span>
+            <span class="n">eval_dataset</span><span class="o">=</span><span class="n">train_valid_split</span><span class="p">[</span><span class="s2">"test"</span><span class="p">],</span>
+            <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        trainer.train()
+        <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-    except Exception as e:
-        print(f"错误: {e}")
-        wandb.log({"error": str(e)})
-    finally:
-        wandb.finish()
-        # 强制等待一小段时间，避免资源竞争
-        time.sleep(2)
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"错误: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)})</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="c1"># 强制等待一小段时间，避免资源竞争</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
-# 创建sweep
-sweep_id = wandb.sweep(sweep_config, project="huggingface-colab-demo")
+<span class="c1"># 创建sweep</span>
+<span class="n">sweep_id</span> <span class="o">=</span> <span class="n">wandb</span><span class="o">.</span><span class="n">sweep</span><span class="p">(</span><span class="n">sweep_config</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">"huggingface-colab-demo"</span><span class="p">)</span>
 
-# 串行运行，每次只跑一个
-for i in range(3):  # 跑3次
-    print(f"\n=== 开始第 {i+1}/3 次运行 ===\n")
-    wandb.agent(sweep_id, function=train, count=1)  # 每次只跑1个
-    time.sleep(3)  # 间隔3秒
-</code></pre>
+<span class="c1"># 串行运行，每次只跑一个</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>  <span class="c1"># 跑3次</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">=== 开始第 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/3 次运行 ===</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">wandb</span><span class="o">.</span><span class="n">agent</span><span class="p">(</span><span class="n">sweep_id</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># 每次只跑1个</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># 间隔3秒</span>
+</code></pre></div>
 <p>而在wandb的后台中，这三次 <code>run</code> 被整理到同一个 <code>sweep</code> 中，便于互相比较。</p>
 <p><img alt="" src="../../migrated/post-images/20260309134622.png"/>
 <img alt="" src="../../migrated/post-images/20260309134635.png"/></p>

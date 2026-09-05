@@ -117,9 +117,9 @@
   <div class="filter-tags">
     <span class="filter-label">筛选</span>
     
-    <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
-    
     <button class="tag-chip" type="button" data-tag="项目">#项目</button>
+    
+    <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
     
     <button class="tag-chip" type="button" data-tag="CS61A">#CS61A</button>
     
@@ -139,11 +139,15 @@
       
       <button class="tag-chip" type="button" data-tag="CSAPP">#CSAPP</button>
       
+      <button class="tag-chip" type="button" data-tag="TypeScript">#TypeScript</button>
+      
       <button class="tag-chip" type="button" data-tag="大模型">#大模型</button>
       
       <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
       
       <button class="tag-chip" type="button" data-tag="工具">#工具</button>
+      
+      <button class="tag-chip" type="button" data-tag="效率工具">#效率工具</button>
       
       <button class="tag-chip" type="button" data-tag="数据结构与算法">#数据结构与算法</button>
       
@@ -163,6 +167,36 @@
   </div>
 
   <div class="card-grid" id="card-grid">
+    
+    <article class="card" data-tags="机器学习 " data-folder="posts/notes/ml" data-date="2026-04-09">
+      
+      <a class="card-link" href="../posts/notes/ml/softmax.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-meta-left">
+              <time datetime="2026-04-09">2026-04-09</time>
+              
+            </span>
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/ml">ml</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">从原始Softmax到在线Softmax</h3>
+          
+          <div class="card-preview">撰写了原始的softmax、数值稳定的softmax、在线softmax的公式及其简单代码呈现。  我们讨论的起点是<strong>原始的softmax形式</strong>： <span class="arithmatex">\(p_j = \frac{e^{z_j}}{\sum_k e^{z_k}}.\)</span>  为保证数值稳定，令 <span class="arithmatex">\( m := \max_k z_k, \)</span> 则 softmax 可等价改写为<strong>数值稳定的softmax形式</strong>： p_j = \frac{e^{z_j - m}}{\sum_k e^{z_k -…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="机器学习">#机器学习</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
     
     <article class="card" data-tags="翻译 " data-folder="posts/reference" data-date="2026-03-25">
       
@@ -517,38 +551,6 @@
         
         <div class="card-thumb">
           <img src="../assets/.thumbs/131482ac47af.jpg" alt="" loading="lazy">
-        </div>
-        
-      </a>
-    </article>
-    
-    <article class="card is-cover" data-tags="项目 " data-folder="posts/toy" data-date="2026-02-26">
-      
-      <span class="card-cover" style="background-image:url('../posts/migrated/post-images/reverseChess.png')"></span>
-      
-      <a class="card-link" href="../posts/toy/reverseChess.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-meta-left">
-              <time datetime="2026-02-26">2026-02-26</time>
-              
-            </span>
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/toy">toy</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">贴贴棋（reverseChess）介绍</h3>
-          
-          <div class="card-preview">贴贴棋是一个黑白棋变体小游戏, 通过“贴贴”来削弱对方、增强己方。</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="项目">#项目</button>
-            
-          </div>
         </div>
         
       </a>
@@ -1174,6 +1176,17 @@
               <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
               <span class="tree-name">十派的玩具箱有哪些内容？</span>
               <span class="tree-date">2024-08-30</span>
+            </a>
+          </li>
+          
+        
+          
+          <li class="tree-file" data-path="posts/toy/anothertodo">
+            <a class="tree-row" href="../posts/toy/anothertodo.html">
+              <span class="tree-toggle tree-toggle-empty"></span>
+              <img class="tree-icon-img tree-icon-file" src="../img/pixel-file.svg" alt="file">
+              <span class="tree-name">AnotherTODO：把待办留在终端，也留在自己手里</span>
+              <span class="tree-date">2026-09-05</span>
             </a>
           </li>
           

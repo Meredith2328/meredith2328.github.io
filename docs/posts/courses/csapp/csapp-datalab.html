@@ -154,13 +154,13 @@
 <p>浮点数部分单独写了笔记，欢迎参阅 <a href="ieee754.html">IEEE754 浮点数与十进制数互相转换流程及例子</a>。</p>
 <h2 id="运行结果">运行结果</h2>
 <h3 id="dlc">dlc</h3>
-<pre class="highlight"><code>make
+<div class="highlight"><pre><span></span><code>make
 ./dlc -e bits.c
-</code></pre>
+</code></pre></div>
 <p><img alt="" src="../../migrated/post-images/1714446458477.png"/></p>
 <h3 id="btest">btest</h3>
-<pre class="highlight"><code>./btest
-</code></pre>
+<div class="highlight"><pre><span></span><code>./btest
+</code></pre></div>
 <p><img alt="" src="../../migrated/post-images/1714446471662.png"/></p>
 <h2 id="思路">思路</h2>
 <h3 id="bitxor">bitXor</h3>
@@ -211,7 +211,7 @@
 <h3 id="isasciidigit">isAsciiDigit</h3>
 <p>题目需要人为构造，考虑使用掩码。</p>
 <p>考虑题设条件：[0011 0000] &lt;= x &lt;= [0011 1001]，可以用以下条件逐位判断：</p>
-<pre class="highlight"><code>if ((x &gt;&gt; 4) == 0x3) {
+<div class="highlight"><pre><span></span><code>if ((x &gt;&gt; 4) == 0x3) {
     int 3rdBit = (x &gt;&gt; 3) &amp; 0x1; // the 3rd bit, counting from 0th
     if (3rdBit == 0) return 1;
     else {
@@ -222,20 +222,20 @@
     }
 }
 else return 0;
-</code></pre>
+</code></pre></div>
 <p>接下来将上述条件简化并根据所给符号改写即可，改写举例如下：</p>
-<pre class="highlight"><code>int HigherByteCond = !((x &gt;&gt; 4) ^ 0x3);
+<div class="highlight"><pre><span></span><code>int HigherByteCond = !((x &gt;&gt; 4) ^ 0x3);
 int the3rdBit = (x &gt;&gt; 3) &amp; 0x1;
 int the2ndAnd1stBit = (x &gt;&gt; 1) &amp; 0x3;
 return HigherByteCond &amp; ((!the3rdBit) | (the3rdBit &amp; (!the2ndAnd1stBit)));
-</code></pre>
+</code></pre></div>
 <p>共计12 ops。</p>
 <h3 id="conditional">conditional</h3>
 <p>首先考虑没有限制的情况，再根据限制改写符号。</p>
 <p>不考虑符号时如下：</p>
-<pre class="highlight"><code>if (x) return z;
+<div class="highlight"><pre><span></span><code>if (x) return z;
 else return y;
-</code></pre>
+</code></pre></div>
 <p>因为z和y具有某种程度的对称性，返回z可以拆成z + 0，返回y可以拆成 0 + y，</p>
 <p>所以如果按照python的逻辑与，返回值可以写为<code>(cond &amp;&amp; z) | (!cond &amp;&amp; y)</code>或<code>(cond &amp;&amp; z) + (!cond &amp;&amp; y)</code>。（python中，逻辑与的两侧如果同时非0，则返回其右侧的值）</p>
 <p>但需要考虑多位的返回值时，<code>&amp;&amp;</code>不能简单地改写为位与，所以另寻他法，即掩码运算。</p>
@@ -243,23 +243,23 @@ else return y;
 <p>如果z和y均只有一位，则返回值可以写为 <code>cond &amp; z + (!cond) &amp; y</code>，注意到cond实际扮演了掩码的角色。这为我们提供了灵感：可以根据cond构造所需长度的掩码（0xFFFFFFFF和0x00000000），规避显式的条件判断。即所需返回值为 <code>bitMask &amp; z + ~bitMask &amp; y</code>，只需构造<code>bitMask</code>即可。</p>
 <p>最后注意到取负可以分别将cond为1和0时映射到0xFFFFFFFF即-1与0x00000000即0，完成<code>bitMask</code>的构造。</p>
 <p>综上，本题思路如下：</p>
-<pre class="highlight"><code>int cond = !x;
+<div class="highlight"><pre><span></span><code>int cond = !x;
 int bitMask = ~cond + 1;
 return ((~bitMask) &amp; y) + (bitMask &amp; z);
-</code></pre>
+</code></pre></div>
 <h3 id="islessorequal">isLessOrEqual</h3>
 <p>用差实现比较，差通过取负实现。</p>
 <p>根据课本，作和差时需要考虑溢出问题。正溢出得负数，负溢出得正数，判断即可。</p>
 <p>同号则一定不溢出、返回<code>diffSign</code>；前0后1时返回0、前1后0时返回1，即返回<code>xSign</code>。</p>
 <p>注意<code>diffSign</code>最好使用<code>-x + y</code>得到，它的符号位在<code>x &lt;= y</code>时一定为0，反之一定为1；</p>
 <p>而如果使用<code>x + (-y)</code>就不会有这样良好的效果（当<code>x == y</code>时）。</p>
-<pre class="highlight"><code>int xSign = (x &gt;&gt; 31) &amp; 0x1;
+<div class="highlight"><pre><span></span><code>int xSign = (x &gt;&gt; 31) &amp; 0x1;
 int ySign = (y &gt;&gt; 31) &amp; 0x1;
 int signXor = xSign ^ ySign;
 int negaX = ~x + 1; 
 int diffSign = ((negaX + y) &gt;&gt; 31) &amp; 0x1;
 return ((!signXor) &amp; (!diffSign)) | (signXor &amp; xSign);
-</code></pre>
+</code></pre></div>
 <h3 id="logicalneg">logicalNeg</h3>
 <p>能够区分0和非0的性质非常有限，比如<code>x == -x</code>。但如果异或两个完整值，则仍然没有规避规格化问题。</p>
 <ul>
@@ -268,22 +268,22 @@ return ((!signXor) &amp; (!diffSign)) | (signXor &amp; xSign);
 <p>考虑判断<code>x</code>与<code>-x</code>的符号位，并只对这一位做异或得到<code>signXor</code>，</p>
 <p>再将得到的0映射到1，得到的1映射到0即可，可以返回<code>1 - signXor = 2 + ~(signXor)</code>。</p>
 <p>除此之外，之前提到了<code>Tmin</code>的加法逆元也是其本身，需要排除掉。</p>
-<pre class="highlight"><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+<div class="highlight"><pre><span></span><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
 return ~(x &gt;&gt; 31) &amp; (2 + ~(signXor));
-</code></pre>
+</code></pre></div>
 <p>将0映射到1、将1映射到0也可以通过“加法逆元”即与1异或实现，即返回<code>signXor ^ 0x1</code>。</p>
-<pre class="highlight"><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+<div class="highlight"><pre><span></span><code>int signXor = ((x ^ (~x + 1)) &gt;&gt; 31) &amp; 0x1;
 return ~(x &gt;&gt; 31) &amp; (signXor ^ 0x1);
-</code></pre>
+</code></pre></div>
 <p>共计9 ops。</p>
 <ul>
 <li>解法二</li>
 </ul>
 <p>相比于异或，先“并”再移位之后取反得到的符号判断可以将<code>Tmin</code>也包含在非0的情况中，省去返回值的特判。</p>
 <p><img alt="" src="../../migrated/post-images/1714446532858.png"/></p>
-<pre class="highlight"><code>int sameSign = ((x | (~x + 1)) &gt;&gt; 31) &amp; 0x1;
+<div class="highlight"><pre><span></span><code>int sameSign = ((x | (~x + 1)) &gt;&gt; 31) &amp; 0x1;
 return sameSign ^ 0x1;
-</code></pre>
+</code></pre></div>
 <p>甚至只有6 ops。</p>
 <h3 id="howmanybits">howManyBits</h3>
 <p>好难，需要多次细分。</p>

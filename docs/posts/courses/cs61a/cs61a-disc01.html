@@ -160,19 +160,19 @@
 <p>关于值有误的情况：举例为 <code>race(3,5)</code> ，按照上面的推理继续往后，实际是满足了 <code>25x=15y</code> 的情况，恰好不是无限循环。</p>
 <p>懒得做一般推理了qwq读者有兴趣自便咯</p>
 <h2 id="q2-fizzbuzz">Q2: Fizzbuzz</h2>
-<pre class="highlight" data-lang="python"><code class="language-python">def fizzbuzz(n):
-    for i in range(1, n + 1):
-        if (i % 3 == 0):
-            if (i % 5 == 0):
-                print('fizzbuzz')
-            else:
-                print('fizz')
-        else:
-            if (i % 5 == 0):
-                print('buzz')
-            else:
-                print(i)
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fizzbuzz</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">'fizzbuzz'</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">'fizz'</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">'buzz'</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</code></pre></div>
 <h2 id="q3-is-prime">Q3: Is Prime?</h2>
 <p>虽然这道题实现很容易，而且很可能已经在读者的长期记忆中存下来了，但不妨去跟着hint想一下这个过程。</p>
 <p>（1. Pick an example input and corresponding output.）
@@ -195,61 +195,61 @@
 我们可以取<code>i</code>初始为<code>2</code>，<code>i</code>的下一个数是<code>i+1</code>，这样可以覆盖到范围内所需的所有的数，达成了我们的需求。</p>
 <p>（4. Implement the process in code using those additional names.）
 那么对于上面这个非常符合直觉的检测过程，<code>python</code>提供了这个循环结构对应的函数：<code>for i in range(2, n)</code>，表示<code>i</code>的范围从<code>2</code>到<code>n-1</code>依次递增。代码如下：</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def is_prime(n):
-    """Haven't Finished."""
-    for i in range(2, n):
-        if (n % i == 0):
-            return False
-    return True
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_prime</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Haven't Finished."""</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
 <p>（5. Determine whether the implementation really works on your original example.）
 我们将<code>n=10</code>代入其中考虑，发现<code>i=2</code>时满足<code>10%2==0</code>，得到<code>False</code>符合我们判断的结果。</p>
 <p>（6. Determine whether the implementation really works on other examples. (If not, you might need to revise step 2.)）
 可以尝试执行<code>is_prime(n), n = 1, 2, ..., 10</code>这样的方式，人工测试；或者通过确认无误的函数来对照检测该函数的正确性。
 我们意识到（或通过测试发现）存在一个反例：<code>n=1</code>是无法满足的，但对于其他情况，我们上述的过程尚不存在反例。因此，我们考虑将<code>n=1</code>单独处理，见下。
 （我认为，只有对算法过程从数学上严格证明不存在反例，才能保证算法的正确性；否则上述过程可能只能保证对测试用例有效）</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def is_prime(n):
-    if n == 1:
-        return False
-    for i in range(2, n):
-        if (n % i == 0):
-            return False
-    return True
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_prime</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
 <h2 id="q4-unique-digits">Q4: Unique Digits</h2>
-<pre class="highlight" data-lang="python"><code class="language-python">def unique_digits(n):
-    """Return the number of unique digits in positive integer n.
-    &gt;&gt;&gt; unique_digits(8675309) # All are unique
-    7
-    &gt;&gt;&gt; unique_digits(13173131) # 1, 3, and 7
-    3
-    &gt;&gt;&gt; unique_digits(101) # 0 and 1
-    2
-    """
-    "*** YOUR CODE HERE ***"
-    count = 0
-    for i in range(0, 10):
-        if has_digit(n, i):
-            count += 1
-    return count
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">unique_digits</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the number of unique digits in positive integer n.</span>
+<span class="sd">    &gt;&gt;&gt; unique_digits(8675309) # All are unique</span>
+<span class="sd">    7</span>
+<span class="sd">    &gt;&gt;&gt; unique_digits(13173131) # 1, 3, and 7</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; unique_digits(101) # 0 and 1</span>
+<span class="sd">    2</span>
+<span class="sd">    """</span>
+    <span class="s2">"*** YOUR CODE HERE ***"</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">has_digit</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">count</span>
 
-def has_digit(n, k):
-    """Returns whether k is a digit in n.
-    &gt;&gt;&gt; has_digit(10, 1)
-    True
-    &gt;&gt;&gt; has_digit(12, 7)
-    False
-    """
-    assert k &gt;= 0 and k &lt; 10
+<span class="k">def</span><span class="w"> </span><span class="nf">has_digit</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Returns whether k is a digit in n.</span>
+<span class="sd">    &gt;&gt;&gt; has_digit(10, 1)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; has_digit(12, 7)</span>
+<span class="sd">    False</span>
+<span class="sd">    """</span>
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">10</span>
 
-    "*** YOUR CODE HERE ***"
+    <span class="s2">"*** YOUR CODE HERE ***"</span>
 
-    while (n &gt; 0):
-        if n % 10 == k:
-            return True
-        n //= 10
-    return False
-</code></pre>
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="n">k</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">n</span> <span class="o">//=</span> <span class="mi">10</span>
+    <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div>
 <p>我们当然可以用其他的算法，也可以利用已经完成的函数。</p>
 <p>这里依旧使用上一题的<code>Problem-Solving</code>思想：
 考虑出一种包含基本（这里的simple含义我不是很确定：基本、简单，似乎都能说通）步骤的过程，
@@ -257,31 +257,31 @@ def has_digit(n, k):
 <p>用在本题中，“有数字”可以考虑的判断条件是“某一位数字是否等于已知数”，那么就要考虑怎样将所查数按顺序拆分成各数字，进而引出转化为字符串、或者整除运算等方法。
 整除运算是很常见的用法，可以记忆并熟练运用。</p>
 <h2 id="q5-ordered-digits">Q5: Ordered Digits</h2>
-<pre class="highlight" data-lang="python"><code class="language-python">def ordered_digits(x):
-    """Return True if the (base 10) digits of X&gt;0 are in non-decreasing
-    order, and False otherwise.
-    &gt;&gt;&gt; ordered_digits(5)
-    True
-    &gt;&gt;&gt; ordered_digits(11)
-    True
-    &gt;&gt;&gt; ordered_digits(127)
-    True
-    &gt;&gt;&gt; ordered_digits(1357)
-    True
-    &gt;&gt;&gt; ordered_digits(21)
-    False
-    &gt;&gt;&gt; result = ordered_digits(1375) # Return, don't print
-    &gt;&gt;&gt; result
-    False
-    """
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ordered_digits</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return True if the (base 10) digits of X&gt;0 are in non-decreasing</span>
+<span class="sd">    order, and False otherwise.</span>
+<span class="sd">    &gt;&gt;&gt; ordered_digits(5)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ordered_digits(11)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ordered_digits(127)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ordered_digits(1357)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; ordered_digits(21)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; result = ordered_digits(1375) # Return, don't print</span>
+<span class="sd">    &gt;&gt;&gt; result</span>
+<span class="sd">    False</span>
+<span class="sd">    """</span>
 
-    "*** YOUR CODE HERE ***"
-    while (x &gt; 0):
-        if (x % 10) &lt; (x // 10 % 10):
-            return False
-        x //= 10
-    return True
-</code></pre>
+    <span class="s2">"*** YOUR CODE HERE ***"</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">x</span> <span class="o">//</span> <span class="mi">10</span> <span class="o">%</span> <span class="mi">10</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">x</span> <span class="o">//=</span> <span class="mi">10</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
 <p>类似上一题的思考：
 逐个判断“是否有某一位数小于它的高位数”？</p>
 <h2 id="总结">总结</h2>

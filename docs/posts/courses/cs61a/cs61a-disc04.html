@@ -148,207 +148,207 @@
 <h2 id="q1-insect-combinatorics">Q1: Insect Combinatorics</h2>
 <p>基础情况略。
 递归情况：从左下出发的路径的可能数，是第一步往上走、之后的路径的可能数 加 第一步往右走，之后的路径的可能数。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def paths(m, n):
-    """Return the number of paths from one corner of an
-    M by N grid to the opposite corner.
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">paths</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the number of paths from one corner of an</span>
+<span class="sd">    M by N grid to the opposite corner.</span>
 
-    &gt;&gt;&gt; paths(2, 2)
-    2
-    &gt;&gt;&gt; paths(5, 7)
-    210
-    &gt;&gt;&gt; paths(117, 1)
-    1
-    &gt;&gt;&gt; paths(1, 157)
-    1
-    """
-    "*** YOUR CODE HERE ***"
-    if m == 1 or n == 1:
-        return 1
-    return paths(m - 1, n) + paths(m, n - 1)
-</code></pre>
+<span class="sd">    &gt;&gt;&gt; paths(2, 2)</span>
+<span class="sd">    2</span>
+<span class="sd">    &gt;&gt;&gt; paths(5, 7)</span>
+<span class="sd">    210</span>
+<span class="sd">    &gt;&gt;&gt; paths(117, 1)</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; paths(1, 157)</span>
+<span class="sd">    1</span>
+<span class="sd">    """</span>
+    <span class="s2">"*** YOUR CODE HERE ***"</span>
+    <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">paths</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">paths</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
 <h2 id="q2-even-weighted">Q2: Even weighted</h2>
 <p>先理解题目含义：
 <code>x = [1, 2, 3, 4, 5, 6]</code>，下标从0开始，只留下标为<code>0, 2, 4</code>的三个元素即 <code>[1, 3, 5]</code> ，之后将每个元素与之前提到的偶数下标相乘，即 <code>[1 * 0, 3 * 2, 5 * 4] = [0, 6, 20]</code>。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def even_weighted_loop(s):
-    """
-    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]
-    &gt;&gt;&gt; even_weighted_loop(x)
-    [0, 6, 20]
-    """
-    "*** YOUR CODE HERE ***"
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">even_weighted_loop</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]</span>
+<span class="sd">    &gt;&gt;&gt; even_weighted_loop(x)</span>
+<span class="sd">    [0, 6, 20]</span>
+<span class="sd">    """</span>
+    <span class="s2">"*** YOUR CODE HERE ***"</span>
 
-    result = []
-    for i in range(len(s)):
-        if (i % 2 == 0):
-            result += [s[i] * i]
-    return result
-</code></pre>
-<pre class="highlight" data-lang="python"><code class="language-python">def even_weighted_comprehension(s):
-    """
-    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]
-    &gt;&gt;&gt; even_weighted_comprehension(x)
-    [0, 6, 20]
-    """
-    return [s[i] * i for i in range(len(s)) if i % 2 == 0]
-</code></pre>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">even_weighted_comprehension</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6]</span>
+<span class="sd">    &gt;&gt;&gt; even_weighted_comprehension(x)</span>
+<span class="sd">    [0, 6, 20]</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
 <h2 id="q3-has-path">Q3: Has Path</h2>
 <p>递归情况：如果本节点值等于路径第一位，子分支中存在一个分支满足路径的剩余部分，则返回真。
 硬控我好几分钟的地方是python的列表切片后如果长度为1，仍然是一个列表。令人忍俊不禁。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def has_path(t, p):
-    """Return whether tree t has a path from the root with labels p.
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">has_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return whether tree t has a path from the root with labels p.</span>
 
-    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
-    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
-    &gt;&gt;&gt; has_path(t1, [5, 6])        # This path is not from the root of t1
-    False
-    &gt;&gt;&gt; has_path(t2, [5, 6])        # This path is from the root of t2
-    True
-    &gt;&gt;&gt; has_path(t1, [3, 5])        # This path does not go to a leaf, but that's ok
-    True
-    &gt;&gt;&gt; has_path(t1, [3, 5, 6])     # This path goes to a leaf
-    True
-    &gt;&gt;&gt; has_path(t1, [3, 4, 5, 6])  # There is no path with these labels
-    False
-    """
-    if p == [label(t)]:  # when len(p) is 1
-        return True
-    elif label(t) != p[0]:
-        return False
-    else:
-        "*** YOUR CODE HERE ***"
-        for child in branches(t):
-            if has_path(child, p[1:]):
-                return True
-        return False
-        # one line version:
-        # return True in [has_path(child, p[1:]) for child in branches(t)]
-</code></pre>
+<span class="sd">    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])</span>
+<span class="sd">    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])</span>
+<span class="sd">    &gt;&gt;&gt; has_path(t1, [5, 6])        # This path is not from the root of t1</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; has_path(t2, [5, 6])        # This path is from the root of t2</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; has_path(t1, [3, 5])        # This path does not go to a leaf, but that's ok</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; has_path(t1, [3, 5, 6])     # This path goes to a leaf</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; has_path(t1, [3, 4, 5, 6])  # There is no path with these labels</span>
+<span class="sd">    False</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="p">[</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)]:</span>  <span class="c1"># when len(p) is 1</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="s2">"*** YOUR CODE HERE ***"</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">has_path</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># one line version:</span>
+        <span class="c1"># return True in [has_path(child, p[1:]) for child in branches(t)]</span>
+</code></pre></div>
 <h2 id="q4-find-path">Q4: Find Path</h2>
 <p>不妨先抛弃题目模板，自行思考。
 仍然满足上一题“子情况中存在一个满足则返回该子情况，子情况全部不满足才返回不满足”。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def find_path(t, x):
-    """
-    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
-    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
-    &gt;&gt;&gt; find_path(t1, 5)
-    [3, 5]
-    &gt;&gt;&gt; find_path(t1, 4)
-    [3, 4]
-    &gt;&gt;&gt; find_path(t1, 6)
-    [3, 5, 6]
-    &gt;&gt;&gt; find_path(t2, 6)
-    [5, 6]
-    &gt;&gt;&gt; print(find_path(t1, 2))
-    None
-    """
-    if label(t) == x:
-        return [label(t)]
-    else:
-        for child in branches(t):
-            if find_path(child, x):
-                return [label(t)] + find_path(child, x)
-        return None
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])</span>
+<span class="sd">    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t1, 5)</span>
+<span class="sd">    [3, 5]</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t1, 4)</span>
+<span class="sd">    [3, 4]</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t1, 6)</span>
+<span class="sd">    [3, 5, 6]</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t2, 6)</span>
+<span class="sd">    [5, 6]</span>
+<span class="sd">    &gt;&gt;&gt; print(find_path(t1, 2))</span>
+<span class="sd">    None</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">find_path</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span> <span class="o">+</span> <span class="n">find_path</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div>
 <p>之后尝试与题目模板格式匹配：</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def find_path(t, x):
-    """
-    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])
-    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])
-    &gt;&gt;&gt; find_path(t1, 5)
-    [3, 5]
-    &gt;&gt;&gt; find_path(t1, 4)
-    [3, 4]
-    &gt;&gt;&gt; find_path(t1, 6)
-    [3, 5, 6]
-    &gt;&gt;&gt; find_path(t2, 6)
-    [5, 6]
-    &gt;&gt;&gt; print(find_path(t1, 2))
-    None
-    """
-    if label(t) == x:
-        return [label(t)]
-    for child in branches(t):
-        path = find_path(child, x)
-        if path:
-            return [label(t)] + path
-    return None
-</code></pre>
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">find_path</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    &gt;&gt;&gt; t2 = tree(5, [tree(6), tree(7)])</span>
+<span class="sd">    &gt;&gt;&gt; t1 = tree(3, [tree(4), t2])</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t1, 5)</span>
+<span class="sd">    [3, 5]</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t1, 4)</span>
+<span class="sd">    [3, 4]</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t1, 6)</span>
+<span class="sd">    [3, 5, 6]</span>
+<span class="sd">    &gt;&gt;&gt; find_path(t2, 6)</span>
+<span class="sd">    [5, 6]</span>
+<span class="sd">    &gt;&gt;&gt; print(find_path(t1, 2))</span>
+<span class="sd">    None</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">find_path</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span> <span class="o">+</span> <span class="n">path</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div>
 <p>（当时在<code>for</code>那里的空填了<code>else</code>，想到一个 <code>path = any([find_path(child, x) for child in branches(t)])</code>，之后会麻烦亿点、而且跟<code>path</code>这个变量名不匹配，xsl）</p>
 <h2 id="q5-sprout-leaves">Q5: Sprout Leaves</h2>
 <p>注意题目要求构造<code>tree</code>，而且在<code>branches</code>里的也是<code>tree</code>。
 思路很简单：
 如果是叶，则构造一个标签相同、带了新叶的树返回；
 如果不是叶，则构造一个标签相同、每个分支完成了<code>sprout leaves</code>（即题设要求的函数）的树返回。</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def sprout_leaves(t, leaves):
-    """Sprout new leaves containing the labels in leaves at each leaf of
-    the original tree t and return the resulting tree.
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sprout_leaves</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">leaves</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Sprout new leaves containing the labels in leaves at each leaf of</span>
+<span class="sd">    the original tree t and return the resulting tree.</span>
 
-    &gt;&gt;&gt; t1 = tree(1, [tree(2), tree(3)])
-    &gt;&gt;&gt; print_tree(t1)
-    1
-      2
-      3
-    &gt;&gt;&gt; new1 = sprout_leaves(t1, [4, 5])
-    &gt;&gt;&gt; print_tree(new1)
-    1
-      2
-        4
-        5
-      3
-        4
-        5
+<span class="sd">    &gt;&gt;&gt; t1 = tree(1, [tree(2), tree(3)])</span>
+<span class="sd">    &gt;&gt;&gt; print_tree(t1)</span>
+<span class="sd">    1</span>
+<span class="sd">      2</span>
+<span class="sd">      3</span>
+<span class="sd">    &gt;&gt;&gt; new1 = sprout_leaves(t1, [4, 5])</span>
+<span class="sd">    &gt;&gt;&gt; print_tree(new1)</span>
+<span class="sd">    1</span>
+<span class="sd">      2</span>
+<span class="sd">        4</span>
+<span class="sd">        5</span>
+<span class="sd">      3</span>
+<span class="sd">        4</span>
+<span class="sd">        5</span>
 
-    &gt;&gt;&gt; t2 = tree(1, [tree(2, [tree(3)])])
-    &gt;&gt;&gt; print_tree(t2)
-    1
-      2
-        3
-    &gt;&gt;&gt; new2 = sprout_leaves(t2, [6, 1, 2])
-    &gt;&gt;&gt; print_tree(new2)
-    1
-      2
-        3
-          6
-          1
-          2
-    """
-    "*** YOUR CODE HERE ***"
-    if is_leaf(t):
-        return tree(label(t), [tree(val) for val in leaves])
-    return tree(label(t), [sprout_leaves(branch, leaves) for branch in branches(t)])
-</code></pre>
+<span class="sd">    &gt;&gt;&gt; t2 = tree(1, [tree(2, [tree(3)])])</span>
+<span class="sd">    &gt;&gt;&gt; print_tree(t2)</span>
+<span class="sd">    1</span>
+<span class="sd">      2</span>
+<span class="sd">        3</span>
+<span class="sd">    &gt;&gt;&gt; new2 = sprout_leaves(t2, [6, 1, 2])</span>
+<span class="sd">    &gt;&gt;&gt; print_tree(new2)</span>
+<span class="sd">    1</span>
+<span class="sd">      2</span>
+<span class="sd">        3</span>
+<span class="sd">          6</span>
+<span class="sd">          1</span>
+<span class="sd">          2</span>
+<span class="sd">    """</span>
+    <span class="s2">"*** YOUR CODE HERE ***"</span>
+    <span class="k">if</span> <span class="n">is_leaf</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tree</span><span class="p">(</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="p">[</span><span class="n">tree</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">leaves</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">tree</span><span class="p">(</span><span class="n">label</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="p">[</span><span class="n">sprout_leaves</span><span class="p">(</span><span class="n">branch</span><span class="p">,</span> <span class="n">leaves</span><span class="p">)</span> <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">(</span><span class="n">t</span><span class="p">)])</span>
+</code></pre></div>
 <h2 id="q6-tree-deciphering">Q6: Tree Deciphering</h2>
 <p><code>result</code>的值是<code>t1</code>和<code>t2</code>中较大的那棵树的所有子分支中最小的分支的标签。
 “大”与“小”通过比较<code>label(t)</code>判断。
 （<code>max(s, key=f)</code> returns the item <code>x</code> in <code>s</code> for which <code>f(x)</code> is largest.
 <code>max([t1, t2], key=label)</code> returns the tree with the largest label, in this case <code>t2</code>.）</p>
-<pre class="highlight" data-lang="python"><code class="language-python">def tree(label, branches=[]):
-    for branch in branches:
-        assert is_tree(branch), 'branches must be trees'
-    return [label] + list(branches)
+<div class="highlight"><pre data-lang="python"><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tree</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">branches</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">is_tree</span><span class="p">(</span><span class="n">branch</span><span class="p">),</span> <span class="s1">'branches must be trees'</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">branches</span><span class="p">)</span>
 
-def label(tree):
-    return tree[0]
+<span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-def branches(tree):
-    return tree[1:]
+<span class="k">def</span><span class="w"> </span><span class="nf">branches</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tree</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-def is_leaf(tree):
-    return not branches(tree)
+<span class="k">def</span><span class="w"> </span><span class="nf">is_leaf</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">branches</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
 
-def is_tree(tree):
-    if type(tree) != list or len(tree) &lt; 1:
-        return False
-    for branch in branches(tree):
-        if not is_tree(branch):
-            return False
-    return True
+<span class="k">def</span><span class="w"> </span><span class="nf">is_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_tree</span><span class="p">(</span><span class="n">branch</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
 
-t2 = tree(5, [tree(6), tree(7)])
-t1 = tree(3, [tree(4), t2])
-result = label(min(branches(max([t1, t2], key=label)), key=label))
-print(result)
-</code></pre>
+<span class="n">t2</span> <span class="o">=</span> <span class="n">tree</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="n">tree</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">tree</span><span class="p">(</span><span class="mi">7</span><span class="p">)])</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="n">tree</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="n">tree</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">t2</span><span class="p">])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">label</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">branches</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="n">label</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="n">label</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="cs61a-disc03.html" title="上一篇">← Disc 03 递归</a><a class="post-rel-link" href="cs61a-disc05.html" title="下一篇">Disc 05 迭代、时空复杂度 →</a><a class="post-rel-link" href="cs61a-disc07.html">Disc 07 树、链表</a></div></aside>
   </div>
 
