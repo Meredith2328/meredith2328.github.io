@@ -168,41 +168,9 @@
 
   <div class="card-grid" id="card-grid">
     
-    <article class="card is-cover" data-tags="奇怪的东西 " data-folder="posts/toy" data-date="2024-08-30">
-      
-      <span class="card-cover" style="background-image:url('posts/migrated/post-images/10pi.jpg')"></span>
-      
-      <a class="card-link" href="posts/toy/10pi.html">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-meta-left">
-              <time datetime="2024-08-30">2024-08-30</time>
-              <span class="pin-badge">置顶</span>
-            </span>
-            
-            
-            <span class="card-folder" title="点击目录片段筛选">
-              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/toy">toy</button>
-            </span>
-            
-          </div>
-          <h3 class="card-title">十派的玩具箱有哪些内容？</h3>
-          
-          <div class="card-preview">顾名思义，玩具箱就应该是玩具箱。 知识笔记、工具笔记、写出的小玩意儿，都是玩具。 有时候玩玩具是为了写blog，有时候写blog是为了玩玩具。 任何批评和建议均会受到最热烈的欢迎： Issues / pipipi2328@gmail.com 主要集中于深度学习常用的工具。 结合 pi 的架构与真实会话数据（sessions.jsonl），把消息模型、主循环、Provider…</div>
-          
-          <div class="card-tags">
-            
-            <button class="tag-chip" type="button" data-tag="奇怪的东西">#奇怪的东西</button>
-            
-          </div>
-        </div>
-        
-      </a>
-    </article>
-    
     <article class="card is-cover" data-tags="项目 TypeScript 效率工具 " data-folder="posts/toy" data-date="2026-09-05">
       
-      <span class="card-cover" style="background-image:url('posts/toy/assets/anothertodo-cover.png')"></span>
+      <span class="card-cover" style="background-image:url('posts/toy/assets/anothertodo-tui.png')"></span>
       
       <a class="card-link" href="posts/toy/anothertodo.html">
         <div class="card-body">
@@ -557,6 +525,36 @@
           <div class="card-tags">
             
             <button class="tag-chip" type="button" data-tag="项目">#项目</button>
+            
+          </div>
+        </div>
+        
+      </a>
+    </article>
+    
+    <article class="card" data-tags="机器学习 " data-folder="posts/notes/ml" data-date="2026-04-09">
+      
+      <a class="card-link" href="posts/notes/ml/softmax.html">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-meta-left">
+              <time datetime="2026-04-09">2026-04-09</time>
+              
+            </span>
+            
+            
+            <span class="card-folder" title="点击目录片段筛选">
+              <button class="folder-part" type="button" data-folder="posts">posts</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes">notes</button><span class="folder-sep">/</span><button class="folder-part" type="button" data-folder="posts/notes/ml">ml</button>
+            </span>
+            
+          </div>
+          <h3 class="card-title">从原始Softmax到在线Softmax</h3>
+          
+          <div class="card-preview">撰写了原始的softmax、数值稳定的softmax、在线softmax的公式及其简单代码呈现。  我们讨论的起点是<strong>原始的softmax形式</strong>： <span class="arithmatex">\(p_j = \frac{e^{z_j}}{\sum_k e^{z_k}}.\)</span>  为保证数值稳定，令 <span class="arithmatex">\( m := \max_k z_k, \)</span> 则 softmax 可等价改写为<strong>数值稳定的softmax形式</strong>： p_j = \frac{e^{z_j - m}}{\sum_k e^{z_k -…</div>
+          
+          <div class="card-tags">
+            
+            <button class="tag-chip" type="button" data-tag="机器学习">#机器学习</button>
             
           </div>
         </div>
