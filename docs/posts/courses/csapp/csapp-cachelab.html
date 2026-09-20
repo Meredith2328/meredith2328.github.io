@@ -221,7 +221,7 @@ Skipping performance evaluation for this function.
 <p>写<code>B[8][0]</code>，<code>Line 00</code>中无该值，发生Conflict Miss，将<code>B[8][0]</code>到<code>B[8][7]</code>存入<code>Line 00</code>中。</p>
 <p>...</p>
 </blockquote>
-<p>为了便于理解，我详细阐述了整个过程。利用我们小学~~或者幼儿园~~学到的找规律可以知道：</p>
+<p>为了便于理解，我详细阐述了整个过程。利用我们小学<del>或者幼儿园</del>学到的找规律可以知道：</p>
 <ol>
 <li><code>A[i][i]</code>和<code>B[i][i]</code>会引起Conflict Miss。具体而言，写<code>B[i][i]</code>时会驱逐相同的Cache Line，导致<code>A[i][i + 1]</code>冲突不命中。（由于i = 0, 1, ..., 31，共计32次miss）（其实此处分析不完全，见下述第二次改进）</li>
 <li>A具有良好的局部性，只在每读入8个int的第一个才会发生Cold Miss，其余都是Hit。（共计128次miss）</li>

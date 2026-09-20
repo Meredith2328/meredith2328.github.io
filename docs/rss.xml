@@ -8,6 +8,13 @@
     <language>zh-CN</language>
     <generator>pilog</generator>
       <item>
+        <title>尝试用 Jev 游玩手机上的黑洞大作战 (HOLEIN) 游戏</title>
+        <link>https://meredith2328.github.io/posts/toy/jev-holein.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/jev-holein.html</guid>
+        <pubDate>Sun, 20 Sep 2026 00:00:00 -0000</pubDate>
+        <description>尝试用Jev。</description>
+      </item>
+      <item>
         <title>AnotherTODO：把待办留在终端，也留在自己手里</title>
         <link>https://meredith2328.github.io/posts/toy/anothertodo.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/anothertodo.html</guid>
@@ -243,7 +250,7 @@
         <link>https://meredith2328.github.io/posts/courses/csapp/csapp-shelllab.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/courses/csapp/csapp-shelllab.html</guid>
         <pubDate>Thu, 27 Jun 2024 00:00:00 -0000</pubDate>
-        <description>以&lt;code&gt;test16&lt;/code&gt;为例，其余效果相似。 根据课本，我们在编写信号处理程序时应当遵守以下规则~~类怪谈~~： 我们为了阻塞信号，提供的主要函数有： 课本（中文）8.4.6节（P525）提供了不回收后台子进程的eval缺陷版本，在此之上加入信号处理：  改变全局变量前后需要阻塞和取消阻塞全部信号，保证原子性；；  2.…</description>
+        <description>以&lt;code&gt;test16&lt;/code&gt;为例，其余效果相似。 根据课本，我们在编写信号处理程序时应当遵守以下规则&lt;del&gt;类怪谈&lt;/del&gt;： 我们为了阻塞信号，提供的主要函数有： 课本（中文）8.4.6节（P525）提供了不回收后台子进程的eval缺陷版本，在此之上加入信号处理：  改变全局变量前后需要阻塞和取消阻塞全部信号，保证原子性；；  2.…</description>
       </item>
       <item>
         <title>CSAPP · Cachelab</title>
@@ -285,7 +292,7 @@
         <link>https://meredith2328.github.io/posts/toy/KaguraHikari.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/KaguraHikari.html</guid>
         <pubDate>Sun, 07 Jan 2024 00:00:00 -0000</pubDate>
-        <description>by. ~~看少女歌剧看魔怔了的~~十派 如何界定神乐光的萌点？ 首先可以盖棺定论地说，神乐光绝对不是“傲娇”一词就能概括的。 事实上，对比于“傲娇”一词的起源明日香，神乐光无论傲和娇都是“不称职”的。假定傲娇一词针对的对象是其在意的人，eva对应男主，神乐光对应华恋，神乐光从来没有对华恋冷言相向，也没有在突破特定阈值时突然展现出“娇”的姿态。 神乐光平日里始终是冷冷、捉摸不透的表情，虽然这种情况下更可能是在发呆。或许用“谜语人”一词更好形容她——带有电波感又内心坚定的无口天然少女，这是我想到的不吝用词的界…</description>
+        <description>by. &lt;del&gt;看少女歌剧看魔怔了的&lt;/del&gt;十派 如何界定神乐光的萌点？ 首先可以盖棺定论地说，神乐光绝对不是“傲娇”一词就能概括的。 事实上，对比于“傲娇”一词的起源明日香，神乐光无论傲和娇都是“不称职”的。假定傲娇一词针对的对象是其在意的人，eva对应男主，神乐光对应华恋，神乐光从来没有对华恋冷言相向，也没有在突破特定阈值时突然展现出“娇”的姿态。 神乐光平日里始终是冷冷、捉摸不透的表情，虽然这种情况下更可能是在发呆。或许用“谜语人”一词更好形容她——带有电波感又内心坚定的无口天然少女，这是我想到的不吝用词的界…</description>
       </item>
       <item>
         <title>CS61A · Disc 03 · 递归</title>
