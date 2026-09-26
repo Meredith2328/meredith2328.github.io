@@ -16,17 +16,17 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
-  <title>尝试用 Jev 游玩手机上的黑洞大作战 (HOLEIN) 游戏 · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="Jev 这种自称是为程序而生的、快速决策的 System One 模型，游玩实际的手机游戏体验如何？ 我选了 Android 上的 HOLEIN （黑洞大作战）。目标很朴素：黑洞移动、吞小物体、逐渐长">
+  <title>给 osu!lazer 接一条歌词时间轴 · 10PI&#39;S BLOG丨十派的玩具箱</title>
+  <meta name="description" content="用 tosu 读取 osu!lazer 的谱面时间，把 LRCLIB 的歌词版本选对，再按时间戳配上中文；几个看似简单的地方各有坑。">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
-  <meta property="og:title" content="尝试用 Jev 游玩手机上的黑洞大作战 (HOLEIN) 游戏">
-  <meta property="og:description" content="Jev 这种自称是为程序而生的、快速决策的 System One 模型，游玩实际的手机游戏体验如何？ 我选了 Android 上的 HOLEIN （黑洞大作战）。目标很朴素：黑洞移动、吞小物体、逐渐长">
-  <link rel="canonical" href="https://meredith2328.github.io/posts/toy/jev-holein.html">
+  <meta property="og:title" content="给 osu!lazer 接一条歌词时间轴">
+  <meta property="og:description" content="用 tosu 读取 osu!lazer 的谱面时间，把 LRCLIB 的歌词版本选对，再按时间戳配上中文；几个看似简单的地方各有坑。">
+  <link rel="canonical" href="https://meredith2328.github.io/posts/toy/osu-lyrics.html">
   
   
-  <meta property="og:image" content="https://meredith2328.github.io/posts/toy/assets/jev-holein/loop-level3.gif">
-  <meta property="article:published_time" content="2026-09-20T00:00:00">
+  <meta property="og:image" content="https://meredith2328.github.io/posts/toy/assets/osu-lyrics-window.png">
+  <meta property="article:published_time" content="2026-09-26T00:00:00">
 
   
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-MVYHGJ8X03"></script>
@@ -126,21 +126,21 @@
 <article class="post">
   <header class="post-header">
     <a class="back-link" href="../../index.html">← 返回首页</a>
-    <h1 class="post-title">尝试用 Jev 游玩手机上的黑洞大作战 (HOLEIN) 游戏</h1>
+    <h1 class="post-title">给 osu!lazer 接一条歌词时间轴</h1>
     <div class="post-meta">
-      <time datetime="2026-09-20T00:00:00">2026-09-20</time>
-      <span class="post-stats">2323 字 · 约 6 分钟</span>
+      <time datetime="2026-09-26T00:00:00">2026-09-26</time>
+      <span class="post-stats">2748 字 · 约 7 分钟</span>
       
-      <a class="tag-chip" href="../../index.html#tag=Agent">#Agent</a>
-      
-      <a class="tag-chip" href="../../index.html#tag=TypeSafe">#TypeSafe</a>
-      
-      <a class="tag-chip" href="../../index.html#tag=%E5%AE%9E%E9%AA%8C">#实验</a>
+      <a class="tag-chip" href="../../index.html#tag=%E5%A5%87%E6%80%AA%E7%9A%84%E4%B8%9C%E8%A5%BF">#奇怪的东西</a>
       
       <span class="post-folder">▣ posts/toy</span>
     </div>
   </header>
 
+  
+  <div class="post-hero" role="img" aria-label="给 osu!lazer 接一条歌词时间轴">
+    <img class="post-hero-img" src="../../posts/toy/assets/osu-lyrics-window.png" alt="">
+  </div>
   
 
   <nav class="post-toc" id="post-toc" aria-label="目录" hidden></nav>
@@ -148,105 +148,33 @@
   
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
-    <p><strong>Jev 这种自称是为程序而生的、快速决策的 System One 模型，游玩实际的手机游戏体验如何？</strong></p>
-<p>我选了 Android 上的 HOLEIN （黑洞大作战）。目标很朴素：黑洞移动、吞小物体、逐渐长大，直到能吞掉整张地图。</p>
+    <p>打 osu!lazer 时，我想把日文原词和中文翻译放在屏幕边上，选歌预览时也能看见。真正费工夫的不是画一个透明窗口，而是回答三个问题：现在放的是哪一首、歌词文件是不是这首歌的这个版本、这一帧该显示哪一句。</p>
+<p><a href="https://github.com/Meredith2328/osulyrics">osu!lyrics 的 Windows 版和源码</a>已经放在 GitHub。它是游戏外的独立窗口，下面这张图是在 osu!lazer 选歌界面实际运行时截的；小窗可以收起，歌词留在原位。</p>
+<p><img alt="osu!lazer 选歌界面中的 osu!lyrics：控制小窗、同步原文与中文译文" src="assets/osu-lyrics-window.png"/></p>
 <!-- more -->
-<h2 id="概述">概述</h2>
-<blockquote>
-<p>如何让Agent获取到手机画面，把有限而真实的游戏状态交给 Jev 做方向选择，再由Agent执行动作并验证结果？</p>
-</blockquote>
-<p>Jev <strong>不看图片</strong>（<strong>所以对游戏环境的建模需要你自己来做</strong>！）、不操作手机，也不拥有循环。它是模型，而不是Agent Loop本身。它负责在代码给出的有限选项中，返回带概率和置信度的结构化判断。</p>
-<p>因此，除了Jev之外的一切代码系统都是我们自己写的。Jev只是一个决策的模型而已。</p>
-<pre class="highlight" data-lang="text"><code class="language-text">Android 屏幕状态（安卓手机真机）
-    │ ADB 截图（只留在本机）
-    ▼
-本地感知：洞口、候选物、尺寸、方位、近期变化
-    │ 结构化精简 JSON（不上传截图）
-    ▼
-Jev 选择下一步方向
-    │ typed answer + probabilities + confidence
-    ▼
-代码通过 ADB 在屏幕上操作
-    │
-    └──────── 回到开头 (下一帧) ────────┘
-</code></pre>
-<p>初版验证用 Playground 做了一次最小试验：</p>
-<p>我把“洞在中央、左上有小木箱、右侧是大建筑”写成状态，给出<del>上北下南左西右东</del>八个方向和 <code>hold</code>。Jev 返回 <code>up_left</code>，概率和置信度都很高。接着用 ADB 执行移动，并回读屏幕，完成一次最小闭环。</p>
-<h2 id="建立游戏闭环">建立游戏闭环</h2>
-<p>根据 <a href="https://docs.typesafe.ai/concepts/how-to-build-with-system-one">TypeSafe 的构建指南</a>，控制流、确定性规则和副作用应该留在代码里。于是后续改成直接调用 API：</p>
-<pre class="highlight" data-lang="python"><code class="language-python">response = client.system_one(
-    state=compact_game_state,
-    questions={"next_move": Choice(...)},
-)
-
-direction = response.choices["next_move"].choice
-adb_swipe(direction)
-</code></pre>
-<p>在我实测的过程中，Jev 的单次 API 延迟大约在 <strong>0.27–0.95</strong> 秒之间。</p>
-<p>就我们要建立起的游戏闭环而言，速度瓶颈不在模型，而是在我的安卓手机上进行高分辨率手机截图的 PNG 压缩：1220×2712 一帧约 <strong>2.19</strong> 秒。把 Android 的逻辑分辨率临时降到 305×678 后，截图约 455 毫秒，本地像素处理约 26 毫秒，游戏才开始有接近连续控制的感觉。</p>
-<p>下面是一段实际演示的gif动图，用来证明“截图 → 状态 → Jev → ADB swipe”确实在真实游戏中持续运行。</p>
-<p><img alt="Level 3 阶段的实时闭环：黑洞移动、画面跟随、Jev 继续给出方向" src="assets/jev-holein/loop-level3.gif"/></p>
-<p>下述是我录制到的从 Level 3 到 Level 4 的升级。</p>
-<p><img alt="从 Level 3 升到 Level 4 的录屏片段" src="assets/jev-holein/level3-to-level4.gif"/></p>
-<h2 id="数据格式参考">数据格式参考</h2>
-<p>Jev 当前不接收图像，所以屏幕截图没有离开电脑。上传的是像下面这样的状态：</p>
-<pre class="highlight" data-lang="json"><code class="language-json">{
-  "player": {
-    "hole_radius_px": 60,
-    "hole_diameter_px": 120,
-    "level_estimate": 3
-  },
-  "candidates": [
-    {
-      "direction": "up_right",
-      "distance_px": 92,
-      "width_px": 37,
-      "height_px": 18,
-      "span_to_hole_diameter": 0.31,
-      "area_to_hole_opening": 0.09,
-      "aspect_ratio": 2.06,
-      "visual_shape": "compact object"
-    }
-  ],
-  "recent_actions": ["left", "up_left", "right"],
-  "stagnant_steps_without_detected_growth": 6
-}
-</code></pre>
-<p>控制器会记录每次请求的语义 payload 字节数、token 用量、延迟、置信度和实际执行方向，并在请求过大时停止。早期状态每次大约 1.3 KiB；加入物体相对尺寸、最近动作和停滞信息后约为 3–4 KiB。</p>
-<p>考虑到我们并不能直接把图片喂给模型进行决策，我们的游戏过程很大程度上取决于环境状态获取得够不够好，需要把真正影响动作的状态关系说清楚。</p>
-<p>但在状态建立得还不错的情况下，Jev确实能够进行游戏决策，决策得还挺快。</p>
-<h2 id="jev-在状态给得不那么明确的前提下-仍然有可能玩出死循环">Jev 在状态给得不那么明确的前提下，仍然有可能玩出死循环</h2>
-<p>最初的本地感知中，我们的状态给得比较粗糙。</p>
-<p>它只会找深色、紧凑的连通区域。它能找出一些小物体，却不理解“这是一栋房子”“它比洞大”“这几步只是围着同一块结构打转”。于是自然而然出现了死循环：模型有时会在两个相近方向间往返，或者把建筑碎片当成候选目标。</p>
-<p>录屏后段能看到这个问题的真实场景：洞已到 Level 4，地图上出现大型建筑、停机坪与成片结构。画面不是模型的输入；本地感知只能把它们压缩为几何描述，因此“建筑”在状态里如果只剩一块深色连通域，就会丢失最关键的可吞性关系。</p>
-<p><img alt="Level 4 在大型建筑和停机坪附近移动的录屏片段" src="assets/jev-holein/large-structures.gif"/></p>
-<p>这里最重要的一次修正并不是再写一个更聪明的本地贪心策略。那样只是用规则把 Jev 架空。</p>
-<p>更合理的修正是补齐状态：</p>
-<ul>
-<li>物体相对洞口的跨度、面积和宽高比；</li>
-<li>组件的紧凑度、颜色与“像独立物体还是长条/大型结构”的视觉描述；</li>
-<li>洞口尺寸最近是否真的增长；</li>
-<li>最近动作序列和各方向的重复次数；</li>
-<li>卡住时的随机探索建议。</li>
-</ul>
-<p>我本来想直接把随机性直接强制写进我们采用的策略中。但是转念一想：为什么不把要不要执行随机方向也作为Jev的一个选项呢？当最近动作已经形成循环、洞口却没有增长时，Jev 可以把它作为打破平局的方向；是否执行仍由返回的 Choice 决定。</p>
-<p><strong>这个模型确实能玩一些游戏，但前提是状态已经把它需要判断的关系表达出来。</strong></p>
-<h2 id="what-s-more">What's more?</h2>
-<p>上述只是使用 Jev 游玩 HOLEIN 游戏的简单尝试，做得很粗糙，还不是一个可靠的自动通关器。</p>
-<p>本地像素处理写得比较简单，只能描述几何关系，不能真正识别 HOLEIN 里的每种建筑、道具或敌人。洞口半径也可能被特效、遮挡和 UI 文字影响。模型的概率和置信度能告诉我们它在给定状态下是否犹豫，却不能弥补缺失的视觉证据。</p>
-<p>如果要把这个实验继续做成稳定系统，可以在更可靠的本地感知层着手：能分割物体、追踪同一目标、确认“吞掉了什么”，再把这些事实交给 Jev。不要把提示词搞得太长，也不要把策略喂给它。</p>
-<p>下面这段 GIF 覆盖了一段实际游玩的 175 秒录屏，并以 5× 速度播放（只降采样取了部分帧，所以看起来没有特别流畅），供参考。</p>
-<p><img alt="完整 HOLEIN 录屏的 5 倍速时间压缩 GIF：从 Level 3、2.2% 到 Level 4 的持续游玩过程" src="assets/jev-holein/full-run-timelapse.gif"/></p>
-<p>“让 AI 玩游戏”并不是一个已经解决的问题。我们只是做了一次有用的拆解：控制系统能跑、模型能决策、手机真的会动；但视觉状态太粗糙时，循环同样会真实地卡住。</p>
+<h2 id="先取得游戏的时间-而不是猜时间">先取得游戏的时间，而不是猜时间</h2>
+<p>我没有去改 osu! 的源码，也没有从窗口标题猜歌名。程序第一次运行时可以单独安装 <a href="https://github.com/tosuapp/tosu">tosu</a>；它在本机提供状态接口，osu!lyrics 每隔约 100 毫秒读取 <code>127.0.0.1:24050/json/v2</code>。<a href="https://github.com/Meredith2328/osulyrics/blob/main/src/osu.cjs"><code>normalizeTosu</code></a>把返回值收成一份固定的数据：谱面的 Unicode/罗马字曲名、歌手、难度名、当前谱面时间 <code>beatmap.time.live</code>、音频长度 <code>mp3Length</code>、暂停状态，以及打图时 Mod 的播放倍率。tosu 负责观察游戏，我的窗口只负责歌词。这条边界也让工具不用随 osu! 的内部结构一起编译。</p>
+<p>只在前端拿到一次时间后靠 <code>Date.now()</code> 一直往前推，短时间看不出问题，暂停、重试、切歌后却会漂。现在的规则是：<strong>以 tosu 的最近一次谱面时间为准，只在两次采样之间补一点画面时间</strong>。<a href="https://github.com/Meredith2328/osulyrics/blob/main/src/playback-clock.js"><code>advancePosition</code></a>最多补 180 毫秒，并乘当前播放倍率；一旦暂停或断开就停在采样值，不再自走。重新采样会直接校正位置，所以重试也不会继承上一轮的计时。</p>
+<p>歌曲结束还有一条独立边界。打图最后一个物件不等于音频结束，而短版歌曲的 LRC 可能来自更长的录音。程序优先用 <code>mp3Length</code> 判断音频终点，到达后停止显示；进入结算画面也会清掉歌词。选歌预览则继续使用 tosu 报告的 <code>live</code> 时间，第一句还没到时不提前亮出后面的词。LRC 自身的固定偏差留给每首歌的校时值处理，避免把“文件偏了 0.5 秒”和“播放时钟漂了”混在一起。</p>
+<h2 id="歌名相同-不代表歌词就是同一份">歌名相同，不代表歌词就是同一份</h2>
+<p>带时间戳的歌词从 <a href="https://lrclib.net/docs">LRCLIB</a> 取。先查本地 LRC，再查在线候选；本地导入或编辑过的文本优先。搜索词会试 Unicode 曲名和罗马字曲名，也会去掉 <code>TV Size</code> 等版本后缀，但<strong>去掉后缀只是为了找到候选，不是直接认定候选可用</strong>。真正选择时还要看音频长度。这样 <code>Gurenge (TV Size)</code> 能找到名字略有差异的歌词，同时不会把完整录音的时间轴套在短版上。</p>
+<p><a href="https://github.com/Meredith2328/osulyrics/blob/main/src/lyrics.cjs"><code>rankLyrics</code></a>给曲名、歌手、时长和歌词语言分别计分。曲名完全相同加 70 分，歌手完全相同加 40 分；时长差在 12 秒内加 25 分，差到 45 秒以上则扣 100 分。自动选用还要求至少 75 分；若前两名分数接近、时长却差了 15 秒以上，就交给用户挑。这个保守规则比“搜索第一条就是答案”更符合打图场景。</p>
+<p>语言也不能只看曲名。<code>Love Letter - YOASOBI</code> 有英语和日语歌词候选，曲名与歌手可以完全一样。程序检查 LRC 正文的假名分布；谱面没有明确写 English Version、且候选同时有英日两种时，优先日文。过去自动缓存过的英文候选也会重新复核，但用户手动选定的版本不会被覆盖。</p>
+<p>合集谱面更麻烦：<code>Various Artists - 6k Starter Pack</code> 的实际歌名可能写在难度里。<a href="https://github.com/Meredith2328/osulyrics/blob/main/src/osu.cjs"><code>parseCompilationDifficulty</code></a>只对符合“合集作者 + 曲包标题”的谱面尝试从难度名拆出歌手和歌名；普通谱面的 <code>Hard</code>、<code>Expert</code> 不会误当曲名。缓存键也随之使用拆出的歌曲信息，避免同一个 Pack 里的几首歌共用一份歌词。</p>
+<p>LRCLIB 返回 503 时，<a href="https://github.com/Meredith2328/osulyrics/blob/main/src/lrclib-client.cjs">请求层</a>按 <code>Retry-After</code> 或递增间隔有限次重试。搜索仍失败，就尝试仅曲名查询和另一个元数据接口；持续不可用时保留已有歌词，并允许导入 LRC。这些回退只改变获取途径，不放宽版本判断。</p>
+<h2 id="翻译要跟着时间戳走-也要能被取消">翻译要跟着时间戳走，也要能被取消</h2>
+<p>LRC 允许同一时间戳出现两行。解析时把同一时刻的原文、译文配成一条记录，原有的双语歌词便不用再翻译。只有缺少中文的行才会交给机器翻译。当前实现每次最多送 8 行到 Google 翻译的非官方网页接口；如果返回结果的行数和输入不一致，就逐行重试，避免译文整体错位。机器译文会标明来源，服务失败时仍保留原词。使用这个功能时歌词文本会发送给 Google，接口没有稳定性保证。</p>
+<p>更隐蔽的问题是异步返回。用户切到下一首歌、改选另一版歌词，或者正在本地编辑时，上一个翻译请求可能刚好完成。<a href="https://github.com/Meredith2328/osulyrics/blob/main/src/lyrics-service.cjs"><code>LyricsService</code></a>用 <code>generation</code> 标记当前歌曲、用 <code>selectionToken</code> 标记当前歌词版本；写回前还检查本地文件是否已被改动。只要任何一个条件变了，旧结果就不能覆盖新歌或手工修改的内容。搜索请求也有自己的 <code>searchRun</code> 和取消信号，快速滚动选歌时不会让慢请求倒灌到当前面板。</p>
+<p>界面用 Electron 的透明置顶窗口实现，位置、外观、锁定状态和每首歌的校时保存在本机。游戏、谱面、音乐和歌词不随安装包分发；osu! 的游戏素材归 osu!/ppy 等权利人，歌曲与歌词归各自权利人。这个小工具只是为了游玩时少在屏幕和歌词页面之间来回切。</p>
   </div>
 
   
   <nav class="post-nav" aria-label="上一篇 / 下一篇">
     
-    <a class="post-nav-link is-prev" href="../../posts/toy/osu-lyrics.html">← 上一篇<br><span class="post-nav-title">给 osu!lazer 接一条歌词时间轴</span></a>
+    <a class="post-nav-link is-prev" href="../../posts/toy/zi-she.html">← 上一篇<br><span class="post-nav-title">自设</span></a>
     
     
-    <a class="post-nav-link is-next" href="../../posts/toy/anothertodo.html">下一篇 →<br><span class="post-nav-title">AnotherTODO：把待办留在终端，也留在自己手里</span></a>
+    <a class="post-nav-link is-next" href="../../posts/toy/jev-holein.html">下一篇 →<br><span class="post-nav-title">尝试用 Jev 游玩手机上的黑洞大作战 (HOLEIN) 游戏</span></a>
     
   </nav>
   

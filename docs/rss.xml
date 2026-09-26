@@ -8,6 +8,13 @@
     <language>zh-CN</language>
     <generator>pilog</generator>
       <item>
+        <title>给 osu!lazer 接一条歌词时间轴</title>
+        <link>https://meredith2328.github.io/posts/toy/osu-lyrics.html</link>
+        <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/osu-lyrics.html</guid>
+        <pubDate>Sat, 26 Sep 2026 00:00:00 -0000</pubDate>
+        <description>用 tosu 读取 osu!lazer 的谱面时间，把 LRCLIB 的歌词版本选对，再按时间戳配上中文；几个看似简单的地方各有坑。</description>
+      </item>
+      <item>
         <title>尝试用 Jev 游玩手机上的黑洞大作战 (HOLEIN) 游戏</title>
         <link>https://meredith2328.github.io/posts/toy/jev-holein.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/toy/jev-holein.html</guid>
