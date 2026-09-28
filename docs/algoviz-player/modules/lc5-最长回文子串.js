@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc5-最长回文子串"] = {
     title: "5 最长回文子串 · 动态规划",
+    link: "https://leetcode.cn/problems/longest-palindromic-substring/",
     language: "python",
     code: [
       "class Solution:",

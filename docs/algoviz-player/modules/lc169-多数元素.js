@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc169-多数元素"] = {
     title: "169 多数元素 · Boyer-Moore 投票",
+    link: "https://leetcode.cn/problems/majority-element/",
     language: "python",
     code: [
       "class Solution:",

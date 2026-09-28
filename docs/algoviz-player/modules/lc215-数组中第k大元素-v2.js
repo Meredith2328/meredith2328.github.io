@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc215-数组中第k大元素-v2"] = {
     title: "215 数组中的第K个最大元素 · 堆",
+    link: "https://leetcode.cn/problems/kth-largest-element-in-an-array/",
     language: "python",
     code: [
       "class Solution:",

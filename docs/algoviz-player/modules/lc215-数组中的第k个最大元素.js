@@ -2,13 +2,18 @@
   global.AlgoVizModules = global.AlgoVizModules || {};
 
   global.AlgoVizModules["lc215-数组中的第k个最大元素"] = {
-    title: "215 数组中的第K个最大元素 · 排序",
+    title: "215 数组中的第K个最大元素 · 堆（维护 size=k）",
     language: "python",
+    link: "https://leetcode.cn/problems/kth-largest-element-in-an-array/",
     code: [
       "class Solution:",
       "    def findKthLargest(self, nums: List[int], k: int) -> int:",
-      "        nums.sort()",
-      "        return nums[-k]"
+      "        heap = [] # 最小堆解法",
+      "        for num in nums:",
+      "            heapq.heappush(heap, num)",
+      "            if len(heap) > k:",
+      "                heapq.heappop(heap)",
+      "        return heap[0]"
     ].join("\n"),
 
     defaultInput: "nums = [3, 2, 1, 5, 6, 4]\nk = 2",
@@ -22,7 +27,7 @@
     views: {
       vars: { type: "vars", title: "变量" },
       nums: { type: "array", title: "nums" },
-      sorted: { type: "array", title: "排序后的 nums" }
+      heap: { type: "heap", title: "最小堆 heap" }
     },
 
     parseInput: function (text) {
@@ -41,76 +46,116 @@
     },
 
     run: function (input) {
-      var nums = input.nums.slice();
-      var k = input.k;
+      var nums = input.nums, k = input.k;
       var steps = [];
-      var n = nums.length;
+      var heap = []; // 最小堆，用数组模拟
 
-      steps.push({
-        line: 2,
-        msg: "开始：在数组 nums 中找第 " + k + " 大的元素。",
-        views: {
-          vars: { k: k, n: n, "返回值": null },
-          nums: { items: nums.slice(), showIndex: true },
-          sorted: { items: [], showIndex: true }
+      // 最小堆辅助函数（sift up / sift down）
+      function heapPush(h, val) {
+        h.push(val);
+        var i = h.length - 1;
+        while (i > 0) {
+          var parent = Math.floor((i - 1) / 2);
+          if (h[parent] <= h[i]) break;
+          var tmp = h[parent]; h[parent] = h[i]; h[i] = tmp;
+          i = parent;
         }
-      });
-
-      // 模拟 Python 的 nums.sort()（升序）
-      var sortedNums = nums.slice().sort(function (a, b) { return a - b; });
-
-      // 逐步展示排序过程（简单插入排序，便于可视化）
-      var arr = nums.slice();
-      for (var i = 1; i < n; i++) {
-        var key = arr[i];
-        var j = i - 1;
-        steps.push({
-          line: 3,
-          msg: "排序中：将第 " + i + " 个元素 " + key + " 插入到已排序部分。",
-          views: {
-            vars: { k: k, n: n, "排序位置": i },
-            nums: { items: arr.slice(), highlights: [i], showIndex: true },
-            sorted: { items: arr.slice(0, i), showIndex: true }
-          }
-        });
-        while (j >= 0 && arr[j] > key) {
-          arr[j + 1] = arr[j];
-          j--;
-        }
-        arr[j + 1] = key;
-        steps.push({
-          line: 3,
-          msg: "排序中：插入完成，当前数组为 [" + arr.join(", ") + "]。",
-          views: {
-            vars: { k: k, n: n, "排序位置": i },
-            nums: { items: arr.slice(), highlights: [i], showIndex: true },
-            sorted: { items: arr.slice(0, i + 1), showIndex: true }
-          }
-        });
       }
+
+      function heapPop(h) {
+        if (h.length === 0) return null;
+        var top = h[0];
+        var last = h.pop();
+        if (h.length > 0) {
+          h[0] = last;
+          var i = 0;
+          while (true) {
+            var left = 2 * i + 1, right = 2 * i + 2, smallest = i;
+            if (left < h.length && h[left] < h[smallest]) smallest = left;
+            if (right < h.length && h[right] < h[smallest]) smallest = right;
+            if (smallest === i) break;
+            var tmp = h[i]; h[i] = h[smallest]; h[smallest] = tmp;
+            i = smallest;
+          }
+        }
+        return top;
+      }
+
+      var heapView = function (hotIdx) {
+        var items = heap.slice();
+        var highlights = [];
+        if (hotIdx != null && hotIdx >= 0 && hotIdx < items.length) highlights.push(hotIdx);
+        return { items: items, highlights: highlights };
+      };
 
       steps.push({
         line: 3,
-        msg: "排序完成，数组已升序排列。",
+        msg: "初始化一个空的最小堆，堆的大小始终不超过 k=" + k + "，堆顶就是第 k 大的元素。",
         views: {
-          vars: { k: k, n: n },
-          nums: { items: arr.slice(), showIndex: true },
-          sorted: { items: arr.slice(), showIndex: true }
+          vars: { k: k, num: null, "len(heap)": 0 },
+          nums: { items: nums.slice() },
+          heap: heapView()
         }
       });
 
-      var result = arr[n - k];
+      for (var i = 0; i < nums.length; i++) {
+        var num = nums[i];
+        steps.push({
+          line: 4,
+          msg: "遍历到第 " + (i + 1) + " 个元素 num=" + num + "。",
+          views: {
+            vars: { k: k, num: num, "len(heap)": heap.length },
+            nums: { items: nums.slice(), highlights: [i], pointers: { i: i } },
+            heap: heapView()
+          }
+        });
+
+        // 模拟 heapq.heappush
+        heapPush(heap, num);
+        steps.push({
+          line: 5,
+          msg: "将 " + num + " 压入最小堆（自动调整堆结构）。",
+          views: {
+            vars: { k: k, num: num, "len(heap)": heap.length },
+            nums: { items: nums.slice(), highlights: [i] },
+            heap: heapView(heap.length - 1)
+          }
+        });
+
+        if (heap.length > k) {
+          var popped = heapPop(heap);
+          steps.push({
+            line: 6,
+            msg: "堆大小 " + (heap.length + 1) + " 超过了 k=" + k + "，弹出堆顶 " + popped + "（当前最小的元素）。",
+            views: {
+              vars: { k: k, num: num, "len(heap)": heap.length, "弹出": popped },
+              nums: { items: nums.slice(), highlights: [i] },
+              heap: heapView()
+            }
+          });
+          steps.push({
+            line: 7,
+            msg: "执行 heapq.heappop，堆大小恢复为 " + heap.length + "。",
+            views: {
+              vars: { k: k, num: num, "len(heap)": heap.length },
+              nums: { items: nums.slice(), highlights: [i] },
+              heap: heapView()
+            }
+          });
+        }
+      }
+
       steps.push({
-        line: 4,
-        msg: "返回 nums[-k] = nums[" + (n - k) + "] = " + result + "，即第 " + k + " 大的元素。",
+        line: 8,
+        msg: "遍历结束，堆顶 " + heap[0] + " 就是第 " + k + " 大的元素。",
         views: {
-          vars: { k: k, n: n, "返回值": result },
-          nums: { items: arr.slice(), highlights: [n - k], ok: [n - k], showIndex: true },
-          sorted: { items: arr.slice(), highlights: [n - k], ok: [n - k], showIndex: true }
+          vars: { k: k, "结果": heap[0] },
+          nums: { items: nums.slice() },
+          heap: heapView(0)
         }
       });
 
-      return { steps: steps, output: JSON.stringify(result) };
+      return { steps: steps, output: JSON.stringify(heap[0]) };
     }
   };
 })(typeof window !== "undefined" ? window : this);

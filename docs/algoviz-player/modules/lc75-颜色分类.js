@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc75-颜色分类"] = {
     title: "75 颜色分类 · 三指针",
+    link: "https://leetcode.cn/problems/sort-colors/",
     language: "python",
     code: [
       "class Solution:",

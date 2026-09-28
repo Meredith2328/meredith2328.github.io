@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc560-和为-k-的子数组"] = {
     title: "560 和为 K 的子数组 · 暴力枚举",
+    link: "https://leetcode.cn/problems/subarray-sum-equals-k/",
     language: "python",
     code: [
       "class Solution:",

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc73-矩阵置零"] = {
     title: "73 矩阵置零 · 暴力标记",
+    link: "https://leetcode.cn/problems/set-matrix-zeroes/",
     language: "python",
     code: [
       "class Solution:",
@@ -30,10 +31,7 @@
       "matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]",
       "matrix = [[1,2,3],[4,5,6]]"
     ],
-    expectedOutputs: [
-      "[[0,0,0,0],[0,4,5,0],[0,3,1,0]]",
-      "[[1,2,3],[4,5,6]]"
-    ],
+    expectedOutputs: ["[[1,0,1],[0,0,0],[1,0,1]]", "[[0,0,0,0],[0,4,5,0],[0,3,1,0]]", "[[1,2,3],[4,5,6]]"],
 
     views: {
       vars: { type: "vars", title: "变量" },

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc39-组合总和-v2"] = {
     title: "39 组合总和 II · 回溯剪枝",
+    link: "https://leetcode.cn/problems/combination-sum/",
     language: "python",
     code: [
       "class Solution:",

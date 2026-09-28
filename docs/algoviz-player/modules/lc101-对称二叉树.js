@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc101-对称二叉树"] = {
     title: "101 对称二叉树 · 递归",
+    link: "https://leetcode.cn/problems/symmetric-tree/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

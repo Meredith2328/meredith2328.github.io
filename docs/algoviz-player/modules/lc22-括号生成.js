@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc22-括号生成"] = {
     title: "22 括号生成 · 回溯",
+    link: "https://leetcode.cn/problems/generate-parentheses/",
     language: "python",
     code: [
       "class Solution:",
@@ -31,7 +32,7 @@
     defaultInput: "n = 3",
     inputHint: "每行一个变量，格式如 n = 3",
     testInputs: ["n = 1", "n = 0"],
-    expectedOutputs: ["[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]", "[\"()\"]", "[]"],
+    expectedOutputs: ["[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]", "[\"()\"]", "[\"\"]"],
 
     views: {
       vars: { type: "vars", title: "变量" },

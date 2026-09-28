@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc279-完全平方数-v2"] = {
     title: "279 完全平方数 · 递归记忆化",
+    link: "https://leetcode.cn/problems/perfect-squares/",
     language: "python",
     code: [
       "class Solution:",

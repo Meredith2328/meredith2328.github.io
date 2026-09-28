@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc31-下一个排列"] = {
     title: "31 下一个排列 · 双指针翻转",
+    link: "https://leetcode.cn/problems/next-permutation/",
     language: "python",
     code: [
       "class Solution:",

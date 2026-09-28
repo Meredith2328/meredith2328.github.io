@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc416-分割等和子集"] = {
     title: "416 分割等和子集 · 动态规划",
+    link: "https://leetcode.cn/problems/partition-equal-subset-sum/",
     language: "python",
     code: [
       "class Solution:",

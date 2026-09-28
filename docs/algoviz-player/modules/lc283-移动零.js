@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc283-移动零"] = {
     title: "283 移动零 · 双指针",
+    link: "https://leetcode.cn/problems/move-zeroes/",
     language: "python",
     code: [
       "class Solution:",

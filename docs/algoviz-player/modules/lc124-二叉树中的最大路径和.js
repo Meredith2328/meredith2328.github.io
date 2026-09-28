@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc124-二叉树中的最大路径和"] = {
     title: "124 二叉树中的最大路径和 · 递归",
+    link: "https://leetcode.cn/problems/binary-tree-maximum-path-sum/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

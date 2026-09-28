@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc1-两数之和"] = {
     title: "1 两数之和 · 哈希",
+    link: "https://leetcode.cn/problems/two-sum/",
     language: "python",
     code: [
       "class Solution:",

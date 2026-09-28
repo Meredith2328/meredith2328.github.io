@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc35-搜索插入位置"] = {
     title: "35 搜索插入位置 · 二分查找",
+    link: "https://leetcode.cn/problems/search-insert-position/",
     language: "python",
     code: [
       "class Solution:",

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc131-分割回文串"] = {
     title: "131 分割回文串 · 回溯",
+    link: "https://leetcode.cn/problems/palindrome-partitioning/",
     language: "python",
     code: [
       "class Solution:",

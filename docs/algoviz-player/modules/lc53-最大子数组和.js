@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc53-最大子数组和"] = {
     title: "53 最大子数组和 · 前缀和",
+    link: "https://leetcode.cn/problems/maximum-subarray/",
     language: "python",
     code: [
       "class Solution:",

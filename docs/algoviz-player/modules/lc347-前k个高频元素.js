@@ -2,30 +2,36 @@
   global.AlgoVizModules = global.AlgoVizModules || {};
 
   global.AlgoVizModules["lc347-前k个高频元素"] = {
-    title: "347 前K个高频元素 · 堆",
+    title: "347 前K个高频元素 · 计数排序",
     language: "python",
+    link: "https://leetcode.cn/problems/top-k-frequent-elements/",
     code: [
       "class Solution:",
       "    def topKFrequent(self, nums: List[int], k: int) -> List[int]:",
       "        freq = defaultdict(int)",
       "        for num in nums:",
       "            freq[num] += 1",
-      "        items = [(-f, v) for v, f in freq.items()]",
-      "        heapq.heapify(items)",
-      "        res = []",
-      "        for i in range(k):",
-      "            res.append(heapq.heappop(items)[1])",
-      "        return res"
+      "        items = list(sorted(freq.items(), key = lambda x: -x[1]))",
+      "        return [x[0] for x in items[:k]]"
     ].join("\n"),
 
     defaultInput: "nums = [1, 1, 1, 2, 2, 3]\nk = 2",
     inputHint: "每行一个变量，格式如 nums = [1, 1, 1, 2, 2, 3] / k = 2",
+    testInputs: [
+      "nums = [1]\nk = 1",
+      "nums = [4, 1, -1, 2, -1, 2, 3]\nk = 2"
+    ],
+    expectedOutputs: [
+      "[1, 2]",
+      "[1]",
+      "[-1, 2]"
+    ],
 
     views: {
       vars: { type: "vars", title: "变量" },
       freq: { type: "vars", title: "频率表 freq" },
-      heap: { type: "heap", title: "堆 items" },
-      res: { type: "array", title: "结果 res" }
+      items: { type: "array", title: "排序后的 items" },
+      result: { type: "array", title: "结果" }
     },
 
     parseInput: function (text) {
@@ -55,123 +61,85 @@
       };
 
       steps.push({
-        line: 2, msg: "开始：统计每个数字出现的频率，然后找出前 " + k + " 个高频元素。",
+        line: 3,
+        msg: "初始化频率表 freq（默认值为 0）。",
         views: {
-          vars: { k: k, num: null, f: null, v: null, i: null },
+          vars: { k: k, num: null, freq: null, items: null },
           freq: {},
-          heap: { items: [] },
-          res: { items: [] }
+          items: { items: [] },
+          result: { items: [] }
         }
       });
 
-      // 统计频率
-      for (var idx = 0; idx < nums.length; idx++) {
-        var num = nums[idx];
+      for (var i = 0; i < nums.length; i++) {
+        var num = nums[i];
         steps.push({
-          line: 4, msg: "遍历到元素 " + num + "（下标 " + idx + "）。",
+          line: 4,
+          msg: "遍历到 nums[" + i + "] = " + num + "。",
           views: {
-            vars: { k: k, num: num, f: null, v: null, i: null },
+            vars: { k: k, num: num, i: i },
             freq: freqView(),
-            heap: { items: [] },
-            res: { items: [] }
+            items: { items: [] },
+            result: { items: [] }
           }
         });
         freq[num] = (freq[num] || 0) + 1;
         steps.push({
-          line: 5, msg: "频率加 1：" + num + " 出现 " + freq[num] + " 次。",
+          line: 5,
+          msg: "freq[" + num + "] 增加 1，变为 " + freq[num] + "。",
           views: {
-            vars: { k: k, num: num, f: null, v: null, i: null },
+            vars: { k: k, num: num, i: i },
             freq: freqView(String(num)),
-            heap: { items: [] },
-            res: { items: [] }
+            items: { items: [] },
+            result: { items: [] }
           }
         });
       }
 
-      // 构建 items 数组
-      var items = [];
-      var keys = Object.keys(freq);
-      steps.push({
-        line: 6, msg: "构建堆数组：每个元素存 (-频率, 值)，以便按频率降序。",
-        views: {
-          vars: { k: k, num: null, f: null, v: null, i: null },
-          freq: freqView(),
-          heap: { items: [] },
-          res: { items: [] }
-        }
+      var entries = [];
+      Object.keys(freq).forEach(function (key) {
+        entries.push([parseInt(key, 10), freq[key]]);
       });
-      for (var j = 0; j < keys.length; j++) {
-        var v = parseInt(keys[j], 10);
-        var f = freq[keys[j]];
-        items.push([-f, v]);
-        steps.push({
-          line: 6, msg: "加入 (" + (-f) + ", " + v + ")，对应 " + v + " 出现 " + f + " 次。",
-          views: {
-            vars: { k: k, num: null, f: f, v: v, i: null },
-            freq: freqView(),
-            heap: { items: items.map(function (p) { return p[0]; }) },
-            res: { items: [] }
-          }
-        });
-      }
+      entries.sort(function (a, b) { return b[1] - a[1]; });
 
-      // 堆化
       steps.push({
-        line: 7, msg: "对 items 进行堆化（最小堆，按 -频率 排序）。",
+        line: 6,
+        msg: "按频率降序排序，得到 items = " + JSON.stringify(entries) + "。",
         views: {
-          vars: { k: k, num: null, f: null, v: null, i: null },
+          vars: { k: k, num: null },
           freq: freqView(),
-          heap: { items: items.map(function (p) { return p[0]; }) },
-          res: { items: [] }
-        }
-      });
-      // 模拟堆化（这里直接排序，但逻辑等价）
-      items.sort(function (a, b) { return a[0] - b[0]; });
-      steps.push({
-        line: 7, msg: "堆化完成，堆顶是最小值（即频率最高的元素）。",
-        views: {
-          vars: { k: k, num: null, f: null, v: null, i: null },
-          freq: freqView(),
-          heap: { items: items.map(function (p) { return p[0]; }) },
-          res: { items: [] }
+          items: { items: entries.map(function (e) { return e[0] + ":" + e[1]; }), highlights: [] },
+          result: { items: [] }
         }
       });
 
-      // 弹出 k 个
-      var res = [];
-      for (var i = 0; i < k; i++) {
+      var result = [];
+      for (var j = 0; j < Math.min(k, entries.length); j++) {
+        result.push(entries[j][0]);
         steps.push({
-          line: 9, msg: "第 " + (i + 1) + " 次弹出：堆顶是 " + items[0][1] + "（频率 " + (-items[0][0]) + "）。",
+          line: 7,
+          msg: "取 items[" + j + "] 的元素 " + entries[j][0] + " 加入结果。",
           views: {
-            vars: { k: k, num: null, f: null, v: null, i: i },
+            vars: { k: k, num: null, j: j },
             freq: freqView(),
-            heap: { items: items.map(function (p) { return p[0]; }), highlights: [0] },
-            res: { items: res.slice() }
-          }
-        });
-        res.push(items[0][1]);
-        items.shift();
-        steps.push({
-          line: 10, msg: "将 " + res[res.length - 1] + " 加入结果，当前结果：" + JSON.stringify(res) + "。",
-          views: {
-            vars: { k: k, num: null, f: null, v: null, i: i },
-            freq: freqView(),
-            heap: { items: items.map(function (p) { return p[0]; }) },
-            res: { items: res.slice(), highlights: [res.length - 1] }
+            items: { items: entries.map(function (e) { return e[0] + ":" + e[1]; }), highlights: [j] },
+            result: { items: result.slice(), highlights: [result.length - 1] }
           }
         });
       }
 
       steps.push({
-        line: 11, msg: "返回结果：" + JSON.stringify(res) + "。",
+        line: 7,
+        msg: "返回结果 " + JSON.stringify(result) + "。",
         views: {
-          vars: { k: k, num: null, f: null, v: null, i: null },
+          vars: { k: k, num: null },
           freq: freqView(),
-          heap: { items: items.map(function (p) { return p[0]; }) },
-          res: { items: res.slice(), ok: res.map(function (_, idx) { return idx; }) }
+          items: { items: entries.map(function (e) { return e[0] + ":" + e[1]; }) },
+          result: { items: result.slice(), ok: result.map(function (_, idx) { return idx; }) }
         }
       });
-      return { steps: steps, output: JSON.stringify(res) };
+
+      return { steps: steps, output: JSON.stringify(result) };
     }
   };
 })(typeof window !== "undefined" ? window : this);

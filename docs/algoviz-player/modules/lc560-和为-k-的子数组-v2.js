@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc560-和为-k-的子数组-v2"] = {
     title: "560 和为 K 的子数组 · 前缀和+哈希",
+    link: "https://leetcode.cn/problems/subarray-sum-equals-k/",
     language: "python",
     code: [
       "class Solution:",

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc160-相交链表"] = {
     title: "160 相交链表 · 双指针",
+    link: "https://leetcode.cn/problems/intersection-of-two-linked-lists/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

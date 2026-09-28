@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc279-完全平方数"] = {
     title: "279 完全平方数 · 动态规划",
+    link: "https://leetcode.cn/problems/perfect-squares/",
     language: "python",
     code: [
       "class Solution:",

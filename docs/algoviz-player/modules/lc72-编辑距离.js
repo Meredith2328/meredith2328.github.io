@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc72-编辑距离"] = {
     title: "72 编辑距离 · 动态规划",
+    link: "https://leetcode.cn/problems/edit-distance/",
     language: "python",
     code: [
       "class Solution:",

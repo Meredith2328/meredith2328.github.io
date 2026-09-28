@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc189-轮转数组"] = {
     title: "189 轮转数组 · 切片拼接",
+    link: "https://leetcode.cn/problems/rotate-array/",
     language: "python",
     code: [
       "class Solution:",
@@ -27,10 +28,7 @@
       "nums = [-1, -100, 3, 99]\nk = 2",
       "nums = [1, 2]\nk = 3"
     ],
-    expectedOutputs: [
-      "[-100, 3, 99, -1]",
-      "[2, 1]"
-    ],
+    expectedOutputs: ["[5,6,7,1,2,3,4]", "[3,99,-1,-100]", "[2,1]"],
 
     views: {
       vars: { type: "vars", title: "变量" },

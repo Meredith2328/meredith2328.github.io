@@ -116,6 +116,36 @@
   margin-right: 12px;
 }
 .algoviz-title small { color: var(--av-mute); font-weight: 400; font-size: 11px; }
+
+/* language badge */
+.algoviz-lang {
+  font-family: var(--av-mono);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  padding: 2px 6px; line-height: 1;
+  border: 1.5px solid var(--av-ink); color: var(--av-ink);
+  white-space: nowrap; flex: none;
+}
+.algoviz-lang.av-lang-py {
+  background: rgba(52, 120, 246, 0.16);
+  border-color: rgba(52, 120, 246, 0.55);
+  color: var(--av-accent);
+}
+.algoviz-lang.av-lang-cpp {
+  background: rgba(0, 150, 175, 0.16);
+  border-color: rgba(0, 150, 175, 0.55);
+  color: #26b6c4;
+}
+html[data-theme="light"] .algoviz-lang.av-lang-cpp { color: #00979c; }
+
+/* problem link (LeetCode / Luogu) — an <a>, strip underline */
+.algoviz-btn.algoviz-link {
+  text-decoration: none;
+  color: var(--av-ink);
+  font-size: 11px;
+}
+.algoviz-btn.algoviz-link:hover { color: var(--av-ink); }
+.algoviz-title + .algoviz-lang { margin-left: 0; }
+
 .algoviz-step-label {
   color: var(--av-text); font-variant-numeric: tabular-nums; white-space: nowrap;
   font-family: var(--av-mono); font-size: 12px;

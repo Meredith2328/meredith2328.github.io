@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc41-缺失的第一个正数"] = {
     title: "41 缺失的第一个正数 · 暴力查找",
+    link: "https://leetcode.cn/problems/first-missing-positive/",
     language: "python",
     code: [
       "class Solution:",

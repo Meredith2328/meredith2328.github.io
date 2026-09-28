@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc48-旋转图像"] = {
     title: "48 旋转图像 · 转置+翻转",
+    link: "https://leetcode.cn/problems/rotate-image/",
     language: "python",
     code: [
       "class Solution:",

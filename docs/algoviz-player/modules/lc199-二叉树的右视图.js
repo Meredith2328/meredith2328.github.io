@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc199-二叉树的右视图"] = {
     title: "199 二叉树的右视图 · 层序",
+    link: "https://leetcode.cn/problems/binary-tree-right-side-view/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

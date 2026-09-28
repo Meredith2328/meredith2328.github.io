@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc19-删除链表倒数第n节点"] = {
     title: "19 删除链表的倒数第n个节点 · 双指针",
+    link: "https://leetcode.cn/problems/remove-nth-node-from-end-of-list/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

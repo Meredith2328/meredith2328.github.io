@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc230-BST中第k小元素"] = {
     title: "230 二叉搜索树中第K小的元素 · 中序遍历",
+    link: "https://leetcode.cn/problems/kth-smallest-element-in-a-bst/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

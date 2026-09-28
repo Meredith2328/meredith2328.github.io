@@ -4,22 +4,19 @@
   global.AlgoVizModules["lc56-合并区间"] = {
     title: "56 合并区间 · 排序+扫描",
     language: "python",
+    link: "https://leetcode.cn/problems/merge-intervals/",
     code: [
       "class Solution:",
       "    def merge(self, intervals: List[List[int]]) -> List[List[int]]:",
-      "        intervals.sort(key=lambda x: x[0])",
-      "        res = []",
-      "        l, r = intervals[0][0], intervals[0][1]",
-      "        for i in range(1, len(intervals)):",
-      "            if intervals[i][0] > r:",
-      "                # 无法合并, 更新为新区间",
-      "                res.append([l, r])",
-      "                l, r = intervals[i][0], intervals[i][1]",
+      "        if not intervals:",
+      "            return []",
+      "        intervals.sort()",
+      "        res = [intervals[0]]",
+      "        for start, end in intervals[1:]:",
+      "            if start <= res[-1][1]: # 可合并",
+      "                res[-1][1] = max(res[-1][1], end)",
       "            else:",
-      "                # 可以合并, 更新右端点",
-      "                r = max(r, intervals[i][1])",
-      "        if [l,r] not in res:",
-      "            res.append([l,r])",
+      "                res.append([start, end])",
       "        return res"
     ].join("\n"),
 
@@ -27,12 +24,9 @@
     inputHint: "每行一个变量，格式如 intervals = [[1,3],[2,6],[8,10],[15,18]]",
     testInputs: [
       "intervals = [[1,4],[4,5]]",
-      "intervals = [[1,4],[2,3]]"
+      "intervals = []"
     ],
-    expectedOutputs: [
-      "[[1,5]]",
-      "[[1,4]]"
-    ],
+    expectedOutputs: ["[[1,6],[8,10],[15,18]]", "[[1,5]]", "[]"],
 
     views: {
       vars: { type: "vars", title: "变量" },
@@ -50,155 +44,142 @@
         catch (e) { val = m[2]; }
         env[m[1]] = val;
       });
-      if (!Array.isArray(env.intervals) || !env.intervals.every(function (x) { return Array.isArray(x) && x.length === 2; })) {
-        throw new Error("缺少 intervals = [[a,b], ...] 或格式错误");
-      }
+      if (!Array.isArray(env.intervals)) throw new Error("缺少 intervals = [[...]]");
       return env;
     },
 
     run: function (input) {
-      var intervals = input.intervals.map(function (x) { return x.slice(); });
+      var intervals = input.intervals;
       var steps = [];
       var res = [];
-      var resView = function (hotIdx) {
-        var items = res.map(function (x) { return x.slice(); });
-        var highlights = [];
-        if (hotIdx != null && hotIdx >= 0 && hotIdx < items.length) highlights.push(hotIdx);
-        return { items: items, highlights: highlights };
+
+      var intervalsView = function (highlights, ok) {
+        return {
+          items: intervals.map(function (iv) { return "[" + iv[0] + "," + iv[1] + "]"; }),
+          highlights: highlights || [],
+          ok: ok || []
+        };
       };
 
+      var resView = function (highlights, ok) {
+        return {
+          items: res.map(function (iv) { return "[" + iv[0] + "," + iv[1] + "]"; }),
+          highlights: highlights || [],
+          ok: ok || []
+        };
+      };
+
+      // 空输入
       steps.push({
-        line: 2, msg: "开始合并区间，共 " + intervals.length + " 个区间。",
+        line: 3,
+        msg: "检查 intervals 是否为空。",
         views: {
-          vars: { l: null, r: null, i: null },
-          intervals: { items: intervals.slice() },
-          res: { items: [] }
+          vars: { intervals: intervals.length },
+          intervals: intervalsView(),
+          res: resView()
         }
       });
+      if (intervals.length === 0) {
+        steps.push({
+          line: 4,
+          msg: "intervals 为空，直接返回 []。",
+          views: {
+            vars: { intervals: intervals.length },
+            intervals: intervalsView(),
+            res: resView()
+          }
+        });
+        return { steps: steps, output: "[]" };
+      }
 
       // 排序
-      intervals.sort(function (a, b) { return a[0] - b[0]; });
+      var sorted = intervals.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+      intervals = sorted;
       steps.push({
-        line: 3, msg: "按左端点排序后：[" + intervals.map(function (x) { return "[" + x.join(",") + "]"; }).join(", ") + "]。",
+        line: 5,
+        msg: "按区间起点排序 intervals。",
         views: {
-          vars: { l: null, r: null, i: null },
-          intervals: { items: intervals.slice() },
-          res: { items: [] }
+          vars: { intervals: intervals.length },
+          intervals: intervalsView(),
+          res: resView()
         }
       });
 
+      // 初始化 res
+      res = [intervals[0].slice()];
       steps.push({
-        line: 4, msg: "初始化结果列表 res 为空。",
+        line: 6,
+        msg: "res 初始化为第一个区间 [" + res[0][0] + "," + res[0][1] + "]。",
         views: {
-          vars: { l: null, r: null, i: null },
-          intervals: { items: intervals.slice() },
-          res: { items: [] }
+          vars: { intervals: intervals.length, res: res.length },
+          intervals: intervalsView([0]),
+          res: resView([0])
         }
       });
 
-      var l = intervals[0][0], r = intervals[0][1];
-      steps.push({
-        line: 5, msg: "取第一个区间作为当前合并区间：l=" + l + ", r=" + r + "。",
-        views: {
-          vars: { l: l, r: r, i: null },
-          intervals: { items: intervals.slice(), highlights: [0] },
-          res: { items: [] }
-        }
-      });
-
+      // 遍历
       for (var i = 1; i < intervals.length; i++) {
+        var start = intervals[i][0], end = intervals[i][1];
         steps.push({
-          line: 6, msg: "遍历第 " + i + " 个区间 [" + intervals[i][0] + "," + intervals[i][1] + "]。",
+          line: 7,
+          msg: "遍历到第 " + i + " 个区间 [" + start + "," + end + "]。",
           views: {
-            vars: { l: l, r: r, i: i },
-            intervals: { items: intervals.slice(), highlights: [i] },
+            vars: { i: i, start: start, end: end, res: res.length },
+            intervals: intervalsView([i]),
             res: resView()
           }
         });
 
-        if (intervals[i][0] > r) {
+        if (start <= res[res.length - 1][1]) {
           steps.push({
-            line: 7, msg: "当前区间左端点 " + intervals[i][0] + " > 当前右端点 " + r + "，无法合并。",
+            line: 8,
+            msg: "start=" + start + " <= res 末尾右端点 " + res[res.length - 1][1] + "，可以合并。",
             views: {
-              vars: { l: l, r: r, i: i },
-              intervals: { items: intervals.slice(), highlights: [i] },
-              res: resView()
+              vars: { i: i, start: start, end: end, res: res.length },
+              intervals: intervalsView([i]),
+              res: resView([res.length - 1])
             }
           });
-
-          res.push([l, r]);
+          var oldEnd = res[res.length - 1][1];
+          res[res.length - 1][1] = Math.max(oldEnd, end);
           steps.push({
-            line: 9, msg: "将当前合并区间 [" + l + "," + r + "] 加入结果 res。",
+            line: 9,
+            msg: "更新 res 末尾右端点：max(" + oldEnd + ", " + end + ") = " + res[res.length - 1][1] + "。",
             views: {
-              vars: { l: l, r: r, i: i },
-              intervals: { items: intervals.slice(), highlights: [i] },
-              res: resView(res.length - 1)
-            }
-          });
-
-          l = intervals[i][0];
-          r = intervals[i][1];
-          steps.push({
-            line: 10, msg: "更新当前合并区间为 [" + l + "," + r + "]。",
-            views: {
-              vars: { l: l, r: r, i: i },
-              intervals: { items: intervals.slice(), highlights: [i] },
-              res: resView()
+              vars: { i: i, start: start, end: end, res: res.length },
+              intervals: intervalsView([i]),
+              res: resView([res.length - 1])
             }
           });
         } else {
           steps.push({
-            line: 12, msg: "当前区间左端点 " + intervals[i][0] + " ≤ 当前右端点 " + r + "，可以合并。",
+            line: 10,
+            msg: "start=" + start + " > res 末尾右端点 " + res[res.length - 1][1] + "，不能合并。",
             views: {
-              vars: { l: l, r: r, i: i },
-              intervals: { items: intervals.slice(), highlights: [i] },
-              res: resView()
+              vars: { i: i, start: start, end: end, res: res.length },
+              intervals: intervalsView([i]),
+              res: resView([res.length - 1])
             }
           });
-
-          var oldR = r;
-          r = Math.max(r, intervals[i][1]);
+          res.push([start, end]);
           steps.push({
-            line: 14, msg: "更新右端点：max(" + oldR + ", " + intervals[i][1] + ") = " + r + "。",
+            line: 11,
+            msg: "将 [" + start + "," + end + "] 追加到 res。",
             views: {
-              vars: { l: l, r: r, i: i },
-              intervals: { items: intervals.slice(), highlights: [i] },
-              res: resView()
+              vars: { i: i, start: start, end: end, res: res.length },
+              intervals: intervalsView([i]),
+              res: resView([res.length - 1])
             }
           });
         }
       }
 
-      var exists = false;
-      for (var j = 0; j < res.length; j++) {
-        if (res[j][0] === l && res[j][1] === r) { exists = true; break; }
-      }
-      if (!exists) {
-        res.push([l, r]);
-        steps.push({
-          line: 15, msg: "将最后一个合并区间 [" + l + "," + r + "] 加入结果 res。",
-          views: {
-            vars: { l: l, r: r, i: i },
-            intervals: { items: intervals.slice() },
-            res: resView(res.length - 1)
-          }
-        });
-      } else {
-        steps.push({
-          line: 15, msg: "最后一个合并区间 [" + l + "," + r + "] 已在 res 中，无需重复添加。",
-          views: {
-            vars: { l: l, r: r, i: i },
-            intervals: { items: intervals.slice() },
-            res: resView()
-          }
-        });
-      }
-
       steps.push({
-        line: 16, msg: "返回合并后的区间列表。",
+        line: 12,
+        msg: "遍历结束，返回合并后的区间。",
         views: {
-          vars: { l: l, r: r, i: i },
-          intervals: { items: intervals.slice() },
+          vars: { res: res.length },
+          intervals: intervalsView(),
           res: resView()
         }
       });

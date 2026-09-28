@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc84-柱状图中最大的矩形"] = {
     title: "84 柱状图中最大的矩形 · 单调栈",
+    link: "https://leetcode.cn/problems/largest-rectangle-in-histogram/",
     language: "python",
     code: [
       "class Solution:",

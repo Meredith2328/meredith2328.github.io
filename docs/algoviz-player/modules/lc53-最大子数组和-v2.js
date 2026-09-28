@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc53-最大子数组和-v2"] = {
     title: "53 最大子数组和 · 动态规划",
+    link: "https://leetcode.cn/problems/maximum-subarray/",
     language: "python",
     code: [
       "class Solution:",

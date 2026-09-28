@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc206-反转链表"] = {
     title: "206 反转链表 · 迭代",
+    link: "https://leetcode.cn/problems/reverse-linked-list/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

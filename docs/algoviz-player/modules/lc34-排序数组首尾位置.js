@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc34-排序数组首尾位置"] = {
     title: "34 在排序数组中查找元素的第一个和最后一个位置 · 二分查找",
+    link: "https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/",
     language: "python",
     code: [
       "class Solution:",

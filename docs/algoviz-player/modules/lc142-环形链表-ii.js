@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc142-环形链表-ii"] = {
     title: "142 环形链表 II · 哈希集合",
+    link: "https://leetcode.cn/problems/linked-list-cycle-ii/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

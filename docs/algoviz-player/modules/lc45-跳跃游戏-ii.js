@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc45-跳跃游戏-ii"] = {
     title: "45 跳跃游戏 II · 动态规划",
+    link: "https://leetcode.cn/problems/jump-game-ii/",
     language: "python",
     code: [
       "class Solution:",

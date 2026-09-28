@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc239-滑动窗口最大值-v2"] = {
     title: "239 滑动窗口最大值 · 最大堆",
+    link: "https://leetcode.cn/problems/sliding-window-maximum/",
     language: "python",
     code: [
       "class Solution:",

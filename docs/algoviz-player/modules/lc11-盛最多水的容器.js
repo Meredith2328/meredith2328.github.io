@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc11-盛最多水的容器"] = {
     title: "11 盛最多水的容器",
+    link: "https://leetcode.cn/problems/container-with-most-water/",
     language: "python",
     code: [
       "class Solution:",

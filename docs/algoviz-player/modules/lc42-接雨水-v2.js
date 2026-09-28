@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc42-接雨水-v2"] = {
     title: "42 接雨水 · 双指针",
+    link: "https://leetcode.cn/problems/trapping-rain-water/",
     language: "python",
     code: [
       "class Solution:",
@@ -30,10 +31,7 @@
       "height = [4,2,0,3,2,5]",
       "height = [1,2,3,4,5]"
     ],
-    expectedOutputs: [
-      "9",
-      "0"
-    ],
+    expectedOutputs: ["6", "9", "0"],
 
     views: {
       vars: { type: "vars", title: "变量" },

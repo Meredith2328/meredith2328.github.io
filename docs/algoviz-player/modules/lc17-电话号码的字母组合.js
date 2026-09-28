@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc17-电话号码的字母组合"] = {
     title: "17 电话号码的字母组合 · 回溯",
+    link: "https://leetcode.cn/problems/letter-combinations-of-a-phone-number/",
     language: "python",
     code: [
       "class Solution:",
@@ -26,7 +27,7 @@
     defaultInput: "digits = '23'",
     inputHint: "每行一个变量，格式如 digits = '23'",
     testInputs: ["digits = ''", "digits = '7'"],
-    expectedOutputs: ["[\"\"]", "[\"p\",\"q\",\"r\",\"s\"]"],
+    expectedOutputs: ["[\"ad\",\"ae\",\"af\",\"bd\",\"be\",\"bf\",\"cd\",\"ce\",\"cf\"]", "[\"\"]", "[\"p\",\"q\",\"r\",\"s\"]"],
 
     views: {
       vars: { type: "vars", title: "变量" },

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc189-轮转数组-v2"] = {
     title: "189 轮转数组 · 乘积除自身",
+    link: "https://leetcode.cn/problems/rotate-array/",
     language: "python",
     code: [
       "class Solution:",

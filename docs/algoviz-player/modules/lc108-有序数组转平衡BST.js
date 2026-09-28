@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc108-有序数组转平衡BST"] = {
     title: "108 将有序数组转换为平衡二叉搜索树 · 递归",
+    link: "https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

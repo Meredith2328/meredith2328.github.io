@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc322-零钱兑换-v2"] = {
     title: "322 零钱兑换 · 递归+记忆化",
+    link: "https://leetcode.cn/problems/coin-change/",
     language: "python",
     code: [
       "class Solution:",
@@ -38,10 +39,7 @@
       "coins = [2]\namount = 3",
       "coins = [1]\namount = 0"
     ],
-    expectedOutputs: [
-      "-1",
-      "0"
-    ],
+    expectedOutputs: ["3", "-1", "0"],
 
     views: {
       vars: { type: "vars", title: "变量" },

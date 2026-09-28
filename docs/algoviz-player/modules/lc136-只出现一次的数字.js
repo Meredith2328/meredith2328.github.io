@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc136-只出现一次的数字"] = {
     title: "136 只出现一次的数字",
+    link: "https://leetcode.cn/problems/single-number/",
     language: "python",
     code: [
       "class Solution:",

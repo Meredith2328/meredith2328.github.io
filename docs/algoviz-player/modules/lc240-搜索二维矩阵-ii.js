@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc240-搜索二维矩阵-ii"] = {
     title: "240 搜索二维矩阵 II · 逐行二分",
+    link: "https://leetcode.cn/problems/search-a-2d-matrix-ii/",
     language: "python",
     code: [
       "class Solution:",

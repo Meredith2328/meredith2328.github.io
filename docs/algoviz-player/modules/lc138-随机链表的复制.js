@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc138-随机链表的复制"] = {
     title: "138 随机链表的复制 · 哈希映射",
+    link: "https://leetcode.cn/problems/copy-list-with-random-pointer/",
     language: "python",
     code: [
       '"""',

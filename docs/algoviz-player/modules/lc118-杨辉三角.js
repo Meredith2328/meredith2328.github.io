@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc118-杨辉三角"] = {
     title: "118 杨辉三角",
+    link: "https://leetcode.cn/problems/pascals-triangle/",
     language: "python",
     code: [
       "class Solution:",

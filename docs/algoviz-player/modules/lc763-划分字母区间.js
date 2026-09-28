@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc763-划分字母区间"] = {
     title: "763 划分字母区间",
+    link: "https://leetcode.cn/problems/partition-labels/",
     language: "python",
     code: [
       "class Solution:",

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc76-最小覆盖子串"] = {
     title: "76 最小覆盖子串 · 滑动窗口",
+    link: "https://leetcode.cn/problems/minimum-window-substring/",
     language: "python",
     code: [
       "class Solution:",

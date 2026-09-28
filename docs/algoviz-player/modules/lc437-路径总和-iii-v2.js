@@ -2,6 +2,7 @@
   global.AlgoVizModules = global.AlgoVizModules || {};
   global.AlgoVizModules["lc437-路径总和-iii-v2"] = {
     title: "437 路径总和 III · 前缀和+回溯",
+    link: "https://leetcode.cn/problems/path-sum-iii/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

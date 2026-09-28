@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc234-回文链表"] = {
     title: "234 回文链表 · 转数组比较",
+    link: "https://leetcode.cn/problems/palindrome-linked-list/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

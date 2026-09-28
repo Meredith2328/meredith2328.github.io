@@ -1,8 +1,9 @@
 (function (global) {
   global.AlgoVizModules = global.AlgoVizModules || {};
 
-  global.AlgoVizModules["lc72-编辑距离-v2"] = {
+  global.AlgoVizModules["lc312-戳气球"] = {
     title: "312 戳气球 · 区间DP",
+    link: "https://leetcode.cn/problems/burst-balloons/",
     language: "python",
     code: [
       "class Solution:",

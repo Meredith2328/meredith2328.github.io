@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc543-二叉树的直径"] = {
     title: "543 二叉树的直径",
+    link: "https://leetcode.cn/problems/diameter-of-binary-tree/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

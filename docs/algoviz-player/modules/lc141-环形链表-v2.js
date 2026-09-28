@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc141-环形链表-v2"] = {
     title: "141 环形链表 · 快慢指针",
+    link: "https://leetcode.cn/problems/linked-list-cycle/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

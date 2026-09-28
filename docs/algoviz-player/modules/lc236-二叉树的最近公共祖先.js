@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc236-二叉树的最近公共祖先"] = {
     title: "236 二叉树的最近公共祖先 · 后序递归",
+    link: "https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

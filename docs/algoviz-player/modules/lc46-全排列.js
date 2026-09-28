@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc46-全排列"] = {
     title: "46 全排列 · 回溯",
+    link: "https://leetcode.cn/problems/permutations/",
     language: "python",
     code: [
       "class Solution:",

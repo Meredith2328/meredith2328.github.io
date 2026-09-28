@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc128-最长连续序列"] = {
     title: "128 最长连续序列 · HashSet剪枝",
+    link: "https://leetcode.cn/problems/longest-consecutive-sequence/",
     language: "python",
     code: [
       "class Solution:",

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc102-二叉树的层序遍历"] = {
     title: "102 二叉树的层序遍历 · 队列",
+    link: "https://leetcode.cn/problems/binary-tree-level-order-traversal/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

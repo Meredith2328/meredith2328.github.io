@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc152-乘积最大子数组"] = {
     title: "152 乘积最大子数组 · 动态规划",
+    link: "https://leetcode.cn/problems/maximum-product-subarray/",
     language: "python",
     code: [
       "class Solution:",

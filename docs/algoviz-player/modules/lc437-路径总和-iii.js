@@ -4,6 +4,7 @@
   global.AlgoVizModules["lc437-路径总和-iii"] = {
     title: "437 路径总和 III · 双重递归",
     language: "python",
+    link: "https://leetcode.cn/problems/path-sum-iii/",
     code: [
       "# Definition for a binary tree node.",
       "# class TreeNode:",
@@ -31,16 +32,12 @@
     ].join("\n"),
 
     defaultInput: "root = [10,5,-3,3,2,null,11,3,-2,null,1]\ntargetSum = 8",
-    inputHint: "每行一个变量，格式如 root = [10,5,-3,3,2,null,11,3,-2,null,1] / targetSum = 8",
+    inputHint: "每行一个变量，root 用层序遍历数组表示（null 表示空节点），targetSum 为整数",
     testInputs: [
       "root = [1,null,2,null,3]\ntargetSum = 3",
       "root = []\ntargetSum = 0"
     ],
-    expectedOutputs: [
-      "3",
-      "1",
-      "0"
-    ],
+    expectedOutputs: ["3", "2", "0"],
 
     views: {
       vars: { type: "vars", title: "变量" },
@@ -58,170 +55,175 @@
         catch (e) { val = m[2]; }
         env[m[1]] = val;
       });
-      if (!Array.isArray(env.root)) throw new Error("缺少 root = [...]");
+      if (!Array.isArray(env.root)) throw new Error("缺少 root = [...]（层序遍历数组）");
       if (typeof env.targetSum !== "number") throw new Error("缺少 targetSum = 数字");
       return env;
     },
 
     run: function (input) {
-      var rootArr = input.root, targetSum = input.targetSum;
+      var arr = input.root;
+      var targetSum = input.targetSum;
       var steps = [];
 
-      // Build tree from array (level order)
+      // Build tree from level-order array
       function buildTree(arr) {
-        if (!arr || arr.length === 0) return null;
-        var nodes = arr.map(function (v) { return v === null ? null : { val: v, left: null, right: null }; });
-        for (var i = 0; i < nodes.length; i++) {
-          if (nodes[i] === null) continue;
-          var leftIdx = 2 * i + 1, rightIdx = 2 * i + 2;
-          if (leftIdx < nodes.length) nodes[i].left = nodes[leftIdx];
-          if (rightIdx < nodes.length) nodes[i].right = nodes[rightIdx];
+        if (!arr || arr.length === 0 || arr[0] === null) return null;
+        var root = { val: arr[0], left: null, right: null };
+        var queue = [root];
+        var i = 1;
+        while (i < arr.length) {
+          var node = queue.shift();
+          if (node) {
+            if (i < arr.length && arr[i] !== null) {
+              node.left = { val: arr[i], left: null, right: null };
+              queue.push(node.left);
+            }
+            i++;
+            if (i < arr.length && arr[i] !== null) {
+              node.right = { val: arr[i], left: null, right: null };
+              queue.push(node.right);
+            }
+            i++;
+          }
         }
-        return nodes[0];
+        return root;
       }
 
-      var root = buildTree(rootArr);
+      var root = buildTree(arr);
 
-      // Tree view builder
-      function treeView(root, hiNode, okNode) {
-        function build(node) {
-          if (!node) return null;
-          var status = null;
-          if (node === hiNode) status = "hi";
-          if (node === okNode) status = "ok";
-          return { val: node.val, children: [build(node.left), build(node.right)].filter(Boolean), status: status };
-        }
-        return { root: build(root) };
+      // Helper to convert tree to view format
+      function treeView(node, statusMap) {
+        if (!node) return null;
+        var obj = { val: node.val, children: [] };
+        if (statusMap && statusMap[node.id]) obj.status = statusMap[node.id];
+        if (node.left) obj.children.push(treeView(node.left, statusMap));
+        if (node.right) obj.children.push(treeView(node.right, statusMap));
+        return obj;
       }
 
-      // Callstack view builder
-      function callstackView(frames) {
-        return { frames: frames.slice() };
+      // Assign ids to nodes for status tracking
+      var nodeId = 0;
+      function assignIds(node) {
+        if (!node) return;
+        node.id = nodeId++;
+        assignIds(node.left);
+        assignIds(node.right);
       }
+      assignIds(root);
 
-      // Helper to get node label
-      function nodeLabel(node) {
-        return node ? String(node.val) : "null";
-      }
-
-      // Recursive countPaths
-      var callstack = [];
       var totalCount = 0;
+      var callStack = [];
 
-      function countPaths(node, tSum, indent) {
+      // countPaths function
+      function countPaths(node, t, depth) {
+        if (!node) {
+          callStack.push("countPaths(null, " + t + ")");
+          steps.push({
+            line: 13,
+            msg: "countPaths 遇到空节点，返回 0。",
+            views: {
+              vars: { node: "null", targetSum: t, count: 0 },
+              tree: { root: treeView(root, {}) },
+              callstack: { frames: callStack.slice() }
+            }
+          });
+          callStack.pop();
+          return 0;
+        }
+
+        callStack.push("countPaths(" + node.val + ", " + t + ")");
+        var count = (node.val === t) ? 1 : 0;
+        steps.push({
+          line: 15,
+          msg: "countPaths(" + node.val + ", " + t + ")：当前节点值 " + node.val + (count ? " 等于目标 " + t + "，count=1" : " 不等于目标 " + t + "，count=0") + "。",
+          views: {
+            vars: { node: node.val, targetSum: t, count: count },
+            tree: { root: treeView(root, { [node.id]: "hi" }) },
+            callstack: { frames: callStack.slice() }
+          }
+        });
+
+        // Left
+        var leftCount = countPaths(node.left, t - node.val, depth + 1);
+        count += leftCount;
+        steps.push({
+          line: 16,
+          msg: "左子树返回 " + leftCount + "，累计 count=" + count + "。",
+          views: {
+            vars: { node: node.val, targetSum: t, count: count, leftCount: leftCount },
+            tree: { root: treeView(root, {}) },
+            callstack: { frames: callStack.slice() }
+          }
+        });
+
+        // Right
+        var rightCount = countPaths(node.right, t - node.val, depth + 1);
+        count += rightCount;
+        steps.push({
+          line: 17,
+          msg: "右子树返回 " + rightCount + "，累计 count=" + count + "。",
+          views: {
+            vars: { node: node.val, targetSum: t, count: count, rightCount: rightCount },
+            tree: { root: treeView(root, {}) },
+            callstack: { frames: callStack.slice() }
+          }
+        });
+
+        callStack.pop();
+        return count;
+      }
+
+      // pathSum function
+      function pathSum(node, t) {
         if (!node) {
           steps.push({
-            line: 13, msg: "countPaths(" + nodeLabel(node) + ", " + tSum + ")：节点为空，返回 0。",
+            line: 8,
+            msg: "pathSum 遇到空节点，返回 0。",
             views: {
-              vars: { targetSum: targetSum, "当前节点": "null", "剩余和": tSum, "累计路径数": totalCount },
-              tree: treeView(root, node, null),
-              callstack: callstackView(callstack)
+              vars: { root: "null", targetSum: t, result: 0 },
+              tree: { root: null },
+              callstack: { frames: [] }
             }
           });
           return 0;
         }
 
-        callstack.push("countPaths(" + node.val + ", " + tSum + ")");
         steps.push({
-          line: 12, msg: "进入 countPaths(" + node.val + ", " + tSum + ")，检查节点 " + node.val + "。",
+          line: 7,
+          msg: "pathSum(" + node.val + ", " + t + ")：开始处理节点 " + node.val + "。",
           views: {
-            vars: { targetSum: targetSum, "当前节点": node.val, "剩余和": tSum, "累计路径数": totalCount },
-            tree: treeView(root, node, null),
-            callstack: callstackView(callstack)
+            vars: { root: node.val, targetSum: t },
+            tree: { root: treeView(root, { [node.id]: "hi" }) },
+            callstack: { frames: [] }
           }
         });
 
-        var count = (node.val === tSum) ? 1 : 0;
+        var c = countPaths(node, t, 0);
+        totalCount += c;
         steps.push({
-          line: 14, msg: "节点值 " + node.val + " 等于剩余和 " + tSum + "？" + (count === 1 ? "是，计数 +1。" : "否，计数不变。") + " 当前 count=" + count + "。",
+          line: 21,
+          msg: "countPaths(" + node.val + ", " + t + ") 返回 " + c + "，累计总数 total=" + totalCount + "。",
           views: {
-            vars: { targetSum: targetSum, "当前节点": node.val, "剩余和": tSum, "count": count, "累计路径数": totalCount },
-            tree: treeView(root, node, count === 1 ? node : null),
-            callstack: callstackView(callstack)
+            vars: { root: node.val, targetSum: t, countPathsResult: c, total: totalCount },
+            tree: { root: treeView(root, {}) },
+            callstack: { frames: [] }
           }
         });
 
-        // Left child
-        steps.push({
-          line: 15, msg: "递归计算左子树，剩余和变为 " + (tSum - node.val) + "。",
-          views: {
-            vars: { targetSum: targetSum, "当前节点": node.val, "剩余和": tSum - node.val, "count": count, "累计路径数": totalCount },
-            tree: treeView(root, node, null),
-            callstack: callstackView(callstack)
-          }
-        });
-        count += countPaths(node.left, tSum - node.val);
-
-        // Right child
-        steps.push({
-          line: 16, msg: "递归计算右子树，剩余和变为 " + (tSum - node.val) + "。",
-          views: {
-            vars: { targetSum: targetSum, "当前节点": node.val, "剩余和": tSum - node.val, "count": count, "累计路径数": totalCount },
-            tree: treeView(root, node, null),
-            callstack: callstackView(callstack)
-          }
-        });
-        count += countPaths(node.right, tSum - node.val);
-
-        callstack.pop();
-        steps.push({
-          line: 17, msg: "返回 count=" + count + "（从节点 " + node.val + " 开始的路径数）。",
-          views: {
-            vars: { targetSum: targetSum, "当前节点": node.val, "count": count, "累计路径数": totalCount },
-            tree: treeView(root, node, null),
-            callstack: callstackView(callstack)
-          }
-        });
-        return count;
-      }
-
-      // Main pathSum
-      steps.push({
-        line: 7, msg: "开始 pathSum：目标路径和为 " + targetSum + "。",
-        views: {
-          vars: { targetSum: targetSum, "累计路径数": 0 },
-          tree: treeView(root, null, null),
-          callstack: callstackView([])
-        }
-      });
-
-      if (!root) {
-        steps.push({
-          line: 8, msg: "根节点为空，直接返回 0。",
-          views: {
-            vars: { targetSum: targetSum, "累计路径数": 0 },
-            tree: treeView(null, null, null),
-            callstack: callstackView([])
-          }
-        });
-        return { steps: steps, output: "0" };
-      }
-
-      // Main recursive pathSum
-      function pathSum(node, tSum) {
-        if (!node) return 0;
-        var res = countPaths(node, tSum);
-        totalCount += res;
-        steps.push({
-          line: 20, msg: "从节点 " + node.val + " 开始的路径数为 " + res + "，累计总数变为 " + totalCount + "。",
-          views: {
-            vars: { targetSum: targetSum, "当前节点": node.val, "累计路径数": totalCount },
-            tree: treeView(root, node, null),
-            callstack: callstackView([])
-          }
-        });
-        res += pathSum(node.left, tSum);
-        res += pathSum(node.right, tSum);
-        return res;
+        var leftResult = pathSum(node.left, t);
+        var rightResult = pathSum(node.right, t);
+        return c + leftResult + rightResult;
       }
 
       var result = pathSum(root, targetSum);
+
       steps.push({
-        line: 20, msg: "最终结果：路径总和为 " + targetSum + " 的路径共有 " + result + " 条。",
+        line: 21,
+        msg: "最终结果：路径总和为 " + targetSum + " 的路径共有 " + result + " 条。",
         views: {
-          vars: { targetSum: targetSum, "累计路径数": result },
-          tree: treeView(root, null, null),
-          callstack: callstackView([])
+          vars: { targetSum: targetSum, result: result },
+          tree: { root: treeView(root, {}) },
+          callstack: { frames: [] }
         }
       });
 

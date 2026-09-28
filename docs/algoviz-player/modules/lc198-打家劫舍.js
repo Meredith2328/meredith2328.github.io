@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc198-打家劫舍"] = {
     title: "198 打家劫舍 · 动态规划",
+    link: "https://leetcode.cn/problems/house-robber/",
     language: "python",
     code: [
       "class Solution:",

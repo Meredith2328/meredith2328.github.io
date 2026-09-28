@@ -2,6 +2,7 @@
   global.AlgoVizModules = global.AlgoVizModules || {};
   global.AlgoVizModules["lc394-字符串解码"] = {
     title: "394 字符串解码 · 双栈",
+    link: "https://leetcode.cn/problems/decode-string/",
     language: "python",
     code: [
       "class Solution:",

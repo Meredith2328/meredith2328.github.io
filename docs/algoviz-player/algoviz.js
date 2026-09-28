@@ -2,7 +2,9 @@
  *
  * A "module" is a JS file defining window.AlgoVizModules[id] = {...}:
  *   {
- *     title, language ("python"), code: "original source code",
+ *     title, language ("python"|"cpp", optional, defaults "python"),
+ *     link: "original problem URL (optional, LeetCode/Luogu only)",
+ *     code: "original source code",
  *     defaultInput: "editable text", inputHint: "how to format the text",
  *     views: { key: {type, title}, ... },          // ordered view layout
  *     parseInput(text) -> input,                    // optional, default: raw text
@@ -87,6 +89,36 @@
       else if (/^[A-Za-z_]/.test(t)) {
         var next = line[m.index + t.length];
         if (PY_KW.has(t)) out += '<span class="av-kw">' + esc(t) + "</span>";
+        else if (next === "(") out += '<span class="av-fn">' + esc(t) + "</span>";
+        else out += esc(t);
+      } else out += esc(t);
+    }
+    return out;
+  }
+
+
+  /* ---------------- C++ highlighter ---------------- */
+  var CPP_KW = new Set(("int long short unsigned signed bool char double float void auto "
+    + "if else for while do switch case default break continue return goto "
+    + "class struct union enum private public protected virtual static const "
+    + "constexpr template typename typedef namespace using new delete sizeof "
+    + "this friend operator inline extern explicit mutable nullptr true false "
+    + "include std not and or try catch throw").split(" "));
+
+  function hlCpp(line) {
+    var com = /^\s*\/\//.test(line);
+    if (com) return '<span class="av-com">' + esc(line) + "</span>";
+    var out = "", m;
+    var tok = /(\/\/.*|"(?:[^"\\]|\\.)*"|'[^']*'|\b\d+(?:\.\d+)?\b|[A-Za-z_]\w*|\s+|.)/g;
+    while ((m = tok.exec(line)) !== null) {
+      var t = m[0];
+      if (t.slice(0, 2) === "//") { out += '<span class="av-com">' + esc(line.slice(m.index)) + "</span>"; break; }
+      else if (/^"/.test(t)) out += '<span class="av-str">' + esc(t) + "</span>";
+      else if (/^'/.test(t)) out += '<span class="av-ch">' + esc(t) + "</span>";
+      else if (/^\d/.test(t)) out += '<span class="av-num">' + esc(t) + "</span>";
+      else if (/^[A-Za-z_]/.test(t)) {
+        var next = line[m.index + t.length];
+        if (CPP_KW.has(t)) out += '<span class="av-kw">' + esc(t) + "</span>";
         else if (next === "(") out += '<span class="av-fn">' + esc(t) + "</span>";
         else out += esc(t);
       } else out += esc(t);
@@ -375,18 +407,39 @@
     var collapseBtn = h("button", { class: "algoviz-btn", text: "收起 ▲", title: "收起播放器（保留进度）" });
     var slider = h("input", { class: "algoviz-progress", type: "range", min: "0", max: "0", value: "0" });
 
+    // --- language badge + problem link (LeetCode / Luogu only) ---
+    var langBadge = null;
+    if (mod.language === "cpp") {
+      langBadge = h("span", { class: "algoviz-lang av-lang-cpp", text: "C++" });
+    } else if (mod.language === "python") {
+      langBadge = h("span", { class: "algoviz-lang av-lang-py", text: "Python" });
+    }
+    var linkBtn = null;
+    var lhref = mod.link;
+    if (lhref && /(^|[./])leetcode\.(cn|com)/.test(lhref)) {
+      linkBtn = h("a", { class: "algoviz-btn algoviz-link", href: lhref, target: "_blank", rel: "noopener", title: "打开 LeetCode 原题" }, [
+        h("span", { text: "◈ 原题" })
+      ]);
+    } else if (lhref && /luogu\.com\.cn/.test(lhref)) {
+      linkBtn = h("a", { class: "algoviz-btn algoviz-link", href: lhref, target: "_blank", rel: "noopener", title: "打开洛谷原题" }, [
+        h("span", { text: "◈ 原题" })
+      ]);
+    }
+
     var header = h("div", { class: "algoviz-header" }, [
       h("div", { class: "algoviz-title", html: esc(mod.title || mod.id || "") + "<small>algoviz</small>" }),
+      langBadge, linkBtn,
       firstBtn, prevBtn, playBtn, nextBtn, lastBtn, speedSel,
       slider, stepLabel, editBtn, collapseBtn
     ]);
 
     // --- code panel
+    var hl = mod.language === "cpp" ? hlCpp : hlPython;
     var codeTable = h("table");
     var rowEls = codeLines.map(function (src, i) {
       var tr = h("tr", null, [
         h("td", { class: "av-ln", text: String(i + 1) }),
-        h("td", { class: "av-src", html: hlPython(src) || "&nbsp;" })
+        h("td", { class: "av-src", html: hl(src) || "&nbsp;" })
       ]);
       codeTable.appendChild(tr);
       return tr;

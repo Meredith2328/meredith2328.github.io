@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc105-从前序中序构造二叉树"] = {
     title: "105 从前序和中序遍历序列构造二叉树 · 递归",
+    link: "https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

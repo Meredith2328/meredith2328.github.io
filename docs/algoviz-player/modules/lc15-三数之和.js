@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc15-三数之和"] = {
     title: "15 三数之和 · 暴力+哈希",
+    link: "https://leetcode.cn/problems/3sum/",
     language: "python",
     code: [
       "class Solution:",

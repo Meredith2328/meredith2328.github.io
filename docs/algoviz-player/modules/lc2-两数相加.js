@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc2-两数相加"] = {
     title: "2 两数相加",
+    link: "https://leetcode.cn/problems/add-two-numbers/",
     language: "python",
     code: [
       "# Definition for singly-linked list.",

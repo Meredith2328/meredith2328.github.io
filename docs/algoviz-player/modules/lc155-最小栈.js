@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc155-最小栈"] = {
     title: "155 最小栈 · 有序辅助栈",
+    link: "https://leetcode.cn/problems/min-stack/",
     language: "python",
     code: [
       "class MinStack:",

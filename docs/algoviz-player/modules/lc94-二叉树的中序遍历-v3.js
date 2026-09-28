@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc94-二叉树的中序遍历-v3"] = {
     title: "94 二叉树的中序遍历 · 递归",
+    link: "https://leetcode.cn/problems/binary-tree-inorder-traversal/",
     language: "python",
     code: [
       "# Definition for a binary tree node.",

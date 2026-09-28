@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc739-每日温度"] = {
     title: "739 每日温度 · 单调栈",
+    link: "https://leetcode.cn/problems/daily-temperatures/",
     language: "python",
     code: [
       "class Solution:",

@@ -3,6 +3,7 @@
 
   global.AlgoVizModules["lc139-单词拆分"] = {
     title: "139 单词拆分 · 动态规划",
+    link: "https://leetcode.cn/problems/word-break/",
     language: "python",
     code: [
       "class Solution:",
@@ -27,10 +28,7 @@
       "s = \"applepenapple\"\nwordDict = [\"apple\", \"pen\"]",
       "s = \"catsandog\"\nwordDict = [\"cats\", \"dog\", \"sand\", \"and\", \"cat\"]"
     ],
-    expectedOutputs: [
-      "true",
-      "false"
-    ],
+    expectedOutputs: ["true", "true", "false"],
 
     views: {
       vars: { type: "vars", title: "变量" },
