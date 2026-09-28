@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#f7f7f7">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self' data:; connect-src 'self' https://api.github.com; form-action 'none'; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>pilog · 手机写作</title>
+<link rel="stylesheet" href="/css/fonts.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("pilog.theme");
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = t;
+    } catch (e) { /* storage blocked: stay light */ }
+  })();
+</script>
+<style>
+:root {
+  --paper: #f7f7f7; --panel: #f1f3f4; --hairline: #dadce0; --ink: #3c4043;
+  --text: #5f6368; --mute: #9aa0a6; --shadow: #e8eaed; --accent: #1a73e8;
+  --highlight: #fbbc04; --raise: #ffffff; --accent-soft: #e8f0fe; --hl-bg: #fff8e1;
+  --table-stripe: #fbfbfb; --ok: #188038; --danger: #c5221f; --scrim: rgba(32, 33, 36, .42);
+  --sans: "Inter", "PingFang SC", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC",
+    "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Code", "SF Mono", ui-monospace, "Roboto Mono", Menlo, Consolas, monospace;
+  --write: "JetBrains Mono", "Cascadia Code", "SF Mono", ui-monospace, "Roboto Mono",
+    "PingFang SC", "Noto Sans SC", "Noto Sans CJK SC", monospace;
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  --paper: #17181a; --panel: #232529; --hairline: #3d4045; --ink: #e4e6e9;
+  --text: #b4b8bd; --mute: #82868b; --shadow: #0c0d0e; --accent: #7cabf5;
+  --highlight: #fdd663; --raise: #1d1f22; --accent-soft: #24344f; --hl-bg: #40361a;
+  --table-stripe: #1d1f22; --ok: #6fcf8e; --danger: #f08a84; --scrim: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink);
+  font: 16px/1.6 var(--sans); -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior: none;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.pix { display: inline-block; flex: none; }
+.pix svg { display: block; width: 100%; height: 100%; }
+
+/* ---------- app shell ---------- */
+.app {
+  position: fixed; left: 0; right: 0; top: 0; margin: 0 auto; max-width: 760px;
+  height: var(--app-h, 100dvh); display: flex; flex-direction: column; background: var(--paper);
+}
+@media (min-width: 780px) {
+  body { background: var(--panel); }
+  .app { border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); box-shadow: 6px 0 0 var(--shadow); }
+}
+.bar {
+  flex: none; display: flex; align-items: center; gap: 8px;
+  padding: calc(env(safe-area-inset-top) + 6px) max(12px, env(safe-area-inset-right)) 6px max(12px, env(safe-area-inset-left));
+  border-bottom: 2px solid var(--ink); background: var(--paper); min-height: 58px;
+}
+.brand { display: flex; align-items: center; gap: 9px; min-width: 0; color: var(--ink); text-decoration: none; }
+.brand .pix { width: 26px; height: 24px; }
+.brand-t {
+  font: 700 12px/1 var(--mono); letter-spacing: .14em; background: var(--ink); color: var(--paper);
+  padding: 7px 8px 6px; white-space: nowrap;
+}
+.save {
+  margin-left: auto; display: flex; align-items: center; gap: 7px; min-width: 0;
+  font: 11px/1 var(--mono); color: var(--mute); white-space: nowrap; overflow: hidden;
+}
+.save i { width: 8px; height: 8px; flex: none; background: var(--ok); }
+.save.is-dirty i { background: transparent; box-shadow: inset 0 0 0 2px var(--mute); }
+.save-c { color: var(--mute); }
+@media (max-width: 389px) { .save-c { display: none; } .brand-t { letter-spacing: .08em; } }
+.save.is-err { color: var(--danger); }
+.save.is-err i { background: var(--danger); }
+.sq {
+  flex: none; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid var(--ink); background: var(--paper); font: 700 15px/1 var(--mono); color: var(--ink);
+}
+.sq:active { background: var(--ink); color: var(--paper); }
+
+/* pixel button, same language as the blog's PLAY / tab boxes */
+.pbtn {
+  min-height: 48px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+  font: 700 13px/1.2 var(--mono); letter-spacing: .06em; box-shadow: 3px 3px 0 var(--shadow); text-decoration: none;
+  white-space: nowrap;
+}
+.pbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+.pbtn.primary { background: var(--ink); color: var(--paper); }
+.pbtn.block { width: 100%; white-space: normal; }
+.bar .pbtn { padding: 0 12px; min-height: 44px; }
+.pbtn .pix { width: 15px; height: 13px; }
+.pbtn .n { font-size: 11px; padding: 2px 6px; background: var(--ink); color: var(--paper); }
+.pbtn.primary .n { background: var(--paper); color: var(--ink); }
+.pbtn.danger { border-color: var(--danger); color: var(--danger); box-shadow: none; }
+.pbtn.danger.is-armed { background: var(--danger); color: #fff; }
+.pbtn.soon {
+  border-style: dashed; border-color: var(--mute); color: var(--mute); box-shadow: none; cursor: not-allowed;
+  justify-content: space-between; text-align: left;
+}
+.pbtn.soon:active { transform: none; }
+.badge {
+  font: 700 10px/1 var(--mono); letter-spacing: .08em; padding: 3px 5px; border: 1px solid currentColor; white-space: nowrap;
+}
+.badge.ink { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.badge.hl { background: var(--highlight); color: #3a3d40; border-color: var(--highlight); }
+
+.views { flex: 1; min-height: 0; position: relative; }
+.view {
+  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; display: none;
+  padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
+}
+.app[data-view="meta"] #view-meta,
+.app[data-view="preview"] #view-preview { display: block; }
+.app[data-view="write"] #view-write { display: flex; flex-direction: column; overflow: hidden; }
+
+/* ---------- write view ---------- */
+.doc-head { flex: none; padding: 16px 18px 0; }
+.doc-title {
+  display: block; width: 100%; border: 0; border-radius: 0; background: transparent; outline: none;
+  font: 700 23px/1.4 var(--sans); letter-spacing: .01em; color: var(--ink); padding: 2px 0 10px;
+  border-bottom: 1px solid var(--hairline);
+}
+.doc-title::placeholder { color: var(--mute); font-weight: 500; }
+.doc-title:focus { border-bottom-color: var(--ink); }
+.doc-path {
+  display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0; border: 0; background: none;
+  font: 12px/1.3 var(--mono); color: var(--mute); text-align: left; overflow: hidden;
+}
+.doc-path .p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.doc-path .p b { color: var(--ink); font-weight: 700; }
+.doc-path .go { margin-left: auto; flex: none; color: var(--accent); }
+.doc-body {
+  flex: 1; min-height: 0; display: block; width: 100%; resize: none; border: 0; border-radius: 0; outline: none;
+  background: transparent; color: var(--ink); font: 16px/1.85 var(--write); letter-spacing: .01em;
+  padding: 6px 18px 96px; tab-size: 4; caret-color: var(--accent);
+}
+.doc-body::placeholder { color: var(--mute); opacity: 1; }
+.doc-body::selection, .doc-title::selection { background: var(--accent-soft); }
+
+/* ---------- meta view ---------- */
+.form { padding: 4px 18px 40px; }
+.zone {
+  display: flex; align-items: center; gap: 8px; margin: 22px 0 14px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--hairline); font: 700 11px/1 var(--mono); letter-spacing: .16em; color: var(--mute);
+}
+.zone:first-child { margin-top: 18px; }
+.fld { margin-bottom: 20px; }
+.lbl {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px;
+  font: 700 12px/1.3 var(--mono); letter-spacing: .06em; color: var(--text);
+}
+.lbl small { font-weight: 400; letter-spacing: 0; color: var(--mute); text-align: right; }
+.inp {
+  display: block; width: 100%; min-height: 48px; margin: 0; padding: 10px 12px; border-radius: 0; outline: none;
+  border: 2px solid var(--hairline); background: var(--raise); color: var(--ink); font: 16px/1.5 var(--sans);
+  -webkit-appearance: none; appearance: none;
+}
+.inp:focus, .affix:focus-within { border-color: var(--ink); box-shadow: 3px 3px 0 var(--shadow); }
+.inp::placeholder, .affix input::placeholder { color: var(--mute); }
+textarea.inp { resize: vertical; min-height: 96px; }
+.inp.mono { font-family: var(--mono); font-size: 14px; }
+.affix { display: flex; align-items: stretch; border: 2px solid var(--hairline); background: var(--raise); min-height: 48px; }
+.affix span {
+  flex: none; display: flex; align-items: center; padding: 0 10px; background: var(--panel);
+  font: 13px/1 var(--mono); color: var(--mute); max-width: 45%; overflow: hidden; white-space: nowrap;
+}
+.affix span:first-child { border-right: 1px solid var(--hairline); }
+.affix span:last-child { border-left: 1px solid var(--hairline); }
+.affix input {
+  flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 0 10px;
+  font: 15px/1 var(--mono); color: var(--ink); border-radius: 0;
+}
+.row { display: flex; gap: 10px; align-items: stretch; }
+.row > .inp { flex: 1; min-width: 0; }
+.row > .pbtn { flex: none; box-shadow: none; }
+.hint { margin: 8px 0 0; font: 12px/1.6 var(--sans); color: var(--mute); }
+.hint code, .help code, .note code {
+  font: 12px var(--mono); background: var(--panel); border: 1px solid var(--hairline); padding: 0 4px; color: var(--ink);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  min-height: 44px; padding: 0 13px; display: inline-flex; align-items: center; gap: 6px;
+  border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font: 13px/1 var(--mono);
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.chip.ghost { border: 1px dashed var(--mute); color: var(--text); padding: 0 12px; }
+.chip.ghost:active, .chip:active { transform: translate(1px, 1px); }
+.chip.tag { background: var(--raise); }
+.chip.tag .x { font-weight: 700; color: var(--mute); margin-left: 2px; }
+.chip.add { border-style: dashed; border-color: var(--accent); color: var(--accent); }
+.tag-box { border: 2px solid var(--hairline); background: var(--raise); padding: 8px; }
+.tag-box:focus-within { border-color: var(--ink); box-shadow: 3px 3px 0 var(--shadow); }
+.tag-box input {
+  flex: 1 1 120px; min-width: 120px; min-height: 44px; border: 0; outline: none; background: transparent;
+  padding: 0 6px; font: 15px/1 var(--sans); color: var(--ink);
+}
+.sugs { margin-top: 10px; }
+.sugs .chip.ghost { min-height: 40px; }
+
+.sw-row {
+  display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 8px 0;
+  border-bottom: 1px dashed var(--hairline); cursor: pointer;
+}
+.sw-row .t { flex: 1; min-width: 0; }
+.sw-row .t b { display: block; font: 700 15px/1.35 var(--sans); color: var(--ink); }
+.sw-row .t small { display: block; font: 12px/1.5 var(--sans); color: var(--mute); margin-top: 2px; }
+.sw-row code { font: 11.5px var(--mono); color: var(--text); }
+.sw {
+  -webkit-appearance: none; appearance: none; flex: none; position: relative; margin: 0;
+  width: 54px; height: 32px; border: 2px solid var(--ink); background: var(--paper); cursor: pointer; border-radius: 0;
+}
+.sw::after {
+  content: ""; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; background: var(--mute);
+  transition: transform .14s steps(3, end);
+}
+.sw:checked { background: var(--ink); }
+.sw:checked::after { transform: translateX(22px); background: var(--paper); }
+
+details.more { margin-top: 26px; border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); background: var(--paper); }
+details.more > summary {
+  list-style: none; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; cursor: pointer;
+  font: 700 12px/1 var(--mono); letter-spacing: .12em; color: var(--ink);
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "▸"; font-size: 12px; transition: transform .12s; }
+details.more[open] > summary::before { transform: rotate(90deg); }
+details.more > summary small { margin-left: auto; font-weight: 400; letter-spacing: 0; color: var(--mute); }
+details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline); }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.seg button {
+  min-height: 44px; border: 2px solid var(--ink); margin-left: -2px; background: var(--paper);
+  font: 700 12px/1 var(--mono); color: var(--ink);
+}
+.seg button:first-child { margin-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.fm { margin-top: 28px; border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); background: var(--panel); }
+.fm-h {
+  display: flex; align-items: center; gap: 8px; min-height: 44px; padding-left: 12px;
+  background: var(--ink); color: var(--paper); font: 700 11px/1 var(--mono); letter-spacing: .12em;
+}
+.fm-h button {
+  margin-left: auto; height: 44px; padding: 0 14px; border: 0; border-left: 1px solid var(--text);
+  background: none; color: var(--paper); font: 700 11px/1 var(--mono); letter-spacing: .08em;
+}
+.fm-path { padding: 8px 12px; font: 12px/1.4 var(--mono); color: var(--text); border-bottom: 1px solid var(--hairline); word-break: break-all; }
+.fm pre { margin: 0; padding: 12px; font: 12.5px/1.65 var(--mono); color: var(--ink); overflow-x: auto; white-space: pre; }
+.link-row {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; margin-top: 18px; padding: 0 2px;
+  border: 0; border-top: 1px solid var(--hairline); background: none; font: 13px/1.4 var(--sans); color: var(--text); text-align: left;
+}
+.link-row b { color: var(--accent); font: 700 13px var(--mono); margin-left: auto; }
+
+/* ---------- preview view ---------- */
+.pv-top {
+  position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px; background: var(--paper); border-bottom: 1px solid var(--hairline);
+}
+.pv-top .seg { width: 176px; }
+.pv-top small { margin-left: auto; font: 11px/1.3 var(--mono); color: var(--mute); text-align: right; }
+.post { padding: 18px 18px 72px; max-width: 820px; margin: 0 auto; }
+.post-crumb { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font: 12px/1.5 var(--mono); color: var(--text); }
+.post-title { margin: 12px 0 10px; font: 700 26px/1.35 var(--sans); letter-spacing: .01em; color: var(--ink); overflow-wrap: anywhere; }
+.post-title.is-empty { color: var(--mute); }
+.post-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin-bottom: 26px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--hairline); font: 12px/1.5 var(--mono); color: var(--mute);
+}
+.post-meta .tag { border: 1px solid var(--hairline); padding: 1px 7px; color: var(--text); }
+.post-meta .folder { margin-left: auto; }
+.empty-state {
+  border: 2px dashed var(--hairline); padding: 28px 16px; text-align: center;
+  font: 13px/1.7 var(--mono); color: var(--mute);
+}
+
+.md { font-size: 16px; line-height: 1.8; color: var(--ink); overflow-wrap: break-word; }
+.md > :first-child { margin-top: 0; }
+.md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
+  font-family: var(--mono); font-weight: 700; line-height: 1.35; margin: 1.8em 0 .7em; letter-spacing: .02em;
+}
+.md h1 { font-size: 26px; padding-bottom: 8px; border-bottom: 4px double var(--hairline); }
+.md h2 { font-size: 22px; border-left: 6px solid var(--ink); padding-left: 11px; }
+.md h3 { font-size: 18px; }
+.md h4, .md h5, .md h6 { font-size: 16px; color: var(--text); }
+.md p { margin: 0 0 1.1em; }
+.md ul, .md ol { padding-left: 1.6em; margin: 0 0 1.1em; }
+.md li { margin-bottom: .25em; }
+.md li > ul, .md li > ol { margin: .25em 0 0; }
+.md li::marker { font-family: var(--mono); color: var(--mute); }
+.md li.task { list-style: none; margin-left: -1.4em; }
+.md li.task input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0 8px 0 0; vertical-align: -2px; }
+.md blockquote {
+  margin: 0 0 1.1em; padding: 10px 16px; background: var(--accent-soft); border-left: 5px solid var(--accent); color: var(--text);
+}
+.md blockquote > :last-child { margin-bottom: 0; }
+.md .callout { border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--shadow); margin: 0 0 1.1em; }
+.md .callout-title {
+  display: flex; align-items: center; gap: 8px; padding: 7px 12px; background: #565b61; color: #f7f7f7;
+  font: 700 12px/1.4 var(--mono); letter-spacing: .08em;
+}
+.md .callout-title::before { content: "▶"; font-size: 9px; }
+.md .callout-body { padding: 10px 14px; background: var(--paper); }
+.md .callout-body > :last-child { margin-bottom: 0; }
+.md .callout-note .callout-title, .md .callout-info .callout-title { background: #1a66d0; }
+.md .callout-tip .callout-title, .md .callout-success .callout-title, .md .callout-example .callout-title { background: #15702f; }
+.md .callout-warning .callout-title { background: #f0b400; color: #3a3d40; }
+.md .callout-danger .callout-title, .md .callout-failure .callout-title,
+.md .callout-bug .callout-title, .md .callout-important .callout-title { background: #c5231d; }
+.md .callout-question .callout-title { background: #872fd4; }
+.md hr { border: none; border-top: 4px double var(--hairline); margin: 2em 0; }
+.md img { display: block; max-width: 100%; height: auto; margin: 1.2em auto; border: 2px solid var(--ink); background: var(--panel); }
+.md .img-ph {
+  display: flex; align-items: center; gap: 10px; margin: 1.2em 0; padding: 12px; min-height: 64px;
+  border: 2px solid var(--ink); background-color: var(--panel); font: 12px/1.45 var(--mono); color: var(--text);
+  background-image: radial-gradient(var(--hairline) 1px, transparent 1px); background-size: 10px 10px;
+}
+.md .img-ph .ic { flex: none; padding: 4px 6px; background: var(--ink); color: var(--paper); font-weight: 700; letter-spacing: .08em; }
+.md .img-ph .t { display: block; color: var(--ink); font-weight: 700; }
+.md .img-ph code { background: none; border: 0; padding: 0; font-size: 11.5px; color: var(--mute); word-break: break-all; }
+.md .tbl { overflow-x: auto; margin: 0 0 1.2em; }
+.md table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+.md th, .md td { border: 2px solid var(--ink); padding: 7px 12px; text-align: left; vertical-align: top; }
+.md th { background: var(--panel); font: 700 13px/1.5 var(--mono); letter-spacing: .04em; }
+.md tr:nth-child(even) td { background: var(--table-stripe); }
+.md code { font-family: var(--mono); font-size: .88em; background: var(--panel); border: 1px solid var(--hairline); padding: 1px 6px; }
+.md .code-block { position: relative; margin: 0 0 1.2em; }
+.md .code-block.has-lang { margin-top: 32px; }
+.md pre {
+  margin: 0; padding: 14px 16px; overflow-x: auto; line-height: 1.55;
+  background: var(--panel); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow);
+}
+.md pre code { background: none; border: 0; padding: 0; font-size: 13px; }
+.md .code-lang {
+  position: absolute; top: -25px; left: 0; max-width: calc(100% - 8px); padding: 6px 16px 7px;
+  font: 700 11px/1 var(--mono); letter-spacing: .08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--paper); background: var(--ink); clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 100%, 0 100%);
+}
+.md .math { font-family: var(--mono); font-size: .92em; color: var(--text); background: var(--accent-soft); padding: 0 4px; }
+.md .math-block {
+  margin: 0 0 1.2em; padding: 12px 14px; border: 1px dashed var(--mute); overflow-x: auto;
+  font: 13.5px/1.6 var(--mono); color: var(--text); white-space: pre; text-align: center;
+}
+.md a { color: var(--accent); text-decoration: none; box-shadow: inset 0 -2px 0 var(--hairline); }
+.md a.wikilink { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent-soft); }
+.md sup.fn a { font: 12px var(--mono); box-shadow: none; }
+.md .footnotes { font-size: 13px; color: var(--text); margin-top: 2.4em; }
+.md .footnotes hr { margin: 0 0 1em; }
+
+.card {
+  display: flex; min-height: 150px; background: var(--paper); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--shadow);
+}
+.card.is-hl { border-color: var(--highlight); outline: 3px solid var(--highlight); outline-offset: -3px; }
+.card-body { flex: 1; min-width: 0; padding: 14px 16px; }
+.card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font: 11px/1.4 var(--mono); color: var(--mute); }
+.card-meta .folder { margin-left: auto; border: 1px solid var(--hairline); padding: 0 6px; color: var(--text); }
+.card h3 { margin: 8px 0 6px; font: 700 18px/1.4 var(--sans); color: var(--ink); overflow-wrap: anywhere; }
+.card-pre { font-size: 13.5px; line-height: 1.7; color: var(--text); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.card-pre code { font: 12px var(--mono); background: var(--panel); border: 1px solid var(--hairline); padding: 0 4px; }
+.card-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; font: 11px/1 var(--mono); color: var(--text); }
+.card-tags span { border: 1px solid var(--hairline); padding: 3px 6px; }
+.card-img {
+  flex: 0 0 34%; max-width: 150px; border-left: 2px solid var(--ink); display: flex; align-items: center; justify-content: center;
+  padding: 8px; background-color: var(--panel); background-image: radial-gradient(var(--hairline) 1px, transparent 1px);
+  background-size: 10px 10px; font: 10.5px/1.5 var(--mono); color: var(--mute); text-align: center; word-break: break-all;
+}
+.card-note { margin: 18px 0 0; font: 12px/1.7 var(--sans); color: var(--mute); }
+
+/* ---------- dock ---------- */
+.dock {
+  flex: none; background: var(--paper); border-top: 2px solid var(--ink);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.tabs { display: flex; gap: 8px; padding: 8px 10px; }
+.seg-tabs { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); }
+.tab {
+  min-height: 54px; margin-left: -2px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  font: 700 12px/1 var(--mono); letter-spacing: .1em;
+}
+.tab:first-child { margin-left: 0; }
+.tab .pix { width: 16px; height: 14px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.cta {
+  flex: 0 0 25%; min-height: 54px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink);
+  box-shadow: 3px 3px 0 var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  font: 700 12px/1 var(--mono); letter-spacing: .1em;
+}
+.cta .pix { width: 16px; height: 14px; }
+.cta:active, .tab:active { transform: translate(1px, 1px); }
+
+.fmt { display: none; align-items: stretch; border-bottom: 1px solid var(--hairline); }
+.app[data-view="write"].is-fine .fmt,
+.app[data-view="write"].is-typing .fmt { display: flex; }
+.app.is-kb .tabs { display: none; }
+.app.is-kb .fmt { border-bottom: 0; }
+.fmt-scroll { flex: 1; min-width: 0; display: flex; overflow-x: auto; scrollbar-width: none; }
+.fmt-scroll::-webkit-scrollbar { display: none; }
+.fk {
+  flex: none; min-width: 46px; height: 48px; padding: 0 10px; border: 0; border-right: 1px solid var(--hairline);
+  background: var(--paper); color: var(--ink); font: 700 14px/1 var(--mono); white-space: nowrap;
+}
+.fk:active { background: var(--ink); color: var(--paper); }
+.fk.sep { border-right: 2px solid var(--ink); }
+.fk.big { font-size: 20px; font-weight: 400; }
+.fk i { font-style: italic; font-family: Georgia, serif; font-size: 16px; }
+.fk s { text-decoration-thickness: 2px; }
+.fk-done {
+  flex: none; height: 48px; padding: 0 16px; border: 0; background: var(--ink); color: var(--paper);
+  font: 700 13px/1 var(--mono); letter-spacing: .08em;
+}
+.app.is-fine .fk-done { display: none; }
+
+/* ---------- sheets ---------- */
+.scrim {
+  position: fixed; inset: 0; z-index: 40; background: var(--scrim); opacity: 0; pointer-events: none; transition: opacity .18s;
+}
+.scrim.is-on { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; margin: 0 auto; max-width: 760px; max-height: 88%;
+  display: flex; flex-direction: column; background: var(--paper); border-top: 2px solid var(--ink);
+  transform: translateY(104%); transition: transform .22s cubic-bezier(.2, .8, .2, 1); visibility: hidden;
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+@media (min-width: 780px) { .sheet { border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); } }
+.sheet.is-open { transform: none; visibility: visible; }
+.sheet-h {
+  flex: none; display: flex; align-items: center; gap: 10px; min-height: 52px; padding-left: 16px;
+  background: var(--ink); color: var(--paper); font: 700 13px/1 var(--mono); letter-spacing: .14em;
+}
+.sheet-h small { font-weight: 400; letter-spacing: .02em; opacity: .7; }
+.sheet-h .x {
+  margin-left: auto; width: 56px; height: 52px; border: 0; border-left: 1px solid var(--text);
+  background: none; color: var(--paper); font: 400 22px/1 var(--mono);
+}
+.sheet-b { overflow-y: auto; overscroll-behavior: contain; padding: 16px 16px 20px; }
+.stack { display: grid; gap: 12px; }
+.sub { margin: 22px 0 10px; font: 700 11px/1 var(--mono); letter-spacing: .16em; color: var(--mute); }
+
+.file { border: 2px solid var(--ink); background: var(--raise); padding: 12px 14px; }
+.file-path { font: 13px/1.5 var(--mono); color: var(--text); word-break: break-all; }
+.file-path b { color: var(--ink); }
+.file-stat { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 12px; font: 11.5px/1.4 var(--mono); color: var(--mute); }
+.note {
+  margin: 12px 0 0; padding: 9px 12px; border-left: 4px solid var(--highlight); background: var(--hl-bg);
+  font: 13px/1.6 var(--sans); color: var(--ink);
+}
+.note.ok { border-left-color: var(--ok); background: var(--panel); }
+
+.drow { display: flex; align-items: stretch; margin-bottom: 10px; border: 2px solid var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--shadow); }
+.drow.is-active { box-shadow: inset 6px 0 0 var(--ink), 3px 3px 0 var(--shadow); }
+.drow-main { flex: 1; min-width: 0; min-height: 68px; padding: 10px 12px 10px 16px; border: 0; background: none; text-align: left; }
+.drow-t { display: block; font: 700 15px/1.4 var(--sans); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drow-t.is-empty { color: var(--mute); font-weight: 500; }
+.drow-m { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 5px; font: 11.5px/1.4 var(--mono); color: var(--mute); }
+.drow-m .badge { font-size: 9.5px; padding: 2px 4px; }
+.drow-del {
+  flex: none; width: 60px; border: 0; border-left: 1px solid var(--hairline); background: none;
+  font: 700 12px/1.2 var(--mono); color: var(--text);
+}
+.drow-del.is-armed { width: 86px; background: var(--danger); color: #fff; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.two.one { grid-template-columns: 1fr; }
+
+.help ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+.help li { counter-increment: s; position: relative; padding: 0 0 18px 40px; font: 14.5px/1.75 var(--sans); color: var(--ink); }
+.help li::before {
+  content: counter(s); position: absolute; left: 0; top: 1px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  background: var(--ink); color: var(--paper); font: 700 12px/1 var(--mono);
+}
+.help li b { display: block; font: 700 14px/1.5 var(--mono); letter-spacing: .02em; }
+.help p { margin: 4px 0 0; color: var(--text); font-size: 13.5px; }
+.help pre { margin: 8px 0 0; padding: 10px 12px; background: var(--panel); border: 2px solid var(--ink); font: 12.5px/1.6 var(--mono); overflow-x: auto; }
+.help a, .note a { color: var(--accent); font-weight: 700; }
+.note.bad { border-left-color: var(--danger); }
+
+/* ---------- publish ---------- */
+.tokrow {
+  display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 0 6px 12px;
+  border: 2px solid var(--ink); background: var(--raise); font: 12px/1.45 var(--mono); color: var(--text);
+}
+.tokrow i { flex: none; width: 10px; height: 10px; box-shadow: inset 0 0 0 2px var(--mute); }
+.tokrow.is-set i { background: var(--ok); box-shadow: none; }
+.tokrow.is-bad i { background: var(--danger); box-shadow: none; }
+.tokrow .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.tokrow .t b { color: var(--ink); }
+.tokrow button {
+  flex: none; align-self: stretch; min-width: 64px; margin: -6px 0; border: 0; border-left: 2px solid var(--ink);
+  background: var(--paper); color: var(--ink); font: 700 12px/1 var(--mono); letter-spacing: .06em;
+}
+.tokrow button:active { background: var(--ink); color: var(--paper); }
+.pbtn small { font-weight: 400; letter-spacing: 0; }
+#btn-publish { justify-content: space-between; text-align: left; }
+#btn-publish[disabled]:not(.soon) { opacity: .6; cursor: progress; }
+.steps { margin: 12px 0 0; padding: 0; list-style: none; font: 12.5px/1.5 var(--mono); color: var(--text); }
+.steps li { display: flex; gap: 8px; padding: 3px 0; }
+.steps li::before { content: "□"; flex: none; color: var(--mute); }
+.steps li.is-run::before { content: "▶"; color: var(--accent); }
+.steps li.is-ok::before { content: "■"; color: var(--ok); }
+.steps li.is-err { color: var(--danger); }
+.steps li.is-err::before { content: "×"; color: var(--danger); }
+.pub-box { margin-top: 12px; border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--shadow); background: var(--paper); }
+.pub-box .h {
+  display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px;
+  background: var(--ink); color: var(--paper); font: 700 11px/1 var(--mono); letter-spacing: .12em;
+}
+.pub-box.is-ok .h { background: var(--ok); color: #fff; }
+.pub-box.is-warn .h { background: var(--highlight); color: #3a3d40; }
+.pub-box.is-err .h { background: var(--danger); color: #fff; }
+.pub-box .b { padding: 12px; font: 13.5px/1.65 var(--sans); color: var(--ink); }
+.pub-box .b p { margin: 0 0 10px; }
+.pub-box .b code { font: 12px var(--mono); background: var(--panel); border: 1px solid var(--hairline); padding: 0 4px; word-break: break-all; }
+.pub-box .url { display: block; margin: 0 0 12px; padding: 10px; border: 1px dashed var(--mute); font: 12.5px/1.5 var(--mono); color: var(--accent); word-break: break-all; text-decoration: none; }
+.pub-box .two { gap: 10px; }
+
+.toast {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 70px); z-index: 60; transform: translate(-50%, -8px);
+  max-width: min(88vw, 520px); padding: 11px 16px; background: var(--ink); color: var(--paper);
+  font: 700 12.5px/1.5 var(--mono); box-shadow: 4px 4px 0 rgba(0, 0, 0, .22); opacity: 0; pointer-events: none;
+  transition: opacity .16s, transform .16s;
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app" id="app" data-view="write">
+  <header class="bar">
+    <a class="brand" id="brand" aria-label="pilog 手机写作">
+      <span class="pix" data-pix="dino"></span>
+      <span class="brand-t">PILOG·WRITE</span>
+    </a>
+    <span class="save" id="save" role="status" aria-live="polite"><i></i><span id="save-t">就绪</span><span class="save-c" id="save-c"></span></span>
+    <button class="sq" id="btn-help" type="button" aria-label="使用说明">?</button>
+    <button class="pbtn" id="btn-drafts" type="button" aria-label="稿件列表">稿件 <span class="n" id="draft-n">1</span></button>
+  </header>
+
+  <main class="views">
+    <section class="view" id="view-meta" aria-label="文章信息">
+      <div class="form">
+        <div class="zone">▤ 位置</div>
+        <div class="fld">
+          <div class="lbl">分类目录 <small>blogs/posts/ 下的文件夹</small></div>
+          <div class="chips" id="cats" role="group" aria-label="分类"></div>
+          <div class="affix" id="cat-custom-wrap" style="margin-top:10px" hidden>
+            <span>posts/</span><input id="cat-custom" type="text" placeholder="如 notes/tools" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="done">
+          </div>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="f-slug">文件名 <small>也是文章网址的一部分</small></label>
+          <div class="row">
+            <div class="affix" style="flex:1;min-width:0">
+              <input id="f-slug" data-f="slug" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="done">
+              <span>.md</span>
+            </div>
+            <button class="pbtn" id="btn-slug" type="button">按标题</button>
+          </div>
+          <p class="hint" id="slug-hint"></p>
+        </div>
+
+        <div class="zone">▤ 基本</div>
+        <div class="fld">
+          <label class="lbl" for="f-title-m">标题 <small>留空则取正文第一个标题</small></label>
+          <input class="inp" id="f-title-m" data-f="title" type="text" autocomplete="off" enterkeyhint="done">
+        </div>
+        <div class="fld">
+          <div class="lbl">日期 <small>时间可留空</small></div>
+          <div class="row">
+            <input class="inp mono" id="f-date" data-f="date" type="date" aria-label="日期">
+            <input class="inp mono" id="f-time" data-f="time" type="time" aria-label="时间" style="flex:0 0 34%">
+            <button class="pbtn" id="btn-now" type="button">现在</button>
+          </div>
+        </div>
+        <div class="fld">
+          <div class="lbl">标签 <small>回车或逗号添加</small></div>
+          <div class="tag-box chips" id="tag-box">
+            <input id="tag-in" type="text" placeholder="添加标签…" autocomplete="off" enterkeyhint="done" aria-label="添加标签">
+          </div>
+          <div class="chips sugs" id="tag-sugs" aria-label="常用标签"></div>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="f-preview">卡片预览文本 <small id="preview-n">留空则自动截取正文</small></label>
+          <textarea class="inp" id="f-preview" data-f="preview" rows="3" placeholder="一两句话介绍这篇文章，支持 Markdown。"></textarea>
+        </div>
+        <label class="sw-row">
+          <span class="t"><b>草稿</b><small>勾选后写入 <code>draft: true</code>，这篇不会进入构建</small></span>
+          <input class="sw" type="checkbox" data-f="draft">
+        </label>
+
+        <details class="more" id="more">
+          <summary>更多字段 <small id="more-n"></small></summary>
+          <div class="in">
+            <div class="fld" style="margin-top:14px">
+              <label class="lbl" for="f-pimg">封面图 preview_image <small>相对 blogs/ 的路径</small></label>
+              <input class="inp mono" id="f-pimg" data-f="previewImage" type="text" placeholder="assets/cover.png" autocomplete="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <div class="fld">
+              <div class="lbl">全局封面 feature <small>整卡显示封面 + 文章头图</small></div>
+              <div class="seg" id="feature-seg" role="group" aria-label="feature">
+                <button type="button" data-v="off">关</button>
+                <button type="button" data-v="on">用封面图</button>
+                <button type="button" data-v="path">指定图片</button>
+              </div>
+              <input class="inp mono" id="f-fpath" data-f="featurePath" type="text" placeholder="assets/hero.png" style="margin-top:10px" autocomplete="off" autocapitalize="none" spellcheck="false" hidden>
+            </div>
+            <label class="sw-row"><span class="t"><b>置顶</b><small><code>pin</code> · 只影响卡片视图</small></span><input class="sw" type="checkbox" data-f="pin"></label>
+            <label class="sw-row"><span class="t"><b>高亮</b><small><code>highlight</code> · 三种视图都加黄色描边</small></span><input class="sw" type="checkbox" data-f="highlight"></label>
+            <label class="sw-row"><span class="t"><b>隐藏</b><small><code>hidden</code> · 保留文件，但不生成页面</small></span><input class="sw" type="checkbox" data-f="hidden"></label>
+            <div class="two" style="margin-top:18px">
+              <div class="fld">
+                <label class="lbl" for="f-order">排序 order</label>
+                <input class="inp mono" id="f-order" data-f="order" type="text" inputmode="decimal" placeholder="按日期">
+              </div>
+              <div class="fld">
+                <label class="lbl" for="f-chap">分页 chapters_per_page</label>
+                <input class="inp mono" id="f-chap" data-f="chapters" type="text" inputmode="numeric" placeholder="不分页">
+              </div>
+            </div>
+            <div class="fld" style="margin-bottom:0">
+              <label class="lbl" for="f-extra">其他 front matter <small>导入时的未知字段，原样保留</small></label>
+              <textarea class="inp mono" id="f-extra" data-f="extra" rows="2" placeholder="published: true" spellcheck="false" autocapitalize="none"></textarea>
+            </div>
+          </div>
+        </details>
+
+        <div class="fm">
+          <div class="fm-h">FRONT MATTER <button type="button" id="btn-copy-fm">复制</button></div>
+          <div class="fm-path" id="fm-path"></div>
+          <pre id="fm-pre"></pre>
+        </div>
+        <button class="link-row" type="button" data-open="help">在 Android 上怎么打开、怎么交稿？<b>说明 →</b></button>
+      </div>
+    </section>
+
+    <section class="view" id="view-write" aria-label="写作">
+      <div class="doc-head">
+        <input class="doc-title" id="f-title" data-f="title" type="text" placeholder="标题" autocomplete="off" enterkeyhint="next" aria-label="标题">
+        <button class="doc-path" id="doc-path" type="button" aria-label="编辑文件位置与信息"></button>
+      </div>
+      <textarea class="doc-body" id="f-body" data-f="body" spellcheck="false" autocapitalize="sentences" aria-label="正文"
+        placeholder="从这里开始写。&#10;&#10;## 二级标题&#10;&#10;正文支持 **加粗**、`代码`、[链接](https://)、&#10;[[另一篇文章]] 与 ![[图片.png]]。&#10;&#10;- 列表项（回车自动续写）&#10;> [!note] 提示框"></textarea>
+    </section>
+
+    <section class="view" id="view-preview" aria-label="预览">
+      <div class="pv-top">
+        <div class="seg" id="pv-seg" role="group" aria-label="预览模式">
+          <button type="button" data-v="post" aria-pressed="true">文章</button>
+          <button type="button" data-v="card" aria-pressed="false">首页卡片</button>
+        </div>
+        <small id="pv-stat"></small>
+      </div>
+      <div id="pv-out"></div>
+    </section>
+  </main>
+
+  <div class="dock">
+    <div class="fmt" id="fmt">
+      <div class="fmt-scroll" id="fmt-keys" role="toolbar" aria-label="格式">
+        <button class="fk big" type="button" data-k="undo" aria-label="撤销">↶</button>
+        <button class="fk sep big" type="button" data-k="redo" aria-label="重做">↷</button>
+        <button class="fk" type="button" data-k="h" aria-label="标题">H</button>
+        <button class="fk" type="button" data-k="b" aria-label="加粗">B</button>
+        <button class="fk" type="button" data-k="i" aria-label="斜体"><i>I</i></button>
+        <button class="fk" type="button" data-k="s" aria-label="删除线"><s>S</s></button>
+        <button class="fk sep big" type="button" data-k="code" aria-label="行内代码">`</button>
+        <button class="fk" type="button" data-k="ul" aria-label="无序列表">•</button>
+        <button class="fk" type="button" data-k="ol" aria-label="有序列表">1.</button>
+        <button class="fk" type="button" data-k="task" aria-label="任务">[ ]</button>
+        <button class="fk" type="button" data-k="quote" aria-label="引用">&gt;</button>
+        <button class="fk sep" type="button" data-k="fence" aria-label="代码块">```</button>
+        <button class="fk" type="button" data-k="link" aria-label="链接">[]()</button>
+        <button class="fk" type="button" data-k="img" aria-label="图片">![]</button>
+        <button class="fk" type="button" data-k="wiki" aria-label="站内引用">[[ ]]</button>
+        <button class="fk sep" type="button" data-k="hr" aria-label="分隔线">—</button>
+        <button class="fk" type="button" data-k="outdent" aria-label="减少缩进">⇤</button>
+        <button class="fk" type="button" data-k="indent" aria-label="增加缩进">⇥</button>
+      </div>
+      <button class="fk-done" type="button" id="btn-done">完成</button>
+    </div>
+    <nav class="tabs" aria-label="视图">
+      <div class="seg-tabs" role="tablist">
+        <button class="tab" type="button" role="tab" data-view="meta" aria-selected="false"><span class="pix" data-pix="meta"></span>信息</button>
+        <button class="tab" type="button" role="tab" data-view="write" aria-selected="true"><span class="pix" data-pix="write"></span>写作</button>
+        <button class="tab" type="button" role="tab" data-view="preview" aria-selected="false"><span class="pix" data-pix="eye"></span>预览</button>
+      </div>
+      <button class="cta" type="button" data-open="export"><span class="pix" data-pix="export"></span>导出</button>
+    </nav>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<section class="sheet" id="sheet-export" role="dialog" aria-modal="true" aria-labelledby="sh-export-t">
+  <div class="sheet-h"><span id="sh-export-t">导出</span><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b">
+    <div class="file">
+      <div class="file-path" id="ex-path"></div>
+      <div class="file-stat" id="ex-stat"></div>
+    </div>
+    <div id="ex-notes"></div>
+    <div class="stack" style="margin-top:18px">
+      <button class="pbtn primary block" type="button" id="btn-download"><span class="pix" data-pix="export"></span>下载 .md 文件</button>
+      <div class="two">
+        <button class="pbtn block" type="button" id="btn-share" hidden>分享…</button>
+        <button class="pbtn block" type="button" id="btn-copy-all">复制全文</button>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:16px">下载后把文件放进仓库的 <code id="ex-dir">blogs/posts/toy/</code>，提交推送即可发布。</p>
+
+    <div class="sub">发布到 GITHUB</div>
+    <div class="tokrow" id="tok-row"><i></i><span class="t" id="tok-row-t">令牌：未设置</span><button type="button" data-open="token">令牌</button></div>
+    <button class="pbtn soon block" type="button" id="btn-publish" style="margin-top:12px" disabled>
+      <span>发布（开 PR）<br><small id="pub-sub">→ Meredith2328/pilog · 合并到 pilog</small></span><span class="badge" id="pub-badge">LOCKED</span>
+    </button>
+    <p class="note" id="pub-lock">发布需要仓库主人在<b>这台设备</b>上设置 GitHub 令牌。没有令牌也能照常写作、预览和导出；页面不会替任何人申请或获得仓库权限。</p>
+    <ol class="steps" id="pub-steps" hidden></ol>
+    <div id="pub-out"></div>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-token" role="dialog" aria-modal="true" aria-labelledby="sh-token-t">
+  <div class="sheet-h"><span id="sh-token-t">GITHUB 令牌</span><small>仅存本机</small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b">
+    <div class="file">
+      <div class="file-path" id="tok-state">未设置</div>
+      <div class="file-stat" id="tok-where">没有令牌时「发布」保持锁定</div>
+    </div>
+    <div class="fld" style="margin-top:18px">
+      <label class="lbl" for="tok-in">粘贴 fine-grained token <small>github_pat_…</small></label>
+      <input class="inp mono" id="tok-in" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="github_pat_…">
+    </div>
+    <label class="sw-row">
+      <span class="t"><b>在这台设备上记住</b><small>关：只存本次会话（<code>sessionStorage</code>），关闭标签页即清除。开：存 <code>localStorage</code>，直到你手动清除。</small></span>
+      <input class="sw" type="checkbox" id="tok-remember">
+    </label>
+    <div class="two" style="margin-top:16px">
+      <button class="pbtn primary block" type="button" id="btn-tok-save">保存并验证</button>
+      <button class="pbtn danger block" type="button" id="btn-tok-clear">清除令牌</button>
+    </div>
+    <div id="tok-msg"></div>
+    <p class="note">令牌只保存在这台设备的浏览器里，只随请求直接发往 <code>api.github.com</code>。这个页面没有后端，不会上传令牌，也不会把它写进稿件或导出文件。不要在别人的设备或共用浏览器上保存。</p>
+
+    <div class="sub">如何创建（只需一次）</div>
+    <div class="help">
+      <ol>
+        <li><b>新建 fine-grained token</b>
+          <p>GitHub → Settings → Developer settings → Fine-grained tokens → Generate new token，或直接打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">创建页面</a>。</p></li>
+        <li><b>只选一个仓库</b>
+          <p>Resource owner 选 <code>Meredith2328</code>；Repository access 选 <b style="display:inline">Only select repositories</b> → <code>Meredith2328/pilog</code>。</p></li>
+        <li><b>只开两项权限</b>
+          <p><code>Contents: Read and write</code> 和 <code>Pull requests: Read and write</code>（<code>Metadata: Read</code> 会自动带上）。其余全部保持 No access。</p></li>
+        <li><b>设置到期时间，复制粘贴到上面</b>
+          <p>丢了手机或怀疑泄露时，到 GitHub 令牌页 Revoke 即可立即失效。详见 <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token" target="_blank" rel="noopener noreferrer">GitHub 文档</a>。</p></li>
+      </ol>
+    </div>
+    <p class="hint" style="margin-top:0">发布只会在 <code>Meredith2328/pilog</code> 新建 <code>write/…</code> 分支并开 PR 到 <code>pilog</code>，从不直接推送 <code>pilog</code>，也不会自动合并。</p>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-drafts" role="dialog" aria-modal="true" aria-labelledby="sh-drafts-t">
+  <div class="sheet-h"><span id="sh-drafts-t">稿件</span><small id="drafts-sub"></small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b">
+    <div class="two">
+      <button class="pbtn primary block" type="button" id="btn-new">＋ 新建稿件</button>
+      <button class="pbtn block" type="button" data-open="remote">✎ 编辑线上文章</button>
+    </div>
+    <div class="sub">本机保存的稿件</div>
+    <div id="draft-list"></div>
+    <div class="sub">更多</div>
+    <div class="two">
+      <button class="pbtn block" type="button" id="btn-import">导入 .md</button>
+      <button class="pbtn block" type="button" id="btn-theme">外观：浅色</button>
+    </div>
+    <button class="pbtn block" type="button" data-open="token" style="margin-top:12px">GitHub 令牌（发布用）</button>
+    <button class="pbtn danger block" type="button" id="btn-wipe" style="margin-top:12px">清空本机全部稿件</button>
+    <input type="file" id="file-in" accept=".md,.markdown,text/markdown,text/plain" hidden>
+    <p class="hint">稿件只存在这台设备的浏览器里（localStorage）。换浏览器、清除网站数据或换打开方式都会看不到，重要内容记得导出。</p>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-remote" role="dialog" aria-modal="true" aria-labelledby="sh-remote-t">
+  <div class="sheet-h"><span id="sh-remote-t">编辑线上文章</span><small>读 pilog 分支</small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b">
+    <div class="fld">
+      <label class="lbl" for="rm-in">文章路径 <small>blogs/posts/…/*.md 或文章网址</small></label>
+      <div class="row">
+        <input class="inp mono" id="rm-in" type="text" placeholder="blogs/posts/toy/10pi.md" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">
+        <button class="pbtn primary" type="button" id="btn-rm-load">载入</button>
+      </div>
+    </div>
+    <div id="rm-out"></div>
+    <p class="hint">从 <code>pilog</code> 分支读取这篇的最新版本，放进本机稿件原地修改。改完在「导出 → 发布（开 PR）」提交，PR 合并前线上不会变。也可以在博客文章页点「✎ 编辑」直接跳过来。</p>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-help" role="dialog" aria-modal="true" aria-labelledby="sh-help-t">
+  <div class="sheet-h"><span id="sh-help-t">在 Android 上使用</span><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b help">
+    <ol>
+      <li><b>在线打开</b>
+        <p>博客导航栏的「写作」，或直接访问 <code>https://meredith2328.github.io/write/</code>。页面是纯静态的，写作、预览、草稿照样离线可用。</p></li>
+      <li><b>本地打开（离线可用）</b>
+        <p>把仓库里的 <code>tools/write.html</code> 存到手机，在「文件」里点开并选择 Chrome。写作、预览、草稿都不需要网络。</p></li>
+      <li><b>或者走电脑的本地服务</b>
+        <p>电脑与手机连同一个 Wi‑Fi，在仓库目录运行：</p>
+        <pre>python pilog.py serve --host 0.0.0.0</pre>
+        <p>手机访问 <code>http://电脑IP:8000/write</code>。电脑本机则直接开 <code>http://127.0.0.1:8000/write</code>。</p></li>
+      <li><b>添加到主屏幕</b>
+        <p>Chrome 菜单 → 添加到主屏幕，之后像 App 一样一点就开。请固定用同一种方式打开：本地文件和网址的草稿存储互不相通。</p></li>
+      <li><b>交稿</b>
+        <p>「导出」下载 <code>.md</code>，放到 <code>blogs/posts/分类/</code> 后提交到 <code>pilog</code> 分支即可自动部署。</p></li>
+      <li><b>或者直接开 PR（仅仓库主人）</b>
+        <p>在「稿件 → GitHub 令牌」粘贴只授权 <code>Meredith2328/pilog</code> 的 fine-grained token，之后「导出 → 发布（开 PR）」会新建 <code>write/日期-文件名</code> 分支并开 PR 到 <code>pilog</code>，在 GitHub 上审阅后手动合并。</p></li>
+      <li><b>修改已发布的文章</b>
+        <p>文章页点「✎ 编辑」，或「稿件 → 编辑线上文章」输入路径。有令牌时会从 <code>pilog</code> 载入原文；改完发布会开一个「更新文章」PR，同样需要手动合并。</p></li>
+    </ol>
+    <p class="hint" style="margin-top:0">预览尽量贴近博客渲染，但图片只显示占位（手机上读不到仓库里的 <code>assets/</code>），公式显示为源码。</p>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================= constants ================= */
+  var PFX = "pilog.write.";
+  var CATS = ["toy", "notes", "notes/agents", "notes/algo", "notes/ml", "notes/tools",
+    "courses", "courses/cs61a", "courses/csapp", "courses/cs336", "reference", "migrated"];
+  var TAGS = ["项目", "大模型", "奇怪的东西", "Agent", "数据结构与算法", "机器学习", "工具",
+    "CS61A", "CSAPP", "CS336", "翻译", "bugfix", "实验"];
+  var CALLOUTS = { note: "笔记", info: "信息", tip: "提示", important: "重要", success: "成功",
+    question: "问题", warning: "警告", failure: "失败", danger: "危险", bug: "Bug", example: "例子",
+    quote: "引用", abstract: "摘要", todo: "待办" };
+  var KNOWN_FM = ["title", "date", "tags", "preview", "preview_image", "feature", "pin",
+    "highlight", "hidden", "order", "chapters_per_page", "draft"];
+
+  var PIX = {
+    dino: ["........########", ".......##.######", ".......#########", ".......#########",
+      ".......#####....", ".......#######..", "#.....#####.....", "#....########...",
+      "##..######.#....", "##########......", ".#########......", "..#######.......",
+      "...##..##.......", "...#....#.......", "...##...##......"],
+    meta: ["##.#########", "##.#########", "............", "##.#######..", "##.#######..",
+      "............", "##.#########", "##.#########", "............", "##.#####...."],
+    write: ["........##..", ".......####.", "......####..", ".....####...", "....####....",
+      "...####.....", "..####......", ".###........", ".##.........", "#...........", "############"],
+    eye: ["....####....", "..##....##..", ".#...##...#.", "#...####...#", "#...####...#",
+      ".#...##...#.", "..##....##..", "....####...."],
+    export: [".....##.....", ".....##.....", ".....##.....", "..#..##..#..", "...#.##.#...",
+      "....####....", ".....##.....", "#..........#", "#..........#", "############"]
+  };
+
+  /* ================= tiny helpers ================= */
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function nowHM() { var d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function pixSvg(map) {
+    var w = map[0].length, h = map.length, d = "";
+    map.forEach(function (row, y) {
+      row.replace(/#+/g, function (run, x) { d += "M" + x + " " + y + "h" + run.length + "v1h-" + run.length + "z"; });
+    });
+    return '<svg viewBox="0 0 ' + w + " " + h + '" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="' + d + '"/></svg>';
+  }
+  function relTime(t) {
+    var s = Math.round((Date.now() - t) / 1000);
+    if (s < 45) return "刚刚";
+    if (s < 3600) return Math.round(s / 60) + " 分钟前";
+    if (s < 86400) return Math.round(s / 3600) + " 小时前";
+    var d = new Date(t);
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日";
+  }
+  function clock(t) { var d = new Date(t); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+
+  /* ================= storage ================= */
+  var store = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem(PFX + k)); } catch (e) { return null; } },
+    set: function (k, v) { localStorage.setItem(PFX + k, JSON.stringify(v)); },
+    del: function (k) { try { localStorage.removeItem(PFX + k); } catch (e) { /* ignore */ } }
+  };
+  var index = store.get("index") || { active: null, ids: [] };
+  var prefs = store.get("prefs") || { cat: "toy", pv: "post" };
+
+  function blankDraft() {
+    return {
+      id: uid(), created: Date.now(), updated: Date.now(), exported: 0,
+      title: "", body: "", category: prefs.cat || "toy", slug: "",
+      date: today(), time: nowHM(), sec: "", tags: [], preview: "", draft: false,
+      previewImage: "", featureMode: "off", featurePath: "",
+      pin: false, highlight: false, hidden: false, order: "", chapters: "", extra: "", caret: 0, pub: null, src: null
+    };
+  }
+  function isBlank(d) { return !d.title.trim() && !d.body.trim() && !d.tags.length && !d.preview.trim(); }
+  function loadDraft(id) {
+    var d = store.get("d." + id);
+    if (!d) return null;
+    var base = blankDraft();
+    for (var k in base) if (d[k] === undefined) d[k] = base[k];
+    return d;
+  }
+  function allDrafts() {
+    return index.ids.map(loadDraft).filter(Boolean).sort(function (a, b) { return b.updated - a.updated; });
+  }
+  function writeIndex() { store.set("index", index); }
+  function removeDraft(id) {
+    store.del("d." + id);
+    index.ids = index.ids.filter(function (x) { return x !== id; });
+    writeIndex();
+  }
+
+  /* ================= state ================= */
+  var app = $("#app");
+  var body = $("#f-body");
+  var cur = null;
+  var saveTimer = 0;
+  var dirty = false;
+
+  function setSave(state, text, t) {
+    var el = $("#save");
+    el.title = t ? "最近保存 " + clock(t) : "";
+    $("#save-c").textContent = t && state === "ok" ? clock(t) : "";
+    el.classList.toggle("is-dirty", state === "dirty");
+    el.classList.toggle("is-err", state === "err");
+    $("#save-t").textContent = text;
+  }
+  function saveNow() {
+    clearTimeout(saveTimer);
+    if (!cur || !dirty) return true;
+    cur.caret = body.selectionStart || 0;
+    try {
+      store.set("d." + cur.id, cur);
+      if (index.ids.indexOf(cur.id) < 0) index.ids.push(cur.id);
+      index.active = cur.id;
+      writeIndex();
+      dirty = false;
+      setSave("ok", "已保存", cur.updated);
+      $("#draft-n").textContent = index.ids.length;
+      return true;
+    } catch (e) {
+      setSave("err", "存储失败");
+      toast("本机存储已满或被禁用，请尽快导出");
+      return false;
+    }
+  }
+  function touch() {
+    cur.updated = Date.now();
+    dirty = true;
+    setSave("dirty", "编辑中");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 450);
+    scheduleDerived();
+  }
+
+  /* ================= front matter ================= */
+  function cleanSlug(s) {
+    return String(s || "").trim().replace(/\.md$/i, "").replace(/[\\/:*?"<>|#%\s]+/g, "-")
+      .replace(/-{2,}/g, "-").replace(/^[-.]+|-+$/g, "");
+  }
+  function cleanCat(s) {
+    return String(s || "").trim().replace(/\\/g, "/").replace(/^\/*(blogs\/)?(posts\/)?/, "")
+      .replace(/\/+/g, "/").replace(/^\/|\/$/g, "").replace(/[:*?"<>|]/g, "");
+  }
+  function autoSlug(d) {
+    var ascii = (d.title || "").normalize("NFKD").replace(/[^\w\s-]/g, " ").trim().toLowerCase()
+      .split(/[\s_]+/).filter(Boolean).slice(0, 6).join("-");
+    return ascii.length >= 3 ? cleanSlug(ascii) : "post-" + (d.date || today()).replace(/-/g, "");
+  }
+  function slugOf(d) { return cleanSlug(d.slug) || autoSlug(d); }
+  function catOf(d) { return cleanCat(d.category) || "toy"; }
+  /* a post loaded from pilog keeps its exact repo path until the user moves it */
+  function srcOf(d) { return d.src && catOf(d) === d.src.cat && slugOf(d) === d.src.slug ? d.src : null; }
+  function pathOf(d) { var s = srcOf(d); return s ? s.path : "blogs/posts/" + catOf(d) + "/" + slugOf(d) + ".md"; }
+
+  function yq(v) {
+    var s = String(v);
+    if (s === "") return '""';
+    var risky = /^[\s\-?:,\[\]{}#&*!|>'"%@`~=]/.test(s) || /:(\s|$)/.test(s) || /\s#/.test(s) ||
+      /[\n\r\t\u2028\u2029]/.test(s) || /\s$/.test(s) ||
+      /^(true|false|yes|no|on|off|null|y|n)$/i.test(s) ||
+      /^[-+]?(\.\d+|\d[\d_]*(\.\d*)?)([eE][-+]?\d+)?$/.test(s) || /^\d{4}-\d\d-\d\d/.test(s) ||
+      /^0[xob]/i.test(s);
+    return risky ? JSON.stringify(s) : s;
+  }
+  function fmLines(d) {
+    var L = [];
+    if (d.title.trim()) L.push("title: " + yq(d.title.trim()));
+    if (d.date) L.push("date: " + d.date + (d.time ? " " + d.time.slice(0, 5) + ":" + (d.sec || "00") : ""));
+    if (d.tags.length) { L.push("tags:"); d.tags.forEach(function (t) { L.push("- " + yq(t)); }); }
+    if (d.preview.trim()) L.push("preview: " + yq(d.preview.trim()));
+    if (d.previewImage.trim()) L.push("preview_image: " + yq(d.previewImage.trim()));
+    if (d.featureMode === "on") L.push("feature: true");
+    if (d.featureMode === "path" && d.featurePath.trim()) L.push("feature: " + yq(d.featurePath.trim()));
+    if (d.pin) L.push("pin: true");
+    if (d.highlight) L.push("highlight: true");
+    if (d.hidden) L.push("hidden: true");
+    var o = parseFloat(d.order);
+    if (String(d.order).trim() && isFinite(o)) L.push("order: " + o);
+    var c = parseInt(d.chapters, 10);
+    if (c > 0) L.push("chapters_per_page: " + c);
+    if (d.draft) L.push("draft: true");
+    var extra = d.extra.replace(/\s+$/, "");
+    if (extra) L = L.concat(extra.split("\n"));
+    return L;
+  }
+  /* Loaded posts reuse their original front matter text and whitespace while
+     the fields are untouched, so an edit PR's diff shows only what changed. */
+  function buildFile(d) {
+    var b = d.body.replace(/\r\n?/g, "\n").replace(/\s+$/, "");
+    var s = d.src, raw = !!s && s.fm === fmLines(d).join("\n");
+    var head = raw ? s.head : "---\n" + fmLines(d).join("\n") + "\n---\n";
+    var sep = s && (raw || s.sep) ? s.sep : "\n";
+    return head + sep + (b ? b + (s ? s.tail : "\n") : "");
+  }
+  function fromRemote(text, path, sha) {
+    text = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+    var name = path.split("/").pop();
+    var d = parseFile(text, name);
+    d.category = path.slice("blogs/posts/".length, -name.length - 1);
+    var m = text.match(/^---\n([\s\S]*?)\n---[ \t]*(?:\n|$)/);
+    var head = m ? m[0] : "";
+    d.src = {
+      path: path, sha: sha, head: head, sep: text.slice(head.length).match(/^\n*/)[0], tail: d.body.match(/\s*$/)[0],
+      cat: catOf(d), slug: slugOf(d), fm: fmLines(d).join("\n"), at: Date.now(), day: today()
+    };
+    d.updated = d.src.at;
+    return d;
+  }
+
+  function yScalar(v) {
+    v = v.trim();
+    if (!v) return "";
+    if (v[0] === '"') { try { return JSON.parse(v); } catch (e) { return v.slice(1, -1); } }
+    if (v[0] === "'") return v.slice(1, v.lastIndexOf("'")).replace(/''/g, "'");
+    v = v.replace(/\s+#.*$/, "");
+    if (/^\[.*\]$/.test(v)) return v.slice(1, -1).split(",").map(yScalar).filter(function (x) { return x !== ""; });
+    if (/^(true|yes|on)$/i.test(v)) return true;
+    if (/^(false|no|off)$/i.test(v)) return false;
+    return v;
+  }
+  function parseFile(text, name) {
+    text = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+    var d = blankDraft();
+    d.time = "";
+    var m = text.match(/^---\n([\s\S]*?)\n---[ \t]*(?:\n|$)/);
+    var bodyText = m ? text.slice(m[0].length) : text;
+    d.body = bodyText.replace(/^\n+/, "");
+    d.slug = cleanSlug((name || "").replace(/\.(md|markdown|txt)$/i, ""));
+    if (!m) return d;
+    var entries = [], e = null;
+    m[1].split("\n").forEach(function (line) {
+      var k = line.match(/^([A-Za-z_][\w-]*)\s*:(.*)$/);
+      if (k) { e = { key: k[1], val: k[2], raw: [line], items: [] }; entries.push(e); return; }
+      if (!e) return;
+      e.raw.push(line);
+      var it = line.match(/^\s*-\s+(.*)$/);
+      if (it) e.items.push(yScalar(it[1]));
+    });
+    var extra = [];
+    entries.forEach(function (en) {
+      var v = en.items.length && !en.val.trim() ? en.items : yScalar(en.val);
+      switch (KNOWN_FM.indexOf(en.key) >= 0 ? en.key : "") {
+        case "title": d.title = String(v); break;
+        case "date":
+          var dm = String(v).match(/^(\d{4}-\d\d-\d\d)(?:[ T](\d\d:\d\d)(?::(\d\d))?)?/);
+          if (dm) { d.date = dm[1]; d.time = dm[2] || ""; d.sec = dm[3] || ""; } else extra = extra.concat(en.raw);
+          break;
+        case "tags":
+          d.tags = (Array.isArray(v) ? v : String(v).split(",")).map(function (t) { return String(t).trim(); }).filter(Boolean);
+          break;
+        case "preview": d.preview = String(v); break;
+        case "preview_image": d.previewImage = String(v); break;
+        case "feature":
+          if (v === true) d.featureMode = "on";
+          else if (v && v !== false) { d.featureMode = "path"; d.featurePath = String(v); }
+          break;
+        case "pin": case "highlight": case "hidden": case "draft": d[en.key] = v === true; break;
+        case "order": d.order = String(v); break;
+        case "chapters_per_page": d.chapters = String(v); break;
+        default: extra = extra.concat(en.raw);
+      }
+    });
+    d.extra = extra.join("\n");
+    return d;
+  }
+
+  /* ================= markdown preview =================
+     Mirrors the subset pilog renders (python-markdown extra + sane_lists +
+     tilde + arithmatex + Obsidian wiki syntax / callouts). Notably nested
+     lists need 4-space indentation, exactly like on the built site. */
+  var RE = {
+    fence: /^( {0,3})(`{3,}|~{3,})[ \t]*([^`]*)$/,
+    heading: /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$/,
+    hr: /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/,
+    quote: /^ {0,3}> ?/,
+    list: /^( *)([-*+]|\d{1,9}[.)])(?:[ \t]+(.*))?$/,
+    fnDef: /^ {0,3}\[\^([^\]]+)\]:[ \t]*(.*)$/,
+    tableSep: /^ *\|? *:?-+:? *(\| *:?-+:? *)*\|? *$/,
+    math: /^ {0,3}\$\$/
+  };
+  function isRemote(u) { return /^(https?:|data:image\/|blob:)/i.test(u); }
+  function safeHref(u) { return /^\s*(javascript|vbscript|data):/i.test(u) ? "#" : u; }
+  function headingId(t) {
+    return t.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, "-").replace(/^-+|-+$/g, "");
+  }
+  function imgPh(alt, src) {
+    return '<span class="img-ph" role="img" aria-label="' + alt + '"><span class="ic">IMG</span><span><span class="t">' +
+      (alt || "图片") + "</span><code>" + src + "</code></span></span>";
+  }
+  function imgTag(alt, src, width) {
+    if (!isRemote(src.replace(/&amp;/g, "&"))) return imgPh(alt, src);
+    return '<img src="' + safeHref(src) + '" alt="' + alt + '" data-src="' + src + '" loading="lazy"' +
+      (width ? ' style="width:' + width + 'px"' : "") + ">";
+  }
+
+  function inline(src, ctx) {
+    var slots = [];
+    function put(h) { return "\u0000" + (slots.push(h) - 1) + "\u0000"; }
+    var s = src.replace(/\\\n/g, function () { return put("<br>") + "\n"; });
+    s = s.replace(/(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g, function (m, t, c) {
+      return put("<code>" + esc(c.replace(/^ ([\s\S]*) $/, "$1")) + "</code>");
+    });
+    s = s.replace(/\\([\\`*_{}\[\]()#+\-.!|~$<>])/g, function (m, c) { return put(esc(c)); });
+    s = s.replace(/\$\$([^$]+?)\$\$|\$(?=\S)([^$\n]*?\S)\$(?!\d)/g, function (m, a, b) {
+      return put('<span class="math">' + esc(a || b) + "</span>");
+    });
+    s = s.replace(/<(https?:\/\/[^\s>]+)>/g, function (m, u) {
+      return put('<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(u) + "</a>");
+    });
+    s = esc(s);
+    s = s.replace(/!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g, function (m, name, opt) {
+      var w = /^\d+/.test(opt || "") ? parseInt(opt, 10) : 0;
+      return put(isRemote(name) ? imgTag(name, name, w) : imgPh(name.replace(/^.*\//, ""), name + (w ? " · " + w + "px" : "")));
+    });
+    s = s.replace(/!\[([^\]]*)\]\(\s*(?:&lt;)?([^)\s]+?)(?:&gt;)?(?:\s+&quot;[^)]*?&quot;)?\s*\)/g, function (m, alt, u) {
+      return put(imgTag(alt, u, 0));
+    });
+    s = s.replace(/\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g, function (m, target, alias) {
+      return put('<a class="wikilink" href="#" title="站内引用：' + target + '">') + (alias || target) + put("</a>");
+    });
+    s = s.replace(/\[\^([^\]]+)\]/g, function (m, id) {
+      if (!ctx || !ctx.defs[id]) return m;
+      var n = ctx.order.indexOf(id);
+      if (n < 0) { ctx.order.push(id); n = ctx.order.length - 1; }
+      return put('<sup class="fn"><a href="#fn-' + (n + 1) + '" data-jump>[' + (n + 1) + "]</a></sup>");
+    });
+    s = s.replace(/\[([^\]]+)\]\(\s*(?:&lt;)?([^)\s]*?)(?:&gt;)?(?:\s+&quot;[^)]*?&quot;)?\s*\)/g, function (m, text, u) {
+      var ext = /^https?:/i.test(u);
+      return put('<a href="' + safeHref(u) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">") + text + put("</a>");
+    });
+    s = s.replace(/(^|[\s(（：:])(https?:\/\/[^\s<）)\u0000]+)/g, function (m, pre, u) {
+      return pre + put('<a href="' + u + '" target="_blank" rel="noopener">' + u + "</a>");
+    });
+    s = s.replace(/(\*\*|__)(?=\S)([\s\S]*?\S)\1/g, "<strong>$2</strong>");
+    s = s.replace(/~~(?=\S)([\s\S]*?\S)~~/g, "<del>$1</del>");
+    s = s.replace(/\*(?=\S)([^*]*?\S)\*/g, "<em>$1</em>");
+    s = s.replace(/(^|[^\w])_(?=\S)([^_]*?\S)_(?!\w)/g, "$1<em>$2</em>");
+    s = s.replace(/ {2,}\n/g, "<br>\n");
+    for (var guard = 0; guard < 3 && s.indexOf("\u0000") >= 0; guard++) {
+      s = s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return slots[+i]; });
+    }
+    return s;
+  }
+
+  function startsBlock(l) {
+    return RE.fence.test(l) || RE.heading.test(l) || RE.quote.test(l) || RE.hr.test(l) ||
+      RE.math.test(l) || (RE.list.test(l) && RE.list.exec(l)[3] !== undefined);
+  }
+  function indentOf(l) { var m = l.match(/^ */); return m[0].length; }
+
+  function codeBlock(code, info) {
+    var lang = (info || "").split(/\s+/).filter(function (t) { return t && !/^hl:/i.test(t); })[0] || "";
+    var tm = (info || "").match(/(?:title|file)=(\S+)/i);
+    if (tm) lang = tm[1];
+    return '<div class="code-block' + (lang ? " has-lang" : "") + '">' +
+      (lang ? '<span class="code-lang">' + esc(lang) + "</span>" : "") +
+      "<pre><code>" + esc(code) + "</code></pre></div>";
+  }
+
+  function splitRow(r) {
+    r = r.trim();
+    if (r[0] === "|") r = r.slice(1);
+    if (r.slice(-1) === "|" && r.slice(-2) !== "\\|") r = r.slice(0, -1);
+    return r.split(/(?<!\\)\|/).map(function (c) { return c.trim().replace(/\\\|/g, "|"); });
+  }
+
+  function quoteBlock(lines, ctx) {
+    var segs = [], seg = { kind: null, title: "", lines: [] };
+    lines.forEach(function (l) {
+      var m = l.match(/^\s*\[!(\w+)\][+-]?[ \t]*(.*)$/);
+      if (m) {
+        if (seg.kind || seg.lines.some(function (x) { return x.trim(); })) segs.push(seg);
+        seg = { kind: m[1].toLowerCase(), title: m[2], lines: [] };
+      } else seg.lines.push(l);
+    });
+    segs.push(seg);
+    return segs.map(function (sg) {
+      if (!sg.kind) {
+        if (!sg.lines.some(function (x) { return x.trim(); })) return "";
+        return "<blockquote>" + blocks(sg.lines, ctx, false) + "</blockquote>";
+      }
+      var title = sg.title.trim() ? inline(sg.title.trim(), ctx) : esc(CALLOUTS[sg.kind] || sg.kind);
+      return '<div class="callout callout-' + sg.kind + '"><div class="callout-title">' + title +
+        '</div><div class="callout-body">' + blocks(sg.lines, ctx, false) + "</div></div>";
+    }).join("\n");
+  }
+
+  function listBlock(lines, i, ctx) {
+    var n = lines.length;
+    var first = lines[i].match(RE.list);
+    var base = first[1].length;
+    var ordered = /\d/.test(first[2]);
+    var start = ordered ? parseInt(first[2], 10) : 1;
+    var items = [], it = null, loose = false, blank = false;
+    while (i < n) {
+      var l = lines[i];
+      if (!l.trim()) { blank = true; i++; continue; }
+      var m = l.match(RE.list), ind = indentOf(l);
+      var sibling = m && ind >= base && ind < base + 4 && /\d/.test(m[2]) === ordered && !RE.hr.test(l);
+      if (sibling) {
+        if (blank && it) loose = true;
+        it = { lines: [m[3] || ""] };
+        items.push(it);
+        blank = false; i++; continue;
+      }
+      if (it && ind >= base + 4) {
+        if (blank) { it.lines.push(""); if (!m) loose = true; }
+        it.lines.push(l.slice(base + 4));
+        blank = false; i++; continue;
+      }
+      if (it && !blank && !m && !startsBlock(l)) { it.lines.push(l.trim()); i++; continue; }
+      break;
+    }
+    var html = items.map(function (x) {
+      var cls = "", lead = "";
+      var tm = x.lines[0].match(/^\[([ xX])\][ \t]+([\s\S]*)$/);
+      if (tm) {
+        cls = ' class="task"';
+        lead = '<input type="checkbox" disabled' + (tm[1] === " " ? "" : " checked") + ">";
+        x.lines[0] = tm[2];
+      }
+      return "<li" + cls + ">" + lead + blocks(x.lines, ctx, !loose) + "</li>";
+    }).join("\n");
+    var tag = ordered ? "ol" : "ul";
+    return { html: "<" + tag + (ordered && start !== 1 ? ' start="' + start + '"' : "") + ">\n" + html + "\n</" + tag + ">", next: i };
+  }
+
+  function blocks(lines, ctx, tight) {
+    var out = [], i = 0, n = lines.length, m;
+    while (i < n) {
+      var line = lines[i];
+      if (!line.trim()) { i++; continue; }
+      if ((m = line.match(RE.fence))) {
+        var fch = m[2][0], flen = m[2].length, ind = m[1].length, buf = [];
+        var close = new RegExp("^ {0,3}" + (fch === "`" ? "`" : "~") + "{" + flen + ",}[ \\t]*$");
+        i++;
+        while (i < n && !close.test(lines[i])) { buf.push(lines[i].slice(Math.min(ind, indentOf(lines[i])))); i++; }
+        i++;
+        out.push(codeBlock(buf.join("\n"), m[3].trim()));
+        continue;
+      }
+      if (RE.math.test(line)) {
+        var rest = line.replace(RE.math, ""), tex = [];
+        var endAt = rest.indexOf("$$");
+        if (endAt >= 0) { tex.push(rest.slice(0, endAt)); i++; }
+        else {
+          if (rest.trim()) tex.push(rest);
+          i++;
+          while (i < n && lines[i].indexOf("$$") < 0) { tex.push(lines[i]); i++; }
+          if (i < n) { tex.push(lines[i].slice(0, lines[i].indexOf("$$"))); i++; }
+        }
+        out.push('<div class="math-block">' + esc(tex.join("\n").trim()) + "</div>");
+        continue;
+      }
+      if ((m = line.match(RE.heading))) {
+        var ht = (m[2] || "").trim(), lv = m[1].length;
+        out.push("<h" + lv + ' id="' + esc(headingId(ht)) + '">' + inline(ht, ctx) + "</h" + lv + ">");
+        i++; continue;
+      }
+      if (RE.hr.test(line)) { out.push("<hr>"); i++; continue; }
+      if (RE.quote.test(line)) {
+        var q = [];
+        while (i < n && RE.quote.test(lines[i])) { q.push(lines[i].replace(RE.quote, "")); i++; }
+        out.push(quoteBlock(q, ctx));
+        continue;
+      }
+      if ((m = line.match(RE.list)) && (m[3] !== undefined || (i + 1 < n && indentOf(lines[i + 1]) > indentOf(line)))) {
+        var r = listBlock(lines, i, ctx);
+        out.push(r.html); i = r.next; continue;
+      }
+      if (RE.fnDef.test(line)) {
+        i++;
+        while (i < n && /^ {4}\S/.test(lines[i])) i++;
+        continue;
+      }
+      if (line.indexOf("|") >= 0 && i + 1 < n && RE.tableSep.test(lines[i + 1]) && lines[i + 1].indexOf("-") >= 0) {
+        var head = splitRow(line);
+        var aligns = splitRow(lines[i + 1]).map(function (c) {
+          return /^:-+:$/.test(c) ? "center" : /-:$/.test(c) ? "right" : "";
+        });
+        i += 2;
+        var rows = [];
+        while (i < n && lines[i].trim() && lines[i].indexOf("|") >= 0) { rows.push(splitRow(lines[i])); i++; }
+        var cell = function (tagName, c, k) {
+          return "<" + tagName + (aligns[k] ? ' style="text-align:' + aligns[k] + '"' : "") + ">" + inline(c, ctx) + "</" + tagName + ">";
+        };
+        out.push('<div class="tbl"><table><thead><tr>' + head.map(function (c, k) { return cell("th", c, k); }).join("") +
+          "</tr></thead><tbody>" + rows.map(function (rw) {
+            return "<tr>" + head.map(function (_, k) { return cell("td", rw[k] || "", k); }).join("") + "</tr>";
+          }).join("") + "</tbody></table></div>");
+        continue;
+      }
+      var para = [line.replace(/^ +/, "")], setext = 0;
+      i++;
+      while (i < n) {
+        var l2 = lines[i];
+        if (!l2.trim()) break;
+        if (/^ {0,3}=+[ \t]*$/.test(l2)) { setext = 1; i++; break; }
+        if (/^ {0,3}-+[ \t]*$/.test(l2)) { setext = 2; i++; break; }
+        if (startsBlock(l2)) break;
+        para.push(l2.replace(/^ +/, ""));
+        i++;
+      }
+      var text = para.join("\n");
+      if (setext) out.push("<h" + setext + ' id="' + esc(headingId(text)) + '">' + inline(text, ctx) + "</h" + setext + ">");
+      else out.push(tight ? inline(text, ctx) : "<p>" + inline(text, ctx) + "</p>");
+    }
+    return out.join("\n");
+  }
+
+  function renderMarkdown(md) {
+    var lines = md.replace(/\r\n?/g, "\n").replace(/\t/g, "    ").split("\n");
+    var ctx = { defs: {}, order: [] };
+    var inFence = false;
+    lines.forEach(function (l, k) {
+      if (/^ {0,3}(```|~~~)/.test(l)) inFence = !inFence;
+      var m = !inFence && l.match(RE.fnDef);
+      if (m) {
+        var t = [m[2]];
+        for (var j = k + 1; j < lines.length && /^ {4}\S/.test(lines[j]); j++) t.push(lines[j].trim());
+        ctx.defs[m[1]] = t.join(" ");
+      }
+    });
+    var html = blocks(lines, ctx, false);
+    if (ctx.order.length) {
+      html += '<div class="footnotes"><hr><ol>' + ctx.order.map(function (id, k) {
+        return '<li id="fn-' + (k + 1) + '">' + inline(ctx.defs[id], null) + "</li>";
+      }).join("") + "</ol></div>";
+    }
+    return html;
+  }
+
+  function proseCount(md) {
+    var inFence = false, out = [];
+    md.split("\n").forEach(function (l) {
+      var s = l.trim();
+      if (s.indexOf("```") === 0 || s.indexOf("~~~") === 0) { inFence = !inFence; return; }
+      if (!inFence) out.push(l);
+    });
+    return out.join("\n").replace(/\s+/g, "").length;
+  }
+  function firstHeading(md) {
+    var m = md.match(/^ {0,3}#{1,6}[ \t]+(.+?)[ \t#]*$/m);
+    return m ? m[1].trim() : "";
+  }
+  function autoPreview(md) {
+    var parts = [], total = 0, inCode = false, lines = md.split("\n");
+    for (var k = 0; k < lines.length; k++) {
+      var s = lines[k].trim();
+      if (/^(```|~~~)/.test(s)) { inCode = !inCode; continue; }
+      if (inCode || !s || /^(#|>|!|\[\[|\[\^)/.test(s) || /^(---|\*\*\*|===)$/.test(s)) continue;
+      if (s[0] === "|" && s.slice(-1) === "|") continue;
+      s = s.replace(/^(?:[-*+]|\d+[.)])\s+/, "").replace(/^\[[ xX]\]\s*/, "");
+      if (s.length < 8) continue;
+      parts.push(s); total += s.length;
+      if (total >= 260) break;
+    }
+    var t = parts.join(" ");
+    return t.length > 260 ? t.slice(0, 260).replace(/\s+\S*$/, "") + "…" : t;
+  }
+
+  /* ================= UI: fields ================= */
+  var fields = $$("[data-f]");
+  function fillFields() {
+    fields.forEach(function (el) {
+      var k = el.dataset.f;
+      if (el.type === "checkbox") el.checked = !!cur[k];
+      else if (el.value !== String(cur[k] == null ? "" : cur[k])) el.value = cur[k] == null ? "" : cur[k];
+    });
+    renderCats(); renderTags(); renderFeature();
+    $("#more").open = moreCount() > 0;
+    updateDerived();
+  }
+  fields.forEach(function (el) {
+    el.addEventListener(el.type === "checkbox" ? "change" : "input", function () {
+      var k = el.dataset.f;
+      cur[k] = el.type === "checkbox" ? el.checked : el.value;
+      if (k === "time") cur.sec = "";
+      if (k === "title") fields.forEach(function (o) { if (o !== el && o.dataset.f === "title") o.value = el.value; });
+      touch();
+    });
+  });
+  $("#f-slug").addEventListener("blur", function () {
+    var v = cleanSlug(this.value);
+    if (v !== cur.slug) { cur.slug = v; this.value = v; touch(); }
+  });
+  $("#f-slug").placeholder = "按标题自动生成";
+  $("#btn-slug").addEventListener("click", function () {
+    cur.slug = autoSlug(cur); $("#f-slug").value = cur.slug; touch();
+    toast("文件名：" + cur.slug + ".md");
+  });
+  $("#btn-now").addEventListener("click", function () {
+    cur.date = today(); cur.time = nowHM(); cur.sec = pad(new Date().getSeconds());
+    $("#f-date").value = cur.date; $("#f-time").value = cur.time; touch();
+  });
+  $("#f-title").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); body.focus(); }
+  });
+
+  function catList() {
+    var list = CATS.slice();
+    (window.__pilogCats || []).forEach(function (c) { if (list.indexOf(c) < 0) list.push(c); });
+    return list;
+  }
+  function renderCats() {
+    var box = $("#cats"), c = catOf(cur), list = catList(), custom = list.indexOf(c) < 0;
+    box.innerHTML = list.map(function (x) {
+      return '<button class="chip" type="button" data-cat="' + esc(x) + '" aria-pressed="' + (x === c) + '">' + esc(x) + "</button>";
+    }).join("") + '<button class="chip ghost" type="button" data-cat="" aria-pressed="' + custom + '">' + (custom ? esc(c) : "自定义…") + "</button>";
+    $("#cat-custom-wrap").hidden = !custom;
+    if (custom && document.activeElement !== $("#cat-custom")) $("#cat-custom").value = c;
+  }
+  $("#cats").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-cat]");
+    if (!b) return;
+    if (b.dataset.cat) {
+      cur.category = b.dataset.cat; prefs.cat = cur.category; store.set("prefs", prefs);
+      renderCats(); touch();
+    } else {
+      $("#cat-custom-wrap").hidden = false;
+      $("#cat-custom").focus();
+    }
+  });
+  $("#cat-custom").addEventListener("input", function () {
+    var v = cleanCat(this.value);
+    if (!v) return;
+    cur.category = v; prefs.cat = v; store.set("prefs", prefs); touch();
+    $$("#cats .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.cat === v || (!b.dataset.cat && catList().indexOf(v) < 0))); });
+  });
+  $("#cat-custom").addEventListener("change", renderCats);
+
+  function renderTags() {
+    var box = $("#tag-box"), input = $("#tag-in");
+    $$(".chip", box).forEach(function (c) { c.remove(); });
+    cur.tags.forEach(function (t, k) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip tag"; b.dataset.k = k;
+      b.setAttribute("aria-label", "移除标签 " + t);
+      b.innerHTML = "#" + esc(t) + '<span class="x" aria-hidden="true">×</span>';
+      box.insertBefore(b, input);
+    });
+    var used = {};
+    cur.tags.forEach(function (t) { used[t.toLowerCase()] = 1; });
+    var seen = {};
+    var sugs = recentTags().concat(TAGS).filter(function (t) {
+      var k = t.toLowerCase();
+      if (used[k] || seen[k]) return false;
+      seen[k] = 1; return true;
+    }).slice(0, 10);
+    $("#tag-sugs").innerHTML = sugs.map(function (t) {
+      return '<button class="chip ghost" type="button" data-t="' + esc(t) + '">+ ' + esc(t) + "</button>";
+    }).join("");
+  }
+  function recentTags() {
+    var out = [];
+    allDrafts().forEach(function (d) { if (d.id !== cur.id) d.tags.forEach(function (t) { if (out.indexOf(t) < 0) out.push(t); }); });
+    return out;
+  }
+  function addTags(raw) {
+    var added = false;
+    raw.split(/[,，、\n]/).forEach(function (t) {
+      t = t.trim().replace(/^#/, "");
+      if (t && !cur.tags.some(function (x) { return x.toLowerCase() === t.toLowerCase(); })) { cur.tags.push(t); added = true; }
+    });
+    if (added) { renderTags(); touch(); }
+  }
+  $("#tag-in").addEventListener("keydown", function (e) {
+    if (e.isComposing) return;
+    if (e.key === "Enter") { e.preventDefault(); addTags(this.value); this.value = ""; }
+    else if (e.key === "Backspace" && !this.value && cur.tags.length) { cur.tags.pop(); renderTags(); touch(); }
+  });
+  $("#tag-in").addEventListener("input", function () {
+    if (/[,，、]/.test(this.value)) { addTags(this.value); this.value = ""; }
+  });
+  $("#tag-in").addEventListener("blur", function () { if (this.value.trim()) { addTags(this.value); this.value = ""; } });
+  $("#tag-box").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip.tag");
+    if (b) { cur.tags.splice(+b.dataset.k, 1); renderTags(); touch(); }
+    else if (e.target === this) $("#tag-in").focus();
+  });
+  $("#tag-sugs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-t]");
+    if (b) addTags(b.dataset.t);
+  });
+
+  function renderFeature() {
+    $$("#feature-seg button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === cur.featureMode)); });
+    $("#f-fpath").hidden = cur.featureMode !== "path";
+  }
+  $("#feature-seg").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    cur.featureMode = b.dataset.v; renderFeature(); touch();
+    if (cur.featureMode === "path") $("#f-fpath").focus();
+  });
+  function moreCount() {
+    return [cur.previewImage.trim(), cur.featureMode !== "off", cur.pin, cur.highlight, cur.hidden,
+      String(cur.order).trim(), String(cur.chapters).trim(), cur.extra.trim()].filter(Boolean).length;
+  }
+
+  /* ================= derived views ================= */
+  var derivedRaf = 0;
+  function scheduleDerived() {
+    if (derivedRaf) return;
+    derivedRaf = requestAnimationFrame(function () { derivedRaf = 0; updateDerived(); });
+  }
+  function updateDerived() {
+    var slug = slugOf(cur), cat = catOf(cur);
+    $("#doc-path").innerHTML = '<span class="p">posts/' + esc(cat) + "/<b>" + esc(slug) + "</b>.md</span>" +
+      (srcOf(cur) ? '<span class="badge ink" title="从 pilog 载入，发布为修改">线上</span>' : "") +
+      (cur.draft ? '<span class="badge">DRAFT</span>' : "") + '<span class="go">信息 ›</span>';
+    $("#slug-hint").innerHTML = cur.slug ? "网址：<code>posts/" + esc(cat) + "/" + esc(slug) + ".html</code>"
+      : "未填写时使用 <code>" + esc(slug) + "</code>。仅英文、数字和连字符最稳妥。";
+    var mc = moreCount();
+    $("#more-n").textContent = mc ? "已设置 " + mc + " 项" : "封面 · 置顶 · 高亮 · 隐藏 · 排序";
+    var pl = cur.preview.trim().length;
+    $("#preview-n").textContent = pl ? pl + " 字" : "留空则自动截取正文";
+    if (app.dataset.view === "meta") {
+      $("#fm-path").textContent = pathOf(cur);
+      $("#fm-pre").textContent = "---\n" + fmLines(cur).join("\n") + "\n---";
+    }
+    if (app.dataset.view === "preview") renderPreview();
+    if ($("#sheet-export").classList.contains("is-open")) renderExport();
+  }
+
+  function metaHtml(d) {
+    var words = proseCount(d.body);
+    return '<span>' + esc(d.date || today()) + "</span><span>" + words + " 字 · 约 " + Math.max(1, Math.ceil(words / 450)) + " 分钟</span>" +
+      d.tags.map(function (t) { return '<span class="tag">#' + esc(t) + "</span>"; }).join("") +
+      '<span class="folder">⊞ posts/' + esc(catOf(d)) + "</span>";
+  }
+  function renderPreview() {
+    var out = $("#pv-out"), d = cur;
+    var title = d.title.trim() || firstHeading(d.body) || slugOf(d);
+    var words = proseCount(d.body);
+    $("#pv-stat").textContent = words + " 字 · " + d.body.split("\n").length + " 行";
+    if (prefs.pv === "card") {
+      var pre = d.preview.trim() || autoPreview(d.body);
+      var img = d.previewImage.trim() || (d.featureMode === "path" ? d.featurePath.trim() : "");
+      out.innerHTML = '<div class="post"><div class="card' + (d.highlight ? " is-hl" : "") + '"><div class="card-body">' +
+        '<div class="card-meta"><span>' + esc(d.date || today()) + "</span>" + (d.pin ? '<span class="badge ink">置顶</span>' : "") +
+        (d.draft ? '<span class="badge">DRAFT</span>' : "") + (d.hidden ? '<span class="badge">隐藏</span>' : "") +
+        '<span class="folder">posts/' + esc(catOf(d)) + "</span></div>" +
+        "<h3>" + esc(title) + "</h3>" +
+        '<div class="card-pre">' + (pre ? inline(pre, null) : '<span style="color:var(--mute)">（没有可截取的正文）</span>') + "</div>" +
+        (d.tags.length ? '<div class="card-tags">' + d.tags.map(function (t) { return "<span>#" + esc(t) + "</span>"; }).join("") + "</div>" : "") +
+        '</div><div class="card-img">' + (img ? "IMG<br>" + esc(img) : "NO IMAGE") + "</div></div>" +
+        '<p class="card-note">首页卡片的近似效果。' + (d.preview.trim() ? "使用你填写的预览文本。" : "未填预览文本，按 pilog 的规则从正文截取。") +
+        (d.featureMode !== "off" ? "开启 feature 后线上会整卡显示封面。" : "") + "</p></div>";
+      return;
+    }
+    var mdHtml = d.body.trim() ? renderMarkdown(d.body)
+      : '<div class="empty-state">正文还是空的<br>去「写作」写点什么吧</div>';
+    out.innerHTML = '<article class="post"><div class="post-crumb"><span>posts / ' + esc(catOf(d)).replace(/\//g, " / ") +
+      "</span>" + (d.draft ? '<span class="badge">DRAFT · 不进入构建</span>' : "") +
+      (d.hidden ? '<span class="badge">HIDDEN</span>' : "") + (d.highlight ? '<span class="badge hl">高亮</span>' : "") + "</div>" +
+      '<h1 class="post-title' + (d.title.trim() ? "" : " is-empty") + '">' + esc(title) + "</h1>" +
+      '<div class="post-meta">' + metaHtml(d) + '</div><div class="md">' + mdHtml + "</div></article>";
+    $$("img[data-src]", out).forEach(function (im) {
+      im.addEventListener("error", function () {
+        var span = document.createElement("span");
+        span.innerHTML = imgPh(esc(im.alt), esc(im.dataset.src));
+        im.replaceWith(span.firstChild);
+      }, { once: true });
+    });
+  }
+  $("#pv-out").addEventListener("click", function (e) {
+    var a = e.target.closest("a");
+    if (!a) return;
+    var href = a.getAttribute("href") || "";
+    if (a.classList.contains("wikilink")) { e.preventDefault(); toast("站内引用：发布后会链接到对应文章"); return; }
+    if (href[0] === "#") {
+      e.preventDefault();
+      var t = document.getElementById(decodeURIComponent(href.slice(1)));
+      if (t) t.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (!/^https?:/i.test(href)) { e.preventDefault(); toast("相对链接在预览里不跳转"); }
+  });
+  $("#pv-seg").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    prefs.pv = b.dataset.v; store.set("prefs", prefs);
+    syncPvSeg(); renderPreview();
+    $("#view-preview").scrollTop = 0;
+  });
+  function syncPvSeg() {
+    $$("#pv-seg button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === prefs.pv)); });
+  }
+
+  /* ================= views ================= */
+  function setView(v) {
+    if (app.dataset.view === v) return;
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    app.dataset.view = v;
+    $$(".tab").forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.view === v)); });
+    prefs.view = v; store.set("prefs", prefs);
+    updateDerived();
+  }
+  $$(".tab").forEach(function (t) { t.addEventListener("click", function () { setView(t.dataset.view); }); });
+  $("#doc-path").addEventListener("click", function () { setView("meta"); });
+
+  /* ================= editor ================= */
+  function lineStart(v, pos) { return v.lastIndexOf("\n", pos - 1) + 1; }
+  function lineEnd(v, pos) { var e = v.indexOf("\n", pos); return e < 0 ? v.length : e; }
+  function replaceRange(a, b, text, selA, selB) {
+    body.focus();
+    body.setSelectionRange(a, b);
+    var ok = false;
+    try { ok = document.execCommand("insertText", false, text); } catch (e) { ok = false; }
+    if (!ok || body.value.slice(a, a + text.length) !== text) {
+      body.setRangeText(text, a, b, "end");
+      body.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    if (selA != null) body.setSelectionRange(selA, selB == null ? selA : selB);
+  }
+  function wrap(before, after, placeholder) {
+    var a = body.selectionStart, b = body.selectionEnd, v = body.value, sel = v.slice(a, b);
+    if (sel && v.slice(a - before.length, a) === before && v.slice(b, b + after.length) === after) {
+      replaceRange(a - before.length, b + after.length, sel, a - before.length, b - before.length);
+      return;
+    }
+    var inner = sel || placeholder;
+    replaceRange(a, b, before + inner + after, a + before.length, a + before.length + inner.length);
+  }
+  function mapLines(fn) {
+    var v = body.value, a = lineStart(v, body.selectionStart), b = lineEnd(v, body.selectionEnd);
+    var src = v.slice(a, b).split("\n");
+    var next = fn(src).join("\n");
+    replaceRange(a, b, next, a, a + next.length);
+    if (src.length === 1) body.setSelectionRange(a + next.length, a + next.length);
+  }
+  var LIST_PREFIX = /^(\s*)([-*+] \[[ xX]\] |[-*+] |\d+[.)] |> ?)?/;
+  function togglePrefix(kind) {
+    mapLines(function (ls) {
+      var all = ls.every(function (l) {
+        var m = l.match(LIST_PREFIX)[2] || "";
+        return kind === "task" ? /\[[ xX]\]/.test(m) : kind === "ul" ? /^[-*+] (?!\[)/.test(m) :
+          kind === "ol" ? /^\d/.test(m) : /^>/.test(m);
+      });
+      var num = 0;
+      return ls.map(function (l) {
+        var m = l.match(LIST_PREFIX), ind = m[1], rest = l.slice(m[0].length);
+        if (all) return ind + rest;
+        num++;
+        var p = kind === "task" ? "- [ ] " : kind === "ul" ? "- " : kind === "ol" ? num + ". " : "> ";
+        return ind + p + rest;
+      });
+    });
+  }
+  function cycleHeading() {
+    mapLines(function (ls) {
+      return ls.map(function (l) {
+        var m = l.match(/^(#{1,6}) /), lv = m ? m[1].length : 0;
+        var rest = m ? l.slice(m[0].length) : l;
+        var next = lv === 0 ? 2 : lv === 2 ? 3 : lv === 3 ? 4 : 0;
+        return (next ? "#".repeat(next) + " " : "") + rest;
+      });
+    });
+  }
+  function ensureBlock(text, selOffset, selLen) {
+    var a = body.selectionStart, b = body.selectionEnd, v = body.value;
+    var pre = a === 0 || v[a - 1] === "\n" ? (a > 1 && v[a - 2] !== "\n" ? "\n" : "") : "\n\n";
+    var post = v[b] === "\n" || b === v.length ? "" : "\n";
+    var at = a + pre.length + selOffset;
+    replaceRange(a, b, pre + text + post, at, at + (selLen || 0));
+  }
+  var KEYS = {
+    undo: function () { body.focus(); document.execCommand("undo"); },
+    redo: function () { body.focus(); document.execCommand("redo"); },
+    h: cycleHeading,
+    b: function () { wrap("**", "**", "加粗"); },
+    i: function () { wrap("*", "*", "斜体"); },
+    s: function () { wrap("~~", "~~", "删除"); },
+    code: function () { wrap("`", "`", "code"); },
+    ul: function () { togglePrefix("ul"); },
+    ol: function () { togglePrefix("ol"); },
+    task: function () { togglePrefix("task"); },
+    quote: function () { togglePrefix("quote"); },
+    fence: function () {
+      var sel = body.value.slice(body.selectionStart, body.selectionEnd);
+      ensureBlock("```\n" + (sel || "") + "\n```", 3, 0);
+    },
+    link: function () {
+      var a = body.selectionStart, b = body.selectionEnd, sel = body.value.slice(a, b);
+      if (/^https?:\/\//.test(sel)) replaceRange(a, b, "[文字](" + sel + ")", a + 1, a + 3);
+      else if (sel) replaceRange(a, b, "[" + sel + "](https://)", a + sel.length + 3, a + sel.length + 11);
+      else replaceRange(a, b, "[文字](https://)", a + 1, a + 3);
+    },
+    img: function () {
+      var a = body.selectionStart, b = body.selectionEnd, sel = body.value.slice(a, b) || "描述";
+      replaceRange(a, b, "![" + sel + "](assets/)", a + sel.length + 4, a + sel.length + 11);
+    },
+    wiki: function () { wrap("[[", "]]", "文章标题"); },
+    hr: function () { ensureBlock("---\n", 4, 0); },
+    indent: function () { mapLines(function (ls) { return ls.map(function (l) { return "    " + l; }); }); },
+    outdent: function () { mapLines(function (ls) { return ls.map(function (l) { return l.replace(/^ {1,4}/, ""); }); }); }
+  };
+  $("#fmt-keys").addEventListener("pointerdown", function (e) { if (e.target.closest(".fk")) e.preventDefault(); });
+  $("#fmt-keys").addEventListener("click", function (e) {
+    var k = e.target.closest(".fk");
+    if (k && KEYS[k.dataset.k]) KEYS[k.dataset.k]();
+  });
+  $("#btn-done").addEventListener("pointerdown", function (e) { e.preventDefault(); });
+  $("#btn-done").addEventListener("click", function () { body.blur(); saveNow(); });
+
+  function inFence(v, pos) {
+    var n = 0, re = /^ {0,3}(```|~~~)/gm, m;
+    var head = v.slice(0, pos);
+    while ((m = re.exec(head))) n++;
+    return n % 2 === 1;
+  }
+  body.addEventListener("beforeinput", function (e) {
+    if (e.inputType !== "insertLineBreak" && e.inputType !== "insertParagraph") return;
+    if (e.isComposing || body.selectionStart !== body.selectionEnd) return;
+    var v = body.value, pos = body.selectionStart, ls = lineStart(v, pos);
+    var line = v.slice(ls, pos);
+    if (inFence(v, ls)) return;
+    var m = line.match(/^(\s*)([-*+] \[[ xX]\] |[-*+] |(\d+)([.)]) |> ?)/);
+    if (!m) return;
+    e.preventDefault();
+    if (!line.slice(m[0].length).trim() && lineEnd(v, pos) === pos) {
+      replaceRange(ls, pos, "", ls);
+      return;
+    }
+    var next = m[3] ? (parseInt(m[3], 10) + 1) + m[4] + " " : /\[[ xX]\]/.test(m[2]) ? m[2].replace(/\[[xX]\]/, "[ ]") : m[2];
+    replaceRange(pos, pos, "\n" + m[1] + next, pos + 1 + m[1].length + next.length);
+  });
+  body.addEventListener("keydown", function (e) {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    var k = e.key.toLowerCase();
+    if (k === "b" || k === "i") { e.preventDefault(); KEYS[k](); }
+  });
+
+  /* ================= keyboard-aware layout ================= */
+  var vv = window.visualViewport, maxH = 0;
+  var coarse = window.matchMedia ? matchMedia("(pointer: coarse)") : { matches: false };
+  function syncPointer() { app.classList.toggle("is-fine", !coarse.matches); }
+  function fit() {
+    var h = vv ? vv.height : window.innerHeight;
+    if (h > maxH || Math.abs(window.innerWidth - (fit.w || 0)) > 40) { maxH = h; fit.w = window.innerWidth; }
+    document.documentElement.style.setProperty("--app-h", Math.round(h) + "px");
+    app.style.top = vv ? Math.max(0, vv.offsetTop) + "px" : "0";
+    syncKb();
+  }
+  function syncKb() {
+    var a = document.activeElement;
+    var editing = !!a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && /^(text|search|number|)$/.test(a.type)));
+    var h = vv ? vv.height : window.innerHeight;
+    var kb = coarse.matches && editing && (!vv || h < maxH * 0.8);
+    app.classList.toggle("is-kb", kb);
+    app.classList.toggle("is-typing", coarse.matches && a === body && kb);
+  }
+  if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); }
+  window.addEventListener("resize", fit);
+  document.addEventListener("focusin", function () { setTimeout(syncKb, 60); });
+  document.addEventListener("focusout", function () { setTimeout(syncKb, 60); });
+  if (coarse.addEventListener) coarse.addEventListener("change", function () { syncPointer(); syncKb(); });
+
+  /* ================= sheets ================= */
+  var openSheet = null;
+  function showSheet(name) {
+    var el = $("#sheet-" + name);
+    if (!el) return;
+    if (openSheet && openSheet !== el) openSheet.classList.remove("is-open");
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    saveNow();
+    if (name === "export") renderExport();
+    if (name === "token") { renderToken(); $("#tok-msg").innerHTML = ""; }
+    if (name === "remote") { $("#rm-out").innerHTML = ""; if (!$("#rm-in").value && cur.src) $("#rm-in").value = cur.src.path; }
+    if (name === "drafts") renderDrafts();
+    if (name === "drafts") syncThemeBtn();
+    el.classList.add("is-open");
+    $("#scrim").classList.add("is-on");
+    if (!openSheet) history.pushState({ sheet: name }, "");
+    openSheet = el;
+    setTimeout(function () { var x = $(".x", el); if (x && !coarse.matches) x.focus(); }, 60);
+  }
+  function hideSheet(fromPop) {
+    if (!openSheet) return;
+    openSheet.classList.remove("is-open");
+    $("#scrim").classList.remove("is-on");
+    openSheet = null;
+    if (!fromPop && history.state && history.state.sheet) history.back();
+  }
+  window.addEventListener("popstate", function () { hideSheet(true); });
+  $$("[data-open]").forEach(function (b) { b.addEventListener("click", function () { showSheet(b.dataset.open); }); });
+  $("#btn-help").addEventListener("click", function () { showSheet("help"); });
+  $("#btn-drafts").addEventListener("click", function () { showSheet("drafts"); });
+  $$("[data-close]").forEach(function (b) { b.addEventListener("click", function () { hideSheet(false); }); });
+  $("#scrim").addEventListener("click", function () { hideSheet(false); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && openSheet) hideSheet(false);
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+      e.preventDefault(); dirty = true; saveNow(); toast("已保存到本机 " + clock(cur.updated));
+    }
+  });
+
+  var toastTimer = 0;
+  function toast(msg) {
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("is-on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("is-on"); }, 2200);
+  }
+
+  /* ================= export ================= */
+  function renderExport() {
+    var d = cur, slug = slugOf(d), cat = catOf(d), text = buildFile(d);
+    var full = pathOf(d), cut = full.lastIndexOf("/") + 1;
+    $("#ex-path").innerHTML = esc(full.slice(0, cut)) + "<b>" + esc(full.slice(cut)) + "</b>";
+    var bytes = new Blob([text]).size;
+    $("#ex-stat").innerHTML = "<span>" + proseCount(d.body) + " 字</span><span>" +
+      (bytes > 2048 ? (bytes / 1024).toFixed(1) + " KB" : bytes + " B") + "</span><span>" +
+      (d.tags.length ? d.tags.map(function (t) { return "#" + esc(t); }).join(" ") : "无标签") + "</span>";
+    $("#ex-dir").textContent = "blogs/posts/" + cat + "/";
+    var notes = [];
+    if (!d.title.trim()) {
+      var h = firstHeading(d.body);
+      notes.push(h ? "未填标题：博客会使用正文第一个标题「" + esc(h) + "」。" : "未填标题：博客会用文件名 <code>" + esc(slug) + "</code> 当标题。");
+    }
+    if (!d.slug.trim()) notes.push("未填文件名：将使用 <code>" + esc(slug) + ".md</code>，可在「信息」里修改。");
+    if (!d.body.trim()) notes.push("正文是空的。");
+    if (d.draft) notes.push("已勾选草稿：这篇放进仓库后不会进入构建。");
+    if (d.hidden) notes.push("已勾选隐藏：不会生成页面。");
+    $("#ex-notes").innerHTML = notes.length ? notes.map(function (n) { return '<p class="note">' + n + "</p>"; }).join("")
+      : d.exported ? '<p class="note ok">上次导出于 ' + relTime(d.exported) + "，之后" + (d.updated > d.exported ? "有改动。" : "没有改动。") + "</p>" : "";
+    var share = canShareFile();
+    $("#btn-share").hidden = !share;
+    $("#btn-share").parentNode.classList.toggle("one", !share);
+    renderPublish();
+  }
+  function fileName() { return slugOf(cur) + ".md"; }
+  function markExported() { cur.exported = Date.now(); dirty = true; saveNow(); renderExport(); }
+  function canShareFile() {
+    try {
+      return !!(navigator.canShare && navigator.canShare({ files: [new File(["x"], "x.md", { type: "text/markdown" })] }));
+    } catch (e) { return false; }
+  }
+  $("#btn-download").addEventListener("click", function () {
+    var blob = new Blob([buildFile(cur)], { type: "text/markdown;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = fileName(); a.rel = "noopener";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    markExported();
+    toast("已下载 " + fileName());
+  });
+  $("#btn-share").addEventListener("click", function () {
+    var file = new File([buildFile(cur)], fileName(), { type: "text/markdown" });
+    navigator.share({ files: [file], title: cur.title || fileName() }).then(markExported).catch(function (e) {
+      if (e && e.name !== "AbortError") toast("分享失败：" + e.message);
+    });
+  });
+  function copyText(text, okMsg) {
+    var done = function () { toast(okMsg); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text) ? done() : toast("复制失败"); });
+    } else if (fallbackCopy(text)) done();
+    else toast("复制失败");
+  }
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:-100px;opacity:0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+  $("#btn-copy-all").addEventListener("click", function () { copyText(buildFile(cur), "已复制完整 Markdown"); markExported(); });
+  $("#btn-copy-fm").addEventListener("click", function () { copyText("---\n" + fmLines(cur).join("\n") + "\n---\n", "已复制 front matter"); });
+
+  /* ================= publish (GitHub PR) =================
+     Browser-only: the owner's fine-grained token lives in this device's
+     storage and is sent to api.github.com and nowhere else (the CSP meta
+     enforces that). There is no backend, so without a token that can push to
+     the repo nothing can be published. Always a write/ branch + PR into
+     pilog; never a direct push, never a merge. */
+  var GH = { api: "https://api.github.com", owner: "Meredith2328", repo: "pilog", base: "pilog" };
+  var TOKEN_KEY = PFX + "ghToken";
+  var tok = {
+    get: function () {
+      try { return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; }
+    },
+    where: function () {
+      try {
+        if (sessionStorage.getItem(TOKEN_KEY)) return "session";
+        if (localStorage.getItem(TOKEN_KEY)) return "local";
+      } catch (e) { /* storage blocked */ }
+      return "";
+    },
+    set: function (v, remember) {
+      tok.clear();
+      (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, v);
+    },
+    clear: function () {
+      try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) { /* ignore */ }
+      try { localStorage.removeItem(TOKEN_KEY); } catch (e) { /* ignore */ }
+    }
+  };
+  var tokBad = "", tokOk = false, pubBusy = false, pubPending = null;
+  var PUB_LOCK = $("#pub-lock").innerHTML;
+  var STEPS = ["验证令牌与仓库", "准备 write/ 分支", "写入文件", "打开 PR"];
+
+  function maskToken(t) {
+    if (t.length < 12) return "…";
+    var head = /^github_pat_/.test(t) ? 11 : /^gh[a-z]_/.test(t) ? 4 : 0;
+    return t.slice(0, head) + "…" + t.slice(-4);
+  }
+  function GhError(status, message, data) { this.status = status; this.message = message || ""; this.data = data || null; }
+  function repoApi(p) { return "/repos/" + GH.owner + "/" + GH.repo + p; }
+  function encPath(p) { return p.split("/").map(encodeURIComponent).join("/"); }
+  function ghReq(method, path, data) {
+    var token = tok.get();
+    if (!token) return Promise.reject(new GhError(-1));
+    if (navigator.onLine === false) return Promise.reject(new GhError(0, "offline"));
+    var headers = { Accept: "application/vnd.github+json", Authorization: "Bearer " + token, "X-GitHub-Api-Version": "2022-11-28" };
+    if (data) headers["Content-Type"] = "application/json";
+    return window.fetch(GH.api + path, {
+      method: method, headers: headers, body: data ? JSON.stringify(data) : undefined,
+      mode: "cors", credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store"
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var j = null;
+        try { j = t ? JSON.parse(t) : null; } catch (e) { j = null; }
+        if (!r.ok) throw new GhError(r.status, (j && j.message) || r.statusText, j);
+        return j;
+      });
+    }, function () { throw new GhError(0, "network"); });
+  }
+  function ghMaybe(method, path) {
+    return ghReq(method, path).catch(function (e) { if (e.status === 404) return null; throw e; });
+  }
+  function ghMsg(e) {
+    var m = (e && e.message) || "";
+    switch (e && e.status) {
+      case -1: return "还没有设置令牌。";
+      case 0: return "网络不可用或请求被拦截。稿件仍保存在本机，联网后再试。";
+      case 401: return "令牌无效、已过期或已被撤销（401）。";
+      case 403:
+        if (e.code === "nopush") return "这个令牌所属的账号对 Meredith2328/pilog 没有写权限（403）。";
+        if (/rate limit/i.test(m)) return "触发了 GitHub 速率限制（403），请稍后再试。";
+        return "令牌权限不足（403）：需要 Contents 与 Pull requests 两项 Read and write，并且只授权了 Meredith2328/pilog。";
+      case 404: return "找不到仓库或分支（404）：令牌可能没有授权 Meredith2328/pilog。";
+      case 409: return "GitHub 报告冲突（409）：分支刚被改动过，请重试。";
+      case 422: return "GitHub 拒绝了请求（422）：" + m;
+      default: return "GitHub 返回 " + e.status + "：" + m;
+    }
+  }
+  function isTokenProblem(e) {
+    return e.status === 401 || (e.status === 403 && !/rate limit/i.test(e.message)) || e.status === 404;
+  }
+  function b64utf8(s) {
+    var bytes = new TextEncoder().encode(s), bin = "";
+    for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+
+  function branchSlug(d) {
+    var s = slugOf(d).normalize("NFKD").replace(/[^\w.-]+/g, "-").replace(/[._-]{2,}/g, "-")
+      .toLowerCase().slice(0, 60).replace(/^[-.]+|[-.]+$/g, "").replace(/\.lock$/, "-lock");
+    return s.length >= 3 ? s : "post-" + d.id.slice(-4);
+  }
+  function publishPlan(d) {
+    var path = pathOf(d), errors = [], warns = [];
+    if (!/^blogs\/posts\/.+\.md$/.test(path) || path.split("/").some(function (s) { return !s || s[0] === "."; }))
+      errors.push("文件路径不安全：<code>" + esc(path) + "</code>。分类和文件名里不能有空段、<code>..</code> 或以点开头的名字。");
+    if (!d.body.trim()) errors.push("正文是空的，不能发布。");
+    if (d.date && !/^\d{4}-\d\d-\d\d$/.test(d.date)) errors.push("日期格式应为 YYYY-MM-DD。");
+    if (d.time && !/^\d\d:\d\d/.test(d.time)) errors.push("时间格式应为 HH:MM。");
+    var extra = d.extra.split("\n").filter(function (l) { return l.trim(); });
+    if (extra.some(function (l) { return /^---\s*$/.test(l); }))
+      errors.push("「其他 front matter」里不能有单独的 <code>---</code> 行，它会提前结束 front matter。");
+    else {
+      var odd = extra.filter(function (l) { return !/^([A-Za-z_][\w-]*\s*:|\s+\S|-\s|#)/.test(l); });
+      if (odd.length) errors.push("「其他 front matter」有无法识别的行：<code>" + esc(odd[0]) + "</code>");
+    }
+    var file = buildFile(d), back = parseFile(file, slugOf(d) + ".md");
+    if (back.title !== d.title.trim() || back.tags.join("\n") !== d.tags.join("\n") || back.draft !== d.draft)
+      errors.push("front matter 回读不一致，请检查标题或标签里的特殊字符。");
+    if (d.draft) warns.push("勾选了草稿（<code>draft: true</code>）：合并后这篇也不会进入构建。");
+    if (d.hidden) warns.push("勾选了隐藏：合并后不会生成页面。");
+    if (d.pub && d.pub.path && d.pub.path !== path)
+      warns.push("上次 PR 写入的是 <code>" + esc(d.pub.path) + "</code>，改位置后旧文件会留在那个分支，合并前请在 GitHub 上删掉。");
+    var src = srcOf(d);
+    if (d.src && !src)
+      warns.push("这篇是从 <code>" + esc(d.src.path) + "</code> 载入的。改了分类或文件名后会新建文件，原文件不会被删除。");
+    return {
+      path: path, file: file, src: !!src,
+      branch: "write/" + (src ? src.day + "-edit-" : (d.date || today()) + "-") + branchSlug(d),
+      title: d.title.trim() || firstHeading(d.body) || slugOf(d), errors: errors, warns: warns
+    };
+  }
+  function prTitle(plan, update) { return (update ? "更新文章：" : "新文章：") + plan.title; }
+  function prBody(plan, d, update) {
+    var L = [
+      "由 pilog 手机写作页（`tools/write.html`）在作者设备上创建。**请审阅后手动合并**，页面不会自动合并。", "",
+      "- 文件：`" + plan.path + "`" + (update ? "（修改已有文章）" : "（新文章）"),
+      "- 分类：`posts/" + catOf(d) + "`",
+      "- 日期：" + (d.date || today()) + (d.time ? " " + d.time.slice(0, 5) : ""),
+      "- 标签：" + (d.tags.length ? d.tags.map(function (t) { return "`" + t.replace(/`/g, "'") + "`"; }).join(" ") : "无"),
+      "- 字数：" + proseCount(d.body)
+    ];
+    if (plan.src) L.push("- 来源：从 `" + GH.base + "` 载入原文后在写作页修改（载入时文件 blob `" + String(d.src.sha).slice(0, 7) + "`）");
+    if (d.draft) L.push("", "> [!WARNING]", "> `draft: true`：合并后这篇也不会进入构建。");
+    if (d.hidden) L.push("", "> [!NOTE]", "> `hidden: true`：合并后不会生成页面。");
+    L.push("", "<details><summary>Front matter</summary>", "", "```yaml", "---", fmLines(d).join("\n"), "---", "```", "", "</details>", "");
+    return L.join("\n");
+  }
+
+  function renderSteps(k, state) {
+    var ol = $("#pub-steps");
+    ol.hidden = k < 0;
+    ol.innerHTML = STEPS.map(function (s, i) {
+      return '<li class="' + (i < k ? "is-ok" : i === k ? "is-" + state : "") + '">' + s + "</li>";
+    }).join("");
+  }
+  function pubBox(kind, head, html) {
+    $("#pub-out").innerHTML = '<div class="pub-box is-' + kind + '"><div class="h">' + head + '</div><div class="b">' + html + "</div></div>";
+  }
+  function pubBtns(a, b) {
+    return '<div class="two">' + [a, b].filter(Boolean).map(function (x) {
+      return '<button class="pbtn block' + (x[2] ? " primary" : "") + '" type="button" data-pub="' + x[0] + '">' + x[1] + "</button>";
+    }).join("") + "</div>";
+  }
+  function renderPublish() {
+    var t = tok.get(), ready = !!t && !tokBad, btn = $("#btn-publish");
+    $("#tok-row").classList.toggle("is-set", ready);
+    $("#tok-row").classList.toggle("is-bad", !!t && !!tokBad);
+    $("#tok-row-t").innerHTML = !t ? "令牌：<b>未设置</b> · 发布已锁定"
+      : "令牌：<b>" + esc(maskToken(t)) + "</b> · " + (tokBad ? "不可用" : tok.where() === "local" ? "本设备记住" : "仅本次会话");
+    btn.disabled = !ready || pubBusy;
+    btn.classList.toggle("soon", !ready);
+    btn.classList.toggle("primary", ready);
+    $("#pub-badge").textContent = !ready ? "LOCKED" : pubBusy ? "…" : "PR";
+    $("#pub-sub").textContent = cur.pub && cur.pub.url ? "→ 更新已开的 PR #" + cur.pub.number : "→ Meredith2328/pilog · 合并到 pilog";
+    $("#pub-lock").hidden = ready;
+    $("#pub-lock").className = "note" + (tokBad ? " bad" : "");
+    $("#pub-lock").innerHTML = tokBad ? esc(tokBad) + " 发布已锁定，请到「令牌」重新设置。" : PUB_LOCK;
+  }
+  function persist(d) {
+    if (d === cur) { dirty = true; saveNow(); } else store.set("d." + d.id, d);
+  }
+  async function freeBranch(name) {
+    for (var n = 2; n < 30; n++) {
+      if (!(await ghMaybe("GET", repoApi("/git/ref/heads/" + encPath(name + "-" + n))))) return name + "-" + n;
+    }
+    throw new GhError(422, "找不到可用的分支名");
+  }
+
+  async function publish(opts) {
+    opts = opts || {};
+    if (pubBusy) return null;
+    var d = cur, plan = publishPlan(d), k = 0;
+    $("#pub-out").innerHTML = "";
+    renderSteps(-1);
+    if (plan.errors.length) {
+      pubBox("err", "还不能发布", plan.errors.map(function (x) { return "<p>" + x + "</p>"; }).join("") +
+        pubBtns(["meta", "去「信息」修改", true]));
+      return { ok: false, reason: "invalid" };
+    }
+    if (!tok.get() || tokBad) { renderPublish(); return { ok: false, reason: "locked" }; }
+    saveNow();
+    pubBusy = true; renderPublish();
+    try {
+      renderSteps(0, "run");
+      var repo = await ghReq("GET", repoApi(""));
+      if (repo && repo.permissions && repo.permissions.push === false) {
+        var np = new GhError(403, "no push"); np.code = "nopush"; throw np;
+      }
+      k = 1; renderSteps(1, "run");
+      var onBase = await ghMaybe("GET", repoApi("/contents/" + encPath(plan.path) + "?ref=" + GH.base));
+      var ours = d.pub && d.pub.path === plan.path;
+      if (plan.src && onBase && onBase.sha !== d.src.sha && !opts.overwrite) {
+        pubPending = opts; renderSteps(1, "wait");
+        pubBox("warn", "线上版本已变", "<p>你载入这篇之后，<code>" + GH.base + "</code> 上的 <code>" + esc(plan.path) +
+          "</code> 又被改过（可能是别的 PR 已合并）。继续提交会让这个 PR 用你的版本替换那些改动，合并前请在 GitHub 上核对 diff。</p>" +
+          pubBtns(["overwrite", "仍然提交我的版本", true], ["reload", "载入线上最新"]));
+        return { ok: false, reason: "stale" };
+      }
+      if (onBase && !opts.overwrite && !ours && !plan.src) {
+        pubPending = opts; renderSteps(1, "wait");
+        pubBox("warn", "文件已存在", "<p><code>" + GH.base + "</code> 上已经有 <code>" + esc(plan.path) +
+          "</code>。继续会以「修改已有文章」开 PR，合并后覆盖线上版本。</p>" +
+          pubBtns(["overwrite", "作为修改提交", true], ["rename", "改文件名"]));
+        return { ok: false, reason: "file-exists" };
+      }
+      var branch = opts.branch || (ours && d.pub.branch) || plan.branch;
+      var ref = await ghMaybe("GET", repoApi("/git/ref/heads/" + encPath(branch)));
+      if (ref && opts.mode === "new") { branch = await freeBranch(plan.branch); ref = null; }
+      else if (ref && opts.mode !== "update") {
+        pubPending = Object.assign({}, opts, { branch: branch }); renderSteps(1, "wait");
+        var mine = d.pub && d.pub.branch === branch;
+        pubBox("warn", "分支已存在", "<p><code>" + esc(branch) + "</code> 已经在仓库里" +
+          (mine ? "（这篇稿件上次开的 PR #" + esc(d.pub.number) + " 用的就是它）" : "") +
+          "。更新它会在这个分支上追加一个提交，已开的 PR 会自动带上改动；也可以另开一个新分支和新 PR。</p>" +
+          pubBtns(["update", "更新这个分支", true], ["new", "新开一个分支"]));
+        return { ok: false, reason: "branch-exists", branch: branch };
+      }
+      if (!ref) {
+        var base = await ghReq("GET", repoApi("/git/ref/heads/" + GH.base));
+        await ghReq("POST", repoApi("/git/refs"), { ref: "refs/heads/" + branch, sha: base.object.sha });
+      }
+      k = 2; renderSteps(2, "run");
+      var content = b64utf8(plan.file);
+      var existing = await ghMaybe("GET", repoApi("/contents/" + encPath(plan.path) + "?ref=" + encodeURIComponent(branch)));
+      if (existing && existing.type && existing.type !== "file") throw new GhError(422, plan.path + " 在仓库里不是文件");
+      var same = existing && String(existing.content || "").replace(/\s+/g, "") === content;
+      if (!same) {
+        await ghReq("PUT", repoApi("/contents/" + encPath(plan.path)), {
+          message: "post: " + (existing ? "更新" : "新增") + "「" + plan.title + "」",
+          content: content, branch: branch, sha: existing ? existing.sha : undefined
+        });
+      }
+      k = 3; renderSteps(3, "run");
+      var update = !!onBase;
+      var open = await ghReq("GET", repoApi("/pulls?state=open&base=" + GH.base + "&head=" + encodeURIComponent(GH.owner + ":" + branch)));
+      var pr = open && open[0], reused = !!pr;
+      if (!pr) pr = await ghReq("POST", repoApi("/pulls"), { title: prTitle(plan, update), head: branch, base: GH.base, body: prBody(plan, d, update) });
+      renderSteps(STEPS.length);
+      tokOk = true;
+      d.pub = { branch: branch, path: plan.path, url: pr.html_url, number: pr.number, at: Date.now() };
+      persist(d);
+      pubBox("ok", "PR #" + esc(pr.number) + (reused ? " 已更新" : " 已打开"),
+        "<p>" + (same ? "文件内容没有变化。" : "") + "<code>" + esc(branch) + "</code> → <code>" + GH.base +
+        "</code>。在 GitHub 上审阅后手动合并，合并后自动部署。</p>" +
+        plan.warns.map(function (x) { return '<p class="note">' + x + "</p>"; }).join("") +
+        '<a class="url" id="pub-url" href="' + esc(pr.html_url) + '" target="_blank" rel="noopener noreferrer">' + esc(pr.html_url) + "</a>" +
+        '<div class="two"><button class="pbtn block" type="button" data-pub="copy">复制链接</button>' +
+        '<a class="pbtn primary block" href="' + esc(pr.html_url) + '" target="_blank" rel="noopener noreferrer">打开 PR</a></div>');
+      toast(reused ? "已更新 PR #" + pr.number : "已开 PR #" + pr.number);
+      return { ok: true, url: pr.html_url, number: pr.number, branch: branch, reused: reused };
+    } catch (e) {
+      if (!(e instanceof GhError)) e = new GhError(-2, String(e && e.message || e));
+      if (k === 1 && e.status === 422 && /already exists/i.test(e.message)) {
+        pubPending = Object.assign({}, opts, { mode: "new" });
+      }
+      renderSteps(k, "err");
+      if (isTokenProblem(e) && k === 0) tokBad = ghMsg(e);
+      else if (e.status === 401 || (e.status === 403 && !/rate limit/i.test(e.message))) tokBad = ghMsg(e);
+      pubBox("err", "发布失败", "<p>" + esc(ghMsg(e)) + "</p>" +
+        (e.status === 0 ? "<p>现在的稿件仍保存在本机，可以先「下载 .md」备份。</p>" : "") +
+        pubBtns(tokBad ? ["token", "设置令牌", true] : ["retry", "重试", true], tokBad ? null : ["token", "检查令牌"]));
+      return { ok: false, reason: "error", status: e.status };
+    } finally {
+      pubBusy = false;
+      renderPublish();
+    }
+  }
+  $("#btn-publish").addEventListener("click", function () { publish(); });
+  $("#pub-out").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pub]");
+    if (!b) return;
+    var act = b.dataset.pub, pend = pubPending || {};
+    if (act === "copy") copyText($("#pub-url").href, "已复制 PR 链接");
+    else if (act === "overwrite") publish(Object.assign({}, pend, { overwrite: true }));
+    else if (act === "update") publish(Object.assign({}, pend, { mode: "update" }));
+    else if (act === "new") publish(Object.assign({}, pend, { mode: "new", branch: null }));
+    else if (act === "retry") publish(pend);
+    else if (act === "token") showSheet("token");
+    else if (act === "reload") loadRemote(cur.src.path, { fresh: true });
+    else if (act === "rename" || act === "meta") {
+      hideSheet(false); setView("meta");
+      if (act === "rename") setTimeout(function () { $("#f-slug").focus(); }, 80);
+    }
+  });
+
+  function tokMsg(kind, html) { $("#tok-msg").innerHTML = '<p class="note ' + kind + '">' + html + "</p>"; }
+  function renderToken() {
+    var t = tok.get(), w = tok.where();
+    $("#tok-state").innerHTML = t ? "<b>" + esc(maskToken(t)) + "</b>" : "未设置";
+    $("#tok-where").textContent = !t ? "没有令牌时「发布」保持锁定"
+      : (w === "local" ? "保存在本设备（localStorage）" : "仅本次会话（sessionStorage）") +
+        (tokBad ? " · 不可用" : tokOk ? " · 已验证" : " · 未验证");
+    $("#tok-remember").checked = w === "local";
+    $("#tok-in").value = "";
+  }
+  $("#btn-tok-save").addEventListener("click", async function () {
+    var v = $("#tok-in").value.trim(), old = tok.get();
+    if (!v && !old) { tokMsg("bad", "先把令牌粘贴到输入框。"); return; }
+    if (v && (/\s/.test(v) || v.length < 20)) { tokMsg("bad", "这看起来不是完整的令牌，请重新复制。"); return; }
+    try { tok.set(v || old, $("#tok-remember").checked); } catch (e) { tokMsg("bad", "浏览器禁止本地存储，无法保存令牌。"); return; }
+    tokBad = ""; tokOk = false;
+    renderToken(); renderPublish();
+    tokMsg("", "验证中…");
+    var fine = /^github_pat_/.test(v || old);
+    try {
+      var repo = await ghReq("GET", repoApi(""));
+      if (repo && repo.permissions && repo.permissions.push === false) {
+        var np = new GhError(403, "no push"); np.code = "nopush"; throw np;
+      }
+      tokOk = true;
+      tokMsg("ok", "已保存并验证：可以访问 Meredith2328/pilog。Pull requests 权限会在第一次发布时确认。" +
+        (fine ? "" : "<br>这不是 fine-grained token，建议换成只授权这个仓库的 fine-grained token。"));
+    } catch (e) {
+      if (e.status === 0) tokMsg("", "已保存，但现在无法联网验证，发布时会再检查。");
+      else if (isTokenProblem(e)) { tokBad = ghMsg(e); tokMsg("bad", esc(tokBad) + " 发布保持锁定。"); }
+      else tokMsg("bad", "已保存，但验证失败：" + esc(ghMsg(e)));
+    }
+    renderToken(); renderPublish();
+    if (tokOk && remote.pending) loadRemote(remote.path);
+  });
+  $("#btn-tok-clear").addEventListener("click", function () {
+    tok.clear(); tokBad = ""; tokOk = false;
+    renderToken(); renderPublish();
+    tokMsg("ok", "已从这台设备清除令牌。如怀疑泄露，请同时到 GitHub 上 Revoke。");
+  });
+  $("#tok-in").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); $("#btn-tok-save").click(); }
+  });
+
+  /* ================= live edit: load a post from pilog =================
+     ?path=blogs/posts/….md (or the post's site URL) pulls the current file
+     from the pilog branch with the same device token; publishing it goes
+     through the usual write/ branch + PR, never straight to pilog. */
+  var remote = { path: "", pending: false, busy: false, cache: null };
+  function normPath(raw) {
+    var s = String(raw || "").trim();
+    try { s = decodeURIComponent(s); } catch (e) { /* keep as typed */ }
+    s = s.replace(/^[a-z]+:\/\/[^/]+/i, "").replace(/[?#].*$/, "").replace(/\\/g, "/").replace(/^\/+/, "");
+    if (/^posts\//.test(s)) s = "blogs/" + s;
+    s = s.replace(/\.html$/, ".md");
+    if (!/^blogs\/posts\/(?:[^/]+\/)*[^/]+\.md$/.test(s)) return "";
+    if (s.split("/").some(function (p) { return !p || p[0] === "."; })) return "";
+    return s;
+  }
+  function unb64utf8(s) {
+    var bin = atob(String(s).replace(/\s+/g, "")), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function rmBox(kind, head, html) {
+    $("#rm-out").innerHTML = '<div class="pub-box is-' + kind + '"><div class="h">' + head + '</div><div class="b">' + html + "</div></div>";
+  }
+  function rmBtns(a, b) {
+    return '<div class="two">' + [a, b].filter(Boolean).map(function (x) {
+      return '<button class="pbtn block' + (x[2] ? " primary" : "") + '" type="button" data-rm="' + x[0] + '">' + x[1] + "</button>";
+    }).join("") + "</div>";
+  }
+  function linkedDraft(path) {
+    var list = allDrafts();
+    if (cur && list.every(function (d) { return d.id !== cur.id; })) list.unshift(cur);
+    return list.filter(function (d) { return d.src && d.src.path === path; })[0] || null;
+  }
+  function useRemote(d, msg) {
+    openDraft(d, true);
+    dirty = true;
+    saveNow();
+    remote.cache = null;
+    hideSheet(false);
+    setView("write");
+    toast(msg);
+    return { ok: true, id: d.id, path: d.src.path };
+  }
+  async function loadRemote(raw, opts) {
+    opts = opts || {};
+    if (remote.busy) return null;
+    var path = normPath(raw);
+    if (!$("#sheet-remote").classList.contains("is-open")) showSheet("remote");
+    $("#rm-in").value = path || String(raw || "");
+    if (!path) {
+      rmBox("err", "路径无效", "<p>只能编辑 <code>blogs/posts/</code> 下的 <code>.md</code> 文件，例如 <code>blogs/posts/toy/10pi.md</code>，也可以粘贴文章网址。</p>");
+      return { ok: false, reason: "invalid" };
+    }
+    remote.path = path;
+    if (!tok.get() || tokBad) {
+      remote.pending = true;
+      rmBox("warn", "需要令牌", "<p>载入 <code>" + esc(path) + "</code> 要用你在这台设备上设置的 GitHub 令牌（与发布同一个）。设置好后会自动继续载入。</p>" +
+        rmBtns(["token", "设置令牌", true]));
+      return { ok: false, reason: "locked" };
+    }
+    remote.pending = false;
+    remote.busy = true;
+    rmBox("run", "载入中", "<p>正在从 <code>" + GH.base + "</code> 读取 <code>" + esc(path) + "</code>…</p>");
+    try {
+      var j = remote.cache && remote.cache.path === path && opts.cached ? remote.cache
+        : await ghReq("GET", repoApi("/contents/" + encPath(path) + "?ref=" + GH.base));
+      if (!j || j.type !== "file") throw new GhError(422, path + " 不是文件");
+      if (j.encoding && j.encoding !== "base64") throw new GhError(422, "文件太大，GitHub 不返回内容（超过 1 MB）");
+      remote.cache = { path: path, type: j.type, sha: j.sha, content: j.content, encoding: j.encoding };
+      tokOk = true;
+      var text = unb64utf8(j.content || ""), have = linkedDraft(path);
+      if (have && !opts.fresh) {
+        var edited = have.updated > have.src.at;
+        if (have.src.sha === j.sha) return useRemote(have, edited ? "继续本机稿件（线上没有新改动）" : "已打开「" + path.split("/").pop() + "」");
+        if (!edited) {
+          var again = fromRemote(text, path, j.sha);
+          again.id = have.id; again.created = have.created; again.pub = have.pub;
+          return useRemote(again, "已刷新为 pilog 上的最新版本");
+        }
+        rmBox("warn", "两边都有改动", "<p>本机稿件有未发布的改动，而 <code>" + GH.base + "</code> 上的这篇在你载入后也被改过。</p>" +
+          "<p>可以继续改本机稿件，或把线上最新版本载入为<b>另一份</b>稿件（本机稿件保留）。</p>" +
+          rmBtns(["keep", "继续本机稿件", true], ["fresh", "载入线上最新"]));
+        remote.keep = have.id;
+        return { ok: false, reason: "conflict" };
+      }
+      return useRemote(fromRemote(text, path, j.sha), "已从 pilog 载入 " + path.split("/").pop());
+    } catch (e) {
+      if (!(e instanceof GhError)) e = new GhError(-2, String(e && e.message || e));
+      if (e.status === 401 || (e.status === 403 && !/rate limit/i.test(e.message))) tokBad = ghMsg(e);
+      var msg = e.status === 404 ? "在 " + GH.base + " 分支上找不到 " + path + "（404）。可能路径写错、文章已改名，或令牌没有授权 Meredith2328/pilog。"
+        : ghMsg(e);
+      rmBox("err", "载入失败", "<p>" + esc(msg) + "</p>" +
+        rmBtns(tokBad ? ["token", "设置令牌", true] : ["retry", "重试", true], tokBad ? null : ["token", "检查令牌"]));
+      return { ok: false, reason: "error", status: e.status };
+    } finally {
+      remote.busy = false;
+      renderPublish();
+    }
+  }
+  $("#btn-rm-load").addEventListener("click", function () { loadRemote($("#rm-in").value); });
+  $("#rm-in").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); loadRemote(this.value); }
+  });
+  $("#rm-out").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-rm]");
+    if (!b) return;
+    var act = b.dataset.rm;
+    if (act === "token") showSheet("token");
+    else if (act === "retry") loadRemote(remote.path);
+    else if (act === "fresh") loadRemote(remote.path, { fresh: true, cached: true });
+    else if (act === "keep") {
+      var d = loadDraft(remote.keep) || linkedDraft(remote.path);
+      if (d) useRemote(d, "继续本机稿件");
+    }
+  });
+
+  /* ================= drafts ================= */
+  function openDraft(d, quiet) {
+    if (cur && cur.id !== d.id) {
+      saveNow();
+      if (isBlank(cur)) removeDraft(cur.id);
+    }
+    cur = d;
+    index.active = d.id;
+    if (index.ids.indexOf(d.id) < 0) index.ids.push(d.id);
+    try { writeIndex(); } catch (e) { /* surfaced on next save */ }
+    fillFields();
+    $("#pub-out").innerHTML = "";
+    renderSteps(-1);
+    var c = Math.min(d.caret || 0, body.value.length);
+    body.setSelectionRange(c, c);
+    body.scrollTop = 0;
+    $("#draft-n").textContent = index.ids.length;
+    setSave("ok", d.body || d.title ? "已恢复" : "新稿件", d.updated);
+    if (!quiet) toast(d.title.trim() ? "打开「" + d.title.trim() + "」" : "打开无标题稿件");
+  }
+  function newDraft() {
+    if (cur && isBlank(cur)) { hideSheet(false); setView("write"); toast("当前已是空白稿件"); return; }
+    var d = blankDraft();
+    openDraft(d, true);
+    dirty = true;
+    saveNow();
+    hideSheet(false);
+    setView("write");
+    toast("新稿件");
+  }
+  function renderDrafts() {
+    var list = allDrafts();
+    if (cur && list.every(function (d) { return d.id !== cur.id; })) list.unshift(cur);
+    $("#drafts-sub").textContent = list.length + " 篇";
+    $("#draft-list").innerHTML = list.map(function (d) {
+      var t = d.title.trim() || firstHeading(d.body);
+      var active = cur && d.id === cur.id;
+      return '<div class="drow' + (active ? " is-active" : "") + '" data-id="' + d.id + '">' +
+        '<button class="drow-main" type="button" data-act="open"><span class="drow-t' + (t ? "" : " is-empty") + '">' + esc(t || "无标题稿件") + "</span>" +
+        '<span class="drow-m"><span>posts/' + esc(catOf(d)) + "</span><span>" + proseCount(d.body) + " 字</span><span>" + relTime(d.updated) + "</span>" +
+        (active ? '<span class="badge ink">编辑中</span>' : "") + (d.src ? '<span class="badge">线上</span>' : "") +
+        (d.draft ? '<span class="badge">DRAFT</span>' : "") +
+        (d.exported && d.exported >= d.updated ? '<span class="badge">已导出</span>' : "") +
+        (d.pub && d.pub.number ? '<span class="badge">PR #' + esc(d.pub.number) + "</span>" : "") + "</span></button>" +
+        '<button class="drow-del" type="button" data-act="del" aria-label="删除">删除</button></div>';
+    }).join("");
+  }
+  $("#draft-list").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    var id = btn.closest(".drow").dataset.id;
+    if (btn.dataset.act === "open") {
+      if (!cur || id !== cur.id) { var d = loadDraft(id); if (d) openDraft(d); }
+      hideSheet(false);
+      setView("write");
+      return;
+    }
+    if (!btn.classList.contains("is-armed")) {
+      btn.classList.add("is-armed"); btn.textContent = "确认删除";
+      setTimeout(function () { if (btn.isConnected) { btn.classList.remove("is-armed"); btn.textContent = "删除"; } }, 3000);
+      return;
+    }
+    removeDraft(id);
+    if (cur && cur.id === id) {
+      var rest = allDrafts();
+      cur = null;
+      openDraft(rest[0] || blankDraft(), true);
+      if (!rest.length) { dirty = true; saveNow(); }
+    }
+    $("#draft-n").textContent = index.ids.length;
+    renderDrafts();
+    toast("已删除");
+  });
+  $("#btn-new").addEventListener("click", newDraft);
+  $("#btn-wipe").addEventListener("click", function () {
+    var b = this;
+    if (!b.classList.contains("is-armed")) {
+      b.classList.add("is-armed"); b.textContent = "再点一次：删除 " + index.ids.length + " 篇稿件";
+      setTimeout(function () { b.classList.remove("is-armed"); b.textContent = "清空本机全部稿件"; }, 3500);
+      return;
+    }
+    index.ids.slice().forEach(removeDraft);
+    b.classList.remove("is-armed"); b.textContent = "清空本机全部稿件";
+    cur = null;
+    dirty = true;
+    openDraft(blankDraft(), true);
+    saveNow();
+    renderDrafts();
+    toast("已清空");
+  });
+  $("#btn-import").addEventListener("click", function () { $("#file-in").click(); });
+  $("#file-in").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    this.value = "";
+    if (!f) return;
+    f.text().then(function (text) {
+      var d = parseFile(text, f.name);
+      openDraft(d, true);
+      dirty = true;
+      saveNow();
+      hideSheet(false);
+      setView("write");
+      toast("已导入 " + f.name + "，请确认分类");
+    }, function () { toast("读取失败"); });
+  });
+
+  /* ================= theme ================= */
+  function syncThemeBtn() {
+    var dark = document.documentElement.dataset.theme === "dark";
+    $("#btn-theme").textContent = "外观：" + (dark ? "深色" : "浅色");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = dark ? "#17181a" : "#f7f7f7";
+  }
+  $("#btn-theme").addEventListener("click", function () {
+    var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("pilog.theme", next); } catch (e) { /* ignore */ }
+    syncThemeBtn();
+  });
+
+  /* ================= boot ================= */
+  $$("[data-pix]").forEach(function (el) { el.innerHTML = pixSvg(PIX[el.dataset.pix]); });
+  (function favicon() {
+    var svg = pixSvg(PIX.dino).replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ').replace("currentColor", "#3c4043");
+    var link = document.createElement("link");
+    link.rel = "icon"; link.href = "data:image/svg+xml," + encodeURIComponent(svg);
+    document.head.appendChild(link);
+  })();
+  syncPointer();
+  syncThemeBtn();
+  syncPvSeg();
+  fit();
+
+  var start = index.active && loadDraft(index.active);
+  if (!start) start = allDrafts()[0];
+  if (!start) { start = blankDraft(); dirty = true; }
+  openDraft(start, true);
+  if (dirty) saveNow();
+  if (prefs.view && prefs.view !== "write") setView(prefs.view);
+
+  try { localStorage.setItem(PFX + "probe", "1"); localStorage.removeItem(PFX + "probe"); }
+  catch (e) { setSave("err", "无法本地保存"); toast("此浏览器禁止本地存储，内容不会自动保存"); }
+
+  document.addEventListener("visibilitychange", function () { if (document.hidden) saveNow(); });
+  window.addEventListener("pagehide", saveNow);
+
+  if (/^https?:$/.test(location.protocol)) { $("#brand").href = "../"; $("#brand").title = "返回博客"; }
+  var askPath = new URLSearchParams(location.search).get("path");
+  if (askPath !== null) {
+    /* drop ?path= so a reload resumes the local draft instead of re-asking */
+    try { history.replaceState(history.state, "", location.pathname + location.hash); } catch (e) { /* file:// */ }
+    loadRemote(askPath);
+  }
+
+  if (/^https?:$/.test(location.protocol)) {
+    fetch("/api/tree", { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.dirs) return;
+      var found = [];
+      (function walk(nodes) {
+        (nodes || []).forEach(function (nd) {
+          if (/^posts\//.test(nd.path) && !/(^|\/)(assets|post-images|images?)(\/|$)/.test(nd.path.slice(6))) found.push(nd.path.slice(6));
+          walk(nd.children);
+        });
+      })(j.dirs);
+      window.__pilogCats = found;
+      renderCats();
+    }).catch(function () { /* offline or not the pilog dev server */ });
+  }
+
+  window.__pilogWrite = {
+    render: renderMarkdown, build: function () { return buildFile(cur); }, parse: parseFile, current: function () { return cur; },
+    plan: function () { var p = publishPlan(cur); p.prTitle = prTitle(p, false); p.prBody = prBody(p, cur, false); return p; },
+    publish: publish, load: loadRemote, fromRemote: fromRemote, normPath: normPath,
+    buildOf: buildFile, pathOf: pathOf
+  };
+})();
+</script>
+</body>
+</html>

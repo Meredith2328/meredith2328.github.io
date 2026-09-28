@@ -1565,6 +1565,24 @@ html[data-theme="dark"] .theme-icon-sun { display: block; }
   margin-left: auto;
 }
 
+.post-edit {
+  margin-left: auto;
+  padding: 1px 6px;
+  border: 1px dashed var(--mute);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.post-folder + .post-edit {
+  margin-left: 0;
+}
+
+.post-edit:hover {
+  border-style: solid;
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
 .post-stats {
   color: var(--mute);
 }
