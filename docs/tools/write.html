@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#f7f7f7">
 <meta name="color-scheme" content="light dark">
 <meta name="mobile-web-app-capable" content="yes">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self' data:; connect-src 'self' https://api.github.com; form-action 'none'; base-uri 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self' data:; connect-src 'self' https://api.github.com https://meredith2328.github.io; form-action 'none'; base-uri 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
 <title>pilog · 手机写作</title>
@@ -184,6 +184,18 @@ textarea.inp { resize: vertical; min-height: 96px; }
   flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 0 10px;
   font: 15px/1 var(--mono); color: var(--ink); border-radius: 0;
 }
+.pk { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.pk .affix { min-width: 0; margin-left: calc(var(--d, 0) * 14px); }
+.pk .affix:focus-within { border-color: var(--ink); box-shadow: 3px 3px 0 var(--shadow); }
+.pk .affix.is-set { border-color: var(--ink); }
+.pk select {
+  flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 0 10px; border-radius: 0;
+  font: 15px/1 var(--mono); color: var(--ink); -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+.pk select:disabled { color: var(--mute); cursor: default; }
+.pk .affix span:last-child { padding: 0 12px; pointer-events: none; }
+.pk-re { border: 0; background: none; padding: 0; font: 12px/1.3 var(--mono); color: var(--accent); cursor: pointer; }
+.pk-re:disabled { color: var(--mute); cursor: default; }
 .row { display: flex; gap: 10px; align-items: stretch; }
 .row > .inp { flex: 1; min-width: 0; }
 .row > .pbtn { flex: none; box-shadow: none; }
@@ -797,14 +809,21 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   <div class="sheet-h"><span id="sh-remote-t">编辑线上文章</span><small>读 pilog 分支</small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
   <div class="sheet-b">
     <div class="fld">
-      <label class="lbl" for="rm-in">文章路径 <small>blogs/posts/…/*.md 或文章网址</small></label>
-      <div class="row">
-        <input class="inp mono" id="rm-in" type="text" placeholder="blogs/posts/toy/10pi.md" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">
-        <button class="pbtn primary" type="button" id="btn-rm-load">载入</button>
-      </div>
+      <div class="lbl"><span>选择文章 <small id="pk-src"></small></span><button class="pk-re" type="button" id="pk-re">刷新列表</button></div>
+      <div class="pk" id="pk"></div>
     </div>
     <div id="rm-out"></div>
-    <p class="hint">从 <code>pilog</code> 分支读取这篇的最新版本，放进本机稿件原地修改。改完在「导出 → 发布（开 PR）」提交，PR 合并前线上不会变。也可以在博客文章页点「✎ 编辑」直接跳过来。</p>
+    <details class="more" id="rm-adv">
+      <summary>高级：粘贴路径或网址</summary>
+      <div class="in">
+        <label class="lbl" for="rm-in" style="margin-top:12px">文章路径 <small>blogs/posts/…/*.md 或文章网址</small></label>
+        <div class="row">
+          <input class="inp mono" id="rm-in" type="text" placeholder="blogs/posts/toy/10pi.md" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">
+          <button class="pbtn primary" type="button" id="btn-rm-load">载入</button>
+        </div>
+      </div>
+    </details>
+    <p class="hint">从 <code>pilog</code> 分支读取这篇的最新版本，放进本机稿件原地修改。没设令牌时列表只有博客上已发布的文章；设了令牌会列出仓库里的全部文章（含未发布）。改完在「导出 → 发布（开 PR）」提交，PR 合并前线上不会变。也可以在博客文章页点「✎ 编辑」直接跳过来。</p>
   </div>
 </section>
 
@@ -1809,7 +1828,12 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     saveNow();
     if (name === "export") renderExport();
     if (name === "token") { renderToken(); $("#tok-msg").innerHTML = ""; }
-    if (name === "remote") { $("#rm-out").innerHTML = ""; if (!$("#rm-in").value && cur.src) $("#rm-in").value = cur.src.path; }
+    if (name === "remote") {
+      $("#rm-out").innerHTML = "";
+      if (!$("#rm-in").value && cur.src) $("#rm-in").value = cur.src.path;
+      $("#rm-adv").open = false;
+      if (pk.hold) pkIdle(); else pkStart();
+    }
     if (name === "drafts") renderDrafts();
     if (name === "drafts") syncThemeBtn();
     el.classList.add("is-open");
@@ -1820,6 +1844,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   }
   function hideSheet(fromPop) {
     if (!openSheet) return;
+    pk.pending = false;
     openSheet.classList.remove("is-open");
     $("#scrim").classList.remove("is-on");
     openSheet = null;
@@ -1922,6 +1947,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
      the repo nothing can be published. Always a write/ branch + PR into
      pilog; never a direct push, never a merge. */
   var GH = { api: "https://api.github.com", owner: "Meredith2328", repo: "pilog", base: "pilog" };
+  var SITE = { origin: "https://meredith2328.github.io", index: "data/cards.json" };
   var TOKEN_KEY = PFX + "ghToken";
   var tok = {
     get: function () {
@@ -1955,11 +1981,13 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   function GhError(status, message, data) { this.status = status; this.message = message || ""; this.data = data || null; }
   function repoApi(p) { return "/repos/" + GH.owner + "/" + GH.repo + p; }
   function encPath(p) { return p.split("/").map(encodeURIComponent).join("/"); }
-  function ghReq(method, path, data) {
-    var token = tok.get();
-    if (!token) return Promise.reject(new GhError(-1));
+  /* anon: read-only request without the token (the repo is public) */
+  function ghReq(method, path, data, anon) {
+    var token = anon ? "" : tok.get();
+    if (!token && !anon) return Promise.reject(new GhError(-1));
     if (navigator.onLine === false) return Promise.reject(new GhError(0, "offline"));
-    var headers = { Accept: "application/vnd.github+json", Authorization: "Bearer " + token, "X-GitHub-Api-Version": "2022-11-28" };
+    var headers = { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+    if (token) headers.Authorization = "Bearer " + token;
     if (data) headers["Content-Type"] = "application/json";
     return window.fetch(GH.api + path, {
       method: method, headers: headers, body: data ? JSON.stringify(data) : undefined,
@@ -2225,7 +2253,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     if (!v && !old) { tokMsg("bad", "先把令牌粘贴到输入框。"); return; }
     if (v && (/\s/.test(v) || v.length < 20)) { tokMsg("bad", "这看起来不是完整的令牌，请重新复制。"); return; }
     try { tok.set(v || old, $("#tok-remember").checked); } catch (e) { tokMsg("bad", "浏览器禁止本地存储，无法保存令牌。"); return; }
-    tokBad = ""; tokOk = false;
+    tokBad = ""; tokOk = false; pk.tree = null;
     renderToken(); renderPublish();
     tokMsg("", "验证中…");
     var fine = /^github_pat_/.test(v || old);
@@ -2243,10 +2271,11 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       else tokMsg("bad", "已保存，但验证失败：" + esc(ghMsg(e)));
     }
     renderToken(); renderPublish();
-    if (tokOk && remote.pending) loadRemote(remote.path);
+    if (tokOk && remote.pending) loadRemote(remote.path, { picked: remote.picked });
+    else if (tokOk && pk.pending) showSheet("remote");
   });
   $("#btn-tok-clear").addEventListener("click", function () {
-    tok.clear(); tokBad = ""; tokOk = false;
+    tok.clear(); tokBad = ""; tokOk = false; pk.tree = null;
     renderToken(); renderPublish();
     tokMsg("ok", "已从这台设备清除令牌。如怀疑泄露，请同时到 GitHub 上 Revoke。");
   });
@@ -2301,29 +2330,26 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     opts = opts || {};
     if (remote.busy) return null;
     var path = normPath(raw);
-    if (!$("#sheet-remote").classList.contains("is-open")) showSheet("remote");
+    if (!$("#sheet-remote").classList.contains("is-open")) { pk.hold = true; showSheet("remote"); pk.hold = false; }
     $("#rm-in").value = path || String(raw || "");
+    remote.picked = !!opts.picked;
+    if (!opts.picked) $("#rm-adv").open = true;
     if (!path) {
       rmBox("err", "路径无效", "<p>只能编辑 <code>blogs/posts/</code> 下的 <code>.md</code> 文件，例如 <code>blogs/posts/toy/10pi.md</code>，也可以粘贴文章网址。</p>");
       return { ok: false, reason: "invalid" };
     }
     remote.path = path;
-    if (!tok.get() || tokBad) {
-      remote.pending = true;
-      rmBox("warn", "需要令牌", "<p>载入 <code>" + esc(path) + "</code> 要用你在这台设备上设置的 GitHub 令牌（与发布同一个）。设置好后会自动继续载入。</p>" +
-        rmBtns(["token", "设置令牌", true]));
-      return { ok: false, reason: "locked" };
-    }
+    var anon = !tok.get() || !!tokBad;
     remote.pending = false;
     remote.busy = true;
     rmBox("run", "载入中", "<p>正在从 <code>" + GH.base + "</code> 读取 <code>" + esc(path) + "</code>…</p>");
     try {
       var j = remote.cache && remote.cache.path === path && opts.cached ? remote.cache
-        : await ghReq("GET", repoApi("/contents/" + encPath(path) + "?ref=" + GH.base));
+        : await ghReq("GET", repoApi("/contents/" + encPath(path) + "?ref=" + GH.base), null, anon);
       if (!j || j.type !== "file") throw new GhError(422, path + " 不是文件");
       if (j.encoding && j.encoding !== "base64") throw new GhError(422, "文件太大，GitHub 不返回内容（超过 1 MB）");
       remote.cache = { path: path, type: j.type, sha: j.sha, content: j.content, encoding: j.encoding };
-      tokOk = true;
+      if (!anon) tokOk = true;
       var text = unb64utf8(j.content || ""), have = linkedDraft(path);
       if (have && !opts.fresh) {
         var edited = have.updated > have.src.at;
@@ -2342,6 +2368,12 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       return useRemote(fromRemote(text, path, j.sha), "已从 pilog 载入 " + path.split("/").pop());
     } catch (e) {
       if (!(e instanceof GhError)) e = new GhError(-2, String(e && e.message || e));
+      if (anon && (e.status === 401 || e.status === 403 || e.status === 429)) {
+        remote.pending = true;
+        rmBox("warn", "需要令牌", "<p>不带令牌读取 <code>" + esc(path) + "</code> 被 GitHub 拒绝（" + (/rate limit/i.test(e.message) ? "未登录请求的速率限制" : "HTTP " + e.status) + "）。设置 GitHub 令牌（与发布同一个）后会自动继续载入。</p>" +
+          rmBtns(["token", "设置令牌", true]));
+        return { ok: false, reason: "locked" };
+      }
       if (e.status === 401 || (e.status === 403 && !/rate limit/i.test(e.message))) tokBad = ghMsg(e);
       var msg = e.status === 404 ? "在 " + GH.base + " 分支上找不到 " + path + "（404）。可能路径写错、文章已改名，或令牌没有授权 Meredith2328/pilog。"
         : ghMsg(e);
@@ -2362,13 +2394,170 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     if (!b) return;
     var act = b.dataset.rm;
     if (act === "token") showSheet("token");
-    else if (act === "retry") loadRemote(remote.path);
-    else if (act === "fresh") loadRemote(remote.path, { fresh: true, cached: true });
+    else if (act === "retry") loadRemote(remote.path, { picked: remote.picked });
+    else if (act === "relist") pkRetry();
+    else if (act === "fresh") loadRemote(remote.path, { fresh: true, cached: true, picked: remote.picked });
     else if (act === "keep") {
       var d = loadDraft(remote.keep) || linkedDraft(remote.path);
       if (d) useRemote(d, "继续本机稿件");
     }
   });
+
+  /* cascading picker: eager data, lazy UI. The whole blogs/posts tree is
+     fetched once — the repo's Git tree on pilog with a token, the site's
+     public post index without — and each select only walks that cache.
+     Refetched on 刷新列表 or when the token changes. */
+  var PK_ROOT = "blogs/posts", PK_SKIP = /^(assets|post-images|images?)$/;
+  var pk = { tree: null, levels: [], want: "", hold: false, pending: false, idle: false, busy: false, err: false, run: 0 };
+  function pkMode() { return tok.get() && !tokBad ? "repo" : "public"; }
+  function pkBuild(paths, pub) {
+    var root = { dirs: {}, files: {} };
+    paths.forEach(function (p) {
+      var segs = p.split("/"), name = segs.pop(), node = root;
+      if (!/\.md$/i.test(name) || /^[._]/.test(name)) return;
+      if (segs.some(function (x) { return !x || x[0] === "." || PK_SKIP.test(x); })) return;
+      segs.forEach(function (x) { node = node.dirs[x] || (node.dirs[x] = { dirs: {}, files: {} }); });
+      node.files[name] = !!pub && !pub[p];
+    });
+    return root;
+  }
+  function pkBlobs(tree, pre) {
+    return (tree || []).filter(function (x) { return x.type === "blob" && x.path.indexOf(pre) === 0; })
+      .map(function (x) { return x.path.slice(pre.length); });
+  }
+  /* "pilog:blogs/posts" (a git revision expression) returns just the posts
+     subtree in one call; the documented two-step lookup is the fallback. */
+  function pkRepoPaths() {
+    var up = PK_ROOT.split("/");
+    function viaParent() {
+      return ghReq("GET", repoApi("/contents/" + encPath(up.slice(0, -1).join("/")) + "?ref=" + GH.base)).then(function (list) {
+        var t = (list || []).filter(function (x) { return x.type === "dir" && x.name === up[up.length - 1]; })[0];
+        if (!t) throw new GhError(404, PK_ROOT);
+        return ghReq("GET", repoApi("/git/trees/" + t.sha + "?recursive=1")).then(function (sub) { return pkBlobs(sub.tree, ""); });
+      });
+    }
+    return ghReq("GET", repoApi("/git/trees/" + encodeURIComponent(GH.base + ":" + PK_ROOT) + "?recursive=1")).then(function (j) {
+      return j && !j.truncated && Array.isArray(j.tree) ? pkBlobs(j.tree, "") : viaParent();
+    }, function (e) {
+      if (e && (e.status === 404 || e.status === 422)) return viaParent();
+      throw e;
+    });
+  }
+  /* data/cards.json lists exactly the posts the site publishes; same-origin
+     on Pages, the absolute site copy from the app or file:// */
+  function pkPublicPaths() {
+    var urls = [];
+    if (/^https?:$/.test(location.protocol)) urls.push(new URL("../" + SITE.index, location.href).href);
+    if (urls.indexOf(SITE.origin + "/" + SITE.index) < 0) urls.push(SITE.origin + "/" + SITE.index);
+    function next(i) {
+      if (i >= urls.length) return Promise.reject(new GhError(0, "public index"));
+      return window.fetch(urls[i], { credentials: "omit", referrerPolicy: "no-referrer", cache: "no-cache" })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (j) {
+          if (!Array.isArray(j)) throw new Error("index");
+          return j.map(function (c) { var p = normPath(c && c.url); return p ? p.slice(PK_ROOT.length + 1) : ""; }).filter(Boolean);
+        })
+        .catch(function () { return next(i + 1); });
+    }
+    return next(0);
+  }
+  function pkFetch(mode) {
+    if (mode === "public") return pkPublicPaths().then(function (ps) { return pkBuild(ps, null); });
+    var pub = pkPublicPaths().then(function (ps) {
+      var m = {}; ps.forEach(function (p) { m[p] = 1; }); return m;
+    }, function () { return null; });
+    return Promise.all([pkRepoPaths(), pub]).then(function (r) { tokOk = true; return pkBuild(r[0], r[1]); });
+  }
+  function pkItems(node) {
+    var cmp = function (a, b) { return a.localeCompare(b); };
+    return Object.keys(node.dirs).sort(cmp).map(function (n) { return { name: n, dir: true }; })
+      .concat(Object.keys(node.files).sort(cmp).map(function (n) { return { name: n, dir: false, draft: node.files[n] }; }));
+  }
+  function pkSelect(i, head, opts, on, set) {
+    return '<div class="affix' + (set ? " is-set" : "") + '" style="--d:' + i + '"><span>' + esc(head) + "</span>" +
+      '<select data-i="' + i + '" aria-label="' + esc(head) + ' 下的目录或文章"' + (on ? "" : " disabled") + ">" +
+      opts + '</select><span aria-hidden="true">▾</span></div>';
+  }
+  function pkRender() {
+    var html;
+    if (pk.busy || pk.err) html = pkSelect(0, "posts/", "<option>" + (pk.err ? "读取失败" : "读取中…") + "</option>", false);
+    else html = pk.levels.map(function (lv, i) {
+      var items = pkItems(lv.node);
+      var opts = !items.length ? "<option>（空）</option>"
+        : '<option value=""' + (lv.pick ? "" : " selected") + " disabled>选择 · " + items.length + " 项</option>" +
+          items.map(function (x) {
+            return '<option value="' + esc((x.dir ? "d:" : "f:") + x.name) + '"' + (lv.pick === x.name ? " selected" : "") + ">" +
+              esc(x.dir ? x.name + "/" : x.name.replace(/\.md$/i, "") + (x.draft ? " · 未发布" : "")) + "</option>";
+          }).join("");
+      return pkSelect(i, lv.dir.split("/").pop() + "/", opts, items.length, lv.pick);
+    }).join("") || (pk.idle ? '<button class="pbtn block" type="button" data-pk="start">从列表选择…</button>' : "");
+    $("#pk").innerHTML = html;
+    $("#pk-src").textContent = !pk.tree || pk.idle || pk.busy || pk.err ? "" : pk.tree.mode === "repo" ? "pilog 仓库 · 含未发布" : "已发布的文章";
+    $("#pk-re").disabled = pk.busy || pk.idle;
+  }
+  function pkShow() {
+    var dir = PK_ROOT, node = pk.tree.root;
+    var rest = pk.want.indexOf(PK_ROOT + "/") === 0 ? pk.want.slice(PK_ROOT.length + 1).split("/") : [];
+    pk.levels = [];
+    while (node) {
+      var lv = { dir: dir, node: node, pick: "" }, seg = rest.shift();
+      pk.levels.push(lv);
+      if (seg && node.dirs[seg]) { lv.pick = seg; dir += "/" + seg; node = node.dirs[seg]; }
+      else { if (seg && seg in node.files) lv.pick = seg; node = null; }
+    }
+    pkRender();
+  }
+  function pkStart(want, fresh) {
+    var run = ++pk.run, mode = pkMode();
+    pk.idle = false; pk.err = false; pk.pending = false; pk.levels = [];
+    pk.want = want != null ? want : cur && cur.src ? cur.src.path : "";
+    if (pk.tree && pk.tree.mode === mode && !fresh) { pk.busy = false; pkShow(); return; }
+    pk.busy = true;
+    pkRender();
+    pkFetch(mode).then(function (root) {
+      if (run !== pk.run) return;
+      pk.busy = false;
+      pk.tree = { mode: mode, root: root };
+      pkShow();
+    }, function (e) {
+      if (run !== pk.run) return;
+      pk.busy = false;
+      if (!(e instanceof GhError)) e = new GhError(-2, String(e && e.message || e));
+      if (mode === "repo" && (e.status === 401 || (e.status === 403 && !/rate limit/i.test(e.message)))) {
+        tokBad = ghMsg(e); renderToken(); renderPublish();
+        rmBox("warn", "令牌不可用", "<p>" + esc(tokBad) + " 下面先列出已发布的文章；修好令牌后可以看到仓库里的全部文章。</p>" + rmBtns(["token", "设置令牌", true]));
+        pkStart(pk.want);
+        pk.pending = true;
+        return;
+      }
+      pk.err = true;
+      pk.pending = true;
+      pkRender();
+      var msg = mode === "public" ? "读不到博客的公开文章列表（离线，或页面不是从博客打开的）。设置 GitHub 令牌后可以直接列出仓库里的文章。" : ghMsg(e);
+      rmBox("err", "列表读取失败", "<p>" + esc(msg) + "</p>" + rmBtns(["relist", "重试", true], ["token", mode === "public" ? "设置令牌" : "检查令牌"]));
+    });
+  }
+  function pkIdle() { pk.run++; pk.levels = []; pk.idle = true; pk.busy = false; pk.err = false; pkRender(); }
+  function pkTrail() {
+    var last = pk.levels.filter(function (lv) { return lv.pick; }).pop();
+    return last ? last.dir + "/" + last.pick : pk.want;
+  }
+  function pkRetry() { $("#rm-out").innerHTML = ""; pkStart(pkTrail(), true); }
+  $("#pk").addEventListener("change", function (e) {
+    var sel = e.target.closest("select");
+    if (!sel || !sel.value) return;
+    var i = +sel.dataset.i, lv = pk.levels[i], name = sel.value.slice(2);
+    pk.levels = pk.levels.slice(0, i + 1);
+    lv.pick = name;
+    $("#rm-out").innerHTML = "";
+    if (sel.value[0] === "d") pk.levels.push({ dir: lv.dir + "/" + name, node: lv.node.dirs[name], pick: "" });
+    pkRender();
+    if (sel.value[0] === "f") loadRemote(lv.dir + "/" + name, { picked: true });
+  });
+  $("#pk").addEventListener("click", function (e) {
+    if (e.target.closest("[data-pk=start]")) { $("#rm-out").innerHTML = ""; pkStart(); }
+  });
+  $("#pk-re").addEventListener("click", pkRetry);
 
   /* ================= drafts ================= */
   function openDraft(d, quiet) {
