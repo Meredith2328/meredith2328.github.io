@@ -925,11 +925,14 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
 
   function newFilenameSuffix() {
     var used = new Set();
-    index.ids.forEach(function (id) {
-      var d = store.get("d." + id);
-      if (d && d.filenameSuffix) used.add(d.filenameSuffix);
-    });
-    if (cur && cur.filenameSuffix) used.add(cur.filenameSuffix);
+    function reserve(d) {
+      if (!d) return;
+      if (d.filenameSuffix) used.add(d.filenameSuffix);
+      var match = /^post-\d{8}-(\d{6})$/.exec(slugOf(d));
+      if (match) used.add(match[1]);
+    }
+    index.ids.forEach(function (id) { reserve(store.get("d." + id)); });
+    reserve(cur);
     if (used.size >= 1000000) throw new Error("六位文件名编号已用完");
     var number = crypto.getRandomValues(new Uint32Array(1))[0] % 1000000;
     var suffix = ("000000" + number).slice(-6);
