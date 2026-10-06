@@ -846,7 +846,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       <li><b>或者直接开 PR（仅仓库主人）</b>
         <p>在「稿件 → GitHub 令牌」粘贴只授权 <code>Meredith2328/pilog</code> 的 fine-grained token，之后「导出 → 发布（开 PR）」会新建 <code>write/日期-文件名</code> 分支并开 PR 到 <code>pilog</code>，在 GitHub 上审阅后手动合并。</p></li>
       <li><b>修改已发布的文章</b>
-        <p>文章页点「✎ 编辑」，或「稿件 → 编辑线上文章」输入路径。有令牌时会从 <code>pilog</code> 载入原文；改完发布会开一个「更新文章」PR，同样需要手动合并。</p></li>
+        <p>文章页点「✎ 编辑」，或在「稿件 → 编辑线上文章」的下拉菜单中依次选择目录和文章，从 <code>pilog</code> 分支载入原文；改完发布会开一个「更新文章」PR，需要手动合并。</p></li>
     </ol>
     <p class="hint" style="margin-top:0">预览尽量贴近博客渲染，但图片只显示占位（手机上读不到仓库里的 <code>assets/</code>），公式显示为源码。</p>
   </div>
@@ -923,10 +923,27 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   var index = store.get("index") || { active: null, ids: [] };
   var prefs = store.get("prefs") || { cat: "toy", pv: "post" };
 
-  function blankDraft() {
+  function newFilenameSuffix() {
+    var used = new Set();
+    index.ids.forEach(function (id) {
+      var d = store.get("d." + id);
+      if (d && d.filenameSuffix) used.add(d.filenameSuffix);
+    });
+    if (cur && cur.filenameSuffix) used.add(cur.filenameSuffix);
+    if (used.size >= 1000000) throw new Error("六位文件名编号已用完");
+    var number = crypto.getRandomValues(new Uint32Array(1))[0] % 1000000;
+    var suffix = ("000000" + number).slice(-6);
+    while (used.has(suffix)) {
+      number = (number + 1) % 1000000;
+      suffix = ("000000" + number).slice(-6);
+    }
+    return suffix;
+  }
+  function blankDraft(forStoredDraft) {
     return {
       id: uid(), created: Date.now(), updated: Date.now(), exported: 0,
       title: "", body: "", category: prefs.cat || "toy", slug: "",
+      filenameSuffix: forStoredDraft ? "" : newFilenameSuffix(),
       date: today(), time: nowHM(), sec: "", tags: [], preview: "", draft: false,
       previewImage: "", featureMode: "off", featurePath: "",
       pin: false, highlight: false, hidden: false, order: "", chapters: "", extra: "", caret: 0, pub: null, src: null
@@ -936,7 +953,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   function loadDraft(id) {
     var d = store.get("d." + id);
     if (!d) return null;
-    var base = blankDraft();
+    var base = blankDraft(true);
     for (var k in base) if (d[k] === undefined) d[k] = base[k];
     return d;
   }
@@ -1002,12 +1019,15 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     return String(s || "").trim().replace(/\\/g, "/").replace(/^\/*(blogs\/)?(posts\/)?/, "")
       .replace(/\/+/g, "/").replace(/^\/|\/$/g, "").replace(/[:*?"<>|]/g, "");
   }
+  function datedSlug(d) {
+    return "post-" + (d.date || today()).replace(/-/g, "") + (d.filenameSuffix ? "-" + d.filenameSuffix : "");
+  }
   function autoSlug(d) {
     var ascii = (d.title || "").normalize("NFKD").replace(/[^\w\s-]/g, " ").trim().toLowerCase()
       .split(/[\s_]+/).filter(Boolean).slice(0, 6).join("-");
-    return ascii.length >= 3 ? cleanSlug(ascii) : "post-" + (d.date || today()).replace(/-/g, "");
+    return ascii.length >= 3 ? cleanSlug(ascii) : datedSlug(d);
   }
-  function slugOf(d) { return cleanSlug(d.slug) || autoSlug(d); }
+  function slugOf(d) { return cleanSlug(d.slug) || (d.filenameSuffix ? datedSlug(d) : autoSlug(d)); }
   function catOf(d) { return cleanCat(d.category) || "toy"; }
   /* a post loaded from pilog keeps its exact repo path until the user moves it */
   function srcOf(d) { return d.src && catOf(d) === d.src.cat && slugOf(d) === d.src.slug ? d.src : null; }
@@ -1445,7 +1465,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     var v = cleanSlug(this.value);
     if (v !== cur.slug) { cur.slug = v; this.value = v; touch(); }
   });
-  $("#f-slug").placeholder = "按标题自动生成";
+  $("#f-slug").placeholder = "默认使用日期和六位编号";
   $("#btn-slug").addEventListener("click", function () {
     cur.slug = autoSlug(cur); $("#f-slug").value = cur.slug; touch();
     toast("文件名：" + cur.slug + ".md");
