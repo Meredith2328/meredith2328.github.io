@@ -1698,6 +1698,72 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     }
     if (selA != null) body.setSelectionRange(selA, selB == null ? selA : selB);
   }
+  var bodyCaretTimer = 0;
+  function syncBodyCaret() {
+    /* Android WebView can keep a stale IME selection when the keyboard
+       resizes the editor. Re-applying the current DOM selection makes the
+       native input connection use the caret the user can actually see. */
+    if (document.activeElement !== body) return;
+    var a = body.selectionStart, b = body.selectionEnd;
+    try { body.setSelectionRange(a, b); } catch (e) { /* ignore */ }
+  }
+  function queueBodyCaretSync() {
+    clearTimeout(bodyCaretTimer);
+    bodyCaretTimer = setTimeout(syncBodyCaret, 0);
+  }
+  body.addEventListener("focus", queueBodyCaretSync);
+  body.addEventListener("pointerup", queueBodyCaretSync);
+  var bodyInputSnapshot = null, bodyCompositionSnapshot = null, fixingBodyInput = false;
+  function repairAppendedInput(snapshot, data) {
+    if (!snapshot || !coarse.matches || !snapshot.value || !data) return false;
+    var actual = body.value, suffix = actual.slice(snapshot.value.length);
+    /* Some Android IMEs ignore setSelectionRange for the first edit and
+       append the committed text to the end even though the visible caret is
+       in the middle. Only repair the unambiguous append-at-end case. */
+    if (actual !== snapshot.value + suffix || suffix !== data) return false;
+    var expected = snapshot.value.slice(0, snapshot.a) + data + snapshot.value.slice(snapshot.b);
+    if (actual === expected) return false;
+    var caret = snapshot.a + data.length;
+    body.value = expected;
+    body.setSelectionRange(caret, caret);
+    fixingBodyInput = true;
+    try {
+      var fixed;
+      try {
+        fixed = new InputEvent("input", { bubbles: true, inputType: "insertText", data: data });
+      } catch (e) {
+        fixed = new Event("input", { bubbles: true });
+      }
+      body.dispatchEvent(fixed);
+    } finally {
+      fixingBodyInput = false;
+    }
+    return true;
+  }
+  body.addEventListener("beforeinput", function (e) {
+    if (!coarse.matches || e.isComposing || typeof e.data !== "string" || !e.data ||
+        (e.inputType !== "insertText" && e.inputType !== "insertReplacementText")) return;
+    bodyInputSnapshot = {
+      value: body.value, a: body.selectionStart, b: body.selectionEnd
+    };
+  });
+  body.addEventListener("input", function (e) {
+    if (fixingBodyInput || !bodyInputSnapshot || e.isComposing) return;
+    var snapshot = bodyInputSnapshot;
+    bodyInputSnapshot = null;
+    repairAppendedInput(snapshot, typeof e.data === "string" ? e.data : "");
+  });
+  body.addEventListener("compositionstart", function () {
+    if (!coarse.matches) return;
+    bodyCompositionSnapshot = {
+      value: body.value, a: body.selectionStart, b: body.selectionEnd
+    };
+  });
+  body.addEventListener("compositionend", function (e) {
+    var snapshot = bodyCompositionSnapshot;
+    bodyCompositionSnapshot = null;
+    repairAppendedInput(snapshot, e.data || "");
+  });
   function wrap(before, after, placeholder) {
     var a = body.selectionStart, b = body.selectionEnd, v = body.value, sel = v.slice(a, b);
     if (sel && v.slice(a - before.length, a) === before && v.slice(b, b + after.length) === after) {
@@ -1822,10 +1888,23 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   function syncPointer() { app.classList.toggle("is-fine", !coarse.matches); }
   function fit() {
     var h = vv ? vv.height : window.innerHeight;
+    var viewportChanged = fit.h && Math.abs(h - fit.h) > 40;
+    fit.h = h;
     if (h > maxH || Math.abs(window.innerWidth - (fit.w || 0)) > 40) { maxH = h; fit.w = window.innerWidth; }
     document.documentElement.style.setProperty("--app-h", Math.round(h) + "px");
     app.style.top = vv ? Math.max(0, vv.offsetTop) + "px" : "0";
     syncKb();
+    if (viewportChanged && document.activeElement === body) {
+      syncBodyCaret();
+      setTimeout(function () {
+        syncBodyCaret();
+        var sec = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PilogSecure;
+        if (sec && sec.syncEditorInput) {
+          try { Promise.resolve(sec.syncEditorInput()).catch(function () { /* JS repair remains active */ }); }
+          catch (e) { /* older shell */ }
+        }
+      }, 0);
+    }
   }
   function syncKb() {
     var a = document.activeElement;
@@ -1837,7 +1916,9 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   }
   if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); }
   window.addEventListener("resize", fit);
-  document.addEventListener("focusin", function () { setTimeout(syncKb, 60); });
+  document.addEventListener("focusin", function () {
+    setTimeout(function () { syncKb(); syncBodyCaret(); }, 60);
+  });
   document.addEventListener("focusout", function () { setTimeout(syncKb, 60); });
   if (coarse.addEventListener) coarse.addEventListener("change", function () { syncPointer(); syncKb(); });
 
