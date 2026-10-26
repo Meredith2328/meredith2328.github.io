@@ -278,7 +278,7 @@
         <link>https://meredith2328.github.io/posts/courses/csapp/csapp-bomblab.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/courses/csapp/csapp-bomblab.html</guid>
         <pubDate>Tue, 30 Apr 2024 00:00:00 -0000</pubDate>
-        <description>炸弹一般没有 strip，&lt;code&gt;nm bomb | grep -E 'phase_|explode_bomb|read_line|phase_defused|secret_phase'&lt;/code&gt; 可以直接列出各关的函数名和地址（地址因炸弹而异）。官方 self-study 的 &lt;code&gt;bomb.tar&lt;/code&gt; 中包含 &lt;code&gt;bomb.c&lt;/code&gt;，main 中的调用顺序是 &lt;code&gt;read_line()&lt;/code&gt; → &lt;code&gt;phase_n()&lt;/code&gt; → &lt;code&gt;phase_defused()&lt;/code&gt;，入口和调用链可以直接看出来。 查找炸点可以用 `objdump -d bomb…</description>
+        <description>符号执行 是一种测试技术，在软件质量保障与测试（董震老师）的课程上有所讲解。其思想是，我们可以在有分支时把输入数据视作一个“符号”而不是一个具体的值，收集符号所满足的条件，最后根据约束条件反过来求解这个符号值的范围或具体值。 例如： 我们对上述条件收集得到的是 &lt;code&gt;solve(2α == 10)  →  α = 5&lt;/code&gt; 。  接下来我们尝试解决…</description>
       </item>
       <item>
         <title>CSAPP · Datalab</title>

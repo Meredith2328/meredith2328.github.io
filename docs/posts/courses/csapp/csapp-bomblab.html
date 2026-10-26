@@ -17,11 +17,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="pilog">
   <title>CSAPP · Bomblab · 10PI&#39;S BLOG丨十派的玩具箱</title>
-  <meta name="description" content="炸弹一般没有 strip，nm bomb | grep -E &#39;phase|explodebomb|readline|phasedefused|secretphase&#39; 可以直接列出各关的函数名和地址">
+  <meta name="description" content="符号执行 是一种测试技术，在软件质量保障与测试（董震老师）的课程上有所讲解。其思想是，我们可以在有分支时把输入数据视作一个“符号”而不是一个具体的值，收集符号所满足的条件，最后根据约束条件反过来求解这">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="10PI&#39;S BLOG丨十派的玩具箱">
   <meta property="og:title" content="CSAPP · Bomblab">
-  <meta property="og:description" content="炸弹一般没有 strip，nm bomb | grep -E &#39;phase|explodebomb|readline|phasedefused|secretphase&#39; 可以直接列出各关的函数名和地址">
+  <meta property="og:description" content="符号执行 是一种测试技术，在软件质量保障与测试（董震老师）的课程上有所讲解。其思想是，我们可以在有分支时把输入数据视作一个“符号”而不是一个具体的值，收集符号所满足的条件，最后根据约束条件反过来求解这">
   <link rel="canonical" href="https://meredith2328.github.io/posts/courses/csapp/csapp-bomblab.html">
   
   
@@ -130,7 +130,7 @@
     <h1 class="post-title">CSAPP · Bomblab</h1>
     <div class="post-meta">
       <time datetime="2024-04-30T00:00:00">2024-04-30</time>
-      <span class="post-stats">4699 字 · 约 11 分钟</span>
+      <span class="post-stats">5431 字 · 约 13 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -151,9 +151,75 @@
 
   <div class="post-body markdown-body" data-chapters="0" data-per-page="0">
     <blockquote>
-<p>最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。<br/>因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。</p>
+<p><strong>2026.10.26更新：出于兴趣，新增符号执行部分！</strong></p>
+<p><del>最近真没写什么其他好玩的东西，所以拿课堂作业报告水一水Blog。
+因为写这个的时间很有限，可能不像datalab那样精致，是边做边记的，逻辑有点混乱，也有不少错误。</del></p>
 </blockquote>
-<h2 id="拆之前-先找入口">拆之前：先找入口</h2>
+<h2 id="bomblab的另一种做法-符号执行">Bomblab的另一种做法：符号执行</h2>
+<blockquote>
+<p>2026.10.26写。这里的符号执行解法只是一种有趣的拓展，并不在CSAPP的课程范围内。</p>
+</blockquote>
+<p><a href="https://zh.wikipedia.org/wiki/符号执行">符号执行</a> 是一种测试技术，在软件质量保障与测试（<a href="https://zhendong2050.github.io/">董震老师</a>）的课程上有所讲解。其思想是，我们可以在有分支时把输入数据视作一个“符号”而不是一个具体的值，收集符号所满足的条件，最后根据约束条件反过来求解这个符号值的范围或具体值。</p>
+<p>例如：</p>
+<pre class="highlight" data-lang="c"><code class="language-c">int f(int x) {
+    int y = x * 2;
+    if (y == 10) {
+        BUG();          // 我们想让它执行到这里
+    }
+    return 0;
+}
+</code></pre>
+<p>我们对上述条件收集得到的是 <code>solve(2α == 10)  →  α = 5</code> 。</p>
+<hr/>
+<p>接下来我们尝试解决 Bomblab 。</p>
+<p>从符号执行的角度思考 Bomblab ，我们可以<strong>把输入看作符号变量，把 <code>explode_bomb</code> 当作需要避开的分支，让求解器搜索满足条件的输入。</strong></p>
+<pre class="highlight" data-lang="text"><code class="language-text">pip install angr
+</code></pre>
+<p>以 phase_1 为例：</p>
+<pre class="highlight" data-lang="python"><code class="language-python">import angr, claripy
+
+proj = angr.Project("bomb", auto_load_libs=False)                         # (1)
+sym = lambda n: proj.loader.main_object.get_symbol(n).rebased_addr        # (2)
+
+buf = 0x700000                                                            # (3)
+state = proj.factory.call_state(sym("phase_1"), buf)                      # (4)
+data = claripy.BVS("data", 8 * 64)                                        # (5)
+state.memory.store(buf, data)                                             # (6)
+state.add_constraints(data.get_byte(63) == 0)                             # (7)
+
+simgr = proj.factory.simgr(state)                                         # (8)
+simgr.explore(find=sym("phase_1") + 0x17, avoid=sym("explode_bomb"))      # (9)
+print(simgr.found[0].solver.eval(data, cast_to=bytes).split(b"\0")[0])    # (10)
+</code></pre>
+<p>以下是原始汇编的内容，方便对比：</p>
+<pre class="highlight"><code>0000000000400ee0 &lt;phase_1&gt;:
+  400ee0:   48 83 ec 08             sub    $0x8,%rsp
+  400ee4:   be 00 24 40 00          mov    $0x402400,%esi
+  400ee9:   e8 4a 04 00 00          callq  401338 &lt;strings_not_equal&gt;
+  400eee:   85 c0                   test   %eax,%eax
+  400ef0:   74 05                   je     400ef7 &lt;phase_1+0x17&gt;
+  400ef2:   e8 43 05 00 00          callq  40143a &lt;explode_bomb&gt;
+  400ef7:   48 83 c4 08             add    $0x8,%rsp
+  400efb:   c3                      retq
+</code></pre>
+<p>接下来我们来逐行讲解。</p>
+<p>先记住 <code>data</code> 就是符号执行当前正在猜的一个未知数据。</p>
+<ul>
+<li><code>(1)</code> 将 <code>bomb</code> 这个二进制导入进来。模板代码。</li>
+<li><code>(2)</code> 构造了一个用来取地址的辅助函数。</li>
+<li><code>(3)</code> <code>buf</code> 是我们随便挑的地址，用来存指向 <code>data</code> 的指针，要求与程序中已有的段不冲突。</li>
+<li><code>(4)</code> <strong>把函数签名对应到符号执行的初始状态</strong>。它建立了一个“正在调用 <code>phase_1</code> ”的初始状态。这个状态的第一个参数是函数地址 <code>phase_1</code> ，后面的参数按照函数调用的参数顺序，对应 <code>rdi</code> ，<code>rsi</code> 等等。这里用了 <code>buf</code> 来充当 <code>phase_1</code> 的第一个参数：即原始函数读输入字符串的寄存器 <code>rdi</code> 。</li>
+<li><code>(5)</code> 造符号变量。模板代码。</li>
+<li><code>(6)</code> 把符号数据 <code>data</code> 写到内存地址 <code>buf</code> 处。这样的话程序从 <code>buf</code> 读的时候读到的就是 <code>data</code> 。</li>
+<li><code>(7)</code> 添加了一条符号执行的约束：<code>data</code> 必须以 <code>\0</code> 结尾（并假设它含 <code>\0</code> 在内的长度不超过64字节）。</li>
+<li><code>(8)</code> 是模板代码。</li>
+<li><code>(9)</code> <strong>求解。这一行的语义是我们本章的核心：找到目标分支（这里是 <code>phase_1+0x17</code> ），避免 <code>explode_bomb</code> 分支。</strong></li>
+<li><code>(10)</code> 把求解结果转回来输出。</li>
+</ul>
+<p>在官方 self-study 的炸弹上运行，phase_1 的输出是 <code>Border relations with Canada have never been better.</code> 。换一颗炸弹，解出的字符串不同，代码流程完全相同。</p>
+<p>这种方式速度快，但不会解释输入为什么成立；关卡和循环一多还会出现路径爆炸（符号执行的缺点），通常仍然需要逐关求解。</p>
+<p>两种方式可以配合使用：angr （及其他的符号执行工具）负责求解，gdb 和反汇编负责理解程序。</p>
+<h2 id="如果是ai来做-它会怎么找各个入口">如果是ai来做，它会怎么找各个入口？</h2>
 <p>炸弹一般没有 strip，<code>nm bomb | grep -E 'phase_|explode_bomb|read_line|phase_defused|secret_phase'</code> 可以直接列出各关的函数名和地址（地址因炸弹而异）。官方 self-study 的 <code>bomb.tar</code> 中包含 <code>bomb.c</code>，main 中的调用顺序是 <code>read_line()</code> → <code>phase_n()</code> → <code>phase_defused()</code>，入口和调用链可以直接看出来。</p>
 <pre class="highlight" data-lang="text"><code class="language-text">b phase_1          # 断在各关入口
 b read_line        # 查看这一关读入的原始字符串
@@ -420,29 +486,6 @@ num4 = %eax = 2</p>
 <h2 id="phase_1-比较字符串">phase_1: 比较字符串</h2>
 <p>strings_not_equal的返回值(%eax)为0就跳出去，意味着要求All strings are created equal. 识得唔识得啊。</p>
 <p>从相应位置读入所需字符串即可。</p>
-<h2 id="另一种做法-符号执行">另一种做法：符号执行</h2>
-<p>手工分析六关比较花时间，phase_6 和 fun7 中的循环尤其麻烦。换一种思路：把输入看作符号变量，把 <code>explode_bomb</code> 当作需要避开的分支，让求解器搜索满足条件的输入。</p>
-<pre class="highlight" data-lang="text"><code class="language-text">pip install angr
-</code></pre>
-<p>以 phase_1 为例：</p>
-<pre class="highlight" data-lang="python"><code class="language-python">import angr, claripy
-
-proj = angr.Project("bomb", auto_load_libs=False)
-sym = lambda n: proj.loader.main_object.get_symbol(n).rebased_addr
-
-buf = 0x700000
-state = proj.factory.call_state(sym("phase_1"), buf)   # rdi = 输入字符串
-data = claripy.BVS("data", 8 * 64)                     # 64 字节符号串
-state.memory.store(buf, data)
-state.add_constraints(data.get_byte(63) == 0)          # 以 \0 结尾
-
-simgr = proj.factory.simgr(state)
-simgr.explore(find=sym("phase_1") + 0x17, avoid=sym("explode_bomb"))
-print(simgr.found[0].solver.eval(data, cast_to=bytes).split(b"\0")[0])
-</code></pre>
-<p><code>call_state</code> 直接调用 phase_1，并把 rdi 指向一块内容未定的符号内存；<code>explore</code> 会执行到 <code>je</code> 后面的成功分支（示例中的 <code>phase_1+0x17</code>，换炸弹时按 <code>disas phase_1</code> 的结果调整），遇到 <code>explode_bomb</code> 的分支则排除；最后用 <code>eval</code> 取出能让第一关通过的字符串。地址都从符号表读取，不需要硬编码。</p>
-<p>在官方 self-study 的炸弹上运行，phase_1 的输出是 <code>Border relations with Canada have never been better.</code>。换一颗炸弹，解出的字符串不同，流程相同。</p>
-<p>这种方式速度快，但不会解释输入为什么成立；关卡和循环一多还会出现路径爆炸，通常仍然需要逐关求解。两种方式可以配合使用：angr 负责求解，gdb 和反汇编负责理解程序。</p>
 <aside class="post-rel is-series"><span class="post-rel-label">系列导航</span><div class="post-rel-items"><a class="post-rel-link" href="csapp-datalab.html" title="上一篇">← Datalab</a><a class="post-rel-link" href="csapp-attacklab.html" title="下一篇">Attacklab →</a></div></aside>
   </div>
 
