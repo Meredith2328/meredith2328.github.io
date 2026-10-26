@@ -130,7 +130,7 @@
     <h1 class="post-title">CSAPP · Bomblab</h1>
     <div class="post-meta">
       <time datetime="2024-04-30T00:00:00">2024-04-30</time>
-      <span class="post-stats">5431 字 · 约 13 分钟</span>
+      <span class="post-stats">5655 字 · 约 13 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=CSAPP">#CSAPP</a>
       
@@ -217,7 +217,16 @@ print(simgr.found[0].solver.eval(data, cast_to=bytes).split(b"\0")[0])    # (10)
 <li><code>(10)</code> 把求解结果转回来输出。</li>
 </ul>
 <p>在官方 self-study 的炸弹上运行，phase_1 的输出是 <code>Border relations with Canada have never been better.</code> 。换一颗炸弹，解出的字符串不同，代码流程完全相同。</p>
-<p>这种方式速度快，但不会解释输入为什么成立；关卡和循环一多还会出现路径爆炸（符号执行的缺点），通常仍然需要逐关求解。</p>
+<hr/>
+<p>虽然看着很玄乎，但这个方法确实是可以解决相关问题的。</p>
+<p>我在 WSL 上用 angr 9.2.213 测试了官方 self-study 的 phase_6：</p>
+<ul>
+<li>从 <code>read_six_numbers</code> 返回后的指令开始，把六个整数设为符号变量。</li>
+<li>执行上述代码（目标为 <code>0x4011f7</code> ，避开 <code>explode_bomb</code> ）。</li>
+<li>使用 angr 的深度优先搜索功能（目的是控制内存占用）</li>
+</ul>
+<p>约 <strong>147.21</strong> 秒得到 <code>4 3 2 1 6 5</code> 即正确答案。</p>
+<p>符号执行可以解决问题，对于简单问题速度也比较快，但不会解释输入为什么成立；关卡和循环一多还会出现路径爆炸（符号执行的缺点），通常仍然需要逐关求解。</p>
 <p>两种方式可以配合使用：angr （及其他的符号执行工具）负责求解，gdb 和反汇编负责理解程序。</p>
 <h2 id="如果是ai来做-它会怎么找各个入口">如果是ai来做，它会怎么找各个入口？</h2>
 <p>炸弹一般没有 strip，<code>nm bomb | grep -E 'phase_|explode_bomb|read_line|phase_defused|secret_phase'</code> 可以直接列出各关的函数名和地址（地址因炸弹而异）。官方 self-study 的 <code>bomb.tar</code> 中包含 <code>bomb.c</code>，main 中的调用顺序是 <code>read_line()</code> → <code>phase_n()</code> → <code>phase_defused()</code>，入口和调用链可以直接看出来。</p>
