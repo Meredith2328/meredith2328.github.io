@@ -278,7 +278,7 @@
         <link>https://meredith2328.github.io/posts/courses/csapp/csapp-bomblab.html</link>
         <guid isPermaLink="false">https://meredith2328.github.io/posts/courses/csapp/csapp-bomblab.html</guid>
         <pubDate>Tue, 30 Apr 2024 00:00:00 -0000</pubDate>
-        <description>各phase答案: 读入整数，整数，字符串 &lt;code&gt;b secret_phase&lt;/code&gt; edx: a esi: 0 rdi: &amp;amp;input_str rbx: rax=int(input_str)=input_int rax: input_int - 1 u&amp;lt;=3e8, so 1 ≤ input_int ≤ 3e9 esi: input_int &lt;code&gt;x/512x 0x604110&lt;/code&gt; 24 8 &lt;strong&gt;32 (50)&lt;/strong&gt; 6 16 2d 6b 1 7 14 23 28 2f(47) 63…</description>
+        <description>炸弹一般没有 strip，&lt;code&gt;nm bomb | grep -E 'phase_|explode_bomb|read_line|phase_defused|secret_phase'&lt;/code&gt; 可以直接列出各关的函数名和地址（地址因炸弹而异）。官方 self-study 的 &lt;code&gt;bomb.tar&lt;/code&gt; 中包含 &lt;code&gt;bomb.c&lt;/code&gt;，main 中的调用顺序是 &lt;code&gt;read_line()&lt;/code&gt; → &lt;code&gt;phase_n()&lt;/code&gt; → &lt;code&gt;phase_defused()&lt;/code&gt;，入口和调用链可以直接看出来。 查找炸点可以用 `objdump -d bomb…</description>
       </item>
       <item>
         <title>CSAPP · Datalab</title>

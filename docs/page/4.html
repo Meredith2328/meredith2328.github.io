@@ -266,7 +266,7 @@
           </div>
           <h3 class="card-title">CSAPP · Bomblab</h3>
           
-          <div class="card-preview">各phase答案: 读入整数，整数，字符串 <code>b secret_phase</code> edx: a esi: 0 rdi: &amp;input_str rbx: rax=int(input_str)=input_int rax: input_int - 1 u&lt;=3e8, so 1 ≤ input_int ≤ 3e9 esi: input_int <code>x/512x 0x604110</code> 24 8 <strong>32 (50)</strong> 6 16 2d 6b 1 7 14 23 28 2f(47) 63…</div>
+          <div class="card-preview">炸弹一般没有 strip，<code>nm bomb | grep -E 'phase_|explode_bomb|read_line|phase_defused|secret_phase'</code> 可以直接列出各关的函数名和地址（地址因炸弹而异）。官方 self-study 的 <code>bomb.tar</code> 中包含 <code>bomb.c</code>，main 中的调用顺序是 <code>read_line()</code> → <code>phase_n()</code> → <code>phase_defused()</code>，入口和调用链可以直接看出来。 查找炸点可以用 `objdump -d bomb…</div>
           
           <div class="card-tags">
             
