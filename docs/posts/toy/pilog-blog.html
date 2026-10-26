@@ -130,7 +130,7 @@
     <h1 class="post-title">用 pilog 搭建像素风博客</h1>
     <div class="post-meta">
       <time datetime="2026-07-30T00:00:00">2026-07-30</time>
-      <span class="post-stats">3392 字 · 约 8 分钟</span>
+      <span class="post-stats">3412 字 · 约 8 分钟</span>
       
       <a class="tag-chip" href="../../index.html#tag=%E9%A1%B9%E7%9B%AE">#项目</a>
       
@@ -349,11 +349,11 @@ feature: true
 <li><code>python pilog.py list</code> —— 列出文章（<code>--json</code> 输出结构化数据）；</li>
 <li><code>python pilog.py import 路径... --dir 目标目录</code> —— 批量导入 Markdown / 图片 / 整个目录；</li>
 <li><code>python pilog.py delete 文章rel</code> —— 删除文章；</li>
-<li><code>python pilog.py publish -m "说明"</code> —— 构建 → 提交 → 推送。</li>
+<li><code>python pilog.py publish -m "说明"</code> —— 构建站点并同步至部署仓库。</li>
 </ul>
 <h3 id="发布与评论">发布与评论</h3>
 <ul>
-<li><code>publish</code> 使用 fine-grained token（只需 Contents: Read and write），只做 add / commit / push，绝不执行删除操作；令牌只保存在本地 gitignore 的文件里，不会进仓库；</li>
+<li><code>publish</code> 使用 fine-grained token（只需 Contents: Read and write），只在部署仓库中同步 <code>docs/</code>、提交和推送；同步会清除过期生成文件，源码工作区和暂存区保持不变；令牌只保存在本地 gitignore 的文件里；</li>
 <li>自动部署：<code>push</code> 到 <code>pilog</code> 分支时，<code>.github/workflows/deploy.yml</code> 会自动构建并推送到部署仓库（需在源码仓库配置 <code>PILOG_TOKEN</code> secret，见 README「自动部署」）；CI 里构建产物与 <code>docs/</code> 一致时不会产生多余提交；</li>
 <li>评论由 giscus 驱动（GitHub Discussions），配置 <code>giscus</code> 段即可；</li>
 <li>自动生成 RSS。</li>
