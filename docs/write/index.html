@@ -28,9 +28,11 @@
   --text: #5f6368; --mute: #9aa0a6; --shadow: #e8eaed; --accent: #1a73e8;
   --highlight: #fbbc04; --raise: #ffffff; --accent-soft: #e8f0fe; --hl-bg: #fff8e1;
   --table-stripe: #fbfbfb; --ok: #188038; --danger: #c5221f; --scrim: rgba(32, 33, 36, .42);
+  --pin-bg: #fbfaf5; --pin-fg: #b58a00;
   --sans: "Inter", "PingFang SC", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC",
     "Microsoft YaHei", system-ui, -apple-system, sans-serif;
-  --mono: "JetBrains Mono", "Cascadia Code", "SF Mono", ui-monospace, "Roboto Mono", Menlo, Consolas, monospace;
+  --mono: "JetBrains Mono", "Cascadia Code", "SF Mono", ui-monospace, "Roboto Mono", Menlo, Consolas,
+    "PixelCJK", monospace;
   --write: "JetBrains Mono", "Cascadia Code", "SF Mono", ui-monospace, "Roboto Mono",
     "PingFang SC", "Noto Sans SC", "Noto Sans CJK SC", monospace;
   color-scheme: light;
@@ -40,6 +42,7 @@ html[data-theme="dark"] {
   --text: #b4b8bd; --mute: #82868b; --shadow: #0c0d0e; --accent: #7cabf5;
   --highlight: #fdd663; --raise: #1d1f22; --accent-soft: #24344f; --hl-bg: #40361a;
   --table-stripe: #1d1f22; --ok: #6fcf8e; --danger: #f08a84; --scrim: rgba(0, 0, 0, .6);
+  --pin-bg: #262420; --pin-fg: #fdd663;
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -460,6 +463,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   background: none; color: var(--paper); font: 400 22px/1 var(--mono);
 }
 .sheet-b { overflow-y: auto; overscroll-behavior: contain; padding: 16px 16px 20px; }
+.sheet-b.more-body { padding: 8px 16px calc(20px + env(safe-area-inset-bottom)); }
 .stack { display: grid; gap: 12px; }
 .sub { margin: 22px 0 10px; font: 700 11px/1 var(--mono); letter-spacing: .16em; color: var(--mute); }
 
@@ -473,18 +477,92 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
 }
 .note.ok { border-left-color: var(--ok); background: var(--panel); }
 
-.drow { display: flex; align-items: stretch; margin-bottom: 10px; border: 2px solid var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--shadow); }
+/* ---------- drafts panel ---------- */
+.dtools { margin: 2px 0 16px; }
+.dtools-row { display: flex; align-items: stretch; gap: 8px; }
+.dbtn { flex: none; height: 40px; min-height: 0; padding: 0 10px; box-shadow: none; font: 700 12px/1 var(--mono); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.dsort {
+  position: relative; flex: none; width: 84px; display: flex; align-items: stretch; height: 40px;
+  border: 2px solid var(--ink); background: var(--raise);
+}
+.dsort select {
+  flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 0 18px 0 8px; border-radius: 0;
+  font: 400 12px/1 var(--mono); color: var(--ink); -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+.dsort .car { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 9px; color: var(--mute); pointer-events: none; }
+.dsearch { flex: 1; min-width: 0; display: flex; align-items: stretch; height: 40px; border: 2px solid var(--ink); background: var(--raise); }
+.dsearch input {
+  flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 0 8px; border-radius: 0;
+  font: 400 12.5px/1 var(--mono); color: var(--ink); -webkit-appearance: none; appearance: none;
+}
+.dsearch input::placeholder { color: var(--mute); }
+.dsearch input::-webkit-search-cancel-button, .dsearch input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.dsearch #d-search-full {
+  flex: none; align-self: center; height: 22px; margin: 0 2px; padding: 0 5px;
+  border: 1px solid var(--rule); background: var(--paper); color: var(--mute);
+  font: 700 9.5px/1 var(--mono); letter-spacing: .04em;
+}
+.dsearch #d-search-full[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.dsearch button {
+  flex: none; width: 30px; border: 0; border-left: 1px solid var(--hairline); background: none;
+  font: 400 16px/1 var(--mono); color: var(--mute);
+}
+.dsearch #d-search-clear { width: 26px; }
+.dsearch button[hidden] { display: none; }
+.drow-snip {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 6px; font: 11.5px/1.55 var(--sans); color: var(--text);
+}
+.drow-snip mark { padding: 0 1px; background: var(--hl-bg); color: var(--ink); box-shadow: inset 0 -2px 0 var(--highlight); }
+.dmenu { position: relative; flex: none; }
+.dmenu-btn { width: 44px; height: 40px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font: 700 18px/1 var(--mono); }
+.dmenu-btn[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+.dmenu-pop {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 6; min-width: 196px;
+  border: 2px solid var(--ink); background: var(--paper); box-shadow: 4px 4px 0 var(--shadow);
+}
+.dmenu-pop[hidden] { display: none; }
+.dmenu-pop button {
+  display: flex; align-items: center; width: 100%; min-height: 46px; padding: 0 14px;
+  border: 0; border-bottom: 1px solid var(--hairline); background: none; text-align: left;
+  font: 400 13.5px/1.3 var(--mono); color: var(--ink);
+}
+.dmenu-pop button:last-child { border-bottom: 0; }
+.dmenu-pop .go { margin-left: auto; color: var(--mute); }
+.drow {
+  display: flex; align-items: stretch; margin-bottom: 10px; border: 2px solid var(--ink);
+  background: var(--paper); box-shadow: 3px 3px 0 var(--shadow);
+}
 .drow.is-active { box-shadow: inset 6px 0 0 var(--ink), 3px 3px 0 var(--shadow); }
 .drow-main { flex: 1; min-width: 0; min-height: 68px; padding: 10px 12px 10px 16px; border: 0; background: none; text-align: left; }
 .drow-t { display: block; font: 700 15px/1.4 var(--sans); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .drow-t.is-empty { color: var(--mute); font-weight: 500; }
 .drow-m { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 5px; font: 11.5px/1.4 var(--mono); color: var(--mute); }
 .drow-m .badge { font-size: 9.5px; padding: 2px 4px; }
-.drow-del {
-  flex: none; width: 60px; border: 0; border-left: 1px solid var(--hairline); background: none;
-  font: 700 12px/1.2 var(--mono); color: var(--text);
+.drow-pin, .drow-arc {
+  flex: none; border: 0; border-left: 1px solid var(--hairline); background: none;
+  font: 700 11.5px/1.25 var(--mono); color: var(--text);
 }
-.drow-del.is-armed { width: 86px; background: var(--danger); color: #fff; }
+.drow-pin { width: 66px; }
+.drow-arc { width: 56px; }
+.drow-pin.is-on { color: var(--ink); background: var(--hl-bg); }
+.drow-arc.is-danger { color: var(--danger); }
+.drow-pin.is-armed, .drow-arc.is-armed { background: var(--danger); color: #fff; }
+.drow.is-pinned { box-shadow: 3px 3px 0 var(--shadow); outline: 2px solid var(--highlight); outline-offset: -2px; }
+.drow.is-archived { opacity: .72; }
+.drow.is-dragging { position: relative; z-index: 4; opacity: .94; box-shadow: 0 10px 22px rgba(0, 0, 0, .2); }
+.drow.is-target { box-shadow: inset 0 4px 0 var(--accent), 3px 3px 0 var(--shadow); }
+#draft-list.is-dragging { -webkit-user-select: none; user-select: none; }
+#btn-import { margin-top: 0; }
+.mrow {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 2px;
+  border: 0; border-bottom: 1px solid var(--hairline); background: none; text-align: left;
+  font: 400 14px/1.3 var(--sans); color: var(--ink);
+}
+.mrow small { margin-left: auto; font: 10.5px/1 var(--mono); color: var(--mute); }
+.mrow .go { color: var(--mute); font-size: 15px; }
+.mrow:last-of-type { border-bottom: 0; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .two.one { grid-template-columns: 1fr; }
 
@@ -547,7 +625,24 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
 }
 .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
 
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* ---------- gestures ---------- */
+/* pan-y keeps vertical scrolling native while horizontal swipes are delivered
+   to the touch handlers; scrollable boxes opt back into horizontal panning. */
+.views, .view, .doc-body { touch-action: pan-y; }
+.md pre, .md .tbl, .md table, .pk, .fmt-scroll, .affix select { touch-action: pan-x pan-y; }
+.sheet-h { touch-action: none; }
+@keyframes view-in-l {
+  from { transform: translateX(26px); opacity: .35; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes view-in-r {
+  from { transform: translateX(-26px); opacity: .35; }
+  to { transform: none; opacity: 1; }
+}
+.view.is-slide-l { animation: view-in-l .2s steps(4, end); }
+.view.is-slide-r { animation: view-in-r .2s steps(4, end); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
@@ -787,20 +882,47 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
 <section class="sheet" id="sheet-drafts" role="dialog" aria-modal="true" aria-labelledby="sh-drafts-t">
   <div class="sheet-h"><span id="sh-drafts-t">稿件</span><small id="drafts-sub"></small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
   <div class="sheet-b">
-    <div class="two">
-      <button class="pbtn primary block" type="button" id="btn-new">＋ 新建稿件</button>
-      <button class="pbtn block" type="button" data-open="remote">✎ 编辑线上文章</button>
+    <div class="dtools">
+      <div class="dtools-row">
+        <button class="pbtn primary dbtn" type="button" id="btn-new">新建</button>
+        <label class="dsort" for="d-sort"><span class="sr">排序</span>
+          <select id="d-sort" aria-label="排序方式">
+            <option value="updated">编辑时间</option>
+            <option value="created">创建时间</option>
+            <option value="title">名称拼音</option>
+            <option value="manual">手动排序</option>
+          </select>
+          <span class="car" aria-hidden="true">▾</span>
+        </label>
+        <div class="dsearch">
+          <input id="d-search" type="search" placeholder="搜索标题" aria-label="搜索稿件" autocomplete="off" spellcheck="false" enterkeyhint="search">
+          <button type="button" id="d-search-full" aria-pressed="false" aria-label="搜索全文" title="搜索全文">全文</button>
+          <button type="button" id="d-search-clear" aria-label="清除搜索" hidden>×</button>
+        </div>
+        <div class="dmenu">
+          <button class="dmenu-btn" type="button" id="d-menu" aria-expanded="false" aria-controls="d-menu-pop" aria-label="更多操作">⋯</button>
+          <button class="dmenu-btn" type="button" id="d-back" aria-label="返回全部稿件" hidden>←</button>
+          <div class="dmenu-pop" id="d-menu-pop" hidden>
+            <button type="button" data-open="remote">编辑线上文章<span class="go">›</span></button>
+            <button type="button" id="d-archived">查看归档文章<span class="go">›</span></button>
+            <button type="button" data-open="more">更多设置<span class="go">›</span></button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="sub">本机保存的稿件</div>
     <div id="draft-list"></div>
-    <div class="sub">更多</div>
-    <div class="two">
-      <button class="pbtn block" type="button" id="btn-import">导入 .md</button>
-      <button class="pbtn block" type="button" id="btn-theme">外观：浅色</button>
-    </div>
-    <button class="pbtn block" type="button" data-open="token" style="margin-top:12px">GitHub 令牌（发布用）</button>
-    <button class="pbtn danger block" type="button" id="btn-wipe" style="margin-top:12px">清空本机全部稿件</button>
     <input type="file" id="file-in" accept=".md,.markdown,text/markdown,text/plain" hidden>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-more" role="dialog" aria-modal="true" aria-labelledby="sh-more-t">
+  <div class="sheet-h"><span id="sh-more-t">更多设置</span><small>pilog write</small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b more-body">
+    <button class="mrow" type="button" id="btn-import">导入 .md<span class="go">›</span></button>
+    <button class="mrow" type="button" data-open="token">GitHub 令牌<small id="more-tok">未设置</small><span class="go">›</span></button>
+    <button class="mrow" type="button" id="btn-theme">外观<small id="more-theme">浅色</small><span class="go">›</span></button>
+    <div id="draft-app-slot"></div>
+    <button class="mrow" type="button" data-open="help">使用说明<span class="go">›</span></button>
     <p class="hint">稿件只存在这台设备的浏览器里（localStorage）。换浏览器、清除网站数据或换打开方式都会看不到，重要内容记得导出。</p>
   </div>
 </section>
@@ -831,6 +953,8 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   <div class="sheet-h"><span id="sh-help-t">在 Android 上使用</span><button class="x" type="button" data-close aria-label="关闭">×</button></div>
   <div class="sheet-b help">
     <ol>
+      <li><b>手势</b>
+        <p>在「信息 / 写作 / 预览」之间左右滑动就能切换页面（左滑下一页、右滑上一页）；在底部面板的标题栏上向下滑动可以关闭面板。在输入框里打字、键盘弹出时不会误触，键盘收起后可以正常滑动。</p></li>
       <li><b>在线打开</b>
         <p>博客导航栏的「写作」，或直接访问 <code>https://meredith2328.github.io/write/</code>。页面是纯静态的，写作、预览、草稿照样离线可用。</p></li>
       <li><b>本地打开（离线可用）</b>
@@ -843,10 +967,12 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
         <p>Chrome 菜单 → 添加到主屏幕，之后像 App 一样一点就开。请固定用同一种方式打开：本地文件和网址的草稿存储互不相通。</p></li>
       <li><b>交稿</b>
         <p>「导出」下载 <code>.md</code>，放到 <code>blogs/posts/分类/</code> 后提交到 <code>pilog</code> 分支即可自动部署。</p></li>
+      <li><b>整理稿件</b>
+        <p>「稿件」面板顶部一行是「新建 / 排序 / 搜索 / ⋯」：排序可选编辑时间、创建时间、名称（拼音）或手动排序；搜索框会按标题、正文、标签和目录即时过滤，多个关键词用空格隔开。点 ⋯ 可以编辑线上文章、查看归档文章和打开「更多设置」。每篇稿件行尾有「置顶」和「归档」两个按钮，归档后从列表里收起；在归档列表里右上角是 ← 返回，两个按钮变成「恢复」和「删除」，删除要点两次。置顶的稿件始终排在最前面。手动排序时，长按一行再上下拖动就能调整顺序。</p></li>
       <li><b>或者直接开 PR（仅仓库主人）</b>
-        <p>在「稿件 → GitHub 令牌」粘贴只授权 <code>Meredith2328/pilog</code> 的 fine-grained token，之后「导出 → 发布（开 PR）」会新建 <code>write/日期-文件名</code> 分支并开 PR 到 <code>pilog</code>，在 GitHub 上审阅后手动合并。</p></li>
+        <p>在「更多设置 → GitHub 令牌」粘贴只授权 <code>Meredith2328/pilog</code> 的 fine-grained token，之后「导出 → 发布（开 PR）」会新建 <code>write/日期-文件名</code> 分支并开 PR 到 <code>pilog</code>，在 GitHub 上审阅后手动合并。</p></li>
       <li><b>修改已发布的文章</b>
-        <p>文章页点「✎ 编辑」，或在「稿件 → 编辑线上文章」的下拉菜单中依次选择目录和文章，从 <code>pilog</code> 分支载入原文；改完发布会开一个「更新文章」PR，需要手动合并。</p></li>
+        <p>文章页点「✎ 编辑」，或在「稿件 → ⋯ → 编辑线上文章」的下拉菜单中依次选择目录和文章，从 <code>pilog</code> 分支载入原文；改完发布会开一个「更新文章」PR，需要手动合并。</p></li>
     </ol>
     <p class="hint" style="margin-top:0">预览尽量贴近博客渲染，但图片只显示占位（手机上读不到仓库里的 <code>assets/</code>），公式显示为源码。</p>
   </div>
@@ -921,7 +1047,9 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     del: function (k) { try { localStorage.removeItem(PFX + k); } catch (e) { /* ignore */ } }
   };
   var index = store.get("index") || { active: null, ids: [] };
-  var prefs = store.get("prefs") || { cat: "toy", pv: "post" };
+  var PREFS_DEFAULT = { cat: "toy", pv: "post", sort: "updated", filter: "all" };
+  var prefs = store.get("prefs") || {};
+  for (var prefKey in PREFS_DEFAULT) if (prefs[prefKey] === undefined) prefs[prefKey] = PREFS_DEFAULT[prefKey];
 
   function newFilenameSuffix() {
     var used = new Set();
@@ -949,7 +1077,8 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       filenameSuffix: forStoredDraft ? "" : newFilenameSuffix(),
       date: today(), time: nowHM(), sec: "", tags: [], preview: "", draft: false,
       previewImage: "", featureMode: "off", featurePath: "",
-      pin: false, highlight: false, hidden: false, order: "", chapters: "", extra: "", caret: 0, pub: null, src: null
+      pin: false, highlight: false, hidden: false, order: "", chapters: "", extra: "", caret: 0, pub: null, src: null,
+      pinned: false, archived: false, sortRank: forStoredDraft ? null : -Date.now()
     };
   }
   function isBlank(d) { return !d.title.trim() && !d.body.trim() && !d.tags.length && !d.preview.trim(); }
@@ -958,6 +1087,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     if (!d) return null;
     var base = blankDraft(true);
     for (var k in base) if (d[k] === undefined) d[k] = base[k];
+    if (d.sortRank == null || !isFinite(d.sortRank)) d.sortRank = -d.created;
     return d;
   }
   function allDrafts() {
@@ -1922,6 +2052,107 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   document.addEventListener("focusout", function () { setTimeout(syncKb, 60); });
   if (coarse.addEventListener) coarse.addEventListener("change", function () { syncPointer(); syncKb(); });
 
+  /* ================= gestures =================
+     Horizontal swipes switch 信息 / 写作 / 预览; a downward swipe on a sheet's
+     title bar closes it. Vertical scrolling stays native (touch-action: pan-y),
+     text fields and horizontal scrollers are left to the browser. */
+  var VIEW_ORDER = ["meta", "write", "preview"];
+  var swipe = null, dragEl = null;
+  function dragReset() {
+    if (dragEl) { dragEl.style.transition = ""; dragEl.style.transform = ""; dragEl = null; }
+  }
+  function swipeBlocked(t) {
+    if (!t || !t.closest) return true;
+    if (app.classList.contains("is-kb")) return true;
+    if (t.closest(".sheet, .scrim, .dock, .fmt, .affix")) return true;
+    if (t.closest("input, select, a, button")) return true;
+    if (t.closest("textarea")) return t !== body;
+    if (t.closest(".pk, .tbl, .fmt-scroll, pre, table")) return true;
+    return false;
+  }
+  function viewSlide(dir) {
+    var i = VIEW_ORDER.indexOf(app.dataset.view), j = i + dir;
+    if (i < 0 || j < 0 || j >= VIEW_ORDER.length) return false;
+    setView(VIEW_ORDER[j]);
+    var el = $("#view-" + VIEW_ORDER[j]);
+    if (el) {
+      el.classList.remove("is-slide-l", "is-slide-r");
+      void el.offsetWidth;
+      el.classList.add(dir > 0 ? "is-slide-l" : "is-slide-r");
+      setTimeout(function () { el.classList.remove("is-slide-l", "is-slide-r"); }, 240);
+    }
+    return true;
+  }
+  $(".views").addEventListener("touchstart", function (e) {
+    swipe = null; dragReset();
+    if (e.touches.length !== 1 || swipeBlocked(e.target)) return;
+    var t = e.touches[0];
+    swipe = { x: t.clientX, y: t.clientY, at: Date.now(), horiz: false, dead: false };
+  }, { passive: true });
+  $(".views").addEventListener("touchmove", function (e) {
+    if (!swipe || swipe.dead) return;
+    if (e.touches.length !== 1) { swipe = null; dragReset(); return; }
+    var t = e.touches[0], dx = t.clientX - swipe.x, dy = t.clientY - swipe.y;
+    if (!swipe.horiz && Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { swipe.dead = true; return; }
+    if (!swipe.horiz && Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      swipe.horiz = true;
+      dragEl = $("#view-" + app.dataset.view);
+    }
+    if (!swipe.horiz) return;
+    if (e.cancelable) e.preventDefault();
+    if (dragEl) {
+      var i = VIEW_ORDER.indexOf(app.dataset.view);
+      var edge = (i === 0 && dx > 0) || (i === VIEW_ORDER.length - 1 && dx < 0);
+      dragEl.style.transition = "none";
+      dragEl.style.transform = "translateX(" + Math.round(dx * (edge ? .16 : .32)) + "px)";
+    }
+  }, { passive: false });
+  $(".views").addEventListener("touchend", function (e) {
+    var s = swipe; swipe = null;
+    var dx = 0, dy = 0, dt = 0;
+    if (s && e.changedTouches && e.changedTouches[0]) {
+      dx = e.changedTouches[0].clientX - s.x;
+      dy = e.changedTouches[0].clientY - s.y;
+      dt = Date.now() - s.at;
+    }
+    var el = dragEl; dragEl = null;
+    if (el) {
+      el.style.transition = "transform .16s steps(3, end)";
+      el.style.transform = "";
+      setTimeout(function () { el.style.transition = ""; }, 200);
+    }
+    if (!s || s.dead || !s.horiz) return;
+    if (dt > 800 || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    viewSlide(dx < 0 ? 1 : -1);
+  });
+  $(".views").addEventListener("touchcancel", function () { swipe = null; dragReset(); });
+  $$(".sheet-h").forEach(function (h) {
+    var st = null;
+    h.addEventListener("touchstart", function (e) {
+      if (e.touches.length !== 1 || !openSheet) return;
+      st = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      openSheet.style.transition = "none";
+    }, { passive: true });
+    h.addEventListener("touchmove", function (e) {
+      if (!st || !openSheet) return;
+      var dy = e.touches[0].clientY - st.y, dx = e.touches[0].clientX - st.x;
+      if (dy > 6 && dy > Math.abs(dx)) {
+        if (e.cancelable) e.preventDefault();
+        openSheet.style.transform = "translateY(" + Math.round(dy) + "px)";
+      }
+    }, { passive: false });
+    function sheetSwipeEnd(e) {
+      if (!st || !openSheet) { st = null; return; }
+      var dy = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY - st.y : 0;
+      openSheet.style.transition = "";
+      openSheet.style.transform = "";
+      st = null;
+      if (dy > 90) hideSheet(false);
+    }
+    h.addEventListener("touchend", sheetSwipeEnd);
+    h.addEventListener("touchcancel", sheetSwipeEnd);
+  });
+
   /* ================= sheets ================= */
   var openSheet = null;
   function showSheet(name) {
@@ -1938,8 +2169,12 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       $("#rm-adv").open = false;
       if (pk.hold) pkIdle(); else pkStart();
     }
-    if (name === "drafts") renderDrafts();
-    if (name === "drafts") syncThemeBtn();
+    if (name === "drafts") {
+      setMenu(false);
+      resetSearch();
+      renderDrafts();
+    }
+    if (name === "more") syncMore();
     el.classList.add("is-open");
     $("#scrim").classList.add("is-on");
     if (!openSheet) history.pushState({ sheet: name }, "");
@@ -1949,6 +2184,8 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   function hideSheet(fromPop) {
     if (!openSheet) return;
     pk.pending = false;
+    openSheet.style.transform = "";
+    openSheet.style.transition = "";
     openSheet.classList.remove("is-open");
     $("#scrim").classList.remove("is-on");
     openSheet = null;
@@ -2214,6 +2451,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     $("#pub-lock").hidden = ready;
     $("#pub-lock").className = "note" + (tokBad ? " bad" : "");
     $("#pub-lock").innerHTML = tokBad ? esc(tokBad) + " 发布已锁定，请到「令牌」重新设置。" : PUB_LOCK;
+    syncMore();
   }
   function persist(d) {
     if (d === cur) { dirty = true; saveNow(); } else store.set("d." + d.id, d);
@@ -2693,33 +2931,239 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     setView("write");
     toast("新稿件");
   }
+  /* ---------- drafts: 新建 / 排序 / 列表 ---------- */
+  var SORTS = ["updated", "created", "title", "manual"];
+  var suppressClick = false, drag = null, menuOpen = false, searchQ = "", searchFull = false;
+  /* Chromium (and Android System WebView) ships ICU, where Chinese collation
+     is pinyin; the 阿/波 probe rejects engines that only have codepoint order. */
+  var pinyin = (function () {
+    function mk(loc) {
+      try { return new Intl.Collator(loc, { sensitivity: "base", numeric: true, usage: "sort" }); }
+      catch (e) { return null; }
+    }
+    var c = mk("zh-Hans-CN-u-co-pinyin") || mk("zh-Hans-CN") || mk("zh");
+    return c && c.compare("阿", "波") < 0 ? c : null;
+  })();
+  function draftTitle(d) { return d.title.trim() || firstHeading(d.body); }
+  function pinyinCompare(a, b) { return pinyin ? pinyin.compare(a, b) : 0; }
+  function cmpTitle(a, b) {
+    var ta = draftTitle(a), tb = draftTitle(b);
+    if (!ta || !tb) return ta ? -1 : tb ? 1 : 0;
+    var r = pinyinCompare(ta, tb);
+    return r || (ta === tb ? 0 : ta < tb ? -1 : 1);
+  }
+  function cmpUpdated(a, b) { return (b.updated || 0) - (a.updated || 0); }
+  function cmpCreated(a, b) { return (b.created || 0) - (a.created || 0); }
+  function rankOf(d) {
+    return d.sortRank == null || !isFinite(d.sortRank) ? -(d.created || 0) : d.sortRank;
+  }
+  function cmpManual(a, b) { return rankOf(a) - rankOf(b) || cmpUpdated(a, b); }
+  function cmpCategory(a, b) {
+    var ca = catOf(a), cb = catOf(b), r = pinyinCompare(ca, cb);
+    return r || (ca === cb ? 0 : ca < cb ? -1 : 1);
+  }
+  function sortCmp() {
+    return prefs.sort === "created" ? cmpCreated : prefs.sort === "title" ? cmpTitle
+      : prefs.sort === "manual" ? cmpManual : cmpUpdated;
+  }
+  function isSticky(d) { return !!d.pinned && !d.archived; }
+  function draftMatches(d, q) {
+    if (!q) return true;
+    var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return true;
+    var hay = searchFull
+      ? (draftTitle(d) + "\n" + d.body + "\n" + (d.tags || []).join(" ") + "\n" + catOf(d)).toLowerCase()
+      : draftTitle(d).toLowerCase();
+    return terms.every(function (t) { return hay.indexOf(t) >= 0; });
+  }
+  function plainPara(p) {
+    return p.replace(/^ {0,3}(?:#{1,6}|>|[-*+]|\d+[.)])\s+/gm, "")
+      .replace(/^ {0,3}```.*$/gm, "").replace(/\s+/g, " ").trim();
+  }
+  function hlTerms(text, terms) {
+    var re = new RegExp(terms.map(function (t) { return t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|"), "gi");
+    var out = "", last = 0, m;
+    while ((m = re.exec(text))) {
+      out += esc(text.slice(last, m.index)) + "<mark>" + esc(m[0]) + "</mark>";
+      last = m.index + m[0].length;
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+    return out + esc(text.slice(last));
+  }
+  /* 全文模式：在命中的段落里截一段前后文，并把关键词标出来。 */
+  function draftSnippet(d, q) {
+    if (!searchFull || !q) return "";
+    var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return "";
+    var paras = d.body.replace(/\r\n?/g, "\n").split(/\n{2,}/).map(plainPara).filter(Boolean);
+    var best = "", bestScore = 0;
+    for (var i = 0; i < paras.length; i++) {
+      var low = paras[i].toLowerCase(), score = 0;
+      for (var k = 0; k < terms.length; k++) if (low.indexOf(terms[k]) >= 0) score++;
+      if (score > bestScore) { best = paras[i]; bestScore = score; }
+    }
+    if (!best) return "";
+    var lowBest = best.toLowerCase(), at = -1;
+    terms.forEach(function (t) {
+      var p = lowBest.indexOf(t);
+      if (p >= 0 && (at < 0 || p < at)) at = p;
+    });
+    if (at < 0) at = 0;
+    var start = Math.max(0, at - 36), end = Math.min(best.length, at + 120);
+    var text = best.slice(start, end).trim();
+    if (start > 0) text = "…" + text;
+    if (end < best.length) text += "…";
+    return '<span class="drow-snip">' + hlTerms(text, terms) + "</span>";
+  }
+  function visibleDrafts() {
+    var list = allDrafts().filter(function (d) {
+      if (prefs.filter === "archived") { if (!d.archived) return false; }
+      else if (d.archived) return false;
+      return draftMatches(d, searchQ);
+    });
+    var cmp = sortCmp();
+    return list.sort(function (a, b) {
+      if (prefs.filter !== "archived" && isSticky(a) !== isSticky(b)) return isSticky(a) ? -1 : 1;
+      return cmp(a, b);
+    });
+  }
+  function persistDraft(d) {
+    if (d === cur) { dirty = true; saveNow(); } else store.set("d." + d.id, d);
+  }
+  function setMenu(open) {
+    var pop = $("#d-menu-pop"), btn = $("#d-menu");
+    if (!pop || !btn) return;
+    pop.hidden = !open;
+    btn.setAttribute("aria-expanded", String(open));
+    menuOpen = !!open;
+  }
+  function syncDraftTools() {
+    if (SORTS.indexOf(prefs.sort) < 0) prefs.sort = "updated";
+    if (prefs.filter !== "archived") prefs.filter = "all";
+    $("#d-sort").value = prefs.sort;
+    var title = $("#sh-drafts-t");
+    if (title) title.textContent = prefs.filter === "archived" ? "归档" : "稿件";
+    var menu = $("#d-menu"), back = $("#d-back"), isArch = prefs.filter === "archived";
+    if (menu) menu.hidden = isArch;
+    if (back) back.hidden = !isArch;
+    if (isArch) setMenu(false);
+  }
+  function syncMore() {
+    var t = "", bad = "";
+    try { t = tok.get(); bad = tokBad; } catch (e) { /* token not ready */ }
+    var el = $("#more-tok");
+    if (el) el.textContent = !t ? "未设置" : bad ? "不可用" : "已设置";
+    syncThemeBtn();
+  }
+  function draftBadges(d, active) {
+    return (active ? '<span class="badge ink">编辑中</span>' : "") +
+      (d.src ? '<span class="badge">线上</span>' : "") +
+      (d.draft ? '<span class="badge">DRAFT</span>' : "") +
+      (d.exported && d.exported >= d.updated ? '<span class="badge">已导出</span>' : "") +
+      (d.pub && d.pub.number ? '<span class="badge">PR #' + esc(d.pub.number) + "</span>" : "");
+  }
+  function draftRow(d) {
+    var t = draftTitle(d), active = !!cur && cur.id === d.id, arch = prefs.filter === "archived";
+    var btns = arch
+      ? '<button class="drow-pin" type="button" data-act="restore" aria-label="恢复到全部稿件">恢复</button>' +
+        '<button class="drow-arc is-danger" type="button" data-act="del" aria-label="删除">删除</button>'
+      : '<button class="drow-pin' + (d.pinned ? " is-on" : "") + '" type="button" data-act="pin" aria-label="' +
+          (d.pinned ? "取消置顶" : "置顶") + '">' + (d.pinned ? "取消置顶" : "置顶") + "</button>" +
+        '<button class="drow-arc" type="button" data-act="archive" aria-label="归档">归档</button>';
+    return '<div class="drow' + (active ? " is-active" : "") + (d.pinned && !arch ? " is-pinned" : "") +
+      '" data-id="' + esc(d.id) + '">' +
+      '<button class="drow-main" type="button" data-act="open">' +
+      '<span class="drow-t' + (t ? "" : " is-empty") + '">' + esc(t || "无标题稿件") + "</span>" +
+      '<span class="drow-m"><span>posts/' + esc(catOf(d)) + "</span><span>" + proseCount(d.body) + " 字</span><span>" +
+      relTime(d.updated) + "</span>" + draftBadges(d, active) + "</span>" + draftSnippet(d, searchQ) + "</button>" + btns + "</div>";
+  }
   function renderDrafts() {
-    var list = allDrafts();
-    if (cur && list.every(function (d) { return d.id !== cur.id; })) list.unshift(cur);
-    $("#drafts-sub").textContent = list.length + " 篇";
-    $("#draft-list").innerHTML = list.map(function (d) {
-      var t = d.title.trim() || firstHeading(d.body);
-      var active = cur && d.id === cur.id;
-      return '<div class="drow' + (active ? " is-active" : "") + '" data-id="' + d.id + '">' +
-        '<button class="drow-main" type="button" data-act="open"><span class="drow-t' + (t ? "" : " is-empty") + '">' + esc(t || "无标题稿件") + "</span>" +
-        '<span class="drow-m"><span>posts/' + esc(catOf(d)) + "</span><span>" + proseCount(d.body) + " 字</span><span>" + relTime(d.updated) + "</span>" +
-        (active ? '<span class="badge ink">编辑中</span>' : "") + (d.src ? '<span class="badge">线上</span>' : "") +
-        (d.draft ? '<span class="badge">DRAFT</span>' : "") +
-        (d.exported && d.exported >= d.updated ? '<span class="badge">已导出</span>' : "") +
-        (d.pub && d.pub.number ? '<span class="badge">PR #' + esc(d.pub.number) + "</span>" : "") + "</span></button>" +
-        '<button class="drow-del" type="button" data-act="del" aria-label="删除">删除</button></div>';
-    }).join("");
+    syncDraftTools();
+    var list = visibleDrafts(), all = allDrafts();
+    var arch = all.filter(function (d) { return d.archived; }).length;
+    var sticky = all.filter(function (d) { return d.pinned && !d.archived; }).length;
+    var clear = $("#d-search-clear");
+    if (clear) clear.hidden = !searchQ;
+    $("#drafts-sub").textContent = searchQ
+      ? (list.length ? list.length + " 个结果" : "没有匹配")
+      : prefs.filter === "archived"
+        ? (list.length ? list.length + " 篇" : "没有归档")
+        : (list.length ? list.length + " 篇" : "没有稿件") + (sticky ? " · 置顶 " + sticky : "") + (arch ? " · 归档 " + arch : "");
+    if (!list.length) {
+      var hint = searchQ ? "没有找到匹配「" + esc(searchQ) + "」的稿件。"
+        : prefs.filter === "archived" ? "没有归档的稿件。点稿件行尾的「归档」就会出现在这里。"
+        : "还没有稿件，点左上角「新建」开始写。";
+      $("#draft-list").innerHTML = '<p class="note">' + hint + "</p>";
+      return;
+    }
+    $("#draft-list").innerHTML = list.map(draftRow).join("");
+  }
+  function normalizeManual() {
+    var list = visibleDrafts(), seen = {};
+    list.forEach(function (d) { seen[d.id] = 1; });
+    var rest = allDrafts().filter(function (d) { return !seen[d.id]; }).sort(cmpManual);
+    list.concat(rest).forEach(function (d, i) {
+      if (d.sortRank === i) return;
+      d.sortRank = i;
+      persistDraft(d);
+    });
+  }
+  function reorderDrafts(id, target) {
+    var list = visibleDrafts().map(function (d) { return d.id; });
+    var from = list.indexOf(id);
+    if (from < 0) return;
+    list.splice(from, 1);
+    target = Math.max(0, Math.min(target, list.length));
+    list.splice(target, 0, id);
+    var seen = {};
+    list.forEach(function (x, i) {
+      var d = loadDraft(x);
+      if (!d) return;
+      seen[x] = 1;
+      if (d.sortRank === i) return;
+      d.sortRank = i;
+      persistDraft(d);
+    });
+    allDrafts().filter(function (d) { return !seen[d.id]; }).sort(cmpManual)
+      .forEach(function (d, i) { d.sortRank = list.length + i; persistDraft(d); });
+    renderDrafts();
   }
   $("#draft-list").addEventListener("click", function (e) {
+    if (suppressClick) { suppressClick = false; return; }
     var btn = e.target.closest("[data-act]");
     if (!btn) return;
-    var id = btn.closest(".drow").dataset.id;
-    if (btn.dataset.act === "open") {
+    var row = btn.closest(".drow");
+    if (!row) return;
+    var id = row.dataset.id, act = btn.dataset.act;
+    if (act === "open") {
       if (!cur || id !== cur.id) { var d = loadDraft(id); if (d) openDraft(d); }
       hideSheet(false);
       setView("write");
       return;
     }
+    var target = cur && cur.id === id ? cur : loadDraft(id);
+    if (!target) return;
+    if (act === "pin") {
+      target.pinned = !target.pinned;
+      persistDraft(target);
+      renderDrafts();
+      return;
+    }
+    if (act === "archive") {
+      target.archived = true;
+      persistDraft(target);
+      renderDrafts();
+      toast("已归档，右上角 ⋯ → 查看归档文章");
+      return;
+    }
+    if (act === "restore") {
+      target.archived = false;
+      persistDraft(target);
+      renderDrafts();
+      toast("已恢复到全部稿件");
+      return;
+    }
+    if (act !== "del") return;
     if (!btn.classList.contains("is-armed")) {
       btn.classList.add("is-armed"); btn.textContent = "确认删除";
       setTimeout(function () { if (btn.isConnected) { btn.classList.remove("is-armed"); btn.textContent = "删除"; } }, 3000);
@@ -2727,32 +3171,151 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     }
     removeDraft(id);
     if (cur && cur.id === id) {
-      var rest = allDrafts();
+      var rest2 = allDrafts();
       cur = null;
-      openDraft(rest[0] || blankDraft(), true);
-      if (!rest.length) { dirty = true; saveNow(); }
+      openDraft(rest2[0] || blankDraft(), true);
+      if (!rest2.length) { dirty = true; saveNow(); }
     }
     $("#draft-n").textContent = index.ids.length;
     renderDrafts();
     toast("已删除");
   });
-  $("#btn-new").addEventListener("click", newDraft);
-  $("#btn-wipe").addEventListener("click", function () {
-    var b = this;
-    if (!b.classList.contains("is-armed")) {
-      b.classList.add("is-armed"); b.textContent = "再点一次：删除 " + index.ids.length + " 篇稿件";
-      setTimeout(function () { b.classList.remove("is-armed"); b.textContent = "清空本机全部稿件"; }, 3500);
-      return;
-    }
-    index.ids.slice().forEach(removeDraft);
-    b.classList.remove("is-armed"); b.textContent = "清空本机全部稿件";
-    cur = null;
-    dirty = true;
-    openDraft(blankDraft(), true);
-    saveNow();
-    renderDrafts();
-    toast("已清空");
+  function resetSearch() {
+    searchQ = "";
+    searchFull = false;
+    var q = $("#d-search"), full = $("#d-search-full"), clear = $("#d-search-clear");
+    if (q) { q.value = ""; q.placeholder = "搜索标题"; }
+    if (full) full.setAttribute("aria-pressed", "false");
+    if (clear) clear.hidden = true;
+  }
+  $("#d-menu").addEventListener("click", function () { setMenu(!menuOpen); });
+  document.addEventListener("click", function (e) {
+    if (menuOpen && !(e.target.closest && e.target.closest(".dmenu"))) setMenu(false);
   });
+  $("#d-menu-pop").addEventListener("click", function () { setMenu(false); });
+  $("#d-archived").addEventListener("click", function () {
+    prefs.filter = "archived";
+    store.set("prefs", prefs);
+    setMenu(false);
+    resetSearch();
+    renderDrafts();
+  });
+  $("#d-back").addEventListener("click", function () {
+    prefs.filter = "all";
+    store.set("prefs", prefs);
+    resetSearch();
+    renderDrafts();
+  });
+  (function bindSearch() {
+    var input = $("#d-search"), clear = $("#d-search-clear"), full = $("#d-search-full"), timer = 0;
+    if (!input || !clear) return;
+    if (full) full.addEventListener("click", function () {
+      searchFull = !searchFull;
+      full.setAttribute("aria-pressed", String(searchFull));
+      input.placeholder = searchFull ? "搜索全文" : "搜索标题";
+      renderDrafts();
+      input.focus();
+    });
+    input.addEventListener("input", function () {
+      clear.hidden = !input.value;
+      clearTimeout(timer);
+      timer = setTimeout(function () { searchQ = input.value.trim(); renderDrafts(); }, 140);
+    });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.isComposing) {
+        e.preventDefault();
+        clearTimeout(timer);
+        searchQ = input.value.trim();
+        renderDrafts();
+        input.blur();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = ""; searchQ = ""; clear.hidden = true; renderDrafts();
+      }
+    });
+    clear.addEventListener("click", function () {
+      input.value = ""; searchQ = ""; clear.hidden = true; renderDrafts(); input.focus();
+    });
+  })();
+  $("#d-sort").addEventListener("change", function () {
+    var next = this.value;
+    if (SORTS.indexOf(next) < 0 || next === prefs.sort) return;
+    if (next === "manual") { normalizeManual(); toast("手动排序：长按稿件拖动调整顺序"); }
+    prefs.sort = next;
+    store.set("prefs", prefs);
+    renderDrafts();
+  });
+  /* 手动排序：长按一行后拖动；上移 / 下移按钮已移除。 */
+  (function bindDrag() {
+    var list = $("#draft-list");
+    function canDrag() { return prefs.sort === "manual" && prefs.filter !== "archived"; }
+    function targetIndex(y) {
+      var idx = 0;
+      for (var i = 0; i < drag.rows.length; i++) {
+        if (drag.rows[i] === drag.row) continue;
+        var b = drag.rows[i].getBoundingClientRect();
+        if (y > b.top + b.height / 2) idx++;
+      }
+      return idx;
+    }
+    function start() {
+      if (!drag || !canDrag()) return;
+      drag.active = true;
+      drag.row.classList.add("is-dragging");
+      list.classList.add("is-dragging");
+      drag.rows = $$(".drow", list);
+      var visible = visibleDrafts(), pinned = 0, isPin = false, id = drag.row.dataset.id;
+      visible.forEach(function (d) {
+        if (isSticky(d)) pinned++;
+        if (d.id === id) isPin = isSticky(d);
+      });
+      drag.group = isPin ? "pin" : "plain";
+      drag.min = isPin ? 0 : pinned;
+      drag.max = isPin ? Math.max(0, pinned - 1) : Math.max(drag.min, drag.rows.length - 1);
+    }
+    list.addEventListener("touchstart", function (e) {
+      if (!canDrag() || e.touches.length !== 1) return;
+      var row = e.target.closest(".drow");
+      if (!row || e.target.closest(".drow-pin, .drow-arc")) return;
+      var t = e.touches[0];
+      drag = { row: row, y0: t.clientY, timer: 0, active: false, moved: false, target: null };
+      drag.timer = setTimeout(start, 260);
+    }, { passive: true });
+    list.addEventListener("touchmove", function (e) {
+      if (!drag) return;
+      var t = e.touches[0], dy = t.clientY - drag.y0;
+      if (!drag.active) {
+        if (Math.abs(dy) > 8) { clearTimeout(drag.timer); drag = null; }
+        return;
+      }
+      e.preventDefault();
+      drag.moved = true;
+      drag.row.style.transform = "translateY(" + dy + "px)";
+      drag.target = Math.max(drag.min, Math.min(drag.max, targetIndex(t.clientY)));
+      var others = drag.rows.filter(function (r) { return r !== drag.row; });
+      $$(".drow.is-target", list).forEach(function (r) { r.classList.remove("is-target"); });
+      var mark = others[drag.target] || others[others.length - 1];
+      if (mark) mark.classList.add("is-target");
+    }, { passive: false });
+    function end(cancel) {
+      if (!drag) return;
+      clearTimeout(drag.timer);
+      if (drag.active) {
+        drag.row.style.transform = "";
+        drag.row.classList.remove("is-dragging");
+        list.classList.remove("is-dragging");
+        $$(".drow.is-target", list).forEach(function (r) { r.classList.remove("is-target"); });
+        if (!cancel && drag.moved && drag.target != null) reorderDrafts(drag.row.dataset.id, drag.target);
+        suppressClick = true;
+        setTimeout(function () { suppressClick = false; }, 400);
+      }
+      drag = null;
+    }
+    list.addEventListener("touchend", function () { end(false); });
+    list.addEventListener("touchcancel", function () { end(true); });
+  })();
+  $("#btn-new").addEventListener("click", newDraft);
   $("#btn-import").addEventListener("click", function () { $("#file-in").click(); });
   $("#file-in").addEventListener("change", function () {
     var f = this.files && this.files[0];
@@ -2772,7 +3335,10 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   /* ================= theme ================= */
   function syncThemeBtn() {
     var dark = document.documentElement.dataset.theme === "dark";
-    $("#btn-theme").textContent = "外观：" + (dark ? "深色" : "浅色");
+    var more = $("#more-theme");
+    if (more) more.textContent = dark ? "深色" : "浅色";
+    var btn = $("#btn-theme");
+    if (btn) btn.setAttribute("aria-label", "外观：" + (dark ? "深色" : "浅色"));
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = dark ? "#17181a" : "#f7f7f7";
   }
@@ -2802,6 +3368,11 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   openDraft(start, true);
   if (dirty) saveNow();
   if (prefs.view && prefs.view !== "write") setView(prefs.view);
+  if (!prefs.gestureHint && coarse.matches) {
+    prefs.gestureHint = 1;
+    store.set("prefs", prefs);
+    setTimeout(function () { toast("左右滑动可切换 信息 / 写作 / 预览"); }, 700);
+  }
 
   try { localStorage.setItem(PFX + "probe", "1"); localStorage.removeItem(PFX + "probe"); }
   catch (e) { setSave("err", "无法本地保存"); toast("此浏览器禁止本地存储，内容不会自动保存"); }
