@@ -393,6 +393,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   padding: 8px; background-color: var(--panel); background-image: radial-gradient(var(--hairline) 1px, transparent 1px);
   background-size: 10px 10px; font: 10.5px/1.5 var(--mono); color: var(--mute); text-align: center; word-break: break-all;
 }
+.card-img img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
 .card-note { margin: 18px 0 0; font: 12px/1.7 var(--sans); color: var(--mute); }
 
 /* ---------- dock ---------- */
@@ -438,6 +439,12 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   flex: none; height: 48px; padding: 0 16px; border: 0; background: var(--ink); color: var(--paper);
   font: 700 13px/1 var(--mono); letter-spacing: .08em;
 }
+.fk-img {
+  flex: none; width: 52px; height: 48px; display: flex; align-items: center; justify-content: center;
+  border: 0; border-left: 2px solid var(--ink); background: var(--hl-bg); color: var(--ink);
+}
+.fk-img:active { background: var(--ink); color: var(--paper); }
+.fk-img .pix { width: 18px; height: 15px; }
 .app.is-fine .fk-done { display: none; }
 
 /* ---------- sheets ---------- */
@@ -565,6 +572,77 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
 .mrow:last-of-type { border-bottom: 0; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .two.one { grid-template-columns: 1fr; }
+
+/* ---------- image manager ---------- */
+.img-body { display: flex; flex-direction: column; gap: 12px; }
+.img-bar { display: flex; gap: 8px; }
+.img-bar .pbtn { flex: 1; min-height: 38px; padding: 0 8px; box-shadow: none; font: 700 12px/1 var(--mono); }
+.img-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.img-grid[hidden] { display: none; }
+.img-cell {
+  min-width: 0; padding: 4px; border: 2px solid var(--hairline); background: var(--paper);
+  text-align: left; color: var(--ink);
+}
+.img-cell:active { border-color: var(--ink); }
+.img-cell img { display: block; width: 100%; height: 84px; object-fit: cover; background: var(--panel); border: 1px solid var(--hairline); }
+.img-cell b { display: block; margin-top: 5px; overflow: hidden; font: 400 9.5px/1.3 var(--mono); color: var(--text); white-space: nowrap; text-overflow: ellipsis; }
+.img-cell small { display: block; margin-top: 2px; font: 400 9px/1.2 var(--mono); color: var(--mute); }
+.img-empty { padding: 28px 14px; border: 2px dashed var(--hairline); text-align: center; font: 12px/1.8 var(--mono); color: var(--mute); }
+.img-editor { display: flex; flex-direction: column; gap: 10px; }
+.img-editor[hidden] { display: none; }
+.img-ed-head { display: flex; align-items: center; gap: 10px; }
+.img-back { flex: none; border: 0; background: none; padding: 0; font: 700 12px/1 var(--mono); color: var(--text); }
+.img-ed-head b { flex: 1; min-width: 0; overflow: hidden; text-align: right; font: 400 11px/1.35 var(--mono); color: var(--text); white-space: nowrap; text-overflow: ellipsis; }
+.img-rename-row { display: flex; gap: 8px; }
+.img-rename-row[hidden] { display: none; }
+.img-rename-row input {
+  flex: 1; min-width: 0; height: 38px; padding: 0 8px; border: 2px solid var(--ink); border-radius: 0;
+  background: var(--paper); color: var(--ink); font: 400 12px/1 var(--mono);
+}
+.img-rename-row button { flex: none; min-width: 58px; padding: 0 8px; }
+.img-stage {
+  position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  min-height: 170px; max-height: 46vh; border: 2px solid var(--ink); background: var(--panel); touch-action: none;
+}
+.img-stage canvas { display: block; max-width: 100%; }
+.img-crop { position: absolute; border: 2px solid var(--accent); background: rgba(26, 115, 232, .13); pointer-events: none; }
+.img-crop[hidden] { display: none; }
+.img-tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.img-tool {
+  min-height: 38px; border: 2px solid var(--ink); background: var(--paper);
+  font: 400 12px/1.2 var(--sans); color: var(--ink);
+}
+.img-tool:active, .img-tool.on { background: var(--ink); color: var(--paper); }
+.img-tool[hidden] { display: none; }
+.img-row { display: flex; align-items: center; gap: 10px; }
+.img-label { flex: none; font: 700 10px/1 var(--mono); letter-spacing: .1em; color: var(--mute); }
+.img-row select {
+  flex: 1; min-width: 0; height: 36px; padding: 0 6px; border: 2px solid var(--ink);
+  border-radius: 0; background: var(--paper); color: var(--ink); font: 400 12px/1 var(--mono);
+}
+.img-info { flex: none; font: 400 10px/1.35 var(--mono); color: var(--mute); white-space: nowrap; }
+.img-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.img-actions .pbtn { min-height: 38px; box-shadow: none; }
+.img-actions .img-wide { grid-column: 1 / -1; }
+.img-actions #img-del { grid-column: 1 / -1; }
+.img-hint { margin-top: 0; }
+.ex-imgs { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 0; }
+.ex-img {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 8px;
+  border: 2px solid var(--hairline); background: var(--paper);
+}
+.ex-img img { flex: none; width: 44px; height: 34px; object-fit: cover; border: 1px solid var(--hairline); background: var(--panel); }
+.ex-img span { flex: 1; min-width: 0; overflow: hidden; font: 400 10.5px/1.35 var(--mono); color: var(--text); white-space: nowrap; text-overflow: ellipsis; }
+.ex-img button {
+  flex: none; min-height: 32px; padding: 0 10px; border: 2px solid var(--ink); background: var(--paper);
+  font: 700 10.5px/1 var(--mono); color: var(--ink);
+}
+html.is-vault [data-k="img"] { display: none; }
+@media (max-width: 380px) {
+  .img-grid { grid-template-columns: repeat(2, 1fr); }
+  .img-cell img { height: 74px; }
+}
+
 
 .help ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
 .help li { counter-increment: s; position: relative; padding: 0 0 18px 40px; font: 14.5px/1.75 var(--sans); color: var(--ink); }
@@ -791,12 +869,12 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
         <button class="fk" type="button" data-k="quote" aria-label="引用">&gt;</button>
         <button class="fk sep" type="button" data-k="fence" aria-label="代码块">```</button>
         <button class="fk" type="button" data-k="link" aria-label="链接">[]()</button>
-        <button class="fk" type="button" data-k="img" aria-label="图片">![]</button>
         <button class="fk" type="button" data-k="wiki" aria-label="站内引用">[[ ]]</button>
         <button class="fk sep" type="button" data-k="hr" aria-label="分隔线">—</button>
         <button class="fk" type="button" data-k="outdent" aria-label="减少缩进">⇤</button>
         <button class="fk" type="button" data-k="indent" aria-label="增加缩进">⇥</button>
       </div>
+      <button class="fk-img" type="button" id="btn-fmt-img" data-k="img" aria-label="插入图片" title="插入图片（图片库）"><span class="pix" data-pix="img"></span></button>
       <button class="fk-done" type="button" id="btn-done">完成</button>
     </div>
     <nav class="tabs" aria-label="视图">
@@ -820,6 +898,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       <div class="file-stat" id="ex-stat"></div>
     </div>
     <div id="ex-notes"></div>
+    <div id="ex-images"></div>
     <div class="stack" style="margin-top:18px">
       <button class="pbtn primary block" type="button" id="btn-download"><span class="pix" data-pix="export"></span>下载 .md 文件</button>
       <div class="two">
@@ -837,6 +916,63 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     <p class="note" id="pub-lock">发布需要仓库主人在<b>这台设备</b>上设置 GitHub 令牌。没有令牌也能照常写作、预览和导出；页面不会替任何人申请或获得仓库权限。</p>
     <ol class="steps" id="pub-steps" hidden></ol>
     <div id="pub-out"></div>
+  </div>
+</section>
+
+<section class="sheet" id="sheet-images" role="dialog" aria-modal="true" aria-labelledby="sh-images-t">
+  <div class="sheet-h"><span id="sh-images-t">图片</span><small id="images-sub"></small><button class="x" type="button" data-close aria-label="关闭">×</button></div>
+  <div class="sheet-b img-body" id="img-body">
+    <div class="img-bar">
+      <button class="pbtn primary" type="button" id="img-camera">拍照</button>
+      <button class="pbtn" type="button" id="img-pick">相册</button>
+      <button class="pbtn" type="button" id="img-paste" hidden>粘贴</button>
+    </div>
+    <div class="img-grid" id="img-grid"></div>
+    <div class="img-empty" id="img-empty">还没有图片。拍照、从相册选择，或把图片拖进来。</div>
+    <div class="img-editor" id="img-editor" hidden>
+      <div class="img-ed-head">
+        <button class="img-back" type="button" id="img-back">‹ 全部图片</button>
+        <b id="img-name"></b>
+      </div>
+      <div class="img-rename-row" id="img-rename-row" hidden>
+        <input id="img-rename-in" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="新的图片文件名">
+        <button class="img-tool" type="button" id="img-rename-ok">确定</button>
+        <button class="img-tool" type="button" id="img-rename-cancel">取消</button>
+      </div>
+      <div class="img-stage" id="img-stage"><canvas id="img-canvas"></canvas><div class="img-crop" id="img-crop" hidden></div></div>
+      <div class="img-tools">
+        <button class="img-tool" type="button" data-img="crop" id="img-crop-tool">裁剪</button>
+        <button class="img-tool" type="button" data-img="rotl">↺ 90°</button>
+        <button class="img-tool" type="button" data-img="rotr">↻ 90°</button>
+        <button class="img-tool" type="button" data-img="fliph">水平翻转</button>
+        <button class="img-tool" type="button" data-img="flipv">垂直翻转</button>
+        <button class="img-tool" type="button" id="img-crop-apply" hidden>应用裁剪</button>
+      </div>
+      <div class="img-row">
+        <label class="img-label" for="img-long">长边</label>
+        <select id="img-long">
+          <option value="0">原尺寸</option>
+          <option value="2000">2000px</option>
+          <option value="1600">1600px</option>
+          <option value="1200">1200px</option>
+          <option value="800">800px</option>
+        </select>
+        <span class="img-info" id="img-info"></span>
+      </div>
+      <div class="img-actions">
+        <button class="pbtn primary img-wide" type="button" id="img-apply">保存修改</button>
+        <button class="pbtn" type="button" id="img-reset">撤销修改</button>
+        <button class="pbtn" type="button" id="img-insert">插入正文</button>
+        <button class="pbtn" type="button" id="img-copy">复制引用</button>
+        <button class="pbtn" type="button" id="img-cover">设为预览图</button>
+        <button class="pbtn" type="button" id="img-share">下载 / 分享</button>
+        <button class="pbtn" type="button" id="img-rename">重命名</button>
+        <button class="pbtn danger" type="button" id="img-del">删除</button>
+      </div>
+      <p class="hint img-hint">裁剪：点「裁剪」后在图上拖动选框，再点「应用裁剪」。插入的引用是 <code>![[文件名]]</code>，发布时会随文章一起上传到 <code>blogs/assets/</code>。</p>
+    </div>
+    <input type="file" id="img-file" accept="image/*" multiple hidden>
+    <input type="file" id="img-camera-in" accept="image/*" capture="environment" hidden>
   </div>
 </section>
 
@@ -904,6 +1040,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
           <button class="dmenu-btn" type="button" id="d-back" aria-label="返回全部稿件" hidden>←</button>
           <div class="dmenu-pop" id="d-menu-pop" hidden>
             <button type="button" data-open="remote">编辑线上文章<span class="go">›</span></button>
+            <button type="button" id="d-images">图片库<span class="go">›</span></button>
             <button type="button" id="d-archived">查看归档文章<span class="go">›</span></button>
             <button type="button" data-open="more">更多设置<span class="go">›</span></button>
           </div>
@@ -968,13 +1105,15 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       <li><b>交稿</b>
         <p>「导出」下载 <code>.md</code>，放到 <code>blogs/posts/分类/</code> 后提交到 <code>pilog</code> 分支即可自动部署。</p></li>
       <li><b>整理稿件</b>
-        <p>「稿件」面板顶部一行是「新建 / 排序 / 搜索 / ⋯」：排序可选编辑时间、创建时间、名称（拼音）或手动排序；搜索框会按标题、正文、标签和目录即时过滤，多个关键词用空格隔开。点 ⋯ 可以编辑线上文章、查看归档文章和打开「更多设置」。每篇稿件行尾有「置顶」和「归档」两个按钮，归档后从列表里收起；在归档列表里右上角是 ← 返回，两个按钮变成「恢复」和「删除」，删除要点两次。置顶的稿件始终排在最前面。手动排序时，长按一行再上下拖动就能调整顺序。</p></li>
+        <p>「稿件」面板顶部一行是「新建 / 排序 / 搜索 / ⋯」：排序可选编辑时间、创建时间、名称（拼音）或手动排序；搜索默认只搜标题，点输入框里的小按钮「全文」后才会连正文、标签和目录一起搜，多个关键词用空格隔开。点 ⋯ 可以编辑线上文章、查看归档文章和打开「更多设置」。每篇稿件行尾有「置顶」和「归档」两个按钮，归档后从列表里收起；在归档列表里右上角是 ← 返回，两个按钮变成「恢复」和「删除」，删除要点两次。置顶的稿件始终排在最前面。手动排序时，长按一行再上下拖动就能调整顺序。</p></li>
+      <li><b>插入图片</b>
+        <p>写作页格式栏最右边的图片图标，或「稿件 → ⋯ → 图片库」打开图片面板，可以拍照、从相册选择，或直接粘贴/拖入图片。选中图片后能裁剪、左右旋转、水平/垂直翻转，也可以把长边压到 2000/1600/1200/800px 再保存；「插入正文」会在光标处写入 <code>![[图片名]]</code>，预览里直接显示，「设为预览图」会把首页卡片图指向它。图片存在本机图片库（IndexedDB），Android App 还会额外镜像到 <code>Documents/pilog/assets/</code>。发布 PR 时会自动把用到的图片一起上传到 <code>blogs/assets/</code>。私密库里的稿件不支持图片。</p></li>
       <li><b>或者直接开 PR（仅仓库主人）</b>
         <p>在「更多设置 → GitHub 令牌」粘贴只授权 <code>Meredith2328/pilog</code> 的 fine-grained token，之后「导出 → 发布（开 PR）」会新建 <code>write/日期-文件名</code> 分支并开 PR 到 <code>pilog</code>，在 GitHub 上审阅后手动合并。</p></li>
       <li><b>修改已发布的文章</b>
         <p>文章页点「✎ 编辑」，或在「稿件 → ⋯ → 编辑线上文章」的下拉菜单中依次选择目录和文章，从 <code>pilog</code> 分支载入原文；改完发布会开一个「更新文章」PR，需要手动合并。</p></li>
     </ol>
-    <p class="hint" style="margin-top:0">预览尽量贴近博客渲染，但图片只显示占位（手机上读不到仓库里的 <code>assets/</code>），公式显示为源码。</p>
+    <p class="hint" style="margin-top:0">预览尽量贴近博客渲染：本机图片库里的图片会直接显示，仓库里已有的图片仍显示占位（手机上读不到 <code>assets/</code>），公式显示为源码。</p>
   </div>
 </section>
 
@@ -1008,7 +1147,9 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     eye: ["....####....", "..##....##..", ".#...##...#.", "#...####...#", "#...####...#",
       ".#...##...#.", "..##....##..", "....####...."],
     export: [".....##.....", ".....##.....", ".....##.....", "..#..##..#..", "...#.##.#...",
-      "....####....", ".....##.....", "#..........#", "#..........#", "############"]
+      "....####....", ".....##.....", "#..........#", "#..........#", "############"],
+    img: ["............", ".##########.", ".#........#.", ".#..##....#.", ".#..##..#.#.",
+      ".#.....##.#.", ".#..######.#", ".##########.", "............", "............"]
   };
 
   /* ================= tiny helpers ================= */
@@ -1302,6 +1443,9 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       (alt || "图片") + "</span><code>" + src + "</code></span></span>";
   }
   function imgTag(alt, src, width) {
+    var local = isRemote(src) ? "" : assetUrl(src);
+    if (local) return '<img src="' + local + '" alt="' + alt + '" data-src="' + esc(src) + '" loading="lazy"' +
+      (width ? ' style="width:' + width + 'px"' : "") + ">";
     if (!isRemote(src.replace(/&amp;/g, "&"))) return imgPh(alt, src);
     return '<img src="' + safeHref(src) + '" alt="' + alt + '" data-src="' + src + '" loading="lazy"' +
       (width ? ' style="width:' + width + 'px"' : "") + ">";
@@ -1324,6 +1468,11 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     s = esc(s);
     s = s.replace(/!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g, function (m, name, opt) {
       var w = /^\d+/.test(opt || "") ? parseInt(opt, 10) : 0;
+      var local = assetUrl(name);
+      if (local) {
+        return put('<img src="' + local + '" alt="' + esc(name.replace(/^.*\//, "")) + '" data-src="' + esc(name) + '" loading="lazy"' +
+          (w ? ' style="width:' + w + 'px"' : "") + ">");
+      }
       return put(isRemote(name) ? imgTag(name, name, w) : imgPh(name.replace(/^.*\//, ""), name + (w ? " · " + w + "px" : "")));
     });
     s = s.replace(/!\[([^\]]*)\]\(\s*(?:&lt;)?([^)\s]+?)(?:&gt;)?(?:\s+&quot;[^)]*?&quot;)?\s*\)/g, function (m, alt, u) {
@@ -1751,6 +1900,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     if (prefs.pv === "card") {
       var pre = d.preview.trim() || autoPreview(d.body);
       var img = d.previewImage.trim() || (d.featureMode === "path" ? d.featurePath.trim() : "");
+      var imgSrc = img ? assetUrl(img) : "";
       out.innerHTML = '<div class="post"><div class="card' + (d.highlight ? " is-hl" : "") + '"><div class="card-body">' +
         '<div class="card-meta"><span>' + esc(d.date || today()) + "</span>" + (d.pin ? '<span class="badge ink">置顶</span>' : "") +
         (d.draft ? '<span class="badge">DRAFT</span>' : "") + (d.hidden ? '<span class="badge">隐藏</span>' : "") +
@@ -1758,7 +1908,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
         "<h3>" + esc(title) + "</h3>" +
         '<div class="card-pre">' + (pre ? inline(pre, null) : '<span style="color:var(--mute)">（没有可截取的正文）</span>') + "</div>" +
         (d.tags.length ? '<div class="card-tags">' + d.tags.map(function (t) { return "<span>#" + esc(t) + "</span>"; }).join("") + "</div>" : "") +
-        '</div><div class="card-img">' + (img ? "IMG<br>" + esc(img) : "NO IMAGE") + "</div></div>" +
+        '</div><div class="card-img">' + (img ? (imgSrc ? '<img src="' + imgSrc + '" alt="">' : "IMG<br>" + esc(img)) : "NO IMAGE") + "</div></div>" +
         '<p class="card-note">首页卡片的近似效果。' + (d.preview.trim() ? "使用你填写的预览文本。" : "未填预览文本，按 pilog 的规则从正文截取。") +
         (d.featureMode !== "off" ? "开启 feature 后线上会整卡显示封面。" : "") + "</p></div>";
       return;
@@ -1967,10 +2117,6 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       else if (sel) replaceRange(a, b, "[" + sel + "](https://)", a + sel.length + 3, a + sel.length + 11);
       else replaceRange(a, b, "[文字](https://)", a + 1, a + 3);
     },
-    img: function () {
-      var a = body.selectionStart, b = body.selectionEnd, sel = body.value.slice(a, b) || "描述";
-      replaceRange(a, b, "![" + sel + "](assets/)", a + sel.length + 4, a + sel.length + 11);
-    },
     wiki: function () { wrap("[[", "]]", "文章标题"); },
     hr: function () { ensureBlock("---\n", 4, 0); },
     indent: function () { mapLines(function (ls) { return ls.map(function (l) { return "    " + l; }); }); },
@@ -1981,6 +2127,9 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     var k = e.target.closest(".fk");
     if (k && KEYS[k.dataset.k]) KEYS[k.dataset.k]();
   });
+  var fmtImgBtn = $("#btn-fmt-img");
+  fmtImgBtn.addEventListener("pointerdown", function (e) { e.preventDefault(); });
+  fmtImgBtn.addEventListener("click", function () { openImages(); });
   $("#btn-done").addEventListener("pointerdown", function (e) { e.preventDefault(); });
   $("#btn-done").addEventListener("click", function () { body.blur(); saveNow(); });
 
@@ -2234,6 +2383,14 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     if (d.hidden) notes.push("已勾选隐藏：不会生成页面。");
     $("#ex-notes").innerHTML = notes.length ? notes.map(function (n) { return '<p class="note">' + n + "</p>"; }).join("")
       : d.exported ? '<p class="note ok">上次导出于 ' + relTime(d.exported) + "，之后" + (d.updated > d.exported ? "有改动。" : "没有改动。") + "</p>" : "";
+    var pics = assetsForDraft(d);
+    if (!pics.length) $("#ex-images").innerHTML = "";
+    else {
+      $("#ex-images").innerHTML = '<div class="sub">图片</div><div class="ex-imgs">' + pics.map(function (r) {
+        return '<div class="ex-img"><img src="' + assetThumb(r.name) + '" alt=""><span>' + esc(r.name) + "<br>" +
+          r.w + "×" + r.h + " · " + sizeLabel(r.bytes) + '</span><button type="button" data-img-dl="' + esc(r.name) + '">下载</button></div>';
+      }).join("") + '</div><p class="hint">发布 PR 时会自动上传到 <code>blogs/assets/</code>；手动发布请先逐张下载，和 .md 一起提交。</p>';
+    }
     var share = canShareFile();
     $("#btn-share").hidden = !share;
     $("#btn-share").parentNode.classList.toggle("one", !share);
@@ -2281,6 +2438,599 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   $("#btn-copy-all").addEventListener("click", function () { copyText(buildFile(cur), "已复制完整 Markdown"); markExported(); });
   $("#btn-copy-fm").addEventListener("click", function () { copyText("---\n" + fmLines(cur).join("\n") + "\n---\n", "已复制 front matter"); });
 
+  /* ================= local image library ================= */
+  var IMG_DB = "pilog-write-assets", IMG_STORE = "assets";
+  var assets = { ready: false, error: "", list: [], refs: Object.create(null) };
+  var assetFullUrl = Object.create(null), assetThumbUrlMap = Object.create(null);
+
+  function idbOpen() {
+    return new Promise(function (resolve, reject) {
+      if (!window.indexedDB) return reject(new Error("这个浏览器不支持 IndexedDB"));
+      var req = indexedDB.open(IMG_DB, 1);
+      req.onupgradeneeded = function () {
+        var db = req.result;
+        if (!db.objectStoreNames.contains(IMG_STORE)) db.createObjectStore(IMG_STORE, { keyPath: "name" });
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error || new Error("无法打开图片库")); };
+    });
+  }
+  function idbReq(req) {
+    return new Promise(function (resolve, reject) {
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+  function idbStore(mode) {
+    return idbOpen().then(function (db) { return db.transaction(IMG_STORE, mode).objectStore(IMG_STORE); });
+  }
+  function imgAll() {
+    return idbStore("readonly").then(function (s) { return idbReq(s.getAll()); }).then(function (list) {
+      return (list || []).sort(function (a, b) { return b.created - a.created; });
+    });
+  }
+  function imgGet(name) { return idbStore("readonly").then(function (s) { return idbReq(s.get(name)); }); }
+  function imgPut(rec) { return idbStore("readwrite").then(function (s) { return idbReq(s.put(rec)); }); }
+  function imgDel(name) { return idbStore("readwrite").then(function (s) { return idbReq(s.delete(name)); }); }
+
+  function assetRec(name) {
+    var base = String(name || "").replace(/^.*\//, "");
+    return base ? assets.refs[base] || null : null;
+  }
+  function assetUrl(name) {
+    var rec = assetRec(name); if (!rec) return "";
+    if (!assetFullUrl[rec.name]) assetFullUrl[rec.name] = URL.createObjectURL(rec.blob);
+    return assetFullUrl[rec.name];
+  }
+  function assetThumb(name) {
+    var rec = assetRec(name); if (!rec) return "";
+    if (rec.thumb) {
+      if (!assetThumbUrlMap[rec.name]) assetThumbUrlMap[rec.name] = URL.createObjectURL(rec.thumb);
+      return assetThumbUrlMap[rec.name];
+    }
+    return assetUrl(rec.name);
+  }
+  function dropAssetUrls(name) {
+    if (assetFullUrl[name]) { URL.revokeObjectURL(assetFullUrl[name]); delete assetFullUrl[name]; }
+    if (assetThumbUrlMap[name]) { URL.revokeObjectURL(assetThumbUrlMap[name]); delete assetThumbUrlMap[name]; }
+  }
+  function refreshAssets() {
+    return imgAll().then(function (list) {
+      list.forEach(function (rec) { dropAssetUrls(rec.name); });
+      assets.list = list;
+      assets.refs = Object.create(null);
+      list.forEach(function (rec) { assets.refs[rec.name] = rec; });
+      assets.ready = true;
+      assets.error = "";
+      if (imageSheetOpen()) renderImageSheet();
+      if (app.dataset.view === "preview") renderPreview();
+      if ($("#sheet-export").classList.contains("is-open")) renderExport();
+      return list;
+    }).catch(function (e) {
+      assets.ready = true;
+      assets.error = e && e.message ? e.message : String(e);
+      if (imageSheetOpen()) renderImageSheet();
+      return [];
+    });
+  }
+  function bootAssets() { return refreshAssets(); }
+
+  function mirrorAsset(rec) {
+    try { if (window.__pilogMirrorAsset) window.__pilogMirrorAsset(rec.name, rec.blob); } catch (e) { /* native hook optional */ }
+  }
+  function mirrorDelete(name) {
+    try { if (window.__pilogDeleteAsset) window.__pilogDeleteAsset(name); } catch (e) { /* native hook optional */ }
+  }
+  function mirrorRename(oldName, rec) {
+    try {
+      if (window.__pilogRenameAsset) window.__pilogRenameAsset(oldName, rec.name, rec.blob);
+      else { mirrorDelete(oldName); mirrorAsset(rec); }
+    } catch (e) { /* native hook optional */ }
+  }
+
+  function loadImageEl(blob) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob), img = new Image();
+      img.onload = function () { resolve({ img: img, url: url }); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("图片解码失败")); };
+      img.src = url;
+    });
+  }
+  function canvasToBlob(canvas, type, quality) {
+    return new Promise(function (resolve, reject) {
+      canvas.toBlob(function (b) { if (b) resolve(b); else reject(new Error("图片编码失败")); }, type, quality);
+    });
+  }
+  function fitCanvas(w, h, max) {
+    var s = Math.min(1, max / Math.max(w, h));
+    return { w: Math.max(1, Math.round(w * s)), h: Math.max(1, Math.round(h * s)), s: s };
+  }
+  function thumbFromCanvas(src) {
+    var t = fitCanvas(src.width, src.height, 360);
+    var c = document.createElement("canvas"); c.width = t.w; c.height = t.h;
+    c.getContext("2d").drawImage(src, 0, 0, t.w, t.h);
+    return canvasToBlob(c, "image/jpeg", .8);
+  }
+  function sizeLabel(n) {
+    return n >= 1024 * 1024 ? (n / 1048576).toFixed(1) + " MB" : Math.round((n || 0) / 1024) + " KB";
+  }
+  function assetFileName(mime) {
+    var ext = mime === "image/png" ? "png" : "jpg";
+    var d = new Date(), p = function (n) { return (n < 10 ? "0" : "") + n; };
+    var stamp = d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+    return "img-" + stamp + "-" + Math.random().toString(36).slice(2, 6) + "." + ext;
+  }
+  async function ingestImageFile(file) {
+    if (!file || !/^image\//i.test(file.type || "")) return null;
+    var loaded = await loadImageEl(file);
+    try {
+      var size = fitCanvas(loaded.img.naturalWidth || loaded.img.width, loaded.img.naturalHeight || loaded.img.height, 2000);
+      var c = document.createElement("canvas"); c.width = size.w; c.height = size.h;
+      c.getContext("2d").drawImage(loaded.img, 0, 0, size.w, size.h);
+      var mime = /png|webp/i.test(file.type || "") ? "image/png" : "image/jpeg";
+      var blob = await canvasToBlob(c, mime, .86);
+      var thumb = await thumbFromCanvas(c);
+      var rec = {
+        name: assetFileName(mime), type: mime, blob: blob, thumb: thumb,
+        w: size.w, h: size.h, bytes: blob.size, created: Date.now(), updated: Date.now()
+      };
+      await imgPut(rec);
+      mirrorAsset(rec);
+      return rec;
+    } finally {
+      URL.revokeObjectURL(loaded.url);
+    }
+  }
+  async function ingestImageFiles(files) {
+    var list = Array.prototype.slice.call(files || []), added = 0, failed = 0, last = null;
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var rec = await ingestImageFile(list[i]);
+        if (rec) { added++; last = rec; }
+      } catch (e) { failed++; }
+    }
+    if (added) {
+      await refreshAssets();
+      toast("已导入 " + added + " 张图片" + (failed ? "，失败 " + failed : ""));
+      if (added === 1 && last) openImageEditor(last.name);
+    } else {
+      toast(failed ? "图片导入失败，请换一张试试" : "请选择图片文件");
+    }
+  }
+
+  var imgEd = null, imgCropSel = null, imgCropMode = false;
+  function imageSheetOpen() { return $("#sheet-images").classList.contains("is-open"); }
+  function openImages() {
+    if (document.documentElement.classList.contains("is-vault")) { toast("私密库暂不支持图片（图片库没有加密）"); return; }
+    showImageGallery();
+    showSheet("images");
+    refreshAssets();
+  }
+  function showImageGallery() {
+    imgEd = null; imgCropSel = null; imgCropMode = false;
+    $("#img-editor").hidden = true;
+    $("#img-crop").hidden = true;
+    $("#img-rename-row").hidden = true;
+    resetImageDelete();
+    renderImageSheet();
+  }
+  function renderImageSheet() {
+    var sub = $("#images-sub");
+    sub.textContent = assets.error ? "不可用" : assets.list.length ? assets.list.length + " 张" : "本机图片";
+    var grid = $("#img-grid"), empty = $("#img-empty");
+    if (assets.error) {
+      grid.hidden = true; empty.hidden = false;
+      empty.textContent = "图片库不可用：" + assets.error;
+      $("#img-editor").hidden = true;
+      return;
+    }
+    grid.hidden = !!imgEd;
+    empty.hidden = !!imgEd || !!assets.list.length;
+    grid.innerHTML = assets.list.map(function (rec) {
+      return '<button class="img-cell" type="button" data-img-name="' + esc(rec.name) + '">' +
+        '<img src="' + assetThumb(rec.name) + '" alt="">' +
+        '<b>' + esc(rec.name) + "</b><small>" + rec.w + "×" + rec.h + " · " + sizeLabel(rec.bytes) + "</small></button>";
+    }).join("");
+    if (!assets.list.length) empty.textContent = "还没有图片。拍照、从相册选择，或把图片拖进来。";
+  }
+  function openImageEditor(name) {
+    imgGet(name).then(function (rec) {
+      if (!rec) { toast("图片不存在"); showImageGallery(); return; }
+      loadImageEl(rec.blob).then(function (loaded) {
+        var c = document.createElement("canvas");
+        c.width = rec.w || loaded.img.naturalWidth;
+        c.height = rec.h || loaded.img.naturalHeight;
+        c.getContext("2d").drawImage(loaded.img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(loaded.url);
+        imgEd = { rec: rec, work: c, dirty: false, scale: 1 };
+        imgCropSel = null; imgCropMode = false;
+        $("#img-grid").hidden = true; $("#img-empty").hidden = true;
+        $("#img-editor").hidden = false;
+        $("#img-name").textContent = rec.name;
+        $("#img-long").value = "0";
+        $("#img-crop").hidden = true;
+        $("#img-crop-apply").hidden = true;
+        $("#img-rename-row").hidden = true;
+        resetImageDelete();
+        syncCropTool();
+        updateImageInfo();
+        imgRender();
+      }).catch(function () { toast("图片读取失败"); });
+    });
+  }
+  function updateImageInfo() {
+    if (!imgEd) return;
+    var c = imgEd.work;
+    $("#img-info").textContent = c.width + "×" + c.height + " · " + sizeLabel(imgEd.rec.bytes) + (imgEd.dirty ? " · 未保存" : "");
+  }
+  function imgRender() {
+    if (!imgEd) return;
+    var stage = $("#img-stage"), c = $("#img-canvas"), work = imgEd.work;
+    var availW = Math.max(120, stage.clientWidth - 4);
+    var availH = Math.max(140, Math.min(window.innerHeight * .38, 420));
+    var s = Math.min(availW / work.width, availH / work.height);
+    c.width = Math.max(1, Math.round(work.width * s));
+    c.height = Math.max(1, Math.round(work.height * s));
+    c.style.width = c.width + "px"; c.style.height = c.height + "px";
+    var g = c.getContext("2d");
+    g.imageSmoothingEnabled = true;
+    g.drawImage(work, 0, 0, c.width, c.height);
+    imgEd.scale = s;
+    positionCropOverlay();
+  }
+  function positionCropOverlay() {
+    var ov = $("#img-crop"), c = $("#img-canvas"), stage = $("#img-stage");
+    if (!imgEd || !imgCropSel) { ov.hidden = true; return; }
+    var cr = c.getBoundingClientRect(), sr = stage.getBoundingClientRect(), s = imgEd.scale;
+    ov.hidden = false;
+    ov.style.left = (cr.left - sr.left + imgCropSel.x * s) + "px";
+    ov.style.top = (cr.top - sr.top + imgCropSel.y * s) + "px";
+    ov.style.width = Math.max(1, imgCropSel.w * s) + "px";
+    ov.style.height = Math.max(1, imgCropSel.h * s) + "px";
+  }
+  function workPoint(clientX, clientY) {
+    var c = $("#img-canvas"), r = c.getBoundingClientRect();
+    var x = (clientX - r.left) / Math.max(1, r.width) * imgEd.work.width;
+    var y = (clientY - r.top) / Math.max(1, r.height) * imgEd.work.height;
+    return { x: Math.max(0, Math.min(imgEd.work.width, x)), y: Math.max(0, Math.min(imgEd.work.height, y)) };
+  }
+  function syncCropTool() {
+    $("#img-crop-tool").classList.toggle("on", imgCropMode);
+    $("#img-crop-apply").hidden = !imgCropSel;
+  }
+  function imgSetWork(c) {
+    if (!imgEd) return;
+    imgEd.work = c; imgEd.dirty = true;
+    imgCropSel = null; imgCropMode = false;
+    $("#img-crop").hidden = true;
+    syncCropTool(); imgRender(); updateImageInfo();
+  }
+  function imgRotate(dir) {
+    if (!imgEd) return;
+    var w = imgEd.work.width, h = imgEd.work.height;
+    var c = document.createElement("canvas"); c.width = h; c.height = w;
+    var g = c.getContext("2d");
+    g.translate(h / 2, w / 2); g.rotate(dir * Math.PI / 2);
+    g.drawImage(imgEd.work, -w / 2, -h / 2);
+    imgSetWork(c);
+  }
+  function imgFlip(horizontal) {
+    if (!imgEd) return;
+    var w = imgEd.work.width, h = imgEd.work.height;
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var g = c.getContext("2d");
+    g.translate(horizontal ? w : 0, horizontal ? 0 : h);
+    g.scale(horizontal ? -1 : 1, horizontal ? 1 : -1);
+    g.drawImage(imgEd.work, 0, 0);
+    imgSetWork(c);
+  }
+  function imgApplyCrop() {
+    if (!imgEd || !imgCropSel) return;
+    var s = imgCropSel;
+    var w = Math.max(1, Math.round(s.w)), h = Math.max(1, Math.round(s.h));
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    c.getContext("2d").drawImage(imgEd.work, Math.round(s.x), Math.round(s.y), w, h, 0, 0, w, h);
+    imgSetWork(c);
+  }
+  async function saveImageEdits() {
+    if (!imgEd) return false;
+    var long = parseInt($("#img-long").value, 10) || 0;
+    var work = imgEd.work;
+    if (long && Math.max(work.width, work.height) > long) {
+      var fit = fitCanvas(work.width, work.height, long);
+      var rc = document.createElement("canvas"); rc.width = fit.w; rc.height = fit.h;
+      rc.getContext("2d").drawImage(work, 0, 0, fit.w, fit.h);
+      work = rc;
+    }
+    var mime = /png/i.test(imgEd.rec.type || "") ? "image/png" : "image/jpeg";
+    var blob = await canvasToBlob(work, mime, .86);
+    var thumb = await thumbFromCanvas(work);
+    var rec = Object.assign({}, imgEd.rec, {
+      blob: blob, thumb: thumb, type: mime, w: work.width, h: work.height, bytes: blob.size, updated: Date.now()
+    });
+    await imgPut(rec);
+    mirrorAsset(rec);
+    imgEd.rec = rec; imgEd.work = work; imgEd.dirty = false;
+    await refreshAssets();
+    $("#img-name").textContent = rec.name;
+    updateImageInfo();
+    toast("图片已保存");
+    return true;
+  }
+  function insertImageRef(name) {
+    var ref = "![[" + name + "]]";
+    var v = body.value, a = body.selectionStart, b = body.selectionEnd;
+    var pre = a === 0 || v[a - 1] === "\n" ? (a > 1 && v[a - 2] !== "\n" ? "\n" : "") : "\n\n";
+    var post = v[b] === "\n" || b === v.length ? "" : "\n";
+    replaceRange(a, b, pre + ref + post, a + pre.length + ref.length);
+    toast("已插入图片引用");
+  }
+  function copyImageRef(rec) { copyText("![[" + rec.name + "]]", "已复制图片引用"); }
+  function downloadBlob(blob, name) {
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = name; a.rel = "noopener";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    toast("已下载 " + name);
+  }
+  function shareImage(rec) {
+    if (window.__pilogShareAsset) {
+      try {
+        Promise.resolve(window.__pilogShareAsset(rec.name, rec.blob)).catch(function () { downloadBlob(rec.blob, rec.name); });
+        return;
+      } catch (e) { /* fall back to download */ }
+    }
+    downloadBlob(rec.blob, rec.name);
+  }
+  function scanImageRefs(text) {
+    var out = [], seen = Object.create(null);
+    function add(n) {
+      n = String(n || "").trim().replace(/^.*\//, "");
+      if (!n || !assets.refs[n] || seen[n]) return;
+      seen[n] = 1; out.push(n);
+    }
+    String(text || "").replace(/!\[\[([^\]|]+?)(?:\|[^\]]*)?\]\]/g, function (m, n) { add(n); return m; });
+    String(text || "").replace(/!\[[^\]]*\]\(\s*<?([^)\s>]+)>?/g, function (m, u) { add(u); return m; });
+    return out;
+  }
+  function assetsForDraft(d) {
+    if (!d) return [];
+    var names = scanImageRefs((d.body || "") + "\n" + (d.preview || ""));
+    function fieldName(value) {
+      var base = String(value || "").trim().replace(/^.*\//, "");
+      return base && assets.refs[base] ? base : "";
+    }
+    [fieldName(d.previewImage), fieldName(d.featurePath)].forEach(function (n) {
+      if (n && names.indexOf(n) < 0) names.push(n);
+    });
+    return names.map(function (n) { return assets.refs[n]; }).filter(Boolean);
+  }
+  async function renameImage(rec, next) {
+    if (!next || next === rec.name) return;
+    var ext = (rec.name.match(/\.([A-Za-z0-9]+)$/) || [])[1] || "png";
+    var name = String(next).trim().replace(/[\\/:*?"<>|\s]+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
+    if (!name) return;
+    if (!/\.[A-Za-z0-9]+$/.test(name)) name += "." + ext;
+    if (name === rec.name) return;
+    if (assets.refs[name]) { toast("已经有同名图片"); return; }
+    var nrec = Object.assign({}, rec, { name: name, updated: Date.now() });
+    await imgPut(nrec);
+    await imgDel(rec.name);
+    var changed = 0;
+    index.ids.slice().forEach(function (id) {
+      var d = loadDraft(id); if (!d) return;
+      var bodyText = d.body.split(rec.name).join(name);
+      var preview = (d.preview || "").split(rec.name).join(name);
+      var previewImage = (d.previewImage || "").split(rec.name).join(name);
+      var featurePath = (d.featurePath || "").split(rec.name).join(name);
+      if (bodyText !== d.body || preview !== d.preview || previewImage !== d.previewImage || featurePath !== d.featurePath) {
+        d.body = bodyText; d.preview = preview; d.previewImage = previewImage; d.featurePath = featurePath;
+        d.updated = Date.now(); store.set("d." + id, d); changed++;
+      }
+    });
+    if (cur) {
+      var b = cur.body.split(rec.name).join(name);
+      if (b !== cur.body) { cur.body = b; body.value = b; }
+      cur.preview = (cur.preview || "").split(rec.name).join(name);
+      cur.previewImage = (cur.previewImage || "").split(rec.name).join(name);
+      cur.featurePath = (cur.featurePath || "").split(rec.name).join(name);
+      dirty = true; saveNow();
+    }
+    mirrorRename(rec.name, nrec);
+    await refreshAssets();
+    openImageEditor(name);
+    toast(changed ? "已重命名，并更新了 " + changed + " 篇稿件" : "已重命名");
+  }
+  function startImageRename() {
+    if (!imgEd) return;
+    var row = $("#img-rename-row"), input = $("#img-rename-in");
+    row.hidden = false;
+    input.value = imgEd.rec.name;
+    input.focus();
+    try { input.select(); } catch (e) { /* older WebView */ }
+  }
+  function cancelImageRename() { $("#img-rename-row").hidden = true; }
+  function imageRefCount(name) {
+    return index.ids.filter(function (id) {
+      var d = loadDraft(id);
+      return d && (d.body.indexOf(name) >= 0 || (d.previewImage || "").indexOf(name) >= 0);
+    }).length;
+  }
+  var imgDelArmed = false, imgDelTimer = 0;
+  function resetImageDelete() {
+    imgDelArmed = false;
+    clearTimeout(imgDelTimer);
+    var b = $("#img-del");
+    if (b) { b.textContent = "删除"; b.classList.remove("is-armed"); }
+  }
+  function armImageDelete() {
+    if (!imgEd) return;
+    resetImageDelete();
+    imgDelArmed = true;
+    var b = $("#img-del");
+    b.textContent = "再点一次删除";
+    b.classList.add("is-armed");
+    var count = imageRefCount(imgEd.rec.name);
+    toast(count ? "有 " + count + " 篇稿件引用了它，再点一次确认删除" : "再点一次确认删除");
+    imgDelTimer = setTimeout(resetImageDelete, 4000);
+  }
+  async function deleteImage(rec) {
+    var count = imageRefCount(rec.name);
+    await imgDel(rec.name);
+    dropAssetUrls(rec.name);
+    mirrorDelete(rec.name);
+    imgEd = null; imgCropSel = null; imgCropMode = false;
+    resetImageDelete();
+    $("#img-editor").hidden = true;
+    await refreshAssets();
+    showImageGallery();
+    toast(count ? "已删除图片，引用它的 " + count + " 篇稿件需要手动处理" : "已删除图片");
+  }
+  (function bindImageManager() {
+    var pick = $("#img-file"), camera = $("#img-camera-in"), stage = $("#img-stage");
+    $("#img-camera").addEventListener("click", function () { camera.click(); });
+    $("#img-pick").addEventListener("click", function () { pick.click(); });
+    camera.addEventListener("change", function () { ingestImageFiles(camera.files); camera.value = ""; });
+    pick.addEventListener("change", function () { ingestImageFiles(pick.files); pick.value = ""; });
+    $("#img-grid").addEventListener("click", function (e) {
+      var cell = e.target.closest("[data-img-name]");
+      if (cell) openImageEditor(cell.dataset.imgName);
+    });
+    $("#img-back").addEventListener("click", showImageGallery);
+    $("#img-crop-tool").addEventListener("click", function () {
+      imgCropMode = !imgCropMode; imgCropSel = null;
+      $("#img-crop").hidden = true; syncCropTool();
+    });
+    $("#img-crop-apply").addEventListener("click", imgApplyCrop);
+    $$(".img-tool[data-img]").forEach(function (b) {
+      var k = b.dataset.img;
+      if (k === "crop") return;
+      b.addEventListener("click", function () {
+        if (k === "rotl") imgRotate(-1);
+        else if (k === "rotr") imgRotate(1);
+        else if (k === "fliph") imgFlip(true);
+        else if (k === "flipv") imgFlip(false);
+      });
+    });
+    var cropDrag = null;
+    stage.addEventListener("pointerdown", function (e) {
+      if (!imgEd || !imgCropMode) return;
+      var p = workPoint(e.clientX, e.clientY);
+      cropDrag = { x0: p.x, y0: p.y };
+      imgCropSel = { x: p.x, y: p.y, w: 1, h: 1 };
+      try { stage.setPointerCapture(e.pointerId); } catch (err) { /* older WebView */ }
+      e.preventDefault();
+      positionCropOverlay();
+    });
+    stage.addEventListener("pointermove", function (e) {
+      if (!cropDrag || !imgEd) return;
+      var p = workPoint(e.clientX, e.clientY);
+      imgCropSel = {
+        x: Math.min(cropDrag.x0, p.x), y: Math.min(cropDrag.y0, p.y),
+        w: Math.abs(p.x - cropDrag.x0), h: Math.abs(p.y - cropDrag.y0)
+      };
+      positionCropOverlay();
+    });
+    stage.addEventListener("pointerup", function () {
+      if (!cropDrag) return;
+      cropDrag = null;
+      if (!imgCropSel || imgCropSel.w < 8 || imgCropSel.h < 8) imgCropSel = null;
+      syncCropTool(); positionCropOverlay();
+    });
+    stage.addEventListener("pointercancel", function () { cropDrag = null; });
+    $("#img-apply").addEventListener("click", function () {
+      saveImageEdits().catch(function (e) { toast("保存失败：" + (e.message || e)); });
+    });
+    $("#img-reset").addEventListener("click", function () { if (imgEd) openImageEditor(imgEd.rec.name); });
+    $("#img-insert").addEventListener("click", function () {
+      if (!imgEd) return;
+      var rec = imgEd.rec;
+      (imgEd.dirty ? saveImageEdits() : Promise.resolve()).then(function () {
+        insertImageRef(rec.name);
+        hideSheet(false);
+        setView("write");
+        body.focus();
+      }).catch(function (e) { toast("保存失败：" + (e.message || e)); });
+    });
+    $("#img-copy").addEventListener("click", function () { if (imgEd) copyImageRef(imgEd.rec); });
+    $("#img-cover").addEventListener("click", function () {
+      if (!imgEd) return;
+      cur.previewImage = "assets/" + imgEd.rec.name;
+      var fimg = $("#f-pimg");
+      if (fimg) fimg.value = cur.previewImage;
+      dirty = true;
+      saveNow();
+      updateDerived();
+      toast("已设为首页卡片预览图");
+    });
+    $("#img-share").addEventListener("click", function () { if (imgEd) shareImage(imgEd.rec); });
+    $("#img-rename").addEventListener("click", startImageRename);
+    $("#img-rename-cancel").addEventListener("click", cancelImageRename);
+    $("#img-rename-ok").addEventListener("click", function () {
+      if (!imgEd) return;
+      var rec = imgEd.rec, input = $("#img-rename-in");
+      cancelImageRename();
+      renameImage(rec, input.value).catch(function (e) { toast("重命名失败：" + (e.message || e)); });
+    });
+    $("#img-rename-in").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.isComposing) {
+        e.preventDefault();
+        $("#img-rename-ok").click();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        cancelImageRename();
+      }
+    });
+    $("#img-del").addEventListener("click", function () {
+      if (!imgEd) return;
+      if (imgDelArmed) deleteImage(imgEd.rec).catch(function (e) { toast("删除失败：" + (e.message || e)); });
+      else armImageDelete();
+    });
+    $("#img-long").addEventListener("change", updateImageInfo);
+    $("#ex-images").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-img-dl]");
+      var rec = b && assets.refs[b.dataset.imgDl];
+      if (rec) shareImage(rec);
+    });
+    $("#sheet-images").addEventListener("click", function (e) {
+      if (e.target.closest("[data-close]")) showImageGallery();
+    });
+    var sheet = $("#sheet-images");
+    sheet.addEventListener("dragover", function (e) { if (e.dataTransfer && e.dataTransfer.types && Array.prototype.indexOf.call(e.dataTransfer.types, "Files") >= 0) e.preventDefault(); });
+    sheet.addEventListener("drop", function (e) {
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        e.preventDefault();
+        ingestImageFiles(e.dataTransfer.files);
+      }
+    });
+    document.addEventListener("paste", function (e) {
+      if (!imageSheetOpen()) return;
+      var items = (e.clipboardData && e.clipboardData.items) || [], files = [];
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].type && /^image\//.test(items[i].type)) {
+          var f = items[i].getAsFile();
+          if (f) files.push(f);
+        }
+      }
+      if (files.length) { e.preventDefault(); ingestImageFiles(files); }
+    });
+    if (navigator.clipboard && navigator.clipboard.read) {
+      $("#img-paste").hidden = false;
+      $("#img-paste").addEventListener("click", function () {
+        navigator.clipboard.read().then(function (items) {
+          items.forEach(function (it) {
+            it.types.forEach(function (t) {
+              if (!/^image\//.test(t)) return;
+              it.getType(t).then(function (b) { ingestImageFiles([new File([b], "clipboard.png", { type: t })]); }).catch(function () {});
+            });
+          });
+        }).catch(function () { toast("剪贴板里没有图片或没有读取权限"); });
+      });
+    }
+    window.addEventListener("resize", function () { if (imageSheetOpen() && imgEd) imgRender(); });
+  })();
+
   /* ================= publish (GitHub PR) =================
      Browser-only: the owner's fine-grained token lives in this device's
      storage and is sent to api.github.com and nowhere else (the CSP meta
@@ -2312,7 +3062,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   };
   var tokBad = "", tokOk = false, pubBusy = false, pubPending = null;
   var PUB_LOCK = $("#pub-lock").innerHTML;
-  var STEPS = ["验证令牌与仓库", "准备 write/ 分支", "写入文件", "打开 PR"];
+  var STEPS = ["验证令牌与仓库", "准备 write/ 分支", "上传图片", "写入文件", "打开 PR"];
 
   function maskToken(t) {
     if (t.length < 12) return "…";
@@ -2369,6 +3119,32 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
     return btoa(bin);
   }
+  function blobB64(blob) {
+    return blob.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf), bin = "";
+      for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+      return btoa(bin);
+    });
+  }
+  /* 把本机图片作为二进制文件写进同一个 write 分支，和 Markdown 一起进 PR。 */
+  async function uploadPlanAssets(plan, branch) {
+    var items = plan.assets || [], uploaded = 0;
+    for (var i = 0; i < items.length; i++) {
+      var rec = assets.refs[items[i].name];
+      if (!rec) continue;
+      var path = "blogs/assets/" + rec.name;
+      var content = await blobB64(rec.blob);
+      var existing = await ghMaybe("GET", repoApi("/contents/" + encPath(path) + "?ref=" + encodeURIComponent(branch)));
+      if (existing && existing.type && existing.type !== "file") throw new GhError(422, path + " 在仓库里不是文件");
+      if (existing && String(existing.content || "").replace(/\s+/g, "") === content) continue;
+      await ghReq("PUT", repoApi("/contents/" + encPath(path)), {
+        message: "asset: " + (existing ? "更新" : "新增") + "图片 " + rec.name,
+        content: content, branch: branch, sha: existing ? existing.sha : undefined
+      });
+      uploaded++;
+    }
+    return uploaded;
+  }
 
   function branchSlug(d) {
     var s = slugOf(d).normalize("NFKD").replace(/[^\w.-]+/g, "-").replace(/[._-]{2,}/g, "-")
@@ -2402,7 +3178,10 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     return {
       path: path, file: file, src: !!src,
       branch: "write/" + (src ? src.day + "-edit-" : (d.date || today()) + "-") + branchSlug(d),
-      title: d.title.trim() || firstHeading(d.body) || slugOf(d), errors: errors, warns: warns
+      title: d.title.trim() || firstHeading(d.body) || slugOf(d), errors: errors, warns: warns,
+      assets: assetsForDraft(d).map(function (r) {
+        return { name: r.name, w: r.w, h: r.h, bytes: r.bytes };
+      })
     };
   }
   function prTitle(plan, update) { return (update ? "更新文章：" : "新文章：") + plan.title; }
@@ -2415,6 +3194,8 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       "- 标签：" + (d.tags.length ? d.tags.map(function (t) { return "`" + t.replace(/`/g, "'") + "`"; }).join(" ") : "无"),
       "- 字数：" + proseCount(d.body)
     ];
+    if (plan.assets && plan.assets.length)
+      L.push("- 图片：" + plan.assets.map(function (a) { return "`blogs/assets/" + a.name + "`"; }).join("、"));
     if (plan.src) L.push("- 来源：从 `" + GH.base + "` 载入原文后在写作页修改（载入时文件 blob `" + String(d.src.sha).slice(0, 7) + "`）");
     if (d.draft) L.push("", "> [!WARNING]", "> `draft: true`：合并后这篇也不会进入构建。");
     if (d.hidden) L.push("", "> [!NOTE]", "> `hidden: true`：合并后不会生成页面。");
@@ -2517,6 +3298,8 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
         await ghReq("POST", repoApi("/git/refs"), { ref: "refs/heads/" + branch, sha: base.object.sha });
       }
       k = 2; renderSteps(2, "run");
+      var uploaded = await uploadPlanAssets(plan, branch);
+      k = 3; renderSteps(3, "run");
       var content = b64utf8(plan.file);
       var existing = await ghMaybe("GET", repoApi("/contents/" + encPath(plan.path) + "?ref=" + encodeURIComponent(branch)));
       if (existing && existing.type && existing.type !== "file") throw new GhError(422, plan.path + " 在仓库里不是文件");
@@ -2527,7 +3310,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
           content: content, branch: branch, sha: existing ? existing.sha : undefined
         });
       }
-      k = 3; renderSteps(3, "run");
+      k = 4; renderSteps(4, "run");
       var update = !!onBase;
       var open = await ghReq("GET", repoApi("/pulls?state=open&base=" + GH.base + "&head=" + encodeURIComponent(GH.owner + ":" + branch)));
       var pr = open && open[0], reused = !!pr;
@@ -2537,7 +3320,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
       d.pub = { branch: branch, path: plan.path, url: pr.html_url, number: pr.number, at: Date.now() };
       persist(d);
       pubBox("ok", "PR #" + esc(pr.number) + (reused ? " 已更新" : " 已打开"),
-        "<p>" + (same ? "文件内容没有变化。" : "") + "<code>" + esc(branch) + "</code> → <code>" + GH.base +
+        "<p>" + (uploaded ? "上传了 " + uploaded + " 张图片。" : "") + (same ? "文件内容没有变化。" : "") + "<code>" + esc(branch) + "</code> → <code>" + GH.base +
         "</code>。在 GitHub 上审阅后手动合并，合并后自动部署。</p>" +
         plan.warns.map(function (x) { return '<p class="note">' + x + "</p>"; }).join("") +
         '<a class="url" id="pub-url" href="' + esc(pr.html_url) + '" target="_blank" rel="noopener noreferrer">' + esc(pr.html_url) + "</a>" +
@@ -3189,6 +3972,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     if (clear) clear.hidden = true;
   }
   $("#d-menu").addEventListener("click", function () { setMenu(!menuOpen); });
+  $("#d-images").addEventListener("click", function () { setMenu(false); openImages(); });
   document.addEventListener("click", function (e) {
     if (menuOpen && !(e.target.closest && e.target.closest(".dmenu"))) setMenu(false);
   });
@@ -3367,6 +4151,7 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
   if (!start) { start = blankDraft(); dirty = true; }
   openDraft(start, true);
   if (dirty) saveNow();
+  bootAssets();
   if (prefs.view && prefs.view !== "write") setView(prefs.view);
   if (!prefs.gestureHint && coarse.matches) {
     prefs.gestureHint = 1;
@@ -3407,7 +4192,16 @@ details.more .in { padding: 4px 14px 16px; border-top: 1px solid var(--hairline)
     render: renderMarkdown, build: function () { return buildFile(cur); }, parse: parseFile, current: function () { return cur; },
     plan: function () { var p = publishPlan(cur); p.prTitle = prTitle(p, false); p.prBody = prBody(p, cur, false); return p; },
     publish: publish, load: loadRemote, fromRemote: fromRemote, normPath: normPath,
-    buildOf: buildFile, pathOf: pathOf
+    buildOf: buildFile, pathOf: pathOf,
+    images: {
+      open: openImages,
+      list: function () {
+        return assets.list.map(function (r) { return { name: r.name, w: r.w, h: r.h, bytes: r.bytes, type: r.type }; });
+      },
+      ready: function () { return assets.ready; },
+      scan: function (text) { return scanImageRefs(text); }, insert: insertImageRef,
+      editor: function () { return imgEd && { name: imgEd.rec.name, w: imgEd.work.width, h: imgEd.work.height, dirty: imgEd.dirty }; }
+    }
   };
 })();
 </script>
