@@ -130,7 +130,7 @@
     <h1 class="post-title">一个最简 Coding Agent 的完整解剖——结合 pi 的架构与真实会话数据</h1>
     <div class="post-meta">
       <time datetime="2026-08-17T00:00:00">2026-08-17</time>
-      <span class="post-stats">42594 字 · 约 95 分钟</span>
+      <span class="post-stats">42668 字 · 约 95 分钟</span>
       
       <a class="tag-chip" href="../../../index.html#tag=Agent">#Agent</a>
       
@@ -900,6 +900,19 @@ if (timedOut) throw new Error(`timeout:${timeout}`);
 <p>重复压缩的边界处理很见功力：第二次压缩的摘要范围从<strong>上一次的 <code>firstKeptEntryId</code></strong> 开始算，而不是从上一个压缩条目开始——这样上次幸存下来的消息这次也会被纳入摘要，不会出现"既没被摘要、又没被保留"的幽灵区间。</p>
 <p>除了阈值触发的 compaction，还有手动 <code>/compact [instructions]</code>（可以给摘要加聚焦指令，<code>enabled: false</code> 也照样能用），以及一套独立的分支摘要机制：<code>/tree</code> 导航到另一条分支时，pi 会提议把"你正在离开的那条分支"（从旧叶子回到共同祖先的路径）总结成 <code>BranchSummaryEntry</code> 追加到新位置——三段式（找共同祖先 → 沿路径收集 → 按 token 预算从最新优先纳入）和 compaction 同构，等于把"压缩"复用成了"换脑子"。</p>
 <p>本质都是同一个取舍：压缩保住了会话的续航，代价是细节的永久丢失，只能靠结构化摘要（尤其是文件清单和关键决策）缓解。会话文件里逐条记录的 <code>usage</code> 在这里派上第二个用场：<code>tokensBefore</code> 加上逐条 usage 就能监控 token 增长曲线，决定阈值调松还是调紧。</p>
+<h3 id="codex-的会话管理-一组不变量">Codex 的会话管理：一组不变量</h3>
+<p>pi 的会话是一条 append-only 的消息流，边界由文件本身保证；Codex 的做法可以先用一组不变量说清楚：</p>
+<pre class="highlight" data-lang="text"><code class="language-text">不变量：
+用户消息数量 = turn数量 = ModelClientSession数量
+
+多个turn共享同一个ModelClient
+
+普通对话一定全部遵守上述不变量关系
+
+steer和goal仅仅只是在这个不变量关系基础上做了局部优化：
+- steer消息可以复用已有的turn而不创建新的turn
+- goal消息不来自用户消息，但是也可以自己创建turn
+</code></pre>
 <h2 id="七-权限与安全-信任要分层">七、权限与安全：信任要分层</h2>
 <p>先说一个会颠覆直觉的事实：<strong>pi 没有内置的 permissions/allow 规则系统，也没有沙箱</strong>（settings.json 里根本不存在 <code>permissions.allow</code> 这类字段，官方 security.md 明说 "It is not a sandbox"）。它的安全模型比传闻的简单得多，也诚实得多——两条防线，各管一段。</p>
 <p>第一条是<strong>目录信任</strong>（<code>trust-manager.js</code>）。存储文件 <code>~/.pi/agent/trust.json</code> 的结构简单到极致：<code>{ "规范化绝对路径": true | false }</code>，值只允许布尔。查找不是 glob 也不是前缀匹配，而是从当前目录<strong>逐级向上找最近的已登记祖先</strong>：</p>
